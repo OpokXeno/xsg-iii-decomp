@@ -1247,11 +1247,32 @@ def notes_block(result):
     return f'{NOTES_BEGIN}\n{render_notes(result)}\n{NOTES_END}'
 
 
+# The plain README form (the user's choice on X2 since 2026-11-05): no marker block,
+# only the headline line above the table. The headline is then the whole check.
+HEADLINE_RE = re.compile(r'(?m)^Recovered [\d,]+ of [\d,]+ in-scope game function\(s\) \([\d.]+%\)\.$')
+
+
+def render_headline(result):
+    return render_notes(result).split('\n', 1)[0]
+
+
+def readme_headline(text):
+    """The headline line above the table of a README without a marker block, or None."""
+    match = readme_table(text)
+    if match is None:
+        return None
+    found = None
+    for found in HEADLINE_RE.finditer(text, 0, match.start()):
+        pass
+    return found
+
+
 def notes_are_current(text, result):
     """True when the README marker block agrees with what this tree can check."""
     notes = readme_notes(text)
     if notes is None:
-        return False
+        headline = readme_headline(text)
+        return headline is not None and headline.group(0) == render_headline(result)
     wanted = notes_block(result)
     if notes.group(0) == wanted:
         return True
@@ -1268,7 +1289,12 @@ def update_readme(text, result, rendered_table):
         return None
     block = notes_block(result)
     notes = readme_notes(text)
-    if notes is not None and notes.end() <= match.start():
+    headline = readme_headline(text) if notes is None else None
+    if headline is not None:
+        # The plain form stays plain: only the headline and the table change.
+        text = text[:headline.start()] + render_headline(result) + text[headline.end():]
+        match = readme_table(text)
+    elif notes is not None and notes.end() <= match.start():
         text = text[:notes.start()] + block + text[notes.end():]
         match = readme_table(text)
     elif notes is not None:
@@ -1310,6 +1336,9 @@ def readme_is_exact(text, result, rendered_table):
     if match.group(0).rstrip('\n') != rendered_table:
         return False
     notes = readme_notes(text)
+    if notes is None:
+        headline = readme_headline(text)
+        return headline is not None and headline.group(0) == render_headline(result)
     return notes is not None and notes.group(0) == notes_block(result)
 
 
