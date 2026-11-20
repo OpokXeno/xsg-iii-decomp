@@ -1,0 +1,97 @@
+# Build every file, compare it with the original, and publish the objdiff
+# progress report for bytematch.dev, which reads the `<version>_report` artifact of
+# successful pushes to the default branch.  Originals and toolchains stay on the
+# private runner; the artifact is the report only.
+name: Verified progress report
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: progress-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    # Never run untrusted fork PR code on the machine holding private inputs.
+    if: github.repository == 'OpokXeno/xsg-iii-decomp' && github.ref == 'refs/heads/master'
+    runs-on: [self-hosted, linux, xenosaga3-ee]
+    timeout-minutes: 30
+    defaults:
+      run:
+        # Legacy GCC allocation can change codegen with Linux's mmap layout.
+        shell: setarch linux32 -L bash --noprofile --norc -e -o pipefail {0}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Build, link and compare the four EE files
+        run: |
+          : "${XENO_GAME_DIR:?Set this in the runner service environment}"
+          : "${XENO_TOOLCHAIN_DIR:?Set this in the runner service environment}"
+          : "${XENO_SPLAT_PYTHON:?Set this in the runner service environment}"
+          python3 -B configure.py
+          ninja -j4 gate
+
+      - name: Write the objdiff project
+        run: python3 -B tools/tu/objdiff_project.py
+
+      - name: Generate the report with the pinned objdiff-cli
+        run: |
+          python3 -B - <<'PY'
+          import hashlib, json, os, pathlib, time, urllib.request
+          pin = json.loads(pathlib.Path('config/report-tools.json').read_text())['objdiff-cli']
+          path = pathlib.Path(os.environ['RUNNER_TEMP']) / 'objdiff-cli'
+          # The self-hosted runner keeps the verified binary between runs, so a
+          # GitHub download outage (HTTP 504 on 2026-11-09) does not fail the job.
+          cache = pathlib.Path(os.environ['RUNNER_TOOL_CACHE']) / 'objdiff-cli' / pin['version'] / 'objdiff-cli'
+          def verified(data):
+              return hashlib.sha256(data).hexdigest() == pin['sha256']
+          data = cache.read_bytes() if cache.is_file() else None
+          if data is None or not verified(data):
+              data = None
+              # Two routes to the same release asset; the API one is served apart.
+              routes = [(pin['url'], {}), (pin['api_url'], {'Accept': 'application/octet-stream'})]
+              for attempt in range(4):
+                  for url, headers in routes:
+                      try:
+                          request = urllib.request.Request(url, headers=headers)
+                          with urllib.request.urlopen(request, timeout=60) as response:
+                              candidate = response.read()
+                      except OSError as error:
+                          print(f'objdiff-cli: {url}: {error}', flush=True)
+                          continue
+                      if not verified(candidate):
+                          raise SystemExit(f'objdiff-cli hash mismatch from {url}')
+                      data = candidate
+                      break
+                  if data is not None:
+                      break
+                  time.sleep(15 * (attempt + 1))
+              if data is None:
+                  raise SystemExit('objdiff-cli: no route served the pinned binary')
+              cache.parent.mkdir(parents=True, exist_ok=True)
+              partial = cache.with_name(cache.name + '.partial')
+              partial.write_bytes(data)
+              partial.replace(cache)
+          path.write_bytes(data)
+          path.chmod(0o755)
+          PY
+          # A unit is complete only when its code and data both fully match: the
+          # first report measures that, the second one is published.
+          "$RUNNER_TEMP/objdiff-cli" report generate --project build/objdiff --output build/report-first.json
+          python3 -B tools/tu/objdiff_complete.py --project build/objdiff --report build/report-first.json
+          "$RUNNER_TEMP/objdiff-cli" report generate --project build/objdiff --output build/report.json
+
+      - name: Upload progress report
+        uses: actions/upload-artifact@v4
+        with:
+          name: SLUS_213.89_report
+          path: build/report.json
+          if-no-files-found: error

@@ -1,0 +1,36 @@
+{
+ "schema": "originals/1",
+ "note": [
+  "The four EE files this repository rebuilds byte for byte.  They come from",
+  "your own copy of the game and are never distributed here: point XENO_GAME_DIR",
+  "at the folder holding them (default: game/extracted-iso).",
+  "This is the NTSC-U release; a different release has different hashes and this",
+  "source does not reproduce it.",
+  "Disc 2 boots SLUS_214.17, byte-identical to SLUS_213.89; OV01.OVL, OV02.OVL, OV04.OVL",
+  "and the IOP/ directory are identical on both discs, so one extracted disc is enough."
+ ],
+ "revision": "slus-21389-bec09b76fd56",
+ "region": "NTSC-U",
+ "units": {
+  "main": {
+   "file": "SLUS_213.89",
+   "size": 4513232,
+   "sha256": "bec09b76fd56a146695954d55b05dec646ac606ed805c9b5287227c37746d99c"
+  },
+  "ov01": {
+   "file": "OV01.OVL",
+   "size": 26120,
+   "sha256": "22a13c815d146edee0ce0d8f10a36026f342421c9151baf0bf938509d9f9c18d"
+  },
+  "ov02": {
+   "file": "OV02.OVL",
+   "size": 303468,
+   "sha256": "806e81feef2fb490a1f4aa96e8f912c56be50b53cec9d8ca2725a0878f7689b3"
+  },
+  "ov04": {
+   "file": "OV04.OVL",
+   "size": 263996,
+   "sha256": "630910794db85125ed82590223bed8ef95ab272da6eae28d1140238ca9197788"
+  }
+ }
+}

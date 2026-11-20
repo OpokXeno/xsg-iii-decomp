@@ -1,0 +1,5 @@
+{
+ "doc": "C-owned data runs carved out of scaffold data pieces: the jump tables and literals a recovered C function generates (tools/tu/data_carve.py, docs/tu-build.md \"Data ownership\"). Written by tools/worker.py (private), tools/review_stage.py (private) and tools/tu_publish.py (published).",
+ "schema": "tu-data-carves/1",
+ "tus": {}
+}
