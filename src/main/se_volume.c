@@ -1,0 +1,77 @@
+#include "common.h"
+#include "shared.h"
+
+/* Sound levels run from 0 to SOUND_LEVEL_MAX. */
+#define SOUND_LEVEL_MAX 0x7F
+
+#include "main/tu018.h"
+
+int seVolumeCurve(int level);
+int seVolumeRampSet(VolumeRamp *ramp, int level, int step);
+int seVolumeRampStep(VolumeRamp *ramp);
+
+extern short seVolumeCurveTable[];
+extern short seVolumeCurveTable[36];
+
+int seVolumeCurve(int level)
+{
+    int fraction = level & 3;
+    int value;
+
+    if (level < SOUND_LEVEL_MAX && fraction != 0) {
+        int point = seVolumeCurveTable[level >> 2];
+        int next = seVolumeCurveTable[(level + 4) >> 2];
+
+        value = point + (((next - point) * fraction) >> 2);
+    } else {
+        value = seVolumeCurveTable[level >> 2];
+        if (level >= SOUND_LEVEL_MAX) {
+            value = 0;
+        }
+    }
+    return value;
+}
+
+/* Starts a ramp toward level, moving by step per seVolumeRampStep call (in the right
+ * direction); step 0 jumps there at once and returns the new level, otherwise -1. The
+ * level is read back as the stored (8-bit) target. */
+int seVolumeRampSet(VolumeRamp *ramp, int level, int step)
+{
+    ramp->target = level;
+    if (step == 0) {
+        ramp->current = level;
+        ramp->step = 0;
+        return ramp->target;
+    }
+    if (ramp->target == ramp->current) {
+        return -1;
+    }
+    if (ramp->target < ramp->current) {
+        ramp->step = -step;
+    } else {
+        ramp->step = step;
+    }
+    return -1;
+}
+
+/* One ramp step: moves current by step and stops at the target (or at the ends of the level
+ * range); returns the new level, or -1 when the ramp is not moving. */
+int seVolumeRampStep(VolumeRamp *ramp)
+{
+    int step;
+    int next_value;
+
+    step = ramp->step;
+    if (step != 0) {
+        next_value = ramp->current;
+        next_value += step;
+        if ((step < 0 && next_value < ramp->target) || (step > 0 && next_value > ramp->target)
+            || next_value < 0 || next_value > SOUND_LEVEL_MAX) {
+            next_value = ramp->target;
+            ramp->step = 0;
+        }
+        ramp->current = next_value;
+        return next_value;
+    }
+    return -1;
+}

@@ -120,6 +120,22 @@ XRG_CLIP_NOPS_IDENTITIES = frozenset({
     ('ov12', 'ov12/tu086', '_CalcPosOnScreen'),
     ('ov12', 'ov12/tu086', '_CalcPosOnScreenFloat'),
 })
+# The X3 functions whose original hand-written VU0/COP1 block keeps its own integer, branch,
+# label and directive lines (user decision 2026-11-20, verbatim: "Admite las formas de esas
+# funciones"; tools/match.py `hand_asm_block_c`, docs/ee-hand-asm.md). Identity-bound: every
+# other hardware block keeps refusing integer/control-flow asm.
+HAND_ASM_BLOCK_IDENTITIES = frozenset({
+    ('main', 'main/tu047', '_CurBoxVisible'),             # .set noat
+    ('main', 'main/tu048', '_ModelCalcClipMat1'),         # bc1f 1f
+    ('main', 'main/tu049', '_ModelCalcClipMat1Xy'),       # bc1f 1f
+    ('main', 'main/tu234', 'MMathRotTransPersClip'),      # ori $9, $0, 0x8000
+    ('main', 'main/tu235', 'MMathMatrixBetweenVectors'),  # li.s $f9, 0.01 not fed to mfc1
+    ('main', 'main/tu352', 'mapStoreEdgePlanes'),         # jal mapTriangleEdgePlanes
+    ('main', 'main/tu352', 'mapPointOutsideTriangle'),    # nop and its own branches
+})
+# The one `ee-interrupt-handler-return` function that keeps the SDK ExitHandler's single
+# "sync\n\tei" statement (user decision 2026-11-20, tools/match.py `handler_return_combined_c`).
+HANDLER_RETURN_COMBINED_IDENTITY = ('main', 'main/tu021', 'soundVSyncCallback')
 # The one function identity whose TU may spell `__attribute__((packed))` on its
 # TU-local byte enum typedefs (user decision 2026-10-28 on main/tu125): the gp
 # byte stores GameMovieInit makes through pointer locals need a non-char,
@@ -1171,6 +1187,9 @@ def admission(cls, tu_class=None, *, unit=None, tu_id=None, function=None):
                     else match.vu0_i_immediate_c)
         # User decisions 2026-11-04: these original clip sequences keep three EE
         # nops that vnop cannot encode, for these identities only.
+        if (unit, tu_id, function) in HAND_ASM_BLOCK_IDENTITIES:
+            return (match.hand_asm_block_native_ti_c if tu_class == 'native-ti'
+                    else match.hand_asm_block_c)
         if (unit, tu_id, function) in XRG_CLIP_NOPS_IDENTITIES:
             return (match.xrg_clip_nops_native_ti_c if tu_class == 'native-ti'
                     else match.xrg_clip_nops_c)
@@ -1227,6 +1246,9 @@ def admission(cls, tu_class=None, *, unit=None, tu_id=None, function=None):
         # A single sync/sync.l/sync.p asm statement (user decision 2026-11-08).
         return match.sync_barrier_native_ti_c if tu_class == 'native-ti' else match.sync_barrier_c
     if cls == 'ee-interrupt-handler-return':
+        if (unit, tu_id, function) == HANDLER_RETURN_COMBINED_IDENTITY:
+            return (match.handler_return_combined_native_ti_c if tu_class == 'native-ti'
+                    else match.handler_return_combined_c)
         # sync plus the handler's ei (user decision 2026-11-08).
         return match.handler_return_native_ti_c if tu_class == 'native-ti' else match.handler_return_c
     raise AuditError(f'unknown source class {cls!r}')

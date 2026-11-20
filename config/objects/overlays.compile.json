@@ -128,23 +128,23 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov01/tu001/func_00A80008.s",
+      "asm/nonmatchings/ov01/tu001/device_check_sync.s",
       "asm/nonmatchings/ov01/tu001/func_00A80050.s",
-      "asm/nonmatchings/ov01/tu001/func_00A800C8.s",
+      "asm/nonmatchings/ov01/tu001/hdd_check.s",
       "asm/nonmatchings/ov01/tu001/func_00A800D0.s",
       "asm/nonmatchings/ov01/tu001/func_00A800F8.s",
       "asm/nonmatchings/ov01/tu001/func_00A804A0.s",
       "asm/nonmatchings/ov01/tu001/func_00A80668.s",
-      "asm/nonmatchings/ov01/tu001/func_00A80898.s",
+      "asm/nonmatchings/ov01/tu001/logoDrawCreditBand.s",
       "asm/nonmatchings/ov01/tu001/func_00A80A28.s",
-      "asm/nonmatchings/ov01/tu001/func_00A80D90.s",
+      "asm/nonmatchings/ov01/tu001/titleGroupMinus2Dummy.s",
       "asm/nonmatchings/ov01/tu001/func_00A80D98.s",
-      "asm/nonmatchings/ov01/tu001/func_00A80EA8.s",
+      "asm/nonmatchings/ov01/tu001/titleFrameHookDummy.s",
       "asm/nonmatchings/ov01/tu001/func_00A80EB0.s",
       "asm/nonmatchings/ov01/tu001/func_00A80EF8.s",
       "asm/nonmatchings/ov01/tu001/func_00A81020.s",
       "asm/nonmatchings/ov01/tu001/func_00A810A0.s",
-      "asm/nonmatchings/ov01/tu001/func_00A814D0.s",
+      "asm/nonmatchings/ov01/tu001/titleFadeTransition.s",
       "asm/nonmatchings/ov01/tu001/func_00A816A8.s",
       "asm/nonmatchings/ov01/tu001/func_00A81718.s"
      ],
@@ -308,7 +308,7 @@
     {
      "ordinal": 1,
      "id": "ov02/tu001_00a81558",
-     "name": "tu001",
+     "name": "boost_gauge",
      "text": [
       "0x00a81558",
       "0x00a81920"
@@ -325,8 +325,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu001.c",
-     "object": "build/src/ov02/tu001.o",
+     "source": "src/ov02/boost_gauge.c",
+     "object": "build/src/ov02/boost_gauge.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -353,18 +353,18 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu001/func_00A81558.s",
-      "asm/nonmatchings/ov02/tu001/func_00A815B0.s",
-      "asm/nonmatchings/ov02/tu001/func_00A815D8.s",
-      "asm/nonmatchings/ov02/tu001/func_00A81600.s",
-      "asm/nonmatchings/ov02/tu001/func_00A81618.s",
-      "asm/nonmatchings/ov02/tu001/func_00A81740.s",
-      "asm/nonmatchings/ov02/tu001/func_00A81770.s",
-      "asm/nonmatchings/ov02/tu001/func_00A817C8.s",
-      "asm/nonmatchings/ov02/tu001/func_00A817F8.s",
-      "asm/nonmatchings/ov02/tu001/func_00A81868.s",
-      "asm/nonmatchings/ov02/tu001/func_00A818A0.s",
-      "asm/nonmatchings/ov02/tu001/func_00A818D0.s"
+      "asm/nonmatchings/ov02/boost_gauge/func_00A81558.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A815B0.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A815D8.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A81600.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A81618.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A81740.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A81770.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A817C8.s",
+      "asm/nonmatchings/ov02/boost_gauge/boostGaugeAddProgress.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A81868.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A818A0.s",
+      "asm/nonmatchings/ov02/boost_gauge/func_00A818D0.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -1057,7 +1057,7 @@
     {
      "ordinal": 12,
      "id": "ov02/tu012_00a859a0",
-     "name": "tu012",
+     "name": "scene_load",
      "text": [
       "0x00a859a0",
       "0x00a86508"
@@ -1074,8 +1074,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu012.c",
-     "object": "build/src/ov02/tu012.o",
+     "source": "src/ov02/scene_load.c",
+     "object": "build/src/ov02/scene_load.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -1102,31 +1102,31 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu012/func_00A859A0.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85A20.s",
-      "asm/nonmatchings/ov02/tu012/ov01StepChainStart.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85A78.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85A88.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85B38.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85B50.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85C68.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85CB0.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85CF0.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85D30.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85D78.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85E10.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85E70.s",
-      "asm/nonmatchings/ov02/tu012/func_00A85FE0.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86108.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86190.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86200.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86268.s",
-      "asm/nonmatchings/ov02/tu012/func_00A862B0.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86340.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86388.s",
-      "asm/nonmatchings/ov02/tu012/func_00A863C0.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86408.s",
-      "asm/nonmatchings/ov02/tu012/func_00A86490.s"
+      "asm/nonmatchings/ov02/scene_load/func_00A859A0.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85A20.s",
+      "asm/nonmatchings/ov02/scene_load/ov01StepChainStart.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85A78.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85A88.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85B38.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85B50.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85C68.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85CB0.s",
+      "asm/nonmatchings/ov02/scene_load/ov01StepAwaitLoads.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85D30.s",
+      "asm/nonmatchings/ov02/scene_load/ov01StepSceneScript.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85E10.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85E70.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A85FE0.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86108.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86190.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86200.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86268.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A862B0.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86340.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86388.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A863C0.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86408.s",
+      "asm/nonmatchings/ov02/scene_load/func_00A86490.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -1464,7 +1464,7 @@
     {
      "ordinal": 18,
      "id": "ov02/tu018_00a88a08",
-     "name": "tu018",
+     "name": "mons_slot",
      "text": [
       "0x00a88a08",
       "0x00a88e28"
@@ -1481,8 +1481,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu018.c",
-     "object": "build/src/ov02/tu018.o",
+     "source": "src/ov02/mons_slot.c",
+     "object": "build/src/ov02/mons_slot.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -1509,27 +1509,27 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu018/func_00A88A08.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88A18.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88AE0.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88B38.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88B40.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88B50.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88B88.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88BA8.s",
-      "asm/nonmatchings/ov02/tu018/monsSlotCreate.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88C08.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88C58.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88CB0.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88CE0.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88CF8.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88D10.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88D20.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88D30.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88D48.s",
-      "asm/nonmatchings/ov02/tu018/func_00A88D80.s",
-      "asm/nonmatchings/ov02/tu018/rnd.s",
-      "asm/nonmatchings/ov02/tu018/ov01RollPercent.s"
+      "asm/nonmatchings/ov02/mons_slot/func_00A88A08.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88A18.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88AE0.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88B38.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88B40.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88B50.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88B88.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88BA8.s",
+      "asm/nonmatchings/ov02/mons_slot/monsSlotCreate.s",
+      "asm/nonmatchings/ov02/mons_slot/monsSlotNew.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88C58.s",
+      "asm/nonmatchings/ov02/mons_slot/monsSlotRelease.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88CE0.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88CF8.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88D10.s",
+      "asm/nonmatchings/ov02/mons_slot/func_00A88D20.s",
+      "asm/nonmatchings/ov02/mons_slot/monsActiveSlotsGet.s",
+      "asm/nonmatchings/ov02/mons_slot/monsSlotInsert.s",
+      "asm/nonmatchings/ov02/mons_slot/monsSlotRemove.s",
+      "asm/nonmatchings/ov02/mons_slot/rnd.s",
+      "asm/nonmatchings/ov02/mons_slot/ov01RollPercent.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -1603,7 +1603,7 @@
     {
      "ordinal": 20,
      "id": "ov02/tu020_00a89128",
-     "name": "tu020",
+     "name": "data_vpad",
      "text": [
       "0x00a89128",
       "0x00a89f50"
@@ -1620,8 +1620,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu020.c",
-     "object": "build/src/ov02/tu020.o",
+     "source": "src/ov02/data_vpad.c",
+     "object": "build/src/ov02/data_vpad.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -1648,31 +1648,31 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu020/func_00A89128.s",
-      "asm/nonmatchings/ov02/tu020/func_00A891F0.s",
-      "asm/nonmatchings/ov02/tu020/func_00A892E8.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89340.s",
-      "asm/nonmatchings/ov02/tu020/func_00A893B8.s",
-      "asm/nonmatchings/ov02/tu020/func_00A893E8.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89400.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89768.s",
-      "asm/nonmatchings/ov02/tu020/func_00A897A0.s",
-      "asm/nonmatchings/ov02/tu020/func_00A897C8.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89838.s",
-      "asm/nonmatchings/ov02/tu020/xglStudioMainCameraMove.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89878.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89970.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89A40.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89AB0.s",
-      "asm/nonmatchings/ov02/tu020/dataVPadReset.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89BC8.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89C68.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89D68.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89E28.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89E40.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89E58.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89E80.s",
-      "asm/nonmatchings/ov02/tu020/func_00A89EC8.s"
+      "asm/nonmatchings/ov02/data_vpad/func_00A89128.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A891F0.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A892E8.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89340.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A893B8.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A893E8.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89400.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89768.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A897A0.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A897C8.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89838.s",
+      "asm/nonmatchings/ov02/data_vpad/xglStudioMainCameraMove.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89878.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89970.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89A40.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89AB0.s",
+      "asm/nonmatchings/ov02/data_vpad/dataVPadReset.s",
+      "asm/nonmatchings/ov02/data_vpad/keyBuffClear.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89C68.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89D68.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89E28.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89E40.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89E58.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89E80.s",
+      "asm/nonmatchings/ov02/data_vpad/func_00A89EC8.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -1935,7 +1935,7 @@
       "asm/nonmatchings/ov02/tu024/func_00A8B050.s",
       "asm/nonmatchings/ov02/tu024/func_00A8B098.s",
       "asm/nonmatchings/ov02/tu024/func_00A8B110.s",
-      "asm/nonmatchings/ov02/tu024/func_00A8B128.s",
+      "asm/nonmatchings/ov02/tu024/unitRefreshPhase.s",
       "asm/nonmatchings/ov02/tu024/func_00A8B210.s"
      ],
      "accepted_asm_files": [],
@@ -1948,7 +1948,7 @@
     {
      "ordinal": 25,
      "id": "ov02/tu025_00a8b2d0",
-     "name": "tu025",
+     "name": "ov01_slot",
      "text": [
       "0x00a8b2d0",
       "0x00a8b4b0"
@@ -1965,8 +1965,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu025.c",
-     "object": "build/src/ov02/tu025.o",
+     "source": "src/ov02/ov01_slot.c",
+     "object": "build/src/ov02/ov01_slot.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -1993,15 +1993,15 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu025/func_00A8B2D0.s",
-      "asm/nonmatchings/ov02/tu025/ov01SlotClaim.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B308.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B318.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B328.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B370.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B3D8.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B440.s",
-      "asm/nonmatchings/ov02/tu025/func_00A8B498.s"
+      "asm/nonmatchings/ov02/ov01_slot/ov01SlotClear.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01SlotClaim.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01SlotRelease.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01SlotInUse.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01CallbackSlotsClear.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01CallbackSlotsRunUpdate.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01CallbackSlotsRunDraw.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01CallbackSlotClaim.s",
+      "asm/nonmatchings/ov02/ov01_slot/ov01CallbackSlotRelease.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2013,7 +2013,7 @@
     {
      "ordinal": 26,
      "id": "ov02/tu026_00a8b4b0",
-     "name": "tu026",
+     "name": "ov01_task",
      "text": [
       "0x00a8b4b0",
       "0x00a8b620"
@@ -2030,8 +2030,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu026.c",
-     "object": "build/src/ov02/tu026.o",
+     "source": "src/ov02/ov01_task.c",
+     "object": "build/src/ov02/ov01_task.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2058,10 +2058,10 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu026/ov01TaskClearAll.s",
-      "asm/nonmatchings/ov02/tu026/ov01TaskRunUpdate.s",
-      "asm/nonmatchings/ov02/tu026/ov01TaskRunDraw.s",
-      "asm/nonmatchings/ov02/tu026/ov01TaskClaim.s"
+      "asm/nonmatchings/ov02/ov01_task/ov01TaskClearAll.s",
+      "asm/nonmatchings/ov02/ov01_task/ov01TaskRunUpdate.s",
+      "asm/nonmatchings/ov02/ov01_task/ov01TaskRunDraw.s",
+      "asm/nonmatchings/ov02/ov01_task/ov01TaskClaim.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2073,7 +2073,7 @@
     {
      "ordinal": 27,
      "id": "ov02/tu027_00a8b620",
-     "name": "tu027",
+     "name": "mons_slot_run",
      "text": [
       "0x00a8b620",
       "0x00a8b7a8"
@@ -2090,8 +2090,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu027.c",
-     "object": "build/src/ov02/tu027.o",
+     "source": "src/ov02/mons_slot_run.c",
+     "object": "build/src/ov02/mons_slot_run.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2118,11 +2118,11 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu027/func_00A8B620.s",
-      "asm/nonmatchings/ov02/tu027/func_00A8B638.s",
-      "asm/nonmatchings/ov02/tu027/func_00A8B680.s",
-      "asm/nonmatchings/ov02/tu027/func_00A8B6E8.s",
-      "asm/nonmatchings/ov02/tu027/func_00A8B750.s"
+      "asm/nonmatchings/ov02/mons_slot_run/ov01TaskRelease.s",
+      "asm/nonmatchings/ov02/mons_slot_run/monsSlotClearAll.s",
+      "asm/nonmatchings/ov02/mons_slot_run/monsSlotRunUpdate.s",
+      "asm/nonmatchings/ov02/mons_slot_run/monsSlotRunDraw.s",
+      "asm/nonmatchings/ov02/mons_slot_run/monsSlotClaim.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2134,7 +2134,7 @@
     {
      "ordinal": 28,
      "id": "ov02/tu028_00a8b7a8",
-     "name": "tu028",
+     "name": "unit_side_table",
      "text": [
       "0x00a8b7a8",
       "0x00a8b9e8"
@@ -2151,8 +2151,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu028.c",
-     "object": "build/src/ov02/tu028.o",
+     "source": "src/ov02/unit_side_table.c",
+     "object": "build/src/ov02/unit_side_table.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2179,16 +2179,16 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu028/func_00A8B7A8.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B7C0.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B808.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B870.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B8D8.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B930.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B948.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B970.s",
-      "asm/nonmatchings/ov02/tu028/menuSceneUnloadAssets.s",
-      "asm/nonmatchings/ov02/tu028/func_00A8B9C0.s"
+      "asm/nonmatchings/ov02/unit_side_table/monsSlotReleaseRecord.s",
+      "asm/nonmatchings/ov02/unit_side_table/unitSideClearAll.s",
+      "asm/nonmatchings/ov02/unit_side_table/unitSideRunUpdate.s",
+      "asm/nonmatchings/ov02/unit_side_table/unitSideRunDraw.s",
+      "asm/nonmatchings/ov02/unit_side_table/unitSideClaim.s",
+      "asm/nonmatchings/ov02/unit_side_table/unitSideRelease.s",
+      "asm/nonmatchings/ov02/unit_side_table/ov01ClearTables.s",
+      "asm/nonmatchings/ov02/unit_side_table/ov01ResetAll.s",
+      "asm/nonmatchings/ov02/unit_side_table/menuSceneUnloadAssets.s",
+      "asm/nonmatchings/ov02/unit_side_table/func_00A8B9C0.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2200,7 +2200,7 @@
     {
      "ordinal": 29,
      "id": "ov02/tu029_00a8b9e8",
-     "name": "tu029",
+     "name": "obj_slot",
      "text": [
       "0x00a8b9e8",
       "0x00a8baa0"
@@ -2217,8 +2217,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu029.c",
-     "object": "build/src/ov02/tu029.o",
+     "source": "src/ov02/obj_slot.c",
+     "object": "build/src/ov02/obj_slot.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2245,10 +2245,10 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu029/ov01StackNew.s",
-      "asm/nonmatchings/ov02/tu029/func_00A8BA18.s",
-      "asm/nonmatchings/ov02/tu029/ov01StackPush.s",
-      "asm/nonmatchings/ov02/tu029/ov01StackPop.s"
+      "asm/nonmatchings/ov02/obj_slot/ov01StackNew.s",
+      "asm/nonmatchings/ov02/obj_slot/ov01StepSetNext.s",
+      "asm/nonmatchings/ov02/obj_slot/ov01StackPush.s",
+      "asm/nonmatchings/ov02/obj_slot/ov01StackPop.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2325,7 +2325,7 @@
       "asm/nonmatchings/ov02/tu030/func_00A8C468.s",
       "asm/nonmatchings/ov02/tu030/func_00A8C478.s",
       "asm/nonmatchings/ov02/tu030/func_00A8C480.s",
-      "asm/nonmatchings/ov02/tu030/func_00A8C498.s",
+      "asm/nonmatchings/ov02/tu030/dataVPadModeSet.s",
       "asm/nonmatchings/ov02/tu030/dataVPadSet.s",
       "asm/nonmatchings/ov02/tu030/func_00A8C4F8.s",
       "asm/nonmatchings/ov02/tu030/func_00A8C570.s"
@@ -2417,7 +2417,7 @@
     {
      "ordinal": 32,
      "id": "ov02/tu032_00a8cfb0",
-     "name": "tu032",
+     "name": "sb_natives",
      "text": [
       "0x00a8cfb0",
       "0x00a8d018"
@@ -2434,8 +2434,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu032.c",
-     "object": "build/src/ov02/tu032.o",
+     "source": "src/ov02/sb_natives.c",
+     "object": "build/src/ov02/sb_natives.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2462,9 +2462,9 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu032/VPadEnable.s",
-      "asm/nonmatchings/ov02/tu032/func_00A8CFD0.s",
-      "asm/nonmatchings/ov02/tu032/func_00A8CFF0.s"
+      "asm/nonmatchings/ov02/sb_natives/VPadEnable.s",
+      "asm/nonmatchings/ov02/sb_natives/VPadDisable.s",
+      "asm/nonmatchings/ov02/sb_natives/func_00A8CFF0.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2596,7 +2596,7 @@
     {
      "ordinal": 35,
      "id": "ov02/tu035_00a8d218",
-     "name": "tu035",
+     "name": "sb_natives_unit_035",
      "text": [
       "0x00a8d218",
       "0x00a8d710"
@@ -2613,8 +2613,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu035.c",
-     "object": "build/src/ov02/tu035.o",
+     "source": "src/ov02/sb_natives_unit_035.c",
+     "object": "build/src/ov02/sb_natives_unit_035.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2641,13 +2641,13 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu035/func_00A8D218.s",
-      "asm/nonmatchings/ov02/tu035/func_00A8D330.s",
-      "asm/nonmatchings/ov02/tu035/func_00A8D3C0.s",
-      "asm/nonmatchings/ov02/tu035/func_00A8D478.s",
-      "asm/nonmatchings/ov02/tu035/func_00A8D498.s",
-      "asm/nonmatchings/ov02/tu035/func_00A8D4D8.s",
-      "asm/nonmatchings/ov02/tu035/func_00A8D4E8.s"
+      "asm/nonmatchings/ov02/sb_natives_unit_035/runtimeSetFog.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_035/func_00A8D330.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_035/unitTblBodySetFog.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_035/runtimeFogPtrGet.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_035/initLight.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_035/lightBlockGet.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_035/func_00A8D4E8.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2704,7 +2704,7 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu036/func_00A8D710.s",
+      "asm/nonmatchings/ov02/tu036/unitTblBodySetLight.s",
       "asm/nonmatchings/ov02/tu036/func_00A8D7B8.s",
       "asm/nonmatchings/ov02/tu036/func_00A8D848.s",
       "asm/nonmatchings/ov02/tu036/func_00A8D858.s"
@@ -2719,7 +2719,7 @@
     {
      "ordinal": 37,
      "id": "ov02/tu037_00a8d900",
-     "name": "tu037",
+     "name": "sb_natives_unit_037",
      "text": [
       "0x00a8d900",
       "0x00a8ddb8"
@@ -2736,8 +2736,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu037.c",
-     "object": "build/src/ov02/tu037.o",
+     "source": "src/ov02/sb_natives_unit_037.c",
+     "object": "build/src/ov02/sb_natives_unit_037.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2764,18 +2764,18 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu037/func_00A8D900.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8D928.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DA50.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DB28.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DB50.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DB60.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DB88.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DBE0.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DC38.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DC78.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DCE0.s",
-      "asm/nonmatchings/ov02/tu037/func_00A8DD30.s"
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8D900.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8D928.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DA50.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DB28.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/bgmIndexGet.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DB60.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DB88.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DBE0.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DC38.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/runEffSet.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/func_00A8DCE0.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_037/batScale.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -2847,7 +2847,7 @@
     {
      "ordinal": 39,
      "id": "ov02/tu039_00a8dee8",
-     "name": "tu039",
+     "name": "sb_natives_unit_039",
      "text": [
       "0x00a8dee8",
       "0x00a8e120"
@@ -2864,8 +2864,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu039.c",
-     "object": "build/src/ov02/tu039.o",
+     "source": "src/ov02/sb_natives_unit_039.c",
+     "object": "build/src/ov02/sb_natives_unit_039.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -2892,15 +2892,15 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu039/func_00A8DEE8.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8DF40.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8DF60.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8DFC8.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8E030.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8E058.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8E080.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8E0D8.s",
-      "asm/nonmatchings/ov02/tu039/func_00A8E100.s"
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8DEE8.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8DF40.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/partsHide.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/partsShow.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8E030.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8E058.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8E080.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8E0D8.s",
+      "asm/nonmatchings/ov02/sb_natives_unit_039/func_00A8E100.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -3329,7 +3329,7 @@
       "asm/nonmatchings/ov02/tu045/func_00A91C18.s",
       "asm/nonmatchings/ov02/tu045/func_00A91D08.s",
       "asm/nonmatchings/ov02/tu045/func_00A91E78.s",
-      "asm/nonmatchings/ov02/tu045/func_00A91F78.s"
+      "asm/nonmatchings/ov02/tu045/battleStatusQueueWait.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -3662,7 +3662,7 @@
       "asm/nonmatchings/ov02/tu050/func_00A93EA0.s",
       "asm/nonmatchings/ov02/tu050/func_00A93EA8.s",
       "asm/nonmatchings/ov02/tu050/func_00A93EF0.s",
-      "asm/nonmatchings/ov02/tu050/func_00A93F00.s",
+      "asm/nonmatchings/ov02/tu050/calcStatGet.s",
       "asm/nonmatchings/ov02/tu050/func_00A93F58.s",
       "asm/nonmatchings/ov02/tu050/func_00A93FE8.s",
       "asm/nonmatchings/ov02/tu050/func_00A940E8.s",
@@ -4201,7 +4201,7 @@
     {
      "ordinal": 59,
      "id": "ov02/tu059_00a982e8",
-     "name": "tu059",
+     "name": "calc",
      "text": [
       "0x00a982e8",
       "0x00a98ec8"
@@ -4218,8 +4218,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu059.c",
-     "object": "build/src/ov02/tu059.o",
+     "source": "src/ov02/calc.c",
+     "object": "build/src/ov02/calc.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -4246,22 +4246,22 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu059/func_00A982E8.s",
-      "asm/nonmatchings/ov02/tu059/func_00A982F0.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98330.s",
-      "asm/nonmatchings/ov02/tu059/func_00A984B8.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98590.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98600.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98638.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98680.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98750.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98770.s",
-      "asm/nonmatchings/ov02/tu059/func_00A988E0.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98CA8.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98CF8.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98D58.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98E98.s",
-      "asm/nonmatchings/ov02/tu059/func_00A98EB0.s"
+      "asm/nonmatchings/ov02/calc/func_00A982E8.s",
+      "asm/nonmatchings/ov02/calc/func_00A982F0.s",
+      "asm/nonmatchings/ov02/calc/func_00A98330.s",
+      "asm/nonmatchings/ov02/calc/func_00A984B8.s",
+      "asm/nonmatchings/ov02/calc/func_00A98590.s",
+      "asm/nonmatchings/ov02/calc/func_00A98600.s",
+      "asm/nonmatchings/ov02/calc/battleEntryFindByKey.s",
+      "asm/nonmatchings/ov02/calc/battleEntryAcquire.s",
+      "asm/nonmatchings/ov02/calc/battleEntryRelease.s",
+      "asm/nonmatchings/ov02/calc/func_00A98770.s",
+      "asm/nonmatchings/ov02/calc/func_00A988E0.s",
+      "asm/nonmatchings/ov02/calc/calcPara2Org.s",
+      "asm/nonmatchings/ov02/calc/calcPara2OrgSub.s",
+      "asm/nonmatchings/ov02/calc/func_00A98D58.s",
+      "asm/nonmatchings/ov02/calc/func_00A98E98.s",
+      "asm/nonmatchings/ov02/calc/func_00A98EB0.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -4273,7 +4273,7 @@
     {
      "ordinal": 60,
      "id": "ov02/tu060_00a98ec8",
-     "name": "tu060",
+     "name": "unit_tbl",
      "text": [
       "0x00a98ec8",
       "0x00a99230"
@@ -4290,8 +4290,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu060.c",
-     "object": "build/src/ov02/tu060.o",
+     "source": "src/ov02/unit_tbl.c",
+     "object": "build/src/ov02/unit_tbl.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -4318,15 +4318,15 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu060/unitInit.s",
-      "asm/nonmatchings/ov02/tu060/func_00A98F00.s",
-      "asm/nonmatchings/ov02/tu060/func_00A98F50.s",
-      "asm/nonmatchings/ov02/tu060/unitTblRemove.s",
-      "asm/nonmatchings/ov02/tu060/func_00A990A8.s",
-      "asm/nonmatchings/ov02/tu060/func_00A99160.s",
-      "asm/nonmatchings/ov02/tu060/func_00A991C0.s",
-      "asm/nonmatchings/ov02/tu060/func_00A991D0.s",
-      "asm/nonmatchings/ov02/tu060/unitTblEntryGet.s"
+      "asm/nonmatchings/ov02/unit_tbl/unitInit.s",
+      "asm/nonmatchings/ov02/unit_tbl/unitTblGet.s",
+      "asm/nonmatchings/ov02/unit_tbl/unitTblSet.s",
+      "asm/nonmatchings/ov02/unit_tbl/unitTblRemove.s",
+      "asm/nonmatchings/ov02/unit_tbl/unitLiveNumGet.s",
+      "asm/nonmatchings/ov02/unit_tbl/func_00A99160.s",
+      "asm/nonmatchings/ov02/unit_tbl/func_00A991C0.s",
+      "asm/nonmatchings/ov02/unit_tbl/func_00A991D0.s",
+      "asm/nonmatchings/ov02/unit_tbl/unitTblEntryGet.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -4491,7 +4491,7 @@
       "asm/nonmatchings/ov02/tu062/func_00A9AAE0.s",
       "asm/nonmatchings/ov02/tu062/func_00A9AB58.s",
       "asm/nonmatchings/ov02/tu062/func_00A9AB70.s",
-      "asm/nonmatchings/ov02/tu062/func_00A9AC28.s"
+      "asm/nonmatchings/ov02/tu062/unitFadeOutStep.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -4929,12 +4929,12 @@
     {
      "ordinal": 69,
      "id": "ov02/tu069_00aa00f8",
-     "name": "tu069",
+     "name": "robo_battle",
      "text": [
       "0x00aa00f8",
-      "0x00aa17e8"
+      "0x00aa1908"
      ],
-     "functions": 37,
+     "functions": 41,
      "category": "game",
      "in_scope": true,
      "toolchain_classification": {
@@ -4946,8 +4946,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu069.c",
-     "object": "build/src/ov02/tu069.o",
+     "source": "src/ov02/robo_battle.c",
+     "object": "build/src/ov02/robo_battle.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -4974,43 +4974,47 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu069/func_00AA00F8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0650.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA07D8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0910.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0BB0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0BC8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0BD8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0BF0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0C00.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0C10.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0C20.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0C30.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0D28.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0DC8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0FB8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA0FC0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1288.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1300.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1370.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA13F0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1410.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1480.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1490.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA14B0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA14D8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA14E8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA14F8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1508.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1588.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1590.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA15A0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA15B0.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA15C8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1650.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA16D8.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1710.s",
-      "asm/nonmatchings/ov02/tu069/func_00AA1738.s"
+      "asm/nonmatchings/ov02/robo_battle/func_00AA00F8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0650.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA07D8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0910.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0BB0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0BC8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0BD8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0BF0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0C00.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0C10.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0C20.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0C30.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0D28.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0DC8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0FB8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA0FC0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1288.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1300.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1370.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA13F0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1410.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1480.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1490.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA14B0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA14D8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA14E8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA14F8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1508.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1588.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1590.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA15A0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA15B0.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA15C8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1650.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA16D8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1710.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1738.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA17E8.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1810.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1828.s",
+      "asm/nonmatchings/ov02/robo_battle/func_00AA1830.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -5022,12 +5026,12 @@
     {
      "ordinal": 70,
      "id": "ov02/tu070_00aa17e8",
-     "name": "tu070",
+     "name": "robo_order",
      "text": [
-      "0x00aa17e8",
+      "0x00aa1908",
       "0x00aa2268"
      ],
-     "functions": 21,
+     "functions": 17,
      "category": "game",
      "in_scope": true,
      "toolchain_classification": {
@@ -5039,8 +5043,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu070.c",
-     "object": "build/src/ov02/tu070.o",
+     "source": "src/ov02/robo_order.c",
+     "object": "build/src/ov02/robo_order.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -5067,27 +5071,23 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu070/func_00AA17E8.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1810.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1828.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1830.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1908.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1918.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1928.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1988.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1A78.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1AB8.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1AE8.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1AF8.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1B40.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1B58.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1C00.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1D58.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1D70.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1DD0.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1DE0.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1F08.s",
-      "asm/nonmatchings/ov02/tu070/func_00AA1FA0.s"
+      "asm/nonmatchings/ov02/robo_order/func_00AA1908.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1918.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1928.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1988.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1A78.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1AB8.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1AE8.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1AF8.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1B40.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1B58.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1C00.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1D58.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1D70.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1DD0.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1DE0.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1F08.s",
+      "asm/nonmatchings/ov02/robo_order/func_00AA1FA0.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -5205,12 +5205,12 @@
     {
      "ordinal": 72,
      "id": "ov02/tu072_00aa4a50",
-     "name": "tu072",
+     "name": "robo_deadseq",
      "text": [
       "0x00aa4a50",
-      "0x00aa5198"
+      "0x00aa52f8"
      ],
-     "functions": 11,
+     "functions": 14,
      "category": "game",
      "in_scope": true,
      "toolchain_classification": {
@@ -5222,8 +5222,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu072.c",
-     "object": "build/src/ov02/tu072.o",
+     "source": "src/ov02/robo_deadseq.c",
+     "object": "build/src/ov02/robo_deadseq.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -5250,76 +5250,20 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu072/func_00AA4A50.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4A68.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4B08.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4B18.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4B28.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4B30.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4B88.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4D00.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA4EB0.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA5178.s",
-      "asm/nonmatchings/ov02/tu072/func_00AA5180.s"
-     ],
-     "accepted_asm_files": [],
-     "c_functions": [],
-     "accepted_asm_functions": [],
-     "local_renames": {},
-     "adaptations": [],
-     "header_divergence": []
-    },
-    {
-     "ordinal": 73,
-     "id": "ov02/tu073_00aa5198",
-     "name": "tu073",
-     "text": [
-      "0x00aa5198",
-      "0x00aa52f8"
-     ],
-     "functions": 3,
-     "category": "game",
-     "in_scope": true,
-     "toolchain_classification": {
-      "compiler": "2.96",
-      "assembler": "legacy-buggy",
-      "g_flag": "-G0",
-      "id": "ov02#73"
-     },
-     "accepted_records": [],
-     "accepted_functions": [],
-     "kind": "c",
-     "source": "src/ov02/tu073.c",
-     "object": "build/src/ov02/tu073.o",
-     "compiler": {
-      "id": "ee-gcc2_96-realconv-lp7",
-      "version": "2.96-ee-001003-1",
-      "dir": "tool:ee-gcc2.96-realconv-lp7",
-      "sha256": {
-       "cc1": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17"
-      },
-      "source": "pinned release"
-     },
-     "flags": [
-      "-O2",
-      "-G0"
-     ],
-     "assembler": {
-      "id": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-      "path": "tool:ee-as-la29-vsqrt-swap",
-      "sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-      "argv": "-EL -m5900 -mabi=eabi <G> -g -I .",
-      "basis": "the patched cc1 and corrected assembler with -g of X1 and X2; see reports/x3-compiler-calibration.md"
-     },
-     "contract_basis": {
-      "decision": "the patched cc1 and corrected assembler with -g of X1 and X2; see reports/x3-compiler-calibration.md",
-      "g_flag_classification": "-G0",
-      "g_basis": "no gp-relative instruction in the whole overlay"
-     },
-     "include_asm_files": [
-      "asm/nonmatchings/ov02/tu073/func_00AA5198.s",
-      "asm/nonmatchings/ov02/tu073/func_00AA5228.s",
-      "asm/nonmatchings/ov02/tu073/func_00AA52E0.s"
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4A50.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4A68.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4B08.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4B18.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4B28.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4B30.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4B88.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4D00.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA4EB0.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA5178.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA5180.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA5198.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA5228.s",
+      "asm/nonmatchings/ov02/robo_deadseq/func_00AA52E0.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -5458,12 +5402,12 @@
     {
      "ordinal": 76,
      "id": "ov02/tu076_00aa6518",
-     "name": "tu076",
+     "name": "robo_param",
      "text": [
       "0x00aa6518",
-      "0x00aa6f08"
+      "0x00aa7010"
      ],
-     "functions": 22,
+     "functions": 24,
      "category": "game",
      "in_scope": true,
      "toolchain_classification": {
@@ -5475,8 +5419,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu076.c",
-     "object": "build/src/ov02/tu076.o",
+     "source": "src/ov02/robo_param.c",
+     "object": "build/src/ov02/robo_param.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -5503,28 +5447,30 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu076/func_00AA6518.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA65F0.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6620.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6828.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6860.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6878.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA68D8.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6918.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6930.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA69A8.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6A08.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6A58.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6AE0.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6AF8.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6B48.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6BC0.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6C28.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6C70.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6CB8.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6DD0.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6E38.s",
-      "asm/nonmatchings/ov02/tu076/func_00AA6E88.s"
+      "asm/nonmatchings/ov02/robo_param/func_00AA6518.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA65F0.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6620.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6828.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6860.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6878.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA68D8.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6918.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6930.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA69A8.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6A08.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6A58.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6AE0.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6AF8.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6B48.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6BC0.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6C28.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6C70.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6CB8.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6DD0.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6E38.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6E88.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6F08.s",
+      "asm/nonmatchings/ov02/robo_param/func_00AA6F40.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -5536,12 +5482,12 @@
     {
      "ordinal": 77,
      "id": "ov02/tu077_00aa6f08",
-     "name": "tu077",
+     "name": "robo_attackseq",
      "text": [
-      "0x00aa6f08",
+      "0x00aa7010",
       "0x00aa7890"
      ],
-     "functions": 13,
+     "functions": 11,
      "category": "game",
      "in_scope": true,
      "toolchain_classification": {
@@ -5553,8 +5499,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu077.c",
-     "object": "build/src/ov02/tu077.o",
+     "source": "src/ov02/robo_attackseq.c",
+     "object": "build/src/ov02/robo_attackseq.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -5581,19 +5527,17 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu077/func_00AA6F08.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA6F40.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7010.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7160.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7170.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7198.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA72A8.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7348.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7468.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA74F0.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA76E0.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA7708.s",
-      "asm/nonmatchings/ov02/tu077/func_00AA77C8.s"
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7010.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7160.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7170.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7198.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA72A8.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7348.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7468.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA74F0.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA76E0.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA7708.s",
+      "asm/nonmatchings/ov02/robo_attackseq/func_00AA77C8.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -6458,7 +6402,7 @@
       "asm/nonmatchings/ov02/tu089/func_00AB1470.s",
       "asm/nonmatchings/ov02/tu089/func_00AB1570.s",
       "asm/nonmatchings/ov02/tu089/func_00AB1660.s",
-      "asm/nonmatchings/ov02/tu089/func_00AB1688.s",
+      "asm/nonmatchings/ov02/tu089/RgDispModelSetLocalByName.s",
       "asm/nonmatchings/ov02/tu089/func_00AB16D8.s",
       "asm/nonmatchings/ov02/tu089/func_00AB16F8.s",
       "asm/nonmatchings/ov02/tu089/func_00AB1728.s",
@@ -6542,12 +6486,12 @@
     {
      "ordinal": 91,
      "id": "ov02/tu091_00ab1a40",
-     "name": "tu091",
+     "name": "robo_script",
      "text": [
       "0x00ab1a40",
-      "0x00ab2e38"
+      "0x00ab2f40"
      ],
-     "functions": 32,
+     "functions": 35,
      "category": "game",
      "in_scope": true,
      "toolchain_classification": {
@@ -6559,8 +6503,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov02/tu091.c",
-     "object": "build/src/ov02/tu091.o",
+     "source": "src/ov02/robo_script.c",
+     "object": "build/src/ov02/robo_script.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -6587,97 +6531,41 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu091/func_00AB1A40.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1A58.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1AB0.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1AC8.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1AE8.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1B80.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1C48.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1CA0.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1CF0.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1D58.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1DC0.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1E28.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1E90.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1EF8.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB1F88.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2000.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2078.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2148.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2188.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB21D8.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2280.s",
-      "asm/nonmatchings/ov02/tu091/msgPutWait.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2370.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2450.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2970.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2A18.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2AF0.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2B60.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2BF0.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2C80.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2D18.s",
-      "asm/nonmatchings/ov02/tu091/func_00AB2DA0.s"
-     ],
-     "accepted_asm_files": [],
-     "c_functions": [],
-     "accepted_asm_functions": [],
-     "local_renames": {},
-     "adaptations": [],
-     "header_divergence": []
-    },
-    {
-     "ordinal": 92,
-     "id": "ov02/tu092_00ab2e38",
-     "name": "tu092",
-     "text": [
-      "0x00ab2e38",
-      "0x00ab2f40"
-     ],
-     "functions": 3,
-     "category": "game",
-     "in_scope": true,
-     "toolchain_classification": {
-      "compiler": "2.96",
-      "assembler": "legacy-buggy",
-      "g_flag": "-G0",
-      "id": "ov02#92"
-     },
-     "accepted_records": [],
-     "accepted_functions": [],
-     "kind": "c",
-     "source": "src/ov02/tu092.c",
-     "object": "build/src/ov02/tu092.o",
-     "compiler": {
-      "id": "ee-gcc2_96-realconv-lp7",
-      "version": "2.96-ee-001003-1",
-      "dir": "tool:ee-gcc2.96-realconv-lp7",
-      "sha256": {
-       "cc1": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17"
-      },
-      "source": "pinned release"
-     },
-     "flags": [
-      "-O2",
-      "-G0"
-     ],
-     "assembler": {
-      "id": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-      "path": "tool:ee-as-la29-vsqrt-swap",
-      "sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-      "argv": "-EL -m5900 -mabi=eabi <G> -g -I .",
-      "basis": "the patched cc1 and corrected assembler with -g of X1 and X2; see reports/x3-compiler-calibration.md"
-     },
-     "contract_basis": {
-      "decision": "the patched cc1 and corrected assembler with -g of X1 and X2; see reports/x3-compiler-calibration.md",
-      "g_flag_classification": "-G0",
-      "g_basis": "no gp-relative instruction in the whole overlay"
-     },
-     "include_asm_files": [
-      "asm/nonmatchings/ov02/tu092/func_00AB2E38.s",
-      "asm/nonmatchings/ov02/tu092/func_00AB2E70.s",
-      "asm/nonmatchings/ov02/tu092/func_00AB2E90.s"
+      "asm/nonmatchings/ov02/robo_script/func_00AB1A40.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1A58.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1AB0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1AC8.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1AE8.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1B80.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1C48.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1CA0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1CF0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1D58.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1DC0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1E28.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1E90.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1EF8.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB1F88.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2000.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2078.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2148.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2188.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB21D8.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2280.s",
+      "asm/nonmatchings/ov02/robo_script/msgPutWait.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2370.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2450.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2970.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2A18.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2AF0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2B60.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2BF0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2C80.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2D18.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2DA0.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2E38.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2E70.s",
+      "asm/nonmatchings/ov02/robo_script/func_00AB2E90.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -8277,7 +8165,7 @@
     {
      "ordinal": 17,
      "id": "ov04/tu017_00a9f6e0",
-     "name": "tu017",
+     "name": "get_017",
      "text": [
       "0x00a9f6e0",
       "0x00a9fb30"
@@ -8294,8 +8182,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov04/tu017.c",
-     "object": "build/src/ov04/tu017.o",
+     "source": "src/ov04/get_017.c",
+     "object": "build/src/ov04/get_017.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -8322,14 +8210,14 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov04/tu017/Get_Distance.s",
-      "asm/nonmatchings/ov04/tu017/Get_Distance3D.s",
-      "asm/nonmatchings/ov04/tu017/Get_Angle.s",
-      "asm/nonmatchings/ov04/tu017/func_00A9F7E0.s",
-      "asm/nonmatchings/ov04/tu017/func_00A9F870.s",
-      "asm/nonmatchings/ov04/tu017/func_00A9F928.s",
-      "asm/nonmatchings/ov04/tu017/Get_Point_By_AngleLength.s",
-      "asm/nonmatchings/ov04/tu017/func_00A9FA48.s"
+      "asm/nonmatchings/ov04/get_017/Get_Distance.s",
+      "asm/nonmatchings/ov04/get_017/Get_Distance3D.s",
+      "asm/nonmatchings/ov04/get_017/Get_Angle.s",
+      "asm/nonmatchings/ov04/get_017/func_00A9F7E0.s",
+      "asm/nonmatchings/ov04/get_017/Get_Decimal_Surplus_for_Radius.s",
+      "asm/nonmatchings/ov04/get_017/func_00A9F928.s",
+      "asm/nonmatchings/ov04/get_017/Get_Point_By_AngleLength.s",
+      "asm/nonmatchings/ov04/get_017/func_00A9FA48.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -8402,7 +8290,7 @@
     {
      "ordinal": 19,
      "id": "ov04/tu019_00a9fe40",
-     "name": "tu019",
+     "name": "get_019",
      "text": [
       "0x00a9fe40",
       "0x00aa0c00"
@@ -8419,8 +8307,8 @@
      "accepted_records": [],
      "accepted_functions": [],
      "kind": "c",
-     "source": "src/ov04/tu019.c",
-     "object": "build/src/ov04/tu019.o",
+     "source": "src/ov04/get_019.c",
+     "object": "build/src/ov04/get_019.o",
      "compiler": {
       "id": "ee-gcc2_96-realconv-lp7",
       "version": "2.96-ee-001003-1",
@@ -8447,25 +8335,25 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov04/tu019/Get_Rnd.s",
-      "asm/nonmatchings/ov04/tu019/Get_RndFloatRange.s",
-      "asm/nonmatchings/ov04/tu019/func_00A9FED8.s",
-      "asm/nonmatchings/ov04/tu019/Get_MiddlePoint.s",
-      "asm/nonmatchings/ov04/tu019/Get_MiddlePoint_Parabora.s",
-      "asm/nonmatchings/ov04/tu019/func_00AA0128.s",
-      "asm/nonmatchings/ov04/tu019/Get_One_Step.s",
-      "asm/nonmatchings/ov04/tu019/unduCheckAngle.s",
-      "asm/nonmatchings/ov04/tu019/func_00AA0378.s",
-      "asm/nonmatchings/ov04/tu019/func_00AA03A0.s",
-      "asm/nonmatchings/ov04/tu019/func_00AA04E0.s",
-      "asm/nonmatchings/ov04/tu019/func_00AA0560.s",
-      "asm/nonmatchings/ov04/tu019/uwamonoQuadEdgesVisible.s",
-      "asm/nonmatchings/ov04/tu019/CalcVerticalVector.s",
-      "asm/nonmatchings/ov04/tu019/CalcLength.s",
-      "asm/nonmatchings/ov04/tu019/CheckPointLine.s",
-      "asm/nonmatchings/ov04/tu019/func_00AA08E8.s",
-      "asm/nonmatchings/ov04/tu019/CalcCrossPoint.s",
-      "asm/nonmatchings/ov04/tu019/CheckCrossCircle.s"
+      "asm/nonmatchings/ov04/get_019/Get_Rnd.s",
+      "asm/nonmatchings/ov04/get_019/Get_RndFloatRange.s",
+      "asm/nonmatchings/ov04/get_019/func_00A9FED8.s",
+      "asm/nonmatchings/ov04/get_019/Get_MiddlePoint.s",
+      "asm/nonmatchings/ov04/get_019/Get_MiddlePoint_Parabora.s",
+      "asm/nonmatchings/ov04/get_019/Get_ParaboraValue.s",
+      "asm/nonmatchings/ov04/get_019/Get_One_Step.s",
+      "asm/nonmatchings/ov04/get_019/unduCheckAngle.s",
+      "asm/nonmatchings/ov04/get_019/vectorCopyPoint.s",
+      "asm/nonmatchings/ov04/get_019/uwamonoPoseAnglesGet.s",
+      "asm/nonmatchings/ov04/get_019/func_00AA04E0.s",
+      "asm/nonmatchings/ov04/get_019/func_00AA0560.s",
+      "asm/nonmatchings/ov04/get_019/uwamonoQuadEdgesVisible.s",
+      "asm/nonmatchings/ov04/get_019/CalcVerticalVector.s",
+      "asm/nonmatchings/ov04/get_019/CalcLength.s",
+      "asm/nonmatchings/ov04/get_019/CheckPointLine.s",
+      "asm/nonmatchings/ov04/get_019/Check_CrossingOver.s",
+      "asm/nonmatchings/ov04/get_019/CalcCrossPoint.s",
+      "asm/nonmatchings/ov04/get_019/CheckCrossCircle.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],

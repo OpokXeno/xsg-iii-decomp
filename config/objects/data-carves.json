@@ -1,5 +1,1924 @@
 {
  "doc": "C-owned data runs carved out of scaffold data pieces: the jump tables and literals a recovered C function generates (tools/tu/data_carve.py, docs/tu-build.md \"Data ownership\"). Written by tools/worker.py (private), tools/review_stage.py (private) and tools/tu_publish.py (published).",
  "schema": "tu-data-carves/1",
- "tus": {}
+ "tus": {
+  "main/tu004": {
+   ".rodata": [
+    {
+     "range": [
+      "0x0053fce0",
+      "0x0053fd40"
+     ],
+     "generated": [
+      "0x0053fce0",
+      "0x0053fd3d"
+     ],
+     "generated_by": [
+      "xglDebFileRead",
+      "xglDebFileSize",
+      "xglDebFileWrite"
+     ],
+     "c_owned_symbols": [
+      "D_0053FCE0",
+      "D_0053FD00",
+      "$LC2"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_debug_file_004.o"
+     }
+    }
+   ]
+  },
+  "main/tu005": {
+   ".rodata": [
+    {
+     "range": [
+      "0x0053fd50",
+      "0x0053ffb0"
+     ],
+     "generated": [
+      "0x0053fd50",
+      "0x0053ffb0"
+     ],
+     "generated_by": [
+      "xglFontPrintSub",
+      "xglFontCmdXx",
+      "xglFontParseHex"
+     ],
+     "c_owned_symbols": [
+      "jtbl_0053FD50",
+      "jtbl_0053FEB0",
+      "jtbl_0053FF90"
+     ],
+     "also_referenced_by_c": [
+      "spCodeParameterSizeTable",
+      "fontInlineErrorFormat"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_font.o"
+     }
+    }
+   ]
+  },
+  "main/tu013": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00540210",
+      "0x00540238"
+     ],
+     "generated": [
+      "0x00540210",
+      "0x00540238"
+     ],
+     "generated_by": [
+      "xglMcRequest"
+     ],
+     "c_owned_symbols": [
+      "$L13"
+     ],
+     "also_referenced_by_c": [
+      "xglMcBasePath"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_mc_request.o"
+     }
+    },
+    {
+     "range": [
+      "0x00540250",
+      "0x005402c0"
+     ],
+     "generated": [
+      "0x00540250",
+      "0x005402c0"
+     ],
+     "generated_by": [
+      "xglMcExecute",
+      "xglMcCreateStep"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00540250",
+      "jtbl_00540280"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_mc_request.o"
+     }
+    }
+   ]
+  },
+  "main/tu017": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fe78",
+      "0x0054fe80"
+     ],
+     "generated": [
+      "0x0054fe78",
+      "0x0054fe80"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE78",
+      "D_0054FE7C"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe78",
+        "0x0054fe80"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        0,
+        8
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe80",
+      "0x0054fe84"
+     ],
+     "generated": [
+      "0x0054fe80",
+      "0x0054fe84"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE80"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe80",
+        "0x0054fe84"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        8,
+        12
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe84",
+      "0x0054fe88"
+     ],
+     "generated": [
+      "0x0054fe84",
+      "0x0054fe88"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE84"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe84",
+        "0x0054fe88"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        12,
+        16
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe88",
+      "0x0054fe8c"
+     ],
+     "generated": [
+      "0x0054fe88",
+      "0x0054fe8c"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE88"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe88",
+        "0x0054fe8c"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        16,
+        20
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe8c",
+      "0x0054fe90"
+     ],
+     "generated": [
+      "0x0054fe8c",
+      "0x0054fe90"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE8C"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe8c",
+        "0x0054fe90"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        20,
+        24
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe90",
+      "0x0054fe94"
+     ],
+     "generated": [
+      "0x0054fe90",
+      "0x0054fe94"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE90"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe90",
+        "0x0054fe94"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        24,
+        28
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe94",
+      "0x0054fe98"
+     ],
+     "generated": [
+      "0x0054fe94",
+      "0x0054fe98"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE94"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe94",
+        "0x0054fe98"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        28,
+        32
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe98",
+      "0x0054fe9c"
+     ],
+     "generated": [
+      "0x0054fe98",
+      "0x0054fe9c"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE98"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe98",
+        "0x0054fe9c"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        32,
+        36
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fe9c",
+      "0x0054fea4"
+     ],
+     "generated": [
+      "0x0054fe9c",
+      "0x0054fea4"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "D_0054FE9C",
+      "D_0054FEA0"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".lit4",
+       "range": [
+        "0x0054fe9c",
+        "0x0054fea4"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        36,
+        44
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00540390",
+      "0x00540408"
+     ],
+     "generated": [
+      "0x00540390",
+      "0x00540408"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "$L499"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".rodata",
+       "range": [
+        "0x00540390",
+        "0x00540408"
+       ],
+       "symbols": [],
+       "anonymous_emission": true,
+       "credit": "verified",
+       "object_range": [
+        0,
+        120
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    }
+   ],
+   ".sdata": [
+    {
+     "range": [
+      "0x005511a4",
+      "0x005511a8"
+     ],
+     "generated": [
+      "0x005511a4",
+      "0x005511a8"
+     ],
+     "generated_by": [],
+     "c_owned_symbols": [
+      "sw"
+     ],
+     "c_input_spans": [
+      {
+       "section": ".sdata",
+       "range": [
+        "0x005511a4",
+        "0x005511a8"
+       ],
+       "object_range": [
+        0,
+        4
+       ],
+       "symbols": [
+        "sw"
+       ]
+      }
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_jpeg.o"
+     }
+    }
+   ]
+  },
+  "main/tu029": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ff2c",
+      "0x0054ff70"
+     ],
+     "generated": [
+      "0x0054ff2c",
+      "0x0054ff70"
+     ],
+     "generated_by": [
+      "xglAtan2",
+      "xglEulerFromRotation"
+     ],
+     "c_owned_symbols": [
+      "D_0054FF2C",
+      "D_0054FF30",
+      "D_0054FF34",
+      "D_0054FF38",
+      "D_0054FF3C",
+      "D_0054FF40",
+      "D_0054FF44",
+      "D_0054FF48",
+      "D_0054FF4C",
+      "D_0054FF50",
+      "D_0054FF54",
+      "D_0054FF58",
+      "D_0054FF5C",
+      "D_0054FF60",
+      "D_0054FF64",
+      "D_0054FF68",
+      "D_0054FF6C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_2.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x005412c0",
+      "0x005412d0"
+     ],
+     "generated": [
+      "0x005412c0",
+      "0x005412cc"
+     ],
+     "generated_by": [
+      "xglMatrix2Quaternion"
+     ],
+     "c_owned_symbols": [
+      "D_005412C0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_2.o"
+     }
+    }
+   ]
+  },
+  "main/tu030": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffb0",
+      "0x0054ffb4"
+     ],
+     "generated": [
+      "0x0054ffb0",
+      "0x0054ffb4"
+     ],
+     "generated_by": [
+      "xglLightBoxColor"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFB0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_light_030.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x005412d0",
+      "0x005412e0"
+     ],
+     "generated": [
+      "0x005412d0",
+      "0x005412e0"
+     ],
+     "generated_by": [
+      "xglLightSpotColor"
+     ],
+     "c_owned_symbols": [
+      "D_005412D0"
+     ],
+     "also_referenced_by_c": [
+      "D_005412E0"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_light_030.o"
+     }
+    }
+   ]
+  },
+  "main/tu037": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffd8",
+      "0x0054ffdc"
+     ],
+     "generated": [
+      "0x0054ffd8",
+      "0x0054ffdc"
+     ],
+     "generated_by": [
+      "pxyProfileEnd"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFD8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/pxy_profile_037.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00541dc8",
+      "0x00541de0"
+     ],
+     "generated": [
+      "0x00541dc8",
+      "0x00541dd2"
+     ],
+     "generated_by": [
+      "pxyProfileEnd"
+     ],
+     "c_owned_symbols": [
+      "D_00541DC8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/pxy_profile_037.o"
+     }
+    }
+   ]
+  },
+  "main/tu045": {
+   ".lit4": [
+    {
+     "range": [
+      "0x00550040",
+      "0x00550044"
+     ],
+     "generated": [
+      "0x00550040",
+      "0x00550044"
+     ],
+     "generated_by": [
+      "pxyCalcFadeMetric"
+     ],
+     "c_owned_symbols": [
+      "D_00550040"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/nml_model_set_045.o"
+     }
+    }
+   ]
+  },
+  "main/tu105": {
+   ".rodata": [
+    {
+     "range": [
+      "0x0053e2b0",
+      "0x0053e300"
+     ],
+     "generated": [
+      "0x0053e2b0",
+      "0x0053e300"
+     ],
+     "generated_by": [
+      "sbOpBinary"
+     ],
+     "c_owned_symbols": [
+      "jtbl_0053E2B0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sb_vm.o"
+     }
+    },
+    {
+     "range": [
+      "0x0053e370",
+      "0x0053e3a0"
+     ],
+     "generated": [
+      "0x0053e370",
+      "0x0053e398"
+     ],
+     "generated_by": [
+      "sbOpPushLocal"
+     ],
+     "c_owned_symbols": [
+      "jtbl_0053E370"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sb_vm.o"
+     }
+    }
+   ]
+  },
+  "main/tu122": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fc54",
+      "0x0054fc5c"
+     ],
+     "generated": [
+      "0x0054fc54",
+      "0x0054fc5c"
+     ],
+     "generated_by": [
+      "func_001ED8A0"
+     ],
+     "c_owned_symbols": [
+      "D_0054FC54",
+      "D_0054FC58"
+     ],
+     "also_referenced_by_c": [
+      "D_0054FC5C",
+      "D_0054FC60"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/sdv_seq.o"
+     }
+    }
+   ]
+  },
+  "main/tu123": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fc64",
+      "0x0054fc68"
+     ],
+     "generated": [
+      "0x0054fc64",
+      "0x0054fc68"
+     ],
+     "generated_by": [
+      "tiWindUpdateKeyframes"
+     ],
+     "c_owned_symbols": [
+      "D_0054FC64"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sdv_wind.o"
+     }
+    }
+   ]
+  },
+  "main/tu131": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fd24",
+      "0x0054fd28"
+     ],
+     "generated": [
+      "0x0054fd24",
+      "0x0054fd28"
+     ],
+     "generated_by": [
+      "sefAnalyzeAnim"
+     ],
+     "c_owned_symbols": [
+      "D_0054FD24"
+     ],
+     "also_referenced_by_c": [
+      "sefTwoPi",
+      "sefCircleAngleScale"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sef.o"
+     }
+    }
+   ]
+  },
+  "main/tu141": {
+   ".rodata": [
+    {
+     "range": [
+      "0x0053f400",
+      "0x0053f430"
+     ],
+     "generated": [
+      "0x0053f400",
+      "0x0053f428"
+     ],
+     "generated_by": [
+      "svAnalyzeChunk"
+     ],
+     "c_owned_symbols": [
+      "$L205"
+     ],
+     "also_referenced_by_c": [
+      "svUnitQuadCornerMatrix",
+      "D_0053F460"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sv_get_image_item.o"
+     }
+    }
+   ]
+  },
+  "main/tu144": {
+   ".rodata": [
+    {
+     "range": [
+      "0x0053f4a0",
+      "0x0053f4a8"
+     ],
+     "generated": [
+      "0x0053f4a0",
+      "0x0053f4a6"
+     ],
+     "generated_by": [
+      "resetWaitForPad"
+     ],
+     "c_owned_symbols": [
+      "$LC0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/draw_list.o"
+     }
+    }
+   ]
+  },
+  "main/tu152": {
+   ".rodata": [
+    {
+     "range": [
+      "0x0053f4b8",
+      "0x0053f4f0"
+     ],
+     "generated": [
+      "0x0053f4b8",
+      "0x0053f4ef"
+     ],
+     "generated_by": [
+      "srsFormatEffectStem"
+     ],
+     "c_owned_symbols": [
+      "D_0053F4B8",
+      "D_0053F4D0",
+      "D_0053F4D8",
+      "D_0053F4E8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/srs.o"
+     }
+    }
+   ]
+  },
+  "main/tu206": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f83c",
+      "0x0054f840"
+     ],
+     "generated": [
+      "0x0054f83c",
+      "0x0054f840"
+     ],
+     "generated_by": [
+      "tiWatSimAdvance"
+     ],
+     "c_owned_symbols": [
+      "D_0054F83C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/ti_wat_sim_update.o"
+     }
+    }
+   ]
+  },
+  "main/tu207": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f840",
+      "0x0054f848"
+     ],
+     "generated": [
+      "0x0054f840",
+      "0x0054f848"
+     ],
+     "generated_by": [
+      "tiWatSimRandomizeItem"
+     ],
+     "c_owned_symbols": [
+      "D_0054F840",
+      "D_0054F844"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/TiWatSim.o"
+     }
+    }
+   ]
+  },
+  "main/tu208": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f818",
+      "0x0054f824"
+     ],
+     "generated": [
+      "0x0054f818",
+      "0x0054f824"
+     ],
+     "generated_by": [
+      "tiWaterVectorAngle"
+     ],
+     "c_owned_symbols": [
+      "D_0054F818",
+      "D_0054F81C",
+      "D_0054F820"
+     ],
+     "also_referenced_by_c": [
+      "D_0054F824"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiWater.o"
+     }
+    }
+   ]
+  },
+  "main/tu218": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f6e0",
+      "0x0054f6e4"
+     ],
+     "generated": [
+      "0x0054f6e0",
+      "0x0054f6e4"
+     ],
+     "generated_by": [
+      "gifStateDrawRing"
+     ],
+     "c_owned_symbols": [
+      "D_0054F6E0"
+     ],
+     "also_referenced_by_c": [
+      "D_0054F6E4",
+      "D_0054F6E8"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/gifState.o"
+     }
+    }
+   ]
+  },
+  "main/tu219": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f828",
+      "0x0054f834"
+     ],
+     "generated": [
+      "0x0054f828",
+      "0x0054f834"
+     ],
+     "generated_by": [
+      "glowUpdateFromPad"
+     ],
+     "c_owned_symbols": [
+      "D_0054F828",
+      "D_0054F82C",
+      "D_0054F830"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/glow.o"
+     }
+    }
+   ]
+  },
+  "main/tu223": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f6fc",
+      "0x0054f708"
+     ],
+     "generated": [
+      "0x0054f6fc",
+      "0x0054f708"
+     ],
+     "generated_by": [
+      "xglAtan2Angle"
+     ],
+     "c_owned_symbols": [
+      "D_0054F6FC",
+      "D_0054F700",
+      "D_0054F704"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_vu1_regs.o"
+     }
+    }
+   ]
+  },
+  "main/tu225": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f834",
+      "0x0054f83c"
+     ],
+     "generated": [
+      "0x0054f834",
+      "0x0054f83c"
+     ],
+     "generated_by": [
+      "tiWaterSendFrame"
+     ],
+     "c_owned_symbols": [
+      "D_0054F834",
+      "D_0054F838"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/nml_packet_add_225.o"
+     }
+    }
+   ]
+  },
+  "main/tu226": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f200",
+      "0x0054f21c"
+     ],
+     "generated": [
+      "0x0054f200",
+      "0x0054f21c"
+     ],
+     "generated_by": [
+      "MMathCalcRotFar",
+      "MMathCalcRotNear",
+      "MMathMakeRandom2PI",
+      "MMathMakeRandomPI"
+     ],
+     "c_owned_symbols": [
+      "D_0054F200",
+      "D_0054F204",
+      "D_0054F208",
+      "D_0054F20C",
+      "D_0054F210",
+      "D_0054F214",
+      "D_0054F218"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/m_math.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054f224",
+      "0x0054f238"
+     ],
+     "generated": [
+      "0x0054f224",
+      "0x0054f238"
+     ],
+     "generated_by": [
+      "MMathDeg2RadVector",
+      "MMathDeg2RadVectorI",
+      "MMathQuatBetweenVectors",
+      "MMathRad2DegVector",
+      "MMathRad2DegVectorI"
+     ],
+     "c_owned_symbols": [
+      "D_0054F224",
+      "D_0054F228",
+      "D_0054F22C",
+      "D_0054F230",
+      "D_0054F234"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/m_math.o"
+     }
+    }
+   ]
+  },
+  "main/tu235": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f238",
+      "0x0054f23c"
+     ],
+     "generated": [
+      "0x0054f238",
+      "0x0054f23c"
+     ],
+     "generated_by": [
+      "MMathMatrixBetweenVectors"
+     ],
+     "c_owned_symbols": [
+      "D_0054F238"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/m_se_obj.o"
+     }
+    }
+   ]
+  },
+  "main/tu245": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f264",
+      "0x0054f268"
+     ],
+     "generated": [
+      "0x0054f264",
+      "0x0054f268"
+     ],
+     "generated_by": [
+      "cameraAnglesBetween"
+     ],
+     "c_owned_symbols": [
+      "D_0054F264"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/game_camera.o"
+     }
+    }
+   ]
+  },
+  "main/tu324": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fe3c",
+      "0x0054fe74"
+     ],
+     "generated": [
+      "0x0054fe3c",
+      "0x0054fe74"
+     ],
+     "generated_by": [
+      "DrawZeldaShadowSub",
+      "DrawZeldaShadow",
+      "DrawDropShadowSub",
+      "DrawDropCircle"
+     ],
+     "c_owned_symbols": [
+      "D_0054FE3C",
+      "D_0054FE40",
+      "D_0054FE44",
+      "D_0054FE48",
+      "D_0054FE4C",
+      "D_0054FE50",
+      "D_0054FE54",
+      "D_0054FE58",
+      "D_0054FE5C",
+      "D_0054FE60",
+      "D_0054FE64",
+      "D_0054FE68",
+      "D_0054FE6C",
+      "D_0054FE70"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/XenoActorUnpack.o"
+     }
+    }
+   ]
+  },
+  "main/tu325": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fd90",
+      "0x0054fd9c"
+     ],
+     "generated": [
+      "0x0054fd90",
+      "0x0054fd9c"
+     ],
+     "generated_by": [
+      "XenoActorInit",
+      "XenoActorAttachChildToJoint"
+     ],
+     "c_owned_symbols": [
+      "D_0054FD90",
+      "D_0054FD94",
+      "D_0054FD98"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xenoActor.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fdd4",
+      "0x0054fdd8"
+     ],
+     "generated": [
+      "0x0054fdd4",
+      "0x0054fdd8"
+     ],
+     "generated_by": [
+      "func_0028F2D0"
+     ],
+     "c_owned_symbols": [
+      "D_0054FDD4"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xenoActor.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fdf8",
+      "0x0054fe04"
+     ],
+     "generated": [
+      "0x0054fdf8",
+      "0x0054fe04"
+     ],
+     "generated_by": [
+      "XenoActorWrapRotation"
+     ],
+     "c_owned_symbols": [
+      "D_0054FDF8",
+      "D_0054FDFC",
+      "D_0054FE00"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xenoActor.o"
+     }
+    }
+   ]
+  },
+  "main/tu326": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fe04",
+      "0x0054fe0c"
+     ],
+     "generated": [
+      "0x0054fe04",
+      "0x0054fe0c"
+     ],
+     "generated_by": [
+      "func_00291D88"
+     ],
+     "c_owned_symbols": [
+      "D_0054FE04",
+      "D_0054FE08"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xeno_actor_set.o"
+     }
+    }
+   ]
+  },
+  "main/tu331": {
+   ".lit4": [
+    {
+     "range": [
+      "0x00550088",
+      "0x00550098"
+     ],
+     "generated": [
+      "0x00550088",
+      "0x00550098"
+     ],
+     "generated_by": [
+      "tiCameraFovDegrees",
+      "tiCameraReadAngle",
+      "tiCameraReadRecord"
+     ],
+     "c_owned_symbols": [
+      "D_00550088",
+      "D_0055008C",
+      "D_00550090",
+      "D_00550094"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/TiCameraSolver.o"
+     }
+    }
+   ]
+  },
+  "main/tu332": {
+   ".lit4": [
+    {
+     "range": [
+      "0x00550098",
+      "0x0055009c"
+     ],
+     "generated": [
+      "0x00550098",
+      "0x0055009c"
+     ],
+     "generated_by": [
+      "tiDrawCollisionBuildRing"
+     ],
+     "c_owned_symbols": [
+      "D_00550098"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiDrawCollision.o"
+     }
+    }
+   ]
+  },
+  "main/tu333": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0055009c",
+      "0x005500a0"
+     ],
+     "generated": [
+      "0x0055009c",
+      "0x005500a0"
+     ],
+     "generated_by": [
+      "tiDrawJointOrientMesh"
+     ],
+     "c_owned_symbols": [
+      "D_0055009C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiDrawJoint.o"
+     }
+    }
+   ]
+  },
+  "main/tu334": {
+   ".lit4": [
+    {
+     "range": [
+      "0x005501ac",
+      "0x005501b4"
+     ],
+     "generated": [
+      "0x005501ac",
+      "0x005501b4"
+     ],
+     "generated_by": [
+      "tiDynamicsCollPushOutSphere"
+     ],
+     "c_owned_symbols": [
+      "D_005501AC",
+      "D_005501B0"
+     ],
+     "also_referenced_by_c": [
+      "D_005501B4"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiDynamicsColl.o"
+     }
+    },
+    {
+     "range": [
+      "0x005501b8",
+      "0x005501cc"
+     ],
+     "generated": [
+      "0x005501b8",
+      "0x005501cc"
+     ],
+     "generated_by": [
+      "tiDynamicsCollPushOutCapsule",
+      "tiDynamicsCollPushPointOutOfSphere",
+      "tiGlobalCollClampScale"
+     ],
+     "c_owned_symbols": [
+      "D_005501B8",
+      "D_005501BC",
+      "D_005501C0",
+      "D_005501C4",
+      "D_005501C8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiDynamicsColl.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00542d40",
+      "0x00542d70"
+     ],
+     "generated": [
+      "0x00542d40",
+      "0x00542d6d"
+     ],
+     "generated_by": [
+      "tiDynamicsCollTransformVectors"
+     ],
+     "c_owned_symbols": [
+      "D_00542D40",
+      "D_00542D58"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiDynamicsColl.o"
+     }
+    }
+   ]
+  },
+  "main/tu335": {
+   ".lit4": [
+    {
+     "range": [
+      "0x005500a0",
+      "0x005500ac"
+     ],
+     "generated": [
+      "0x005500a0",
+      "0x005500ac"
+     ],
+     "generated_by": [
+      "tiMRPackageGetNodeMatrix",
+      "tiMRPackageGetNodePoint",
+      "tiGlobalCollPushOutSphere"
+     ],
+     "c_owned_symbols": [
+      "D_005500A0",
+      "D_005500A4",
+      "D_005500A8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiGlobalColl.o"
+     }
+    },
+    {
+     "range": [
+      "0x005500b0",
+      "0x005500b4"
+     ],
+     "generated": [
+      "0x005500b0",
+      "0x005500b4"
+     ],
+     "generated_by": [
+      "tiGlobalCollPushOutCylinder"
+     ],
+     "c_owned_symbols": [
+      "D_005500B0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiGlobalColl.o"
+     }
+    }
+   ]
+  },
+  "main/tu336": {
+   ".lit4": [
+    {
+     "range": [
+      "0x005501d8",
+      "0x005501dc"
+     ],
+     "generated": [
+      "0x005501d8",
+      "0x005501dc"
+     ],
+     "generated_by": [
+      "tiMatrixNormalizeRows"
+     ],
+     "c_owned_symbols": [
+      "D_005501D8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/ti_dynamics_node.o"
+     }
+    },
+    {
+     "range": [
+      "0x005501e8",
+      "0x005501f0"
+     ],
+     "generated": [
+      "0x005501e8",
+      "0x005501f0"
+     ],
+     "generated_by": [
+      "tiDynamicsSolveLink"
+     ],
+     "c_owned_symbols": [
+      "D_005501E8",
+      "D_005501EC"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/ti_dynamics_node.o"
+     }
+    }
+   ]
+  },
+  "main/tu338": {
+   ".lit4": [
+    {
+     "range": [
+      "0x00550144",
+      "0x00550148"
+     ],
+     "generated": [
+      "0x00550144",
+      "0x00550148"
+     ],
+     "generated_by": [
+      "tiMotionUpdateVisibility"
+     ],
+     "c_owned_symbols": [
+      "D_00550144"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiMotionSolver.o"
+     }
+    }
+   ]
+  },
+  "main/tu339": {
+   ".lit4": [
+    {
+     "range": [
+      "0x00550164",
+      "0x0055016c"
+     ],
+     "generated": [
+      "0x00550164",
+      "0x0055016c"
+     ],
+     "generated_by": [
+      "tiMtnBlendMatrix",
+      "tiMtnBlendUpdateLocal"
+     ],
+     "c_owned_symbols": [
+      "D_00550164",
+      "D_00550168"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiMtnBlend.o"
+     }
+    }
+   ]
+  },
+  "main/tu340": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0055016c",
+      "0x00550170"
+     ],
+     "generated": [
+      "0x0055016c",
+      "0x00550170"
+     ],
+     "generated_by": [
+      "XrgQuaternionNormalize"
+     ],
+     "c_owned_symbols": [
+      "D_0055016C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiPartsAnim.o"
+     }
+    },
+    {
+     "range": [
+      "0x00550174",
+      "0x00550180"
+     ],
+     "generated": [
+      "0x00550174",
+      "0x00550180"
+     ],
+     "generated_by": [
+      "XrgQuaternionToAxisAngle",
+      "XrgQuaternionSlerp"
+     ],
+     "c_owned_symbols": [
+      "D_00550174",
+      "D_00550178",
+      "D_0055017C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiPartsAnim.o"
+     }
+    }
+   ]
+  },
+  "main/tu344": {
+   ".lit4": [
+    {
+     "range": [
+      "0x00550184",
+      "0x005501a0"
+     ],
+     "generated": [
+      "0x00550184",
+      "0x005501a0"
+     ],
+     "generated_by": [
+      "tiWindDirAdvance",
+      "tiWindDirApply",
+      "tiWindPointAdvance",
+      "tiWindPointApply"
+     ],
+     "c_owned_symbols": [
+      "D_00550184",
+      "D_00550188",
+      "D_0055018C",
+      "D_00550190",
+      "D_00550194",
+      "D_00550198",
+      "D_0055019C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiWindBase.o"
+     }
+    }
+   ]
+  },
+  "main/tu345": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00542c50",
+      "0x00542c90"
+     ],
+     "generated": [
+      "0x00542c50",
+      "0x00542c90"
+     ],
+     "generated_by": [
+      "xacGetKeyInTangentAngle",
+      "xacGetKeyOutTangentAngle"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00542C50",
+      "jtbl_00542C70"
+     ],
+     "also_referenced_by_c": [
+      "D_00542C30",
+      "D_00542C90"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiXacAnimCurve.o"
+     }
+    },
+    {
+     "range": [
+      "0x00542ca0",
+      "0x00542cc0"
+     ],
+     "generated": [
+      "0x00542ca0",
+      "0x00542cc0"
+     ],
+     "generated_by": [
+      "xacGetKeyValue"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00542CA0"
+     ],
+     "also_referenced_by_c": [
+      "D_00542CC0",
+      "D_00542CD8",
+      "D_00542CF0",
+      "D_00542D08"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiXacAnimCurve.o"
+     }
+    },
+    {
+     "range": [
+      "0x00542d20",
+      "0x00542d40"
+     ],
+     "generated": [
+      "0x00542d20",
+      "0x00542d3c"
+     ],
+     "generated_by": [
+      "xacEvalCurve"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00542D20"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/TiXacAnimCurve.o"
+     }
+    }
+   ]
+  },
+  "main/tu346": {
+   ".lit4": [
+    {
+     "range": [
+      "0x005501a4",
+      "0x005501a8"
+     ],
+     "generated": [
+      "0x005501a4",
+      "0x005501a8"
+     ],
+     "generated_by": [
+      "func_002A4B78"
+     ],
+     "c_owned_symbols": [
+      "D_005501A4"
+     ],
+     "also_referenced_by_c": [
+      "tiXacAnimCurveTimeScale"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xac_eval.o"
+     }
+    }
+   ]
+  },
+  "ov04/tu019": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00abe470",
+      "0x00abe480"
+     ],
+     "generated": [
+      "0x00abe470",
+      "0x00abe478"
+     ],
+     "generated_by": [
+      "unduCheckAngle"
+     ],
+     "c_owned_symbols": [
+      "D_00ABE470"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/ov04/build/scaffold/src/ov04/tu019.o"
+     }
+    }
+   ]
+  }
+ }
 }

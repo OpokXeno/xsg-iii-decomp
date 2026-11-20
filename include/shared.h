@@ -32,4 +32,9 @@ typedef union DoublewordVector4 {
     u64 words[2];
 } DoublewordVector4;
 
+typedef float Matrix4[4][4];
+
+typedef float XglFVector[4];
+
+
 #endif /* INCLUDE_SHARED_H */

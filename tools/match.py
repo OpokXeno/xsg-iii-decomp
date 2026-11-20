@@ -1488,6 +1488,18 @@ def _hardware_line(line):
     return _hardware_instruction(line) not in (None, 'sync')
 
 
+# User decision 2026-11-20 ("Admite las formas de esas funciones"): the original hand-written
+# VU0/COP1 blocks of a closed list of X3 functions (tools/tu_audit.py HAND_ASM_BLOCK_IDENTITIES)
+# keep their own integer, branch, label and assembler-directive lines (`.set noat`, `bc1f 1f`,
+# `ori`, `jal`, `nop`, a bare `li.s`) inside the hardware block. Set only by `hand_asm_block_c`,
+# which the TU audit selects for those identities alone; never a precedent for other functions.
+_HAND_ASM_BLOCK = False
+_HAND_ASM_LINE = re.compile(
+    r'(?:[A-Za-z_.$0-9]+:\s*)?'                              # an optional label (`1:`, `loop:`)
+    r'(?:\.set\s+[A-Za-z0-9_]+'                               # an assembler mode directive
+    r'|[a-z][a-z0-9]*(?:\.[a-z0-9]+)*(?:\s+[^;#"\\]*)?)?')      # one mnemonic and its operands
+
+
 def _cop2_check_line(line):
     found = _cop2_match_line(line)
     err = None
@@ -1499,6 +1511,8 @@ def _cop2_check_line(line):
         if name not in _HW_NARROW_KINDS:
             require(False, err + ' in COP2 inline: ' + line[:120])
     if _hardware_instruction(line):
+        return
+    if _HAND_ASM_BLOCK and _HAND_ASM_LINE.fullmatch(line.strip()):
         return
     if err:
         require(False, err + ' in COP2 inline: ' + line[:120])
@@ -1766,6 +1780,8 @@ def _cop2_float_constant(body, clobbers):
     FPR clobber, and only consumed by the very next line's `mfc1` (VU0's float
     interface); the `mfc1` itself is checked by the ordinary table.
     """
+    if _HAND_ASM_BLOCK:
+        return list(body)       # the hand-written block's own li.s lines stay as written
     out, seen = [], False
     for index, line in enumerate(body):
         m = _FLOAT_CONSTANT.fullmatch(line)
@@ -3183,6 +3199,23 @@ def vu0_i_immediate_native_ti_c(text, staged=None, headers=()):
     return vu0_i_immediate_c(text, staged, headers, inner=native_ti.hardware_source)
 
 
+def hand_asm_block_c(text, staged=None, headers=(), inner=None):
+    """Identity-scoped admission of an original hand-written VU0/COP1 block with its own
+    integer/control-flow lines, selected only by TU audit admission (HAND_ASM_BLOCK_IDENTITIES,
+    user decision 2026-11-20)."""
+    global _HAND_ASM_BLOCK
+    _HAND_ASM_BLOCK = True
+    try:
+        return hardware_c(text, staged, headers, inner=inner)
+    finally:
+        _HAND_ASM_BLOCK = False
+
+
+def hand_asm_block_native_ti_c(text, staged=None, headers=()):
+    from tools import native_ti
+    return hand_asm_block_c(text, staged, headers, inner=native_ti.hardware_source)
+
+
 def xrg_clip_nops_c(text, staged=None, headers=(), inner=None):
     """Identity-scoped admission of _Disp's three clip-sequence `nop` lines,
     selected only by TU audit admission (ov12/tu084 _Disp, 2026-11-04)."""
@@ -3818,6 +3851,26 @@ def sync_barrier_c(text, staged=None, headers=(), inner=None):
 def handler_return_c(text, staged=None, headers=(), inner=None):
     return _barrier_c(text, staged, headers, inner, 'ee-interrupt-handler-return',
                       {'sync', 'sync.l', 'sync.p', 'ei'})
+
+
+# User decision 2026-11-20: soundVSyncCallback (main/tu021) keeps the SDK ExitHandler's single
+# `"sync\n\tei"` statement; two statements reorder `move v0,zero` against `ld ra`. Selected only
+# by TU audit admission (HANDLER_RETURN_COMBINED_IDENTITY).
+_SYNC_EI_COMBINED = re.compile(
+    r'\b__asm__\s+(?:__volatile__|volatile)\s*\(\s*"sync\\n\\tei"'
+    r'\s*(?::\s*:\s*:\s*"memory"\s*)?\)\s*;')
+
+
+def handler_return_combined_c(text, staged=None, headers=(), inner=None):
+    found = _SYNC_EI_COMBINED.findall(text)
+    require(len(found) == 1, 'the combined handler return admits exactly one "sync\\n\\tei" statement')
+    folded = _SYNC_EI_COMBINED.sub('__asm__ volatile("sync" ::: "memory"); __asm__ volatile("ei");', text)
+    return handler_return_c(folded, staged, headers, inner)
+
+
+def handler_return_combined_native_ti_c(text, staged=None, headers=()):
+    from tools import native_ti
+    return handler_return_combined_c(text, staged, headers, inner=native_ti.source)
 
 
 def sync_barrier_native_ti_c(text, staged=None, headers=()):

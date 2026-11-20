@@ -2471,11 +2471,36 @@ def ovl_piece(unit_dir, unit, name, sec='.rodata'):
                 file=f'asm/data/{unit}/{name}{sec}.s')
 
 
+UNSPLIT_SECTIONS = ('.rodata', '.data')   # overlay sections an `unsplit` .data family can hand to a C TU
+
+
+def ovl_unsplit_piece(unit_dir, unit, sec):
+    """The overlay's single unsplit `.data` family as a piece, for a TU section it has no own piece for.
+
+    An X3 overlay's literals, jump tables and initialized data are one scaffold object
+    (`asm/data/<unit>/unsplit.data.s`) until the map gives it per-TU families.  A C TU's
+    `.rodata`/`.data` run is cut out of that object by address (apply_overlay), so the TU
+    needs no scaffold piece of its own.  None when the unit has no such family."""
+    if sec not in UNSPLIT_SECTIONS:
+        return None
+    layout = json.loads((Path(unit_dir) / 'layout.json').read_bytes())
+    key = f'{unit}/unsplit'
+    for row in layout['families'].get('.data', []):
+        if row[0] == key and (Path(unit_dir) / f'asm/data/{unit}/unsplit.data.s').is_file():
+            return dict(name=key, start=hx(row[1]), end=hx(row[2]), c_split=False,
+                        file=f'asm/data/{unit}/unsplit.data.s')
+    return None
+
+
+def ovl_piece_or_unsplit(unit_dir, unit, name, sec):
+    return ovl_piece(unit_dir, unit, name, sec) or ovl_unsplit_piece(unit_dir, unit, sec)
+
+
 def overlay_section_items(unit_dir, unit, name, sec):
     """[item] of one overlay TU section from its layout piece, or None without one."""
     if sec not in OVERLAY_SECTIONS:
         return None
-    p = ovl_piece(unit_dir, unit, name, sec)
+    p = ovl_piece_or_unsplit(unit_dir, unit, name, sec)
     if p is None:
         return None
     try:
@@ -2509,6 +2534,7 @@ def apply_overlay(root, unit_dir, unit, ld_text, registry=None, write=True,
                   for row in bss_families.get(sec, [])]
     bss_base = min(bss_starts) if bss_starts else base
     report = []
+    unsplit_rows = []
     explicit_input_ordinals = {}
     input_parts = {}
     for tu_id, tu_secs in declared.items():
@@ -2574,6 +2600,13 @@ def apply_overlay(root, unit_dir, unit, ld_text, registry=None, write=True,
                                                    name=owner_name, address=h8(owner_address), size=owner_size),
                                                run=[h8(lo), h8(hi)]))
             piece = ovl_piece(unit_dir, unit, name, sec)
+            if piece is None and ovl_unsplit_piece(unit_dir, unit, sec) is not None:
+                # No per-TU piece: the run is cut out of the unit's unsplit data object.
+                # All such runs of the unit are carved together below (one object, one cut list).
+                unsplit_rows.append(dict(tu=tu_id, sec=sec, runs=runs, spans=spans, c_obj=c_obj,
+                                         allocated_obj=allocated_obj, linked_obj=linked_obj,
+                                         alias_rows=alias_rows))
+                continue
             if piece is None:
                 raise CarveError(f'{tu_id} has no {sec} piece in {unit}/layout.json')
             if re.search(re.escape(c_obj) + r'\(' + re.escape(sec) + r'\)', text):
@@ -2700,7 +2733,70 @@ def apply_overlay(root, unit_dir, unit, ld_text, registry=None, write=True,
                                **({'c_input_spans': [x for r in runs for x in r.get('c_input_spans', [])]}
                                   if any(r.get('c_input_spans') for r in runs) else {}),
                                pieces=[(p['name'], h8(p['start']), h8(p['end']), p['c_split']) for p in new]))
+    if unsplit_rows:
+        text = apply_overlay_unsplit(unit_dir, unit, text, unsplit_rows, base, report, write)
     return text, report
+
+
+def apply_overlay_unsplit(unit_dir, unit, text, rows, base, report, write):
+    """Carve the declared `.rodata`/`.data` runs of C TUs out of the overlay's unsplit data object.
+
+    `rows`: one entry per (TU, section) whose overlay has no per-TU piece for it.  The unsplit
+    piece is cut once at every run boundary (repiece, item boundaries only); each cut-out run is
+    linked from its TU's object at the original address, each scaffold remainder is a carve piece."""
+    piece = ovl_unsplit_piece(unit_dir, unit, rows[0]['sec'])
+    data_obj = f'build/asm/data/{unit}/unsplit.data.o'
+    line = re.search(r'^(\s*)' + re.escape(data_obj) + r'\(\.data\);[^\n]*\n', text, re.M)
+    if not line:
+        raise CarveError(f'{unit}.ld does not place {data_obj}(.data)')
+    # The scaffold links an (empty) `<tu>.o(<sec>)` placeholder at the end of the data half for
+    # every TU; once the section is carved at its original address that input must not repeat there.
+    for row in rows:
+        text = re.sub(r'^[ \t]*' + re.escape(row['c_obj']) + r'\(' + re.escape(row['sec']) + r'\);[ \t]*\n',
+                      '', text, flags=re.M)
+    line = re.search(r'^(\s*)' + re.escape(data_obj) + r'\(\.data\);[^\n]*\n', text, re.M)
+    flat = []                                   # (lo, hi, row, run index inside the TU section)
+    for row in rows:
+        for k, (lo, hi) in enumerate(row['spans']):
+            flat.append((lo, hi, row, k))
+    flat.sort(key=lambda x: (x[0], x[1]))
+    for (lo, hi, row, _), nxt in zip(flat, flat[1:] + [None]):
+        if nxt is not None and hi > nxt[0]:
+            raise CarveError(f'{row["tu"]} {row["sec"]}: run {h8(lo)}-{h8(hi)} overlaps {nxt[2]["tu"]} {nxt[2]["sec"]} '
+                             f'{h8(nxt[0])}-{h8(nxt[1])} in the unsplit {unit} data object')
+    def read(p):
+        return piece_items(Path(unit_dir) / p['file'], p['start'], p['end'])
+    new = repiece('unsplit', [piece], [(lo, hi) for lo, hi, _, _ in flat], read)
+    indent = line.group(1)
+    out = [f'{indent}{LD_ORIG}{data_obj}[.data] */\n']
+    for p in new:
+        if p['c_split']:
+            lo, hi, row, k = flat[p['run']]
+            input_sec = split_section_name(row['sec'], k) if len(row['spans']) > 1 else row['sec']
+            out.append(f'{indent}{row["linked_obj"]}({input_sec}); {LD_MARK}\n')
+            out.append(f'{indent}. = 0x{p["end"] - base:X}; {LD_MARK} /* pin: end of the C run of {row["tu"]} */\n')
+            continue
+        rel = f'{CARVE_DIR}/{unit}/{p["name"].split("/")[-1]}.data'
+        if write:
+            write_piece_file(Path(unit_dir) / f'{rel}.s', p['header'], p['items'])
+        out.append(f'{indent}build/{rel}.o(.data); {LD_MARK}\n')
+    text = text[:line.start()] + ''.join(out) + text[line.end():]
+    for row in rows:
+        if row['linked_obj'] != row['c_obj']:
+            text = text.replace(row['c_obj'] + '(', row['linked_obj'] + '(')
+        if row['allocated_obj'] != row['c_obj']:
+            text = text.replace(row['allocated_obj'] + '(', row['linked_obj'] + '(')
+    for row in rows:
+        spans = row['spans']
+        report.append(dict(tu=row['tu'], section=row['sec'], run=[h8(spans[0][0]), h8(spans[-1][1])],
+                           runs=[[h8(lo), h8(hi)] for lo, hi in spans], c_object=row['c_obj'],
+                           allocated_object=row['allocated_obj'] if row['allocated_obj'] != row['c_obj'] else None,
+                           link_object=row['linked_obj'], source_piece=f'{unit}/unsplit',
+                           **({'c_owned_symbols': sorted(set().union(*[
+                               set(r.get('c_owned_symbols') or []) for r in row['runs']]))}
+                              if any(r.get('c_owned_symbols') for r in row['runs']) else {}),
+                           pieces=[(p['name'], h8(p['start']), h8(p['end']), p['c_split']) for p in new]))
+    return text
 
 
 # ---------------------------------------------------------------------------
@@ -2798,7 +2894,7 @@ def tu_context(root, unit, unit_dir, tu_id):
             raise CarveError(f'{tu_id} is not a TU of {unit}')
         pieces, placed, imported = {}, set(), {}
         for sec in OVERLAY_SECTIONS:
-            p = ovl_piece(unit_dir, unit, name, sec)
+            p = ovl_piece_or_unsplit(unit_dir, unit, name, sec)
             if p:
                 pieces[sec] = [p]
         ld = Path(unit_dir) / f'{unit}.ld'
@@ -2814,6 +2910,11 @@ def tu_context(root, unit, unit_dir, tu_id):
                                   + r'\.allocated\.o)\(\.text\);', text)
             for sec in OVERLAY_SECTIONS:
                 allocated_sections = (sec, '.scommon') if sec == '.sbss' else (sec,)
+                if ovl_piece(unit_dir, unit, name, sec) is None and sec in pieces:
+                    # The section's bytes are in the unsplit data object: the scaffold's
+                    # empty `<tu>.o(<sec>)` input is a placeholder at the section's end,
+                    # not where the original bytes are, so it never means "already C".
+                    continue
                 if ((obj and f'{obj.group(1)}({sec});' in text) or
                         (allocated and any(f'{allocated.group(1)}({s});' in text
                                            for s in allocated_sections))):
