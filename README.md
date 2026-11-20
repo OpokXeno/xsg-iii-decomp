@@ -14,14 +14,14 @@ Recovery has not started: the four files rebuild byte for byte from disassembly,
 function is C yet. The build system, tools and compile contracts come from the
 [Xenosaga Episode II](https://bytematch.dev/OpokXeno/xsg-ii-decomp) project.
 
-Recovered 0 of 7,286 in-scope game function(s) (0.000%).
+Recovered 1,135 of 7,286 in-scope game function(s) (15.578%).
 
 | Version | Target | Functions | Progress |
 | --- | --- | ---: | ---: |
-| NTSC-U | `SLUS_213.89` | 0 / 5,594 | 0.000% |
-| NTSC-U | `OV01.OVL` | 0 / 21 | 0.000% |
-| NTSC-U | `OV02.OVL` | 0 / 1,364 | 0.000% |
-| NTSC-U | `OV04.OVL` | 0 / 307 | 0.000% |
+| NTSC-U | `SLUS_213.89` | 1,014 / 5,594 | 18.127% |
+| NTSC-U | `OV01.OVL` | 7 / 21 | 33.333% |
+| NTSC-U | `OV02.OVL` | 91 / 1,364 | 6.672% |
+| NTSC-U | `OV04.OVL` | 23 / 307 | 7.492% |
 
 ## Building
 

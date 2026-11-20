@@ -34,7 +34,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-SRC = Path('/home/pc/xenosaga2-port/xenosga-ii-decomp')
+SRC = Path(os.environ.get('XENO_X2_ROOT', ROOT.parents[1] / 'xenosaga2-port' / 'xenosga-ii-decomp'))
 sys.path.insert(0, str(ROOT / 'tools'))
 sys.path.insert(0, str(ROOT / 'tools/tu'))
 import tu_edit  # noqa: E402

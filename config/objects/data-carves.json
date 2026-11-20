@@ -27,7 +27,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_debug_file_004.o"
+      "object": "build/main/build/c/xgl_debug_file_004.o"
      }
     }
    ]
@@ -600,7 +600,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_light_030.o"
+      "object": "build/main/build/c/xgl_light_030.o"
      }
     }
    ],
@@ -626,7 +626,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_light_030.o"
+      "object": "build/main/build/c/xgl_light_030.o"
      }
     }
    ]
@@ -780,7 +780,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/sdv_seq.o"
+      "object": "build/main/build/c/sdv_seq.o"
      }
     }
    ]
@@ -890,7 +890,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/draw_list.o"
+      "object": "build/main/build/c/draw_list.o"
      }
     }
    ]
@@ -945,7 +945,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/ti_wat_sim_update.o"
+      "object": "build/main/build/c/ti_wat_sim_update.o"
      }
     }
    ]
@@ -972,7 +972,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/TiWatSim.o"
+      "object": "build/main/build/c/TiWatSim.o"
      }
     }
    ]
@@ -1087,7 +1087,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xgl_vu1_regs.o"
+      "object": "build/main/build/c/xgl_vu1_regs.o"
      }
     }
    ]
@@ -1231,7 +1231,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/game_camera.o"
+      "object": "build/main/build/c/game_camera.o"
      }
     }
    ]
@@ -1406,7 +1406,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/TiCameraSolver.o"
+      "object": "build/main/build/c/TiCameraSolver.o"
      }
     }
    ]
@@ -1889,7 +1889,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/main/build/c/xac_eval.o"
+      "object": "build/main/build/c/xac_eval.o"
      }
     }
    ]
@@ -1915,7 +1915,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "/home/pc/xenosaga3-port/Xenosaga-III-decomp/build/ov04/build/scaffold/src/ov04/tu019.o"
+      "object": "build/ov04/build/scaffold/src/ov04/tu019.o"
      }
     }
    ]

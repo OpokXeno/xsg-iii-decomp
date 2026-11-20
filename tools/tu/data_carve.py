@@ -131,7 +131,7 @@ from toolchain import Toolchain, tu_assembler_options  # noqa: E402
 # The former private config/tu/data-carves.json is retired.
 PUBLIC_REGISTRY = 'config/objects/data-carves.json'
 REGISTRY = PUBLIC_REGISTRY
-CANONICAL_ROOT = Path('/home/pc/xenosaga3-port/Xenosaga-III-decomp')
+CANONICAL_ROOT = Path(__file__).resolve().parents[2]
 SCHEMA = 'tu-data-carves/1'
 # Sections a compiler fills with anonymous constants of a function: jump tables
 # and string/float/double literals (.rodata), gp-relative float literals (.lit4)

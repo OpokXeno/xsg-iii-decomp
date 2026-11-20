@@ -1,3 +1,4 @@
+/* header_harvest: hand-maintained (X3 express integration; tools/header_harvest.py leaves it alone). */
 #ifndef INCLUDE_OV02_TU012_H
 #define INCLUDE_OV02_TU012_H
 
