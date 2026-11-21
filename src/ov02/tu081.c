@@ -147,7 +147,7 @@ void queueRunSecondaryAction(void) {
 }
 
 void queueAdvance(RoboCommandUnit *commandUnit);
-void *roboBattleUnitGet(u32 unitId, void *file, s32 line);
+void *roboBattleUnitGet(u32 battleSlotIndex, const char *caller_file, s32 caller_line);
 void roboActorModeStart(void *, s32);
 void func_00AAB820(s32, void *, void *, s32 *, s32);
 void publishEntryRecords(void);

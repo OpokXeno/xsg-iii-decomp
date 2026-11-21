@@ -395,7 +395,7 @@ void battleActorPostStartEvent(BattleActor *actor);
 s32 calcStatGet(void *, s32, s32);
 s32 func_00A81868(void *, s32);
 s32 func_00A94218(void *);
-void *roboBattleUnitGet(u32 index, s32 *file, s32 line);
+void *roboBattleUnitGet(u32 battleSlotIndex, const char *caller_file, s32 caller_line);
 s32 roboSetActive(s32);
 s32 func_00AA3610(void *, void *);
 s32 func_00AA5B20(void *, s32, s32, s32);

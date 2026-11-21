@@ -77,7 +77,7 @@ s32 unitStockSlotUsable(BattleUnit *battleUnit, s32 actionNumber)
     return func_00A837C0(battleUnit, actionSlotDetail) > 0;
 }
 
-BattleSlot *ov02BattleSlotGet(s32 index);
+u8 *ov02BattleSlotGet(s32 entryNumber);
 
 s32 unitStatUsable(BattleUnit *battleUnit, s32 statNumber)
 {

@@ -4,7 +4,6 @@ typedef unsigned char u8;
 typedef int s32;
 typedef float f32;
 typedef signed char s8;
-typedef s32 s32;
 
 /* Plane record: the 0x80-byte block this TU initialises; func_00196200 takes the sub-record at +0x80. */
 typedef struct NjPlane {

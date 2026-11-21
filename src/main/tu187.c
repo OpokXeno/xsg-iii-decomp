@@ -33,7 +33,7 @@ extern SeVoiceState *gSeVoiceState;
 s32 slotKindResolve(s32);
 s32 func_00222C60(s32, s32);
 s32 pagedTableGetCurrentEntry();
-s32 func_00A843F8(s32 index);
+u8 *func_00A843F8(s32 index);
 
 s32 seVoiceLookupSlot(void) {
     s32 resolvedSlot;

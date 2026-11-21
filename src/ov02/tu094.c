@@ -73,7 +73,7 @@ s32 roboStartCommandPlain(s32 actorId, s32 targetId, s32 commandValue) {
 INCLUDE_ASM("asm/nonmatchings/ov02/tu094", func_00AB3618);
 
 extern unsigned char D_00ABBBE0[];
-void *roboBattleUnitGet(u32 id, unsigned char *table, s32 key);
+void *roboBattleUnitGet(u32 battleSlotIndex, const char *caller_file, s32 caller_line);
 
 s32 roboPairStatDelta(s32 *leftId, s32 *rightId) {
     RoboActor *left_unit;
@@ -101,7 +101,7 @@ s32 roboPairStatDelta(s32 *leftId, s32 *rightId) {
 INCLUDE_ASM("asm/nonmatchings/ov02/tu094", func_00AB3780);
 
 s32 unitStatUsable(BattleUnit *);
-s32 ov02BattleSlotGet(s32 index);
+u8 *ov02BattleSlotGet(s32 entryNumber);
 s32 func_00A86530(s32);
 
 s32 roboUnitOwnedStat(RoboActor *roboActor, s32 statId) {
