@@ -25,7 +25,7 @@ typedef struct SefEffectEntry {
     signed char signal;
 } SefEffectEntry;
 
-/* The request block sefGetBattleData returns (sefRequestBuffer). X3 layout measured from the asm of sef_134, sdv_183 and
+/* The request block sefGetBattleData returns (sefRequestKeyBlock). X3 layout measured from the asm of sef_134, sdv_183 and
  * tu122: the source and target actors of the request at +0x00/+0x04, the hit-wait byte at +0x20, two kind matrices
  * (kind 0x100 at +0x70, kind 0x200 at +0xB0) and, from +0x2C8, one table word per kind (kinds 1, 0, 2, 3, 4, 6; the
  * kind tables hold 64-byte matrices from +0x00, 16-byte slot vectors from +0xCC0 and flag bytes from +0x155C). */

@@ -5,32 +5,32 @@ float srsAtan2(float x, float y);
 
 /* Row-major 4x4 float matrix. */
 
-float vu0CopyMatrixWithTranslation(Vector4 *dst, Matrix4 src, Vector4 *aux, Vector4 *direction);
+float vu0CopyMatrixWithTranslation(Vector4 *dstMatrix, Matrix4 srcMatrix, Vector4 *translationRow, Vector4 *direction);
 float MMathCalcDist(const Vector4 *first, const Vector4 *second);
 
-/* Copies a matrix: rows 0-2 from src, row 3 from the translation vector in aux. Returns the distance from aux to
- * direction. */
-float vu0CopyMatrixWithTranslation(Vector4 *dst, Matrix4 src, Vector4 *aux, Vector4 *direction)
+/* Copies a matrix: rows 0-2 from srcMatrix, row 3 from the translation vector translationRow. Returns the distance from
+ * translationRow to direction. */
+float vu0CopyMatrixWithTranslation(Vector4 *dstMatrix, Matrix4 srcMatrix, Vector4 *translationRow, Vector4 *direction)
 {
     float (*source)[4];
-    Vector4 *translation = aux;
-    Vector4 *destination = dst;
+    Vector4 *translation = translationRow;
+    Vector4 *dstRows = dstMatrix;
     float distance = MMathCalcDist(translation, direction);
-    source = src;
+    source = srcMatrix;
     __asm__ __volatile__("lqc2 vf26, 0(%0)" : : "r"(source) : "memory");
     __asm__ __volatile__("lqc2 vf27, 16(%0)" : : "r"(source) : "memory");
     __asm__ __volatile__("lqc2 vf28, 32(%0)" : : "r"(source) : "memory");
     __asm__ __volatile__("lqc2 vf29, 0(%0)" : : "r"(translation) : "memory");
-    __asm__ __volatile__("sqc2 vf26, 0(%0)" : : "r"(destination) : "memory");
-    __asm__ __volatile__("sqc2 vf27, 16(%0)" : : "r"(destination) : "memory");
-    __asm__ __volatile__("sqc2 vf28, 32(%0)" : : "r"(destination) : "memory");
-    __asm__ __volatile__("sqc2 vf29, 48(%0)" : : "r"(destination) : "memory");
+    __asm__ __volatile__("sqc2 vf26, 0(%0)" : : "r"(dstRows) : "memory");
+    __asm__ __volatile__("sqc2 vf27, 16(%0)" : : "r"(dstRows) : "memory");
+    __asm__ __volatile__("sqc2 vf28, 32(%0)" : : "r"(dstRows) : "memory");
+    __asm__ __volatile__("sqc2 vf29, 48(%0)" : : "r"(dstRows) : "memory");
     return distance;
 }
 
 #include "vu0_macro.h"
 
-/* A key of a Hermite track: the point, then the key time (signed short at +12) and the flags byte (curve type in the
+/* A key of a Hermite track: the point, then the key time (signed short at +12) and the curve-and-ease byte (curve type in the
  * low nibble, ease index in the high nibble) at +15. A time of MMATH_HERMITE_END ends the track. */
 typedef struct MMathHermiteKey {
     float x;
@@ -38,72 +38,72 @@ typedef struct MMathHermiteKey {
     float z;
     short time;
     unsigned char unmodeled_0E;
-    unsigned char flags;
+    unsigned char curveAndEase;
 } MMathHermiteKey;
 
 #define MMATH_HERMITE_END 0x1000
 
 float sefEaseCurve(float offset, float span, int ease);
-void func_001FA1C0(const MMathHermiteKey *key, Vector4 **first, Vector4 **second, Vector4 **third, Vector4 **fourth);
-void func_0025A000(Vector4 *result, const Vector4 *start, const Vector4 *next, float parameter);
+void MMathHermiteKeyNeighbors(const MMathHermiteKey *key, Vector4 **first, Vector4 **second, Vector4 **third, Vector4 **fourth);
+void func_0025A000(Vector4 *outPoint, const Vector4 *start, const Vector4 *next, float parameter);
 void MMathCalcHermitePrm(Vector4 *tangent_start, Vector4 *tangent_end, const Vector4 *point_prev,
                          const Vector4 *point_start, const Vector4 *point_end, const Vector4 *point_next);
-float *MMathCalcHermite(float *destination, Vector4 *tangent_first, Vector4 *tangent_second,
+float *MMathCalcHermite(float *outPoint, Vector4 *tangent_first, Vector4 *tangent_second,
                         Vector4 *endpoint_first, Vector4 *endpoint_second, float parameter);
 
 /* The point of the Hermite track `keys` at `time`: the origin without keys, the first or last key's point outside
  * the keys, else the curve between the two keys around `time`. */
-void MMathEvalHermiteKeys(Vector4 *result, MMathHermiteKey *keys, float time)
+void MMathEvalHermiteKeys(Vector4 *outPoint, MMathHermiteKey *keys, float time)
 {
     Vector4 tangent[2];
     Vector4 *points[4];
-    MMathHermiteKey *start;
+    MMathHermiteKey *trackStart;
     MMathHermiteKey *firstKey;
     MMathHermiteKey *nextKey;
     float parameter;
     int frame;
-    int first;
-    int count;
-    int index;
+    int keySegment;
+    int keyCount;
+    int keyIndex;
 
     frame = time;
-    start = keys;
-    first = -1;
-    index = 0;
-    count = 0;
-    for (; *&keys[index].time != MMATH_HERMITE_END; index++) {
-        if (frame < keys[index].time && first < 0) {
-            first = index - 1;
+    trackStart = keys;
+    keySegment = -1;
+    keyIndex = 0;
+    keyCount = 0;
+    for (; *&keys[keyIndex].time != MMATH_HERMITE_END; keyIndex++) {
+        if (frame < keys[keyIndex].time && keySegment < 0) {
+            keySegment = keyIndex - 1;
         }
-        count++;
+        keyCount++;
     }
-    if (count <= 0) {
-        Vu0SetOrigin(result);
+    if (keyCount <= 0) {
+        Vu0SetOrigin(outPoint);
         return;
     }
-    if (count == 1) {
-        Vu0MMathCopyPoint(result, start);
+    if (keyCount == 1) {
+        Vu0MMathCopyPoint(outPoint, trackStart);
         return;
     }
     if (frame < keys[0].time) {
-        count = 1;
+        keyCount = 1;
     }
-    if (first < 0 || first == count - 1) {
-        Vu0MMathCopyPoint(result, &keys[count - 1]);
+    if (keySegment < 0 || keySegment == keyCount - 1) {
+        Vu0MMathCopyPoint(outPoint, &keys[keyCount - 1]);
         return;
     }
-    parameter = sefEaseCurve(time - keys[first].time, keys[first + 1].time - keys[first].time, keys[first].flags >> 4);
-    firstKey = &keys[first];
+    parameter = sefEaseCurve(time - keys[keySegment].time, keys[keySegment + 1].time - keys[keySegment].time, keys[keySegment].curveAndEase >> 4);
+    firstKey = &keys[keySegment];
     nextKey = firstKey + 1;
-    switch (firstKey->flags & 0xf) {
+    switch (firstKey->curveAndEase & 0xf) {
     case 0:
     default:
-        func_0025A000(result, (const Vector4 *) firstKey, (const Vector4 *) nextKey, parameter);
+        func_0025A000(outPoint, (const Vector4 *) firstKey, (const Vector4 *) nextKey, parameter);
         break;
     case 1:
-        func_001FA1C0(firstKey, &points[0], &points[1], &points[2], &points[3]);
+        MMathHermiteKeyNeighbors(firstKey, &points[0], &points[1], &points[2], &points[3]);
         MMathCalcHermitePrm(&tangent[0], &tangent[1], points[0], points[1], points[2], points[3]);
-        MMathCalcHermite(&result->x, &tangent[0], &tangent[1], points[1], points[2], parameter);
+        MMathCalcHermite(&outPoint->x, &tangent[0], &tangent[1], points[1], points[2], parameter);
         break;
     }
 }

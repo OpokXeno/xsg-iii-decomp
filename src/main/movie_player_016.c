@@ -5,17 +5,25 @@ void moviePlayerInit(void);
 void *memset(void *dest, int value, unsigned int size);
 
 typedef struct MoviePlayerInitParams {
-    float value;
+    float frameRate;
     int flag_a;
     int flag_b;
     int flag_c;
     unsigned char unmodeled_10[0x10];
 } MoviePlayerInitParams;
 
-int mwPlyInitSfdFx(MoviePlayerInitParams *params);
+int mwPlyInitSfdFx(MoviePlayerInitParams *sfdInitParams);
 extern float movieFrameRate;
 
-INCLUDE_ASM("asm/main/nonmatchings/movie_player_016", func_0018BC98);
+typedef int s32;
+s32 func_00130158(s32 value);
+s32 func_00132D90(s32 value);
+
+s32 moviePlayerReleaseHandle(s32 *playerHandle) {
+    func_00132D90(*playerHandle);
+    func_00130158(*playerHandle);
+    return 0;
+}
 
 typedef struct MoviePlayerParams {
     int file_type;
@@ -24,8 +32,8 @@ typedef struct MoviePlayerParams {
     int max_height;
     int frame_pool_count;
     int stream_count;
-    int base;
-    int size;
+    int movieWorkAreaBase;
+    int movieWorkAreaSize;
     int composition_mode;
     unsigned char unmodeled_24[0xC];
 } MoviePlayerParams;
@@ -36,58 +44,98 @@ typedef struct MoviePlayerParams {
 #define MOVIE_STREAM_COUNT 1
 #define MOVIE_COMPOSITION_MODE 17
 
-int func_0012EC60(MoviePlayerParams *layout);
+int func_0012EC60(MoviePlayerParams *creationParams);
 /* Two halfwords in the .sdata of this TU (no symbol name): the movie width and height. */
-extern unsigned short D_005511A0;
-extern unsigned short D_005511A2;
+extern unsigned short moviePlayerWidth;
+extern unsigned short moviePlayerHeight;
 void func_002FB030(void);
 void func_002F47D8(int value);
 void func_00132140(void);
 void func_00167790(void);
 void func_0015DF18(void);
 
-void moviePlayerParamsInit(MoviePlayerParams *layout)
+void moviePlayerParamsInit(MoviePlayerParams *creationParams)
 {
     unsigned short width;
     unsigned short height;
-    memset(layout, 0, sizeof(*layout));
-    width = D_005511A0;
-    height = D_005511A2;
-    layout->file_type = MOVIE_FILE_TYPE;
-    layout->composition_mode = MOVIE_COMPOSITION_MODE;
-    layout->max_bit_rate = MOVIE_MAX_BIT_RATE;
-    layout->max_width = width;
-    layout->max_height = height;
-    layout->frame_pool_count = MOVIE_FRAME_POOL_COUNT;
-    layout->stream_count = MOVIE_STREAM_COUNT;
-    layout->size = func_0012EC60(layout);
+    memset(creationParams, 0, sizeof(*creationParams));
+    width = moviePlayerWidth;
+    height = moviePlayerHeight;
+    creationParams->file_type = MOVIE_FILE_TYPE;
+    creationParams->composition_mode = MOVIE_COMPOSITION_MODE;
+    creationParams->max_bit_rate = MOVIE_MAX_BIT_RATE;
+    creationParams->max_width = width;
+    creationParams->max_height = height;
+    creationParams->frame_pool_count = MOVIE_FRAME_POOL_COUNT;
+    creationParams->stream_count = MOVIE_STREAM_COUNT;
+    creationParams->movieWorkAreaSize = func_0012EC60(creationParams);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/movie_player_016", func_0018BD40);
+void moviePlayerSetDimensions(u16 width, u16 height) {
+    moviePlayerWidth = width;
+    moviePlayerHeight = height;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/movie_player_016", func_0018BD50);
 
-INCLUDE_ASM("asm/main/nonmatchings/movie_player_016", func_0018BDC0);
+s32 func_0012FBB8();
+s32 makeGstransChain(s32 destination, s32 image, void *frame);
+
+/* Layout of the movie player object that moviePlayerSetupObject fills in (0x17 bytes used). */
+typedef struct MoviePlayerObject {
+    s32 playerHandle;                     /* +0x00, returned by func_0012FBB8 */
+    s32 chainBase;                  /* +0x04 */
+    unsigned char unk_08[0x4];
+    s16 unk_0C;                     /* +0x0C, cleared */
+    s16 unk_0E;                     /* +0x0E, cleared */
+    s16 maxWidth;                   /* +0x10, from MoviePlayerParams.max_width */
+    s16 maxHeight;                  /* +0x12, from MoviePlayerParams.max_height */
+    unsigned char unk_14;           /* +0x14, cleared */
+    unsigned char unk_15;           /* +0x15, cleared */
+    unsigned char unk_16;           /* +0x16, set to 0x7F */
+} MoviePlayerObject;
+
+s32 moviePlayerSetupObject(MoviePlayerObject *player, s32 movieWorkAreaBase)
+{
+  MoviePlayerParams creationParams;
+  s32 chainBase;
+  s32 movieWorkAreaSize;
+
+  player->unk_16 = 0x7F;
+  player->unk_0E = 0;
+  player->unk_0C = 0;
+  player->unk_14 = 0;
+  player->unk_15 = 0;
+  moviePlayerParamsInit(&creationParams);
+  movieWorkAreaSize = creationParams.movieWorkAreaSize;
+  creationParams.movieWorkAreaBase = movieWorkAreaBase;
+  chainBase = movieWorkAreaBase + ((movieWorkAreaSize + 0x3F) & (~0x3F));
+  player->playerHandle = func_0012FBB8(&creationParams);
+  player->maxWidth = creationParams.max_width;
+  player->maxHeight = creationParams.max_height;
+  player->chainBase = chainBase;
+  return chainBase + (((makeGstransChain(chainBase, 0, player) * 0x10) + 0x3F) & (~0x3F));
+}
 
 void moviePlayerSetSize(void)
 {
     func_002FB030();
-    D_005511A0 = 512;
-    D_005511A2 = 448;
+    moviePlayerWidth = 512;
+    moviePlayerHeight = 448;
 }
 
 void moviePlayerInit(void)
 {
-    MoviePlayerInitParams params;
+    MoviePlayerInitParams sfdInitParams;
 
-    memset(&params, 0, sizeof(params));
-    params.flag_c = 0;
-    params.value = movieFrameRate;
-    params.flag_b = (params.flag_a = 1);
-    mwPlyInitSfdFx(&params);
+    memset(&sfdInitParams, 0, sizeof(sfdInitParams));
+    sfdInitParams.flag_c = 0;
+    sfdInitParams.frameRate = movieFrameRate;
+    sfdInitParams.flag_b = (sfdInitParams.flag_a = 1);
+    mwPlyInitSfdFx(&sfdInitParams);
 }
 
-void func_0018BEE8(void)
+void moviePlayerTerminate(void)
 {
     func_002F47D8(0);
     func_00132140();

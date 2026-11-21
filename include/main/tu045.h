@@ -16,14 +16,14 @@ typedef struct PxyClipPlanes {
 } PxyClipPlanes;
 
 /* The "pxy" model file header. */
-typedef struct PxyHeader {
+typedef struct PxyModelHeader {
     char magic[4]; /* "pxy" */
     float version; /* +0x04 */
     u32 flags; /* +0x08: bit 0x2000 = per-geometry shadow mask */
     u32 fileSize[1]; /* +0x0c, a one-word array, read as *h->fileSize */
     char name[0x20]; /* +0x10 */
     int layerCount; /* +0x30 */
-    int entryCount; /* +0x34: the map code clears one hide-mask bit for each */
+    int hideMaskCount; /* +0x34: the map code clears one hide-mask bit for each */
     u8 unmodeled_38[4];
     int offset3C; /* +0x3c */
     int partOffset; /* +0x40 */
@@ -57,7 +57,7 @@ typedef struct PxyHeader {
     int subPackOffset; /* +0xd0: offset of a second pack, 0 if none */
     u8 unmodeled_D4[0xE8 - 0xD4];
     int sortEntryOffset; /* +0xe8 */
-} PxyHeader;
+} PxyModelHeader;
 
 typedef struct PxyHideMask { u32 bits[1]; } PxyHideMask;
 
@@ -82,12 +82,12 @@ typedef struct PxyPart {
 } PxyPart;
 
 /* A 0x20-byte range of parts: [0] opaque, [1] translucent. */
-typedef struct PxyPartRange {
+typedef struct PxyDrawPartRange {
     u8 unk00[0x14];
     int first; /* +0x14 */
     int count; /* +0x18 */
     u8 unk1C[4];
-} PxyPartRange;
+} PxyDrawPartRange;
 
 /* The 0x180-byte light block of a shadow projector, cleared for each model: the XglLightSet layout with the first
  * direction as a Vector4 (the matrix multiply and the w store take a vector) and the first colour as three floats. */
@@ -156,8 +156,8 @@ typedef struct PxyPacket {
     int camera; /* +0x04: camera that owns the model */
     int drawMode; /* +0x08: 1 and 4 cast shadows */
     u8 unmodeled_0C[4];
-    PxyHeader *header; /* +0x10 */
-    struct PxyPartRange *ranges; /* +0x14 */
+    PxyModelHeader *header; /* +0x10 */
+    struct PxyDrawPartRange *ranges; /* +0x14 */
     u8 unmodeled_18[4];
     u8 *channelTable; /* +0x1C: 0x70-byte record per matrix index, its bone ids from +0x30 */
     PxyPart *parts; /* +0x20 */

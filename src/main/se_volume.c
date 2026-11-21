@@ -7,49 +7,48 @@
 #include "main/tu018.h"
 
 int seVolumeCurve(int level);
-int seVolumeRampSet(VolumeRamp *ramp, int level, int step);
+int seVolumeRampSet(VolumeRamp *ramp, int level, int levelPerStep);
 int seVolumeRampStep(VolumeRamp *ramp);
 
-extern short seVolumeCurveTable[];
 extern short seVolumeCurveTable[36];
 
 int seVolumeCurve(int level)
 {
     int fraction = level & 3;
-    int value;
+    int curveValue;
 
     if (level < SOUND_LEVEL_MAX && fraction != 0) {
-        int point = seVolumeCurveTable[level >> 2];
-        int next = seVolumeCurveTable[(level + 4) >> 2];
+        int lowerCurvePoint = seVolumeCurveTable[level >> 2];
+        int upperCurvePoint = seVolumeCurveTable[(level + 4) >> 2];
 
-        value = point + (((next - point) * fraction) >> 2);
+        curveValue = lowerCurvePoint + (((upperCurvePoint - lowerCurvePoint) * fraction) >> 2);
     } else {
-        value = seVolumeCurveTable[level >> 2];
+        curveValue = seVolumeCurveTable[level >> 2];
         if (level >= SOUND_LEVEL_MAX) {
-            value = 0;
+            curveValue = 0;
         }
     }
-    return value;
+    return curveValue;
 }
 
 /* Starts a ramp toward level, moving by step per seVolumeRampStep call (in the right
  * direction); step 0 jumps there at once and returns the new level, otherwise -1. The
  * level is read back as the stored (8-bit) target. */
-int seVolumeRampSet(VolumeRamp *ramp, int level, int step)
+int seVolumeRampSet(VolumeRamp *ramp, int level, int levelPerStep)
 {
     ramp->target = level;
-    if (step == 0) {
-        ramp->current = level;
-        ramp->step = 0;
+    if (levelPerStep == 0) {
+        ramp->currentLevel = level;
+        ramp->levelDelta = 0;
         return ramp->target;
     }
-    if (ramp->target == ramp->current) {
+    if (ramp->target == ramp->currentLevel) {
         return -1;
     }
-    if (ramp->target < ramp->current) {
-        ramp->step = -step;
+    if (ramp->target < ramp->currentLevel) {
+        ramp->levelDelta = -levelPerStep;
     } else {
-        ramp->step = step;
+        ramp->levelDelta = levelPerStep;
     }
     return -1;
 }
@@ -58,20 +57,20 @@ int seVolumeRampSet(VolumeRamp *ramp, int level, int step)
  * range); returns the new level, or -1 when the ramp is not moving. */
 int seVolumeRampStep(VolumeRamp *ramp)
 {
-    int step;
-    int next_value;
+    int levelDelta;
+    int nextLevel;
 
-    step = ramp->step;
-    if (step != 0) {
-        next_value = ramp->current;
-        next_value += step;
-        if ((step < 0 && next_value < ramp->target) || (step > 0 && next_value > ramp->target)
-            || next_value < 0 || next_value > SOUND_LEVEL_MAX) {
-            next_value = ramp->target;
-            ramp->step = 0;
+    levelDelta = ramp->levelDelta;
+    if (levelDelta != 0) {
+        nextLevel = ramp->currentLevel;
+        nextLevel += levelDelta;
+        if ((levelDelta < 0 && nextLevel < ramp->target) || (levelDelta > 0 && nextLevel > ramp->target)
+            || nextLevel < 0 || nextLevel > SOUND_LEVEL_MAX) {
+            nextLevel = ramp->target;
+            ramp->levelDelta = 0;
         }
-        ramp->current = next_value;
-        return next_value;
+        ramp->currentLevel = nextLevel;
+        return nextLevel;
     }
     return -1;
 }

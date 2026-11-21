@@ -15,7 +15,7 @@
  */
 typedef struct FadeTask FadeTask;
 
-/* The 0x1C-byte task record ov01TaskClaim hands out, with the fade payload at +0x0C. */
+/* The 0x1C-byte task record battleTaskClaim hands out, with the fade payload at +0x0C. */
 struct FadeTask {
     int flags;                          /* +0x00 */
     void (*update)(FadeTask *task);     /* +0x04: the step callback the task runs */

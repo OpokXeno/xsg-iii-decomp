@@ -7,9 +7,9 @@
 
 extern GifStatusBlock gifStatus;
 
-void gifStateSetDepth(int value);
+void gifStateSetDepth(int depth);
 void nmlModelSetMulColor(Vector4 *color);
-void nmlModelUseSubWindow(unsigned int index, int enabled);
+void nmlModelUseSubWindow(unsigned int subWindowIndex, int enabled);
 void gifStateSetDecrease(f32 decrease);
 void gifStateSetCenter(int centerX, int centerY);
 void gifStateSetEffectAlpha(int alphaType, int alpha);
@@ -42,8 +42,8 @@ void gifStateSetCenter(int centerX, int centerY) {
 }
 
 /* Stores the Z of the camera quad (gifStatus +0x1C). */
-void gifStateSetDepth(int value) {
-    gifStatus.depth = value;
+void gifStateSetDepth(int depth) {
+    gifStatus.depth = depth;
 }
 
 /* Stores the frame buffer base of the effect. */
@@ -56,14 +56,14 @@ void gifStateSetBlur(int blur) {
     gifStatus.blur = blur;
 }
 
-void nmlModelUseSubWindow(unsigned int index, int enabled) {
-    if (index < NML_WINDOW_COUNT) {
-        gifStatus.subWindow[index] = enabled;
+void nmlModelUseSubWindow(unsigned int subWindowIndex, int enabled) {
+    if (subWindowIndex < NML_WINDOW_COUNT) {
+        gifStatus.subWindow[subWindowIndex] = enabled;
     }
 }
 
-void nmlModelSetSubWindowValue(u32 index, f32 value) {
-    if (index < 4U) {
-        gifStatus.subWindowValue[index] = value;
+void nmlModelSetSubWindowValue(u32 subWindowIndex, f32 subWindowValue) {
+    if (subWindowIndex < 4U) {
+        gifStatus.subWindowValue[subWindowIndex] = subWindowValue;
     }
 }

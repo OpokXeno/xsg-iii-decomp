@@ -5,8 +5,8 @@
 #include "main/tu031.h"
 
 float xglFRand(void);
-int F2I(float value);
-float I2F(int value);
+int F2I(float scalar);
+float I2F(int integer);
 void xglVectorNormal(Vector4 *destination, const Vector4 *source);
 void xglVectorScale(Vector4 *destination, const Vector4 *source, float scale);
 void xglVectorInner(float *destination, const Vector4 *left, const Vector4 *right);
@@ -26,25 +26,31 @@ float xglFRand(void)
     __asm__ __volatile__("vrnext.x vf1x, R\n\tqmfc2 $2, vf1\n\tmtc1 $2, $f0" : : : "$2", "$f0", "memory");
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197500);
+#include "main/tu141.h"
+typedef int s32;
 
-int F2I(register f32 value)
+void xglFRandSeed(f32 seed) {
+    __asm__ __volatile__("qmtc2.ni %0, vf1" : : "r"(seed) : "memory");
+    __asm__ __volatile__("vrinit R, vf1x" : : : "memory");
+}
+
+int F2I(register f32 scalar)
 {
-    register int result;
+    register int truncated;
 
     __asm__ __volatile__(
         "mtc1 %1,$f0\n\t"
         "cvt.w.s $f0,$f0\n\t"
         "mfc1 %0,$f0"
-        : "=r"(result)
-        : "r"(value)
+        : "=r"(truncated)
+        : "r"(scalar)
         : "$f0");
-    return result;
+    return truncated;
 }
 
-f32 I2F(register int value)
+f32 I2F(register int integer)
 {
-    return (f32)value;
+    return integer;
 }
 
 extern char D_20[];
@@ -81,11 +87,34 @@ float xglCos(float angle)
         : "+r"(angleBits) : "r"((u32)&D_E8 >> 3) : "$f0", "memory");
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001975B0);
+void func_001975C8();
+
+void xglLightPrepare(void) {
+    func_001975C8();
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001975C8);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197880);
+/* One of the 16 light slots at xglLightSlotTable: the handle of the light it holds (0 when free). */
+typedef struct XglLightSlot {
+    s32 lightHandle;
+    s32 unk_04;
+    u8 unk_08[0x8];
+} XglLightSlot;
+
+extern XglLightSlot xglLightSlotTable[];
+
+void xglLightSlotsClear(void) {
+    s32 lightSlotNumber;
+    XglLightSlot *lightSlot;
+
+    lightSlot = xglLightSlotTable;
+    for (lightSlotNumber = 0; lightSlotNumber < 16; lightSlotNumber++) {
+        lightSlot->lightHandle = 0;
+        lightSlot->unk_04 = 0;
+        lightSlot += 1;
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001978B8);
 
@@ -179,7 +208,7 @@ int xglLightBoxColor(Vector4 *color, Vector4 *lightDirection, XglLightKey *key, 
 void xglMatrixStackSave(Matrix4 matrix);
 void xglMatrixStackLoad(Matrix4 matrix);
 float xglPointLength(Vector4 *from, Vector4 *to);
-extern const DoublewordAlignedVector4 D_005412E0;
+extern const DoublewordAlignedVector4 xglLightConeEdgeTemplate;
 
 static inline void xglLightConeFinish(Vector4 *color, Vector4 *lightDirection, XglLightKey *key, Matrix4 keyMatrix, float fade)
 {
@@ -230,7 +259,7 @@ int xglLightConeColor(Vector4 *color, Vector4 *lightDirection, XglLightKey *key,
     xglMatrixStackMulVector(lightDirection, lightDirection);
 
     if (lightDirection->y > 1.0f || lightDirection->y < -1.0f) {
-        edgePoint = D_005412E0;
+        edgePoint = xglLightConeEdgeTemplate;
         if (lightDirection->y < -1.0f) {
             edgePoint.y = -1.0f;
         }
@@ -261,14 +290,49 @@ int xglLightConeColor(Vector4 *color, Vector4 *lightDirection, XglLightKey *key,
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198548);
+extern s32 xglLightBankValid;
+extern unsigned char xglLightBankStorage[];
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198568);
+u8 *xglLightBankGet(void) {
+    if (xglLightBankValid != 0) {
+        return xglLightBankStorage;
+    }
+    return 0;
+}
+
+void xglLightBankReset(void) {
+    xglLightBankValid = 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198570);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198C08);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198CA8);
+void xglLightSlotsInit(void) {
+    s32 lightSlotNumber;
+    XglLightSlot *lightSlot;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198CE0);
+    lightSlot = xglLightSlotTable;
+    for (lightSlotNumber = 0; lightSlotNumber < 16; lightSlotNumber++) {
+        lightSlot->lightHandle = 0;
+        lightSlot->unk_04 = 0;
+        lightSlot += 1;
+    }
+}
+
+void func_00197B10(s32 lightHandle, f32 value);
+
+void xglLightSlotsApply(f32 value) {
+    s32 lightHandle;
+    s32 lightSlotNumber;
+    XglLightSlot *lightSlot;
+
+    lightSlot = xglLightSlotTable;
+    for (lightSlotNumber = 0; lightSlotNumber < 16; lightSlotNumber++) {
+        lightHandle = lightSlot->lightHandle;
+        lightSlot += 1;
+        if (lightHandle != 0) {
+            func_00197B10(lightHandle, value);
+        }
+    }
+}

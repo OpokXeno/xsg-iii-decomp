@@ -11,9 +11,6 @@ void assertFailed(const char *message, const char *file, int line);
 
 
 
-
-
-
 /* Camera animation record: the version float at +4 picks the layout of the curve data that starts at +0xC; the frame
  * range of its playback is at +8 and +0xA (the title scene steps through it). */
 typedef struct TiCameraRecord {
@@ -21,10 +18,10 @@ typedef struct TiCameraRecord {
     f32 version;
     unsigned short frameStart;  /* +8 */
     unsigned short frameEnd;    /* +0xA */
-    u8 data[0];
+    u8 curveData[0];
 } TiCameraRecord;
 
-void tiCameraReadRecord(XglCamera *camera, TiCameraRecord *record, f32 value);
+void tiCameraReadRecord(XglCamera *camera, TiCameraRecord *cameraRecord, f32 curveParam);
 void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation);
 
 f32 atanf(f32);
@@ -34,9 +31,9 @@ f32 atanf(f32);
  * This view of travel.focus..scale keeps those two words int. */
 typedef struct TiCameraChannel {
     unsigned char unmodeled_00[4];
-    float value;                /* travel.fov */
-    int unknown_08;             /* travel.fov_velocity */
-    int unknown_0c;             /* travel.scale */
+    float fov;                /* travel.fov */
+    int fovVelocity;             /* travel.fov_velocity */
+    int scale;             /* travel.scale */
 } TiCameraChannel;
 
 extern const char tiCameraAssertPData[];
@@ -99,8 +96,8 @@ void tiCameraReadScalar(XglCamera *camera, u8 **ppData, f32 curveParam)
     }
     xacEvalJointValue(curveParam, &sample, ppData);
     channel = (TiCameraChannel *)&camera->travel;
-    channel->unknown_08 = channel->unknown_0c = 0;
-    channel->value = sample;
+    channel->fovVelocity = channel->scale = 0;
+    channel->fov = sample;
 }
 
 void tiCameraReadAngle(XglCamera *camera, u8 **ppData, f32 curveParam)
@@ -116,26 +113,26 @@ void tiCameraReadAngle(XglCamera *camera, u8 **ppData, f32 curveParam)
     }
     xacEvalJointValue(curveParam, &sample, ppData);
     channel = (TiCameraChannel *)&camera->travel;
-    channel->unknown_0c = 0;
-    channel->unknown_08 = 0;
-    channel->value = sample * 3.1415927f / 180.0f;
+    channel->scale = 0;
+    channel->fovVelocity = 0;
+    channel->fov = sample * 3.1415927f / 180.0f;
 }
 
 /* Camera animation record: three header words, then `version` picks the layout (< 1.1 uses the
  * scalar reader, otherwise the angle reader). The data cursor starts after the header. */
-void tiCameraReadRecord(XglCamera *camera, TiCameraRecord *record, f32 value)
+void tiCameraReadRecord(XglCamera *camera, TiCameraRecord *cameraRecord, f32 curveParam)
 {
     u8 *stream;
 
-    stream = record->data;
-    if (record->version < 1.1f)
+    stream = cameraRecord->curveData;
+    if (cameraRecord->version < 1.1f)
     {
-        tiCameraReadPose(camera, &stream, value);
-        tiCameraReadScalar(camera, &stream, value);
+        tiCameraReadPose(camera, &stream, curveParam);
+        tiCameraReadScalar(camera, &stream, curveParam);
         return;
     }
-    tiCameraReadPose(camera, &stream, value);
-    tiCameraReadAngle(camera, &stream, value);
+    tiCameraReadPose(camera, &stream, curveParam);
+    tiCameraReadAngle(camera, &stream, curveParam);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/TiCameraSolver", func_002941D0);

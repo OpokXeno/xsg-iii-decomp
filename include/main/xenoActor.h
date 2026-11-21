@@ -52,7 +52,7 @@ typedef struct XenoMatrix {
     float m[4][4];
 } XenoMatrix;
 
-/* The 0x180-byte light set of an actor: the battle actors copy it whole (unitCreateSide in src/ov01/unit_cmd.c), and
+/* The 0x180-byte light set of an actor: the battle actors copy it whole (unitCreateSide in X2 src/ov01/unit_cmd.c), and
  * uwamonoLightBlendStep blends the vectors. */
 typedef struct XenoLight {
     float directions[3][4];                 /* +0x00 */
@@ -132,16 +132,16 @@ struct XenoActor {
     DoublewordAlignedVector4 sourceBlock;   /* +0x4B0: 0xFF in the actor init */
     void *overrideMatrix;                   /* +0x4C0 */
     struct XenoActor *parent;               /* +0x4C4 */
-    unsigned char unmodeled_4c8[0x4];       /* +0x4C8 */
+    unsigned char attachSlotIndex[0x4];       /* +0x4C8 */
     struct XenoActor *children[8];          /* +0x4CC */
     unsigned int resetFlags;                /* +0x4EC */
     float frame;                            /* +0x4F0: loop frame of the current motion (the cached play position) */
-    short unmodeled_4f4;                    /* +0x4F4 */
-    short unmodeled_4f6;                    /* +0x4F6 */
-    short unmodeled_4f8;                    /* +0x4F8 */
+    short currentMotionSlot;                    /* +0x4F4 */
+    short currentMotionTable;                    /* +0x4F6 */
+    short requestedMotionSlot;                    /* +0x4F8 */
     unsigned char unmodeled_4fa[2];
-    float unmodeled_4fc;                    /* +0x4FC: cached range minimum of package B's entry */
-    short unmodeled_500;                    /* +0x500: selected entry of package B */
+    float selectorRangeMin;                    /* +0x4FC: cached range minimum of package B's entry */
+    short selectedEntry;                    /* +0x500: selected entry of package B */
     unsigned char unmodeled_502[2];
     int rsrc[12];                           /* +0x504: XAct_Rsrc_Count entries */
     unsigned char unmodeled_534[0x540 - 0x534];

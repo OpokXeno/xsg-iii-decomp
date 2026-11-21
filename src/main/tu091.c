@@ -5,7 +5,7 @@
 
 
 
-/* Messages in a thread's queue (sbChainReset: first 0, last 0xF). */
+/* Messages in a thread's queue (sbQueueReset: first 0, last 0xF). */
 #define SB_QUEUE_LAST 0xF
 
 
@@ -23,28 +23,89 @@ INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CCF28);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CCFF0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CD0D0);
+typedef signed char s8;
+typedef int s32;
+/* The argument block at gGameLoopRuntimeStorage: the two values sbDeferredCallStore stores (+0x10 and +0x12). */
+typedef struct GameLoopRuntime {
+    u8 unk_00[0x10];
+    s16 firstVmArg;               /* +0x10 */
+    s16 secondVmArg;              /* +0x12 */
+} GameLoopRuntime;
+extern GameLoopRuntime gGameLoopRuntimeStorage[];
+s32 vmArgTagIsZero(SbThread *thread, s32 argIndex);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CD190);
+s32 sbDeferredCallStore(SbThread *thread)
+{
+  s16 firstVmArg;
+  s16 secondVmArg;
+  s16 storedSecondVmArg;
+    if ((VM_PLUGIN_CNT_GET(thread) <= 0) || (VM_PLUGIN_CNT_GET(thread) >= 3))
+  {
+    sbSlotJumpRequest(thread, 2);
+    return 0;
+  }
+  firstVmArg = vmArgGet(thread, 1);
+  if (vmArgTagIsZero(thread, 2) == 0)
+  {
+    secondVmArg = vmArgGet(thread, 2);
+    storedSecondVmArg = secondVmArg;
+  }
+  else
+  {
+    storedSecondVmArg = -1;
+  }
+  gGameLoopRuntimeStorage->firstVmArg = firstVmArg;
+  gGameLoopRuntimeStorage->secondVmArg = storedSecondVmArg;
+  return 1;
+}
+
+s32 func_001BBCB8(s16 first, s16 second);
+
+s32 sbDeferredCallRun(void)
+{
+  GameLoopRuntime *deferredCall;
+  s16 secondVmArg;
+  deferredCall = gGameLoopRuntimeStorage;
+  secondVmArg = deferredCall->secondVmArg;
+  if (((deferredCall->firstVmArg) > 0) == 0U)
+  {
+    return 0;
+  }
+  func_001BBCB8(deferredCall->firstVmArg, secondVmArg);
+  return 1;
+}
 
 /* Script native "math.random": two arguments, min and max, passed to Get_Rnd. */
-int mathRandom(SbThread *context)
+int mathRandom(SbThread *thread)
 {
-    int min;
-    int max;
+    int randomMin;
+    int randomMax;
 
-    if (VM_PLUGIN_CNT_GET(context) != 2) {
-        sbSlotJumpRequest(context, 2);
+    if (VM_PLUGIN_CNT_GET(thread) != 2) {
+        sbSlotJumpRequest(thread, 2);
         return 0;
     }
-    min = vmArgGet(context, 1);
-    max = vmArgGet(context, 2);
-    return Get_Rnd_001B8CD0(min, max);
+    randomMin = vmArgGet(thread, 1);
+    randomMax = vmArgGet(thread, 2);
+    return Get_Rnd_001B8CD0(randomMin, randomMax);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CD248);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CD398);
+s32 func_001B5C38(s32, s32);
+
+s32 mathArgsTest(SbThread *thread) {
+    s32 firstVmArg;
+    int secondVmArg;
+
+    if (VM_PLUGIN_CNT_GET(thread) != 2) {
+        sbSlotJumpRequest(thread, 2);
+        return 0;
+    }
+    firstVmArg = vmArgGet(thread, 1);
+    secondVmArg = vmArgGet(thread, 2);
+    return func_001B5C38(firstVmArg, secondVmArg) != 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu091", func_001CD410);
 

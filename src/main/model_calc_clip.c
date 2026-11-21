@@ -3,19 +3,19 @@
 
 /* Row-major 4x4 float matrix. */
 
-void _CurRotTransPersFog(Vector4 *out, const Vector4 *in, const Vector4 *fog);
+void _CurRotTransPersFog(Vector4 *projected, const Vector4 *position, const Vector4 *fog);
 
-int _CurRotTransPersClipFloat(Vector4 *out, const Vector4 *in);
+int _CurRotTransPersClipFloat(Vector4 *projected, const Vector4 *position);
 
-void _ModelCalcClipInitMat1(Matrix4 clip, Matrix4 matrix);
+void _ModelCalcClipInitMat1(Matrix4 planeSet, Matrix4 clipMatrix);
 
-int _ModelCalcClipMat1(const Vector4 *model);
+int _ModelCalcClipMat1(const Vector4 *boundSphere);
 
 /*
  * Transforms in by the current matrix (vf27..vf30) and writes it to out with w
  * replaced by the fog value: fog.z * (1 / w) + fog.w, clamped to [fog.x, fog.y].
  */
-void _CurRotTransPersFog(Vector4 *out, const Vector4 *in, const Vector4 *fog)
+void _CurRotTransPersFog(Vector4 *projected, const Vector4 *position, const Vector4 *fog)
 {
     __asm__ __volatile__(
         "lqc2 vf31, 0(%1)\n\t"
@@ -33,11 +33,11 @@ void _CurRotTransPersFog(Vector4 *out, const Vector4 *in, const Vector4 *fog)
         "vminiy.w vf31, vf31, vf4y\n\t"
         "sqc2 vf31, 0(%0)"
         :
-        : "r"(out), "r"(in), "r"(fog)
+        : "r"(projected), "r"(position), "r"(fog)
         : "$2", "memory");
 }
 
-int _CurRotTransPersClipFloat(Vector4 *out, const Vector4 *in)
+int _CurRotTransPersClipFloat(Vector4 *projected, const Vector4 *position)
 {
     register int clipFlags;
 
@@ -64,13 +64,13 @@ int _CurRotTransPersClipFloat(Vector4 *out, const Vector4 *in)
         "andi $2, $2, 0x3f\n\t"
         "move %0, $2"
         : "=r"(clipFlags)
-        : "r"(out), "r"(in)
+        : "r"(projected), "r"(position)
         : "$2", "memory");
     return clipFlags;
 }
 
 /* _ModelCalcClipInitMat1: loads the clip matrix pair (eight rows at clip) into vf24..vf31 and the matrix into vf20..vf23. */
-void _ModelCalcClipInitMat1(Matrix4 clip, Matrix4 matrix)
+void _ModelCalcClipInitMat1(Matrix4 planeSet, Matrix4 clipMatrix)
 {
     __asm__ __volatile__(
         "lqc2 vf24, 0(%0)\n\t"
@@ -86,11 +86,11 @@ void _ModelCalcClipInitMat1(Matrix4 clip, Matrix4 matrix)
         "lqc2 vf22, 32(%1)\n\t"
         "lqc2 vf23, 48(%1)"
         :
-        : "r"(clip), "r"(matrix)
+        : "r"(planeSet), "r"(clipMatrix)
         : "memory");
 }
 
-int _ModelCalcClipMat1(const Vector4 *model)
+int _ModelCalcClipMat1(const Vector4 *boundSphere)
 {
     register int clipFlags;
 
@@ -147,7 +147,7 @@ int _ModelCalcClipMat1(const Vector4 *model)
         "2:\n\t"
         "move %0, $2"
         : "=r"(clipFlags)
-        : "r"(model)
+        : "r"(boundSphere)
         : "$2", "$f0", "$f1", "memory");
     return clipFlags;
 }

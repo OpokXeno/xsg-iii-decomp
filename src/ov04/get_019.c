@@ -1,23 +1,23 @@
 #include "common.h"
 #include "shared.h"
 
-int Get_Rnd(int min, int max);
+int Get_Rnd(int minimum, int maximum);
 int Get_RndFloatRange(float minimum, float maximum);
 float Get_Distance(const Vector4 *first, const Vector4 *second);
-void Get_One_Step(float length, const Vector4 *source, const Vector4 *destination, Vector4 *output);
-void Get_MiddlePoint(const Vector4 *start, const Vector4 *following,
-                     short point_index, short point_count, Vector4 *result);
-void Get_MiddlePoint_Parabora(const Vector4 *first, const Vector4 *second, int current, int total, float height,
-                              Vector4 *destination);
-int Check_CrossingOver(const Vector4 *first_start, const Vector4 *first_end,
-                       const Vector4 *second_start, const Vector4 *second_end);
-int uwamonoQuadEdgesVisible(const Vector4 *origin, const Vector4 *corner0, const Vector4 *corner1,
-                            const Vector4 *corner2, const Vector4 *corner3);
+void Get_One_Step(float length, const Vector4 *fromPoint, const Vector4 *toPoint, Vector4 *stepVector);
+void Get_MiddlePoint(const Vector4 *fromPoint, const Vector4 *toPoint,
+                     short point_index, short point_count, Vector4 *interpolated);
+void Get_MiddlePoint_Parabora(const Vector4 *startPoint, const Vector4 *endPoint, int arcStepIndex, int arcStepCount, float height,
+                              Vector4 *arcPoint);
+int Check_CrossingOver(const Vector4 *firstLineStart, const Vector4 *firstLineEnd,
+                       const Vector4 *secondLineStart, const Vector4 *secondLineEnd);
+int uwamonoQuadEdgesVisible(const Vector4 *origin, const Vector4 *cornerA, const Vector4 *cornerB,
+                            const Vector4 *cornerC, const Vector4 *cornerD);
 unsigned short xglSRand(void);
 float xglFRand(void);
-int CheckPointLine(const Vector4 *first, const Vector4 *second, const Vector4 *point);
-void CalcCrossPoint(const Vector4 *first, const Vector4 *second, const Vector4 *third, const Vector4 *fourth, Vector4 *cross_point);
-void CalcVerticalVector(const Vector4 *first, const Vector4 *second, const Vector4 *third, Vector4 *vertical);
+int CheckPointLine(const Vector4 *lineStart, const Vector4 *lineEnd, const Vector4 *point);
+void CalcCrossPoint(const Vector4 *vertexA, const Vector4 *vertexB, const Vector4 *vertexC, const Vector4 *lineEnd, Vector4 *cross_point);
+void CalcVerticalVector(const Vector4 *vertexA, const Vector4 *vertexB, const Vector4 *vertexC, Vector4 *vertical);
 void xglVectorInner(float *destination, const Vector4 *left, const Vector4 *right);
 void xglVectorOuter(Vector4 *destination, const Vector4 *first, const Vector4 *second);
 void xglVectorLength(float *destination, const Vector4 *vector);
@@ -25,93 +25,110 @@ void xglVectorNormal(Vector4 *destination, const Vector4 *source);
 
 #include "vu0_macro.h"
 
-int Get_Rnd(int min, int max)
+int Get_Rnd(int minimum, int maximum)
 {
-    return min + xglSRand() % (max - min + 1);
+    return minimum + xglSRand() % (maximum - minimum + 1);
 }
 
 int Get_RndFloatRange(float minimum, float maximum)
 {
-    return (int) (minimum + (xglFRand() * (maximum - minimum)));
+    return minimum + (xglFRand() * (maximum - minimum));
 }
 
-INCLUDE_ASM("asm/nonmatchings/ov04/get_019", func_00A9FED8);
+typedef int s32;
 
-void Get_MiddlePoint(const Vector4 *start, const Vector4 *following,
-                     short point_index, short point_count, Vector4 *result)
+/* Slot 0 of the moving-actor table whose pointer is stored in gMovingActorSlots (see ov04/tu002): the seeded range takes the fraction of pos_x + pos_z as its random draw. */
+typedef struct MovingActorSlotPosition {
+    unsigned char unk_00[0x10];
+    f32 pos_x;             /* +0x10 */
+    unsigned char unk_14[0x18 - 0x14];
+    f32 pos_z;            /* +0x18 */
+} MovingActorSlotPosition;
+
+extern MovingActorSlotPosition *gMovingActorSlots;
+
+s32 actorPositionSeededRange(f32 lowBound, f32 highBound) {
+    f32 seedPositionSum;
+
+    seedPositionSum = gMovingActorSlots->pos_x + gMovingActorSlots->pos_z;
+    return lowBound + ((seedPositionSum - (f32) (s32) seedPositionSum) * (highBound - lowBound));
+}
+
+void Get_MiddlePoint(const Vector4 *fromPoint, const Vector4 *toPoint,
+                     short point_index, short point_count, Vector4 *interpolated)
 {
     if (point_index == point_count) {
-        result->x = following->x;
-        result->y = following->y;
-        result->z = following->z;
-        result->w = 1.0f;
+        interpolated->x = toPoint->x;
+        interpolated->y = toPoint->y;
+        interpolated->z = toPoint->z;
+        interpolated->w = 1.0f;
     } else {
-        result->x = start->x + (following->x - start->x) * (float)point_index
+        interpolated->x = fromPoint->x + (toPoint->x - fromPoint->x) * (float)point_index
                     / (float)point_count;
-        result->y = start->y + (following->y - start->y) * (float)point_index
+        interpolated->y = fromPoint->y + (toPoint->y - fromPoint->y) * (float)point_index
                     / (float)point_count;
-        result->z = start->z + (following->z - start->z) * (float)point_index
+        interpolated->z = fromPoint->z + (toPoint->z - fromPoint->z) * (float)point_index
                     / (float)point_count;
-        result->w = 1.0f;
+        interpolated->w = 1.0f;
     }
 }
 
-void Get_MiddlePoint_Parabora(const Vector4 *first, const Vector4 *second,
-                              int current, int total, float height,
-                              Vector4 *destination)
+void Get_MiddlePoint_Parabora(const Vector4 *startPoint, const Vector4 *endPoint,
+                              int arcStepIndex, int arcStepCount, float height,
+                              Vector4 *arcPoint)
 {
-    int current_value = (short)current;
-    int total_value = (short)total;
-    int midpoint = (int)((short)total +
-                         ((unsigned int)(total << 16) >> 31)) >> 1;
-    int delta = midpoint - current_value;
+    short arcStepIndexS16 = arcStepIndex;
+    short arcStepCountS16 = arcStepCount;
+    int midpoint = (int)(arcStepCountS16 +
+                         ((unsigned int)(arcStepCount << 16) >> 31)) >> 1;
+    int delta = midpoint - arcStepIndexS16;
     float adjusted_height = height * (float)(delta * delta)
                            / (float)(midpoint * midpoint);
     height -= adjusted_height;
 
-    if (current_value == total_value) {
-        destination->x = second->x;
-        destination->y = second->y;
-        destination->z = second->z;
-        destination->w = second->w;
+    if (arcStepIndexS16 == arcStepCountS16) {
+        arcPoint->x = endPoint->x;
+        arcPoint->y = endPoint->y;
+        arcPoint->z = endPoint->z;
+        arcPoint->w = endPoint->w;
     } else {
-        destination->x = first->x + (second->x - first->x)
-                       * (float)current_value / (float)total_value;
-        destination->y = first->y + (second->y - first->y)
-                       * (float)current_value / (float)total_value + height;
-        destination->z = first->z + (second->z - first->z)
-                       * (float)current_value / (float)total_value;
-        destination->w = first->w + (second->w - first->w)
-                       * (float)current_value / (float)total_value;
+        arcPoint->x = startPoint->x + (endPoint->x - startPoint->x)
+                       * (float)arcStepIndexS16 / (float)arcStepCountS16;
+        arcPoint->y = startPoint->y + (endPoint->y - startPoint->y)
+                       * (float)arcStepIndexS16 / (float)arcStepCountS16 + height;
+        arcPoint->z = startPoint->z + (endPoint->z - startPoint->z)
+                       * (float)arcStepIndexS16 / (float)arcStepCountS16;
+        arcPoint->w = startPoint->w + (endPoint->w - startPoint->w)
+                       * (float)arcStepIndexS16 / (float)arcStepCountS16;
     }
 }
 
-float Get_ParaboraValue(int current, int total, float first, float second, float height)
+float Get_ParaboraValue(int arcStepIndex, int arcStepCount, float arcStartValue, float arcEndValue, float height)
 {
-    int current_value = (short)current;
-    int total_value = (short)total;
-    int midpoint = (int)((short)total + ((unsigned int)(total << 16) >> 31)) >> 1;
-    int delta = midpoint - current_value;
+    short arcStepIndexS16 = arcStepIndex;
+    short arcStepCountS16 = arcStepCount;
+    int midpoint = (int)(arcStepCountS16 + ((unsigned int)(arcStepCount << 16) >> 31)) >> 1;
+    int delta = midpoint - arcStepIndexS16;
     float adjusted_height = height * (float)(delta * delta) / (float)(midpoint * midpoint);
     height -= adjusted_height;
 
-    if (current_value == total_value) {
-        return second;
+    if (arcStepIndexS16 == arcStepCountS16) {
+        return arcEndValue;
     }
-    return first + (second - first) * (float)current_value / (float)total_value + height;
+    return arcStartValue + (arcEndValue - arcStartValue) * (float)arcStepIndexS16 / (float)arcStepCountS16 + height;
 }
 
-void Get_One_Step(float length, const Vector4 *source,
-                  const Vector4 *destination, Vector4 *output)
+void Get_One_Step(float length, const Vector4 *fromPoint,
+                  const Vector4 *toPoint, Vector4 *stepVector)
 {
-    float x_step = destination->x - source->x;
-    float z_step = destination->z - source->z;
-    float inverse_distance = 1.0f / Get_Distance(source, destination);
+    float x_step = toPoint->x - fromPoint->x;
+    float z_step = toPoint->z - fromPoint->z;
+    float inverse_distance = 1.0f / Get_Distance(fromPoint, toPoint);
 
-    output->x = x_step * inverse_distance * length;
-    output->y = 0.0f;
-    output->z = z_step * inverse_distance * length;
-    output->w = 1.0f;
+    stepVector->x = x_step * inverse_distance * length;
+    stepVector->y = 0.0f;
+    stepVector->z = z_step * inverse_distance * length;
+    stepVector->w = 1.0f;
 }
 
 /* soft-double helpers at their scaffold labels: double from float, double subtract, double compare */
@@ -124,56 +141,56 @@ float Get_Decimal_Surplus_for_Radius(float angle);
 
 /* Whether angle lies in the sector from..to, after normalising the three angles with
    Get_Decimal_Surplus_for_Radius; a sector spanning a full turn or more contains every angle. */
-int unduCheckAngle(float angle, float from, float to)
+int unduCheckAngle(float angle, float fromAngle, float toAngle)
 {
-    double span = fptodp(to - from);
+    double sectorSpan = fptodp(toAngle - fromAngle);
     int inside;
 
-    if (dpcmp(span, 0.0) < 0) {
-        span = dpsub(0.0, span);
+    if (dpcmp(sectorSpan, 0.0) < 0) {
+        sectorSpan = dpsub(0.0, sectorSpan);
     }
-    if (dpcmp(span, GET_TWO_PI) >= 0) {
+    if (dpcmp(sectorSpan, GET_TWO_PI) >= 0) {
         return 1;
     }
 
-    from = Get_Decimal_Surplus_for_Radius(from);
-    to = Get_Decimal_Surplus_for_Radius(to);
+    fromAngle = Get_Decimal_Surplus_for_Radius(fromAngle);
+    toAngle = Get_Decimal_Surplus_for_Radius(toAngle);
     angle = Get_Decimal_Surplus_for_Radius(angle);
-    if (from <= to) {
-        if (from <= angle) {
-            return angle <= to;
+    if (fromAngle <= toAngle) {
+        if (fromAngle <= angle) {
+            return angle <= toAngle;
         }
         return 0;
     }
-    if (from <= angle) {
+    if (fromAngle <= angle) {
         return 1;
     }
     inside = 0;
-    if (angle <= to) {
+    if (angle <= toAngle) {
         inside = 1;
     }
     return inside;
 }
 
-typedef struct Ov04Source30 {
+typedef struct SourceWithPoint {
     unsigned char unmodeled_00[0x30];
     Vector4 point;
-} Ov04Source30;
+} SourceWithPoint;
 
-void vectorCopyPoint(const Ov04Source30 *source, Vector4 *destination)
+void vectorCopyPoint(const SourceWithPoint *pointHolder, Vector4 *copiedPoint)
 {
     float z;
 
-    destination->x = source->point.x;
-    destination->y = source->point.y;
-    z = source->point.z;
-    destination->w = 1.0f;
-    destination->z = z;
+    copiedPoint->x = pointHolder->point.x;
+    copiedPoint->y = pointHolder->point.y;
+    z = pointHolder->point.z;
+    copiedPoint->w = 1.0f;
+    copiedPoint->z = z;
 }
 
-typedef struct Ov04Pose {
+typedef struct PoseMatrix {
     float matrix[4][4];
-} Ov04Pose;
+} PoseMatrix;
 
 extern float asinf(float x);
 extern float atan2f(float y, float x);
@@ -182,7 +199,7 @@ extern double func_00304070(double x);
 extern double func_0030A190(double dividend, double divisor);
 extern float func_0030A4E0(double x);
 
-void uwamonoPoseAnglesGet(const Ov04Pose *pose, Vector4 *angles)
+void uwamonoPoseAnglesGet(const PoseMatrix *pose, Vector4 *angles)
 {
     float roll;
 
@@ -203,87 +220,97 @@ void uwamonoPoseAnglesGet(const Ov04Pose *pose, Vector4 *angles)
 
 INCLUDE_ASM("asm/nonmatchings/ov04/get_019", func_00AA04E0);
 
-INCLUDE_ASM("asm/nonmatchings/ov04/get_019", func_00AA0560);
+s32 Check_RangeOverlap(f32 leftMin, f32 leftMax, f32 rightMin, f32 rightMax) {
+    s32 overlaps;
 
-/* True when the origin sees the midpoint of each edge of the quad (corner0..corner3) without that
+    overlaps = 0;
+    if (!(leftMax < rightMin)) {
+        if (!(rightMax < leftMin)) {
+            overlaps = 1;
+        }
+    }
+    return overlaps;
+}
+
+/* True when the origin sees the midpoint of each edge of the quad (cornerA..cornerD) without that
    ray crossing another edge: the four midpoints are tested against the three other edges. */
-int uwamonoQuadEdgesVisible(const Vector4 *origin, const Vector4 *corner0, const Vector4 *corner1,
-                  const Vector4 *corner2, const Vector4 *corner3)
+int uwamonoQuadEdgesVisible(const Vector4 *origin, const Vector4 *cornerA, const Vector4 *cornerB,
+                  const Vector4 *cornerC, const Vector4 *cornerD)
 {
     Vector4 edge_midpoints[4];
 
-    Get_MiddlePoint(corner0, corner1, 1, 2, &edge_midpoints[0]);
-    Get_MiddlePoint(corner1, corner2, 1, 2, &edge_midpoints[1]);
-    Get_MiddlePoint(corner2, corner3, 1, 2, &edge_midpoints[2]);
-    Get_MiddlePoint(corner3, corner0, 1, 2, &edge_midpoints[3]);
+    Get_MiddlePoint(cornerA, cornerB, 1, 2, &edge_midpoints[0]);
+    Get_MiddlePoint(cornerB, cornerC, 1, 2, &edge_midpoints[1]);
+    Get_MiddlePoint(cornerC, cornerD, 1, 2, &edge_midpoints[2]);
+    Get_MiddlePoint(cornerD, cornerA, 1, 2, &edge_midpoints[3]);
 
-    if (Check_CrossingOver(origin, &edge_midpoints[0], corner1, corner2) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[0], cornerB, cornerC) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[0], corner2, corner3) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[0], cornerC, cornerD) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[0], corner3, corner0) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[0], cornerD, cornerA) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[1], corner2, corner3) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[1], cornerC, cornerD) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[1], corner3, corner0) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[1], cornerD, cornerA) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[1], corner0, corner1) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[1], cornerA, cornerB) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[2], corner3, corner0) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[2], cornerD, cornerA) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[2], corner0, corner1) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[2], cornerA, cornerB) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[2], corner1, corner2) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[2], cornerB, cornerC) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[3], corner0, corner1) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[3], cornerA, cornerB) == 1)
         return 0;
-    if (Check_CrossingOver(origin, &edge_midpoints[3], corner1, corner2) == 1)
+    if (Check_CrossingOver(origin, &edge_midpoints[3], cornerB, cornerC) == 1)
         return 0;
-    return Check_CrossingOver(origin, &edge_midpoints[3], corner2, corner3) != 1;
+    return Check_CrossingOver(origin, &edge_midpoints[3], cornerC, cornerD) != 1;
 }
 
-void CalcVerticalVector(const Vector4 *first, const Vector4 *second,
-                        const Vector4 *third, Vector4 *vertical)
+void CalcVerticalVector(const Vector4 *vertexA, const Vector4 *vertexB,
+                        const Vector4 *vertexC, Vector4 *vertical)
 {
     Vector4 first_edge;
     Vector4 second_edge;
     Vector4 normal;
 
-    Vu0SubVectorXYZ(&first_edge, second, first);
-    Vu0SubVectorXYZ(&second_edge, third, first);
+    Vu0SubVectorXYZ(&first_edge, vertexB, vertexA);
+    Vu0SubVectorXYZ(&second_edge, vertexC, vertexA);
     xglVectorOuter(&normal, &first_edge, &second_edge);
     xglVectorOuter(vertical, &first_edge, &normal);
 }
 
-float CalcLength(const Vector4 *first, const Vector4 *second, const Vector4 *third)
+float CalcLength(const Vector4 *vertexA, const Vector4 *vertexB, const Vector4 *vertexC)
 {
     Vector4 vertical;
     Vector4 delta;
     float length;
 
-    CalcVerticalVector(first, second, third, &vertical);
+    CalcVerticalVector(vertexA, vertexB, vertexC, &vertical);
     xglVectorNormal(&vertical, &vertical);
-    Vu0SubVectorXYZ(&delta, first, third);
+    Vu0SubVectorXYZ(&delta, vertexA, vertexC);
     xglVectorInner(&length, &vertical, &delta);
     return length;
 }
 
 /* Side of the XZ directed line first->second that point lies on: 1 left (cross > 0), 2 right (cross < 0), 0 on the line. */
-int CheckPointLine(const Vector4 *first, const Vector4 *second,
+int CheckPointLine(const Vector4 *lineStart, const Vector4 *lineEnd,
                    const Vector4 *point)
 {
-    Vector4 first_delta;
-    Vector4 second_delta;
+    Vector4 lineDelta;
+    Vector4 pointDelta;
     float cross;
-    float first_x = first->x;
+    float lineStartX = lineStart->x;
     int side = 1;
 
-    first_delta.x = second->x - first_x;
-    second_delta.x = point->x - first_x;
-    first_delta.z = second->z - first->z;
-    second_delta.z = point->z - first->z;
-    cross = first_delta.x * second_delta.z
-          - first_delta.z * second_delta.x;
+    lineDelta.x = lineEnd->x - lineStartX;
+    pointDelta.x = point->x - lineStartX;
+    lineDelta.z = lineEnd->z - lineStart->z;
+    pointDelta.z = point->z - lineStart->z;
+    cross = lineDelta.x * pointDelta.z
+          - lineDelta.z * pointDelta.x;
 
     if (!(0.0f < cross)) {
         if (cross < 0.0f) {
@@ -295,15 +322,15 @@ int CheckPointLine(const Vector4 *first, const Vector4 *second,
     return side;
 }
 
-int Check_CrossingOver(const Vector4 *first_start, const Vector4 *first_end,
-                       const Vector4 *second_start, const Vector4 *second_end)
+int Check_CrossingOver(const Vector4 *firstLineStart, const Vector4 *firstLineEnd,
+                       const Vector4 *secondLineStart, const Vector4 *secondLineEnd)
 {
-    int first_start_side = CheckPointLine(first_start, first_end, second_start);
-    int first_end_side = CheckPointLine(first_start, first_end, second_end);
+    int first_start_side = CheckPointLine(firstLineStart, firstLineEnd, secondLineStart);
+    int first_end_side = CheckPointLine(firstLineStart, firstLineEnd, secondLineEnd);
 
     if (first_start_side != first_end_side) {
-        int second_start_side = CheckPointLine(second_start, second_end, first_start);
-        int second_end_side = CheckPointLine(second_start, second_end, first_end);
+        int second_start_side = CheckPointLine(secondLineStart, secondLineEnd, firstLineStart);
+        int second_end_side = CheckPointLine(secondLineStart, secondLineEnd, firstLineEnd);
 
         if (second_start_side != second_end_side)
             return 1;
@@ -311,8 +338,8 @@ int Check_CrossingOver(const Vector4 *first_start, const Vector4 *first_end,
     return 0;
 }
 
-void CalcCrossPoint(const Vector4 *first, const Vector4 *second,
-                    const Vector4 *third, const Vector4 *fourth,
+void CalcCrossPoint(const Vector4 *vertexA, const Vector4 *vertexB,
+                    const Vector4 *vertexC, const Vector4 *lineEnd,
                     Vector4 *cross_point)
 {
     Vector4 normal;
@@ -320,10 +347,10 @@ void CalcCrossPoint(const Vector4 *first, const Vector4 *second,
        [0] holds the dot product of the edge with the normal, then the scale ratio. */
     float intersection_scale[2];
 
-    intersection_scale[1] = CalcLength(first, second, third);
-    CalcVerticalVector(first, second, third, &normal);
+    intersection_scale[1] = CalcLength(vertexA, vertexB, vertexC);
+    CalcVerticalVector(vertexA, vertexB, vertexC, &normal);
     xglVectorNormal(&normal, &normal);
-    Vu0SubVectorXYZ(cross_point, fourth, third);
+    Vu0SubVectorXYZ(cross_point, lineEnd, vertexC);
     xglVectorInner(&intersection_scale[0], cross_point, &normal);
     intersection_scale[0] = intersection_scale[1] / intersection_scale[0];
     xglVectorLength(&intersection_scale[1], cross_point);
@@ -338,11 +365,11 @@ void CalcCrossPoint(const Vector4 *first, const Vector4 *second,
         "vadd.xyzw vf20, vf20, vf21\n\t"
         "sqc2 vf20, 0(%0)"
         :
-        : "r"(cross_point), "r"(third)
+        : "r"(cross_point), "r"(vertexC)
         : "memory");
 }
 
-int CheckCrossCircle(const Vector4 *start, const Vector4 *end,
+int CheckCrossCircle(const Vector4 *lineStart, const Vector4 *lineEnd,
                      const Vector4 *center, float radius)
 {
     Vector4 middle;
@@ -352,19 +379,19 @@ int CheckCrossCircle(const Vector4 *start, const Vector4 *end,
     float along;
     float x;
     float z;
-    int result;
+    int crossesCircle;
 
-    direction.x = end->x - start->x;
+    direction.x = lineEnd->x - lineStart->x;
     direction.y = 0.0f;
-    direction.z = end->z - start->z;
+    direction.z = lineEnd->z - lineStart->z;
     direction.w = 1.0f;
     half_length = __builtin_sqrtf(direction.x * direction.x
                                   + direction.z * direction.z) * 0.5f;
     xglVectorNormal(&direction, &direction);
     half_length += radius;
-    result = 0;
-    middle.x = start->x + (end->x - start->x) * 0.5f;
-    middle.z = start->z + (end->z - start->z) * 0.5f;
+    crossesCircle = 0;
+    middle.x = lineStart->x + (lineEnd->x - lineStart->x) * 0.5f;
+    middle.z = lineStart->z + (lineEnd->z - lineStart->z) * 0.5f;
     x = center->x - middle.x;
     z = center->z - middle.z;
     along = x * direction.x + z * direction.z;
@@ -372,7 +399,7 @@ int CheckCrossCircle(const Vector4 *start, const Vector4 *end,
         projection_x = along * direction.x;
         x = center->x - (projection_x + middle.x);
         z = center->z - (along * direction.z + middle.z);
-        result = x * x + z * z < radius * radius;
+        crossesCircle = x * x + z * z < radius * radius;
     }
-    return result;
+    return crossesCircle;
 }

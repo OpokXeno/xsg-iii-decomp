@@ -11,8 +11,8 @@
  * track stops there), value is the sample the key holds. */
 typedef struct SefTrackKey {
     short key;
-    unsigned short link;
-    float value;
+    unsigned short nextKeyIndex;
+    float sampleValue;
 } SefTrackKey;
 
 #endif

@@ -133,7 +133,7 @@ struct TiHrcDynamics {
     unsigned char unmodeled_6C[0x4];
     float scale[3];           /* +0x70 */
     unsigned char unmodeled_7C[0x90 - 0x7C];
-    Vector4 unmodeled_90;     /* +0x90 */
+    Vector4 bodyPosition;     /* +0x90 */
     unsigned char unmodeled_A0[0xD0 - 0xA0];
     TiCollEntry entries[0];   /* +0xD0 */
 };
@@ -151,10 +151,10 @@ struct TiHrcDynamics {
  * position to aim at, the smoothing bounds and the current rotations.
  */
 struct TiMRState {
-    int flags;      /* +0x0: flag word (tiWordSetBits/tiWordClearBits) */
+    int motionFlags;      /* +0x0: flag word (tiWordSetBits/tiWordClearBits) */
     float speed;
     float position;
-    float value;
+    float channelValue;
     int rangeMin;   /* +0x10: the range of the advance (tiMRStateSetRange) */
     int rangeMax;   /* +0x14 */
     unsigned char unmodeled_18[0x8];
@@ -175,26 +175,26 @@ struct TiMRPackage {
     int first_word;
     int targetNode;           /* +0x04: node index that the aim solver targets (0x1D after the initializer) */
     unsigned char unmodeled_08[8];
-    TiMRState state_a;        /* +0x10 */
-    TiMRState state_b;        /* +0x60 */
+    TiMRState bodyAnimBlend;        /* +0x10 */
+    TiMRState faceAnimBlend;        /* +0x60 */
     float scale[3];           /* +0xB0: (1, 1, 1) after the initializer; multiplies the translation of the second locator */
     unsigned char unmodeled_bc[4];
-    struct TiOffsetEntry *entryA;    /* +0xC0: entry of state A; the update checks its version float as pAnimData (xac) */
+    struct TiOffsetEntry *bodyAnimEntry;    /* +0xC0: entry of state A; the update checks its version float as pAnimData (xac) */
     struct OffsetTable *entryTableA; /* +0xC4: offset table of state A (tiMRPackageSelectAnimEntry) */
-    struct TiOffsetEntry *entryB;    /* +0xC8: entry of state B; the update checks its version float as pFaceAnimData (fac) */
+    struct TiOffsetEntry *faceAnimEntry;    /* +0xC8: entry of state B; the update checks its version float as pFaceAnimData (fac) */
     struct OffsetTable *entryTableB; /* +0xCC: offset table of state B (tiMRPackageSelectFaceAnimEntry) */
     struct TiHrcData *hrcData;       /* +0xD0: pHrcData, version float at +4 */
     struct TiPamData *pamData;       /* +0xD4: parts animation data, its two shorts at +8 and +A bound state A */
     struct TiNodeTable *nodeTable;   /* +0xD8: pStatus, the node point table (tiMRPackageSetEntryTableC) */
-    void *xstData;            /* +0xDC: header tagged "XST ": its ints at +0xC and +0x10 are the range of state A (func_00299730) */
+    void *xstData;            /* +0xDC: header tagged "XST ": its ints at +0xC and +0x10 are the range of state A (tiMRPackageSetXstHeader) */
     void *xstRecord;          /* +0xE0: the record of xstData that func_00299770 selected for the playback position, 0 when none */
     unsigned char unmodeled_e4[4];
     int unmodeled_e8;         /* +0xE8 */
     Matrix4 *localMat;        /* +0xEC: pLocalMat, one matrix per node (stored by tiMRPackageSetLocalMat) */
     Matrix4 *globalMat;       /* +0xF0: pGlobalMat, the placed matrices (stored by tiMRPackageSetGlobalMat) */
     Matrix4 *blendMat;        /* +0xF4: the blend matrices (stored by tiMRPackageSetBlendMat) */
-    void *valueF8;            /* +0xF8: stored by tiMRPackageSetPartsMat */
-    struct TiSolverState *dynMat; /* +0xFC: pDynMat, one solver body per dynamics node (stored by func_00299698) */
+    void *partsMatrix;            /* +0xF8: stored by tiMRPackageSetPartsMat */
+    struct TiSolverState *dynMat; /* +0xFC: pDynMat, one solver body per dynamics node (stored by tiMRPackageBindDynamics) */
     unsigned char unmodeled_100[0x10];
     float copyDst110;         /* +0x110: receives copySrc114 when TiMtnBlend swaps a matrix array with blendMat */
     float copySrc114;         /* +0x114 */

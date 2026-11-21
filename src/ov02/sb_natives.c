@@ -18,4 +18,16 @@ int VPadDisable(void)
     return 1;
 }
 
-INCLUDE_ASM("asm/nonmatchings/ov02/sb_natives", func_00A8CFF0);
+typedef int s32;
+void dataVPadSet(int virtualPad);
+struct SbThread;
+int vmArgGet(struct SbThread *thread, int argIndex);
+
+/* VM native: sets the virtual pad from the first script argument (low 16 bits) and returns 1. */
+s32 VPadSet(struct SbThread *thread) {
+    s32 virtualPad;
+
+    virtualPad = vmArgGet(thread, 1);
+    dataVPadSet(virtualPad & 0xFFFF);
+    return 1;
+}

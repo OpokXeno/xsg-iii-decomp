@@ -9,7 +9,7 @@ void XrgMatrixToQuaternion(float quat[4], Matrix4 matrix);
 
 void xglCurMatrixSet(Matrix4 matrix);
 void xglCurMatrixGet(Matrix4 matrix);
-void xglCurApplyVector(Vector4 *destination, const Vector4 *vector);
+void xglCurApplyVector(Vector4 *outVector, const Vector4 *vector);
 void xglCurSetRotateX(float value);
 void xglCurSetRotateY(float angle);
 void xglCurSetRotateZ(f32 angle);
@@ -39,7 +39,7 @@ extern Matrix4 xglMulTranslateMatrix;
 extern Matrix4 xglMulScaleMatrix;
 extern Matrix4 xglMulScaleXYZMatrix;
 extern Matrix4 xglMulInvScaleMatrix;
-void xglVectorAddXYZ(Vector4 *destination, const Vector4 *first, const Vector4 *second);
+void xglVectorAddXYZ(Vector4 *outVector, const Vector4 *left, const Vector4 *right);
 void tiVu0LoadIdentityMatrix(void);
 /* A four-row matrix in data; its rows load into the resident VU0 matrix. */
 extern Matrix4 tiVu0IdentityMatrix;
@@ -47,72 +47,73 @@ extern Matrix4 tiVu0IdentityMatrix;
 /* Quaternion from the rotation part of a row-major 4x4 matrix (Shepperd's method). */
 void XrgMatrixToQuaternion(float quat[4], Matrix4 matrix) {
     float trace;
-    float s;
-    float two_s;
-    int i;
-    int j;
-    int k;
-    float *slot;
-    int off_i;
-    int off_j;
-    int off_k;
-    int off_larger_diag;
-    int off_ji;
-    int off_ij;
-    int off_ki;
-    int off_ik;
-    int off_jk;
-    int off_kj;
-    int quat_off_j;
-    int quat_off_k;
-    /* Byte-offset float reads kept: the typed matrix[i][j] and quat[j] forms change the code (check.py). */
+    float diagRoot;
+    float twiceDiagRoot;
+    int maxAxis;
+    int nextAxis;
+    int thirdAxis;
+    float *matrixFloats;
+    float *bestDiag;
+    float *quatMaxAxis;
+    float *quatNextAxis;
+    float *quatThirdAxis;
+    float *diagMaxAxis;
+    float *diagNextAxis;
+    float *diagThirdAxis;
+    float *ji;
+    float *ij;
+    float *ki;
+    float *ik;
+    float *jk;
+    float *kj;
 
+    matrixFloats = &matrix[0][0];
     trace = matrix[0][0] + matrix[1][1] + matrix[2][2] + matrix[3][3];
     if (trace >= 1.0f) {
-        s = __builtin_sqrtf(trace);
-        two_s = s + s;
-        quat[3] = two_s * 0.25f;
-        quat[0] = (matrix[1][2] - matrix[2][1]) / two_s;
-        quat[1] = (matrix[2][0] - matrix[0][2]) / two_s;
-        quat[2] = (matrix[0][1] - matrix[1][0]) / two_s;
+        diagRoot = __builtin_sqrtf(trace);
+        twiceDiagRoot = diagRoot + diagRoot;
+        quat[3] = twiceDiagRoot * 0.25f;
+        quat[0] = (matrix[1][2] - matrix[2][1]) / twiceDiagRoot;
+        quat[1] = (matrix[2][0] - matrix[0][2]) / twiceDiagRoot;
+        quat[2] = (matrix[0][1] - matrix[1][0]) / twiceDiagRoot;
     } else {
         if (matrix[1][1] < matrix[0][0]) {
-            i = 0;
+            maxAxis = 0;
         } else {
-            i = 1;
+            maxAxis = 1;
         }
-        off_larger_diag = 20 * i;
-        if (matrix[2][2] > *(float *)((char *)matrix + off_larger_diag)) {
-            i = 2;
+        bestDiag = &matrixFloats[4 * maxAxis + maxAxis];
+        if (matrix[2][2] > *bestDiag) {
+            maxAxis = 2;
         }
-        j = (i + 1) % 3;
-        k = (j + 1) % 3;
-        off_i = 20 * i;
-        off_j = 20 * j;
-        off_k = 20 * k;
-        s = __builtin_sqrtf(*(float *)((char *)matrix + off_i) - *(float *)((char *)matrix + off_j) - *(float *)((char *)matrix + off_k) + 1.0f);
-        two_s = s + s;
-        slot = &quat[i];
-        *slot = two_s * 0.25f;
-        off_ji = 16 * j + 4 * i;
-        off_ij = 16 * i + 4 * j;
-        quat_off_j = 4 * j;
-        *(float *)((char *)quat + quat_off_j) = (*(float *)((char *)matrix + off_ji) + *(float *)((char *)matrix + off_ij)) / two_s;
-        off_ki = 16 * k + 4 * i;
-        off_ik = 16 * i + 4 * k;
-        quat_off_k = 4 * k;
-        *(float *)((char *)quat + quat_off_k) = (*(float *)((char *)matrix + off_ki) + *(float *)((char *)matrix + off_ik)) / two_s;
-        off_jk = 16 * j + 4 * k;
-        off_kj = 16 * k + 4 * j;
-        quat[3] = (*(float *)((char *)matrix + off_jk) - *(float *)((char *)matrix + off_kj)) / two_s;
+        nextAxis = (maxAxis + 1) % 3;
+        thirdAxis = (nextAxis + 1) % 3;
+        diagMaxAxis = &matrixFloats[4 * maxAxis + maxAxis];
+        diagNextAxis = &matrixFloats[4 * nextAxis + nextAxis];
+        diagThirdAxis = &matrixFloats[4 * thirdAxis + thirdAxis];
+        diagRoot = __builtin_sqrtf(*diagMaxAxis - *diagNextAxis - *diagThirdAxis + 1.0f);
+        twiceDiagRoot = diagRoot + diagRoot;
+        quatMaxAxis = &quat[maxAxis];
+        *quatMaxAxis = twiceDiagRoot * 0.25f;
+        ji = &matrixFloats[4 * nextAxis + maxAxis];
+        ij = &matrixFloats[4 * maxAxis + nextAxis];
+        quatNextAxis = &quat[nextAxis];
+        *quatNextAxis = (*ji + *ij) / twiceDiagRoot;
+        ki = &matrixFloats[4 * thirdAxis + maxAxis];
+        ik = &matrixFloats[4 * maxAxis + thirdAxis];
+        quatThirdAxis = &quat[thirdAxis];
+        *quatThirdAxis = (*ki + *ik) / twiceDiagRoot;
+        jk = &matrixFloats[4 * nextAxis + thirdAxis];
+        kj = &matrixFloats[4 * thirdAxis + nextAxis];
+        quat[3] = (*jk - *kj) / twiceDiagRoot;
     }
 }
 
 void xglVectorOuter(Vector4 *destination, const Vector4 *left, const Vector4 *right);
 void xglVectorInner(float *result, const Vector4 *left, const Vector4 *right);
-extern const float D_00550180;
+extern const float xglQuatLengthEpsilon;
 
-int XrgQuaternionFromVectors(Vector4 *destination, const Vector4 *left, const Vector4 *right) {
+int XrgQuaternionFromVectors(Vector4 *quaternion, const Vector4 *left, const Vector4 *right) {
     Vector4 cross;
     float dot;
     float length;
@@ -121,77 +122,77 @@ int XrgQuaternionFromVectors(Vector4 *destination, const Vector4 *left, const Ve
     xglVectorOuter(&cross, left, right);
     xglVectorInner(&dot, left, right);
     length = __builtin_sqrtf((dot + 1.0f) * 2.0f);
-    if (__builtin_fabsf(length) < D_00550180) {
+    if (__builtin_fabsf(length) < xglQuatLengthEpsilon) {
         cross.y = 1.0f;
         cross.x = 0.0f;
         cross.z = 0.0f;
-        destination->y = cross.y;
-        destination->x = cross.x;
-        destination->z = cross.z;
-        destination->w = 0.0f;
+        quaternion->y = cross.y;
+        quaternion->x = cross.x;
+        quaternion->z = cross.z;
+        quaternion->w = 0.0f;
         return 0;
     }
     inverse = 1.0f / length;
-    destination->x = cross.x * inverse;
-    destination->y = cross.y * inverse;
-    destination->z = cross.z * inverse;
-    destination->w = 0.5f * length;
+    quaternion->x = cross.x * inverse;
+    quaternion->y = cross.y * inverse;
+    quaternion->z = cross.z * inverse;
+    quaternion->w = 0.5f * length;
     return 1;
 }
 
 /* Copies one vector through VU0 register vf2. */
-void xglVectorCopy(Vector4 *destination, const Vector4 *source) {
-    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(source) : "memory");
-    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(destination) : "memory");
+void xglVectorCopy(Vector4 *outVector, const Vector4 *inVector) {
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(inVector) : "memory");
+    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(outVector) : "memory");
 }
 
 /* Adds the xyz parts of two vectors; w is taken from the first operand. */
-void xglVectorAddXYZ(Vector4 *destination, const Vector4 *first, const Vector4 *second) {
-    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(first) : "memory");
-    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(second) : "memory");
+void xglVectorAddXYZ(Vector4 *outVector, const Vector4 *left, const Vector4 *right) {
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(left) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(right) : "memory");
     __asm__ __volatile__("vadd.xyz vf4, vf2, vf3" : : : "memory");
     __asm__ __volatile__("vmove.w vf4, vf2" : : : "memory");
-    __asm__ __volatile__("sqc2 vf4, 0(%0)" : : "r"(destination) : "memory");
+    __asm__ __volatile__("sqc2 vf4, 0(%0)" : : "r"(outVector) : "memory");
 }
 
 /* Subtracts the xyz parts of two vectors; w is taken from the minuend. */
-void xglVectorSubXYZ(Vector4 *destination, const Vector4 *minuend, const Vector4 *subtrahend) {
+void xglVectorSubXYZ(Vector4 *outVector, const Vector4 *minuend, const Vector4 *subtrahend) {
     __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(minuend) : "memory");
     __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(subtrahend) : "memory");
     __asm__ __volatile__("vsub.xyz vf4, vf2, vf3" : : : "memory");
     __asm__ __volatile__("vmove.w vf4, vf2" : : : "memory");
-    __asm__ __volatile__("sqc2 vf4, 0(%0)" : : "r"(destination) : "memory");
+    __asm__ __volatile__("sqc2 vf4, 0(%0)" : : "r"(outVector) : "memory");
 }
 
 /* Component-wise product of two vectors. */
-void xglVectorMul(Vector4 *destination, const Vector4 *first, const Vector4 *second) {
-    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(first) : "memory");
-    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(second) : "memory");
+void xglVectorMul(Vector4 *outVector, const Vector4 *left, const Vector4 *right) {
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(left) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(right) : "memory");
     __asm__ __volatile__("vmul.xyzw vf4, vf2, vf3" : : : "memory");
-    __asm__ __volatile__("sqc2 vf4, 0(%0)" : : "r"(destination) : "memory");
+    __asm__ __volatile__("sqc2 vf4, 0(%0)" : : "r"(outVector) : "memory");
 }
 
-void xglVectorNormal_002A1010(Vector4 *destination, const Vector4 *source) {
-    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(source) : "memory");
+void xglVectorNormal_002A1010(Vector4 *outVector, const Vector4 *inVector) {
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(inVector) : "memory");
     __asm__ __volatile__("vmul.xyz vf3, vf2, vf2" : : : "memory");
     __asm__ __volatile__("vaddy.x vf3, vf3, vf3y" : : : "memory");
     __asm__ __volatile__("vaddz.x vf3, vf3, vf3z" : : : "memory");
     __asm__ __volatile__("vrsqrt Q, vf0w, vf3x" : : : "memory");
     __asm__ __volatile__("vwaitq" : : : "memory");
     __asm__ __volatile__("vmulq.xyz vf2, vf2, Q" : : : "memory");
-    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(destination) : "memory");
+    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(outVector) : "memory");
 }
 
 /* Copies four vectors (a 4x4 matrix) through vf2..vf5. */
-void xglMatrixCopy(Vector4 *destination, const Vector4 *source) {
-    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(source) : "memory");
-    __asm__ __volatile__("lqc2 vf3, 16(%0)" : : "r"(source) : "memory");
-    __asm__ __volatile__("lqc2 vf4, 32(%0)" : : "r"(source) : "memory");
-    __asm__ __volatile__("lqc2 vf5, 48(%0)" : : "r"(source) : "memory");
-    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(destination) : "memory");
-    __asm__ __volatile__("sqc2 vf3, 16(%0)" : : "r"(destination) : "memory");
-    __asm__ __volatile__("sqc2 vf4, 32(%0)" : : "r"(destination) : "memory");
-    __asm__ __volatile__("sqc2 vf5, 48(%0)" : : "r"(destination) : "memory");
+void xglMatrixCopy(Vector4 *outMatrix, const Vector4 *inMatrix) {
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(inMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 16(%0)" : : "r"(inMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf4, 32(%0)" : : "r"(inMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf5, 48(%0)" : : "r"(inMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf3, 16(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf4, 32(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf5, 48(%0)" : : "r"(outMatrix) : "memory");
 }
 
 /* Loads the data matrix tiVu0IdentityMatrix into the VU0 current matrix (vf27..vf30). */
@@ -243,7 +244,7 @@ void xglCurMatrixGet(Matrix4 matrix) {
 }
 
 /* destination = current matrix * (vector.xyz, 1); the w component is passed through. */
-void xglCurApplyVector(Vector4 *destination, const Vector4 *vector) {
+void xglCurApplyVector(Vector4 *outVector, const Vector4 *vector) {
     __asm__ __volatile__(
         "lqc2 vf2, 0(%1)\n\t"
         "vmulax.xyzw ACC, vf27, vf2x\n\t"
@@ -252,12 +253,19 @@ void xglCurApplyVector(Vector4 *destination, const Vector4 *vector) {
         "vmaddw.xyzw vf2, vf30, vf2w\n\t"
         "sqc2 vf2, 0(%0)"
         :
-        : "r"(destination), "r"(vector)
+        : "r"(outVector), "r"(vector)
         : "memory"
     );
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cur_matrix", func_002A1138);
+void xglCurApplyVectorXYZ(Vector4 *outVector, const Vector4 *inVector) {
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(inVector) : "memory");
+    __asm__ __volatile__("vmulax.xyz ACC, vf27, vf2x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyz ACC, vf28, vf2y" : : : "memory");
+    __asm__ __volatile__("vmaddaz.xyz ACC, vf29, vf2z" : : : "memory");
+    __asm__ __volatile__("vmaddw.xyz vf2, vf30, vf2w" : : : "memory");
+    __asm__ __volatile__("sqc2 vf2, 0(%0)" : : "r"(outVector) : "memory");
+}
 
 /* Empty body: no statements, no role shown. */
 void xglCurDummy(void) {
@@ -323,7 +331,16 @@ void xglCurSetScaleXYZ(const Vector4 *scale) {
     xglCurMatrixSet(xglScaleXYZMatrix);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cur_matrix", func_002A1318);
+extern f32 xglLowerLeftMatrix[4];
+
+void xglCurMatrixSetLowerLeft(const f32 *lowerLeft)
+{
+  Matrix4 *matrix = (Matrix4 *) xglLowerLeftMatrix;
+  (*matrix)[1][0] = lowerLeft[0];
+  (*matrix)[2][0] = lowerLeft[1];
+  (*matrix)[2][1] = lowerLeft[2];
+  xglCurMatrixSet(*matrix);
+}
 
 /* Rotation about X: cosine on the [1][1] and [2][2] diagonal, sine at [1][2], -sine at [2][1]. */
 void xglCurMulRotateX(f32 angle)

@@ -48,7 +48,7 @@ typedef struct XglRenderState {
     /* +0x24: the per-frame callbacks xgl_render.c's final packet pass calls with the frame packet; recordRenderAll takes
      * slot 6. */
     XglRenderFadeCallback final_packet_callback[8];
-    /* +0x44: ov01SceneInit sets it to ov01DrawAll and ov01SceneEnd clears it. */
+    /* +0x44: battleSceneInit sets it to ov01DrawAll and ov01SceneEnd clears it. */
     XglRenderFadeCallback fade_callback;
     u32 render_status;                 /* +0x48 */
     u32 frame_delta;                   /* +0x4c */

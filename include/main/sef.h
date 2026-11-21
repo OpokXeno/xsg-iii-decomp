@@ -17,7 +17,7 @@ typedef struct SvTypeListEntry {
     unsigned short textureHeightExponent;       /* +0x1E */
 } SvTypeListEntry;
 
-/* The current effect record (sefCurrentRecord): only the entry id at +0x08 is read here. */
+/* The current effect record (sefCurrentEffectRecord): only the entry id at +0x08 is read here. */
 typedef struct SefEffectRecord {
     unsigned char unmodeled_00[0x08];
     short entryId;                              /* +0x08 */

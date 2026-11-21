@@ -91,7 +91,7 @@ f32 MMathMakeRandom(void)
     u32 bits;
 
     bits = MMathRandomNext();
-    return (f32) bits * 2.3283064e-10f;
+    return bits * 2.3283064e-10f;
 }
 
 /* A random float in [-1, 1): the 32-bit output scaled by 2^-31, minus 1. */
@@ -100,7 +100,7 @@ f32 MMathMakeRandomSigned(void)
     u32 bits;
 
     bits = MMathRandomNext();
-    return ((f32) bits * 4.656613e-10f) - 1.0f;
+    return (bits * 4.656613e-10f) - 1.0f;
 }
 
 void MMathRandomSeed(int seed);
@@ -124,7 +124,7 @@ f32 MMathMakeRandom2PI(void)
     u32 bits;
 
     bits = MMathRandomNext();
-    return (f32) bits * 1.462918e-09f;
+    return bits * 1.462918e-09f;
 }
 
 /* A random angle in [-pi, pi). */
@@ -133,56 +133,56 @@ f32 MMathMakeRandomPI(void)
     u32 bits;
 
     bits = MMathRandomNext();
-    return ((f32) bits * 1.462918e-09f) - 3.1415927f;
+    return (bits * 1.462918e-09f) - 3.1415927f;
 }
 
 /* Shortest signed difference toAngle - fromAngle, wrapped into [-pi, pi]. */
 f32 MMathCalcRotNear(f32 fromAngle, f32 toAngle)
 {
     f32 twoPi;
-    f32 result;
+    f32 rotDelta;
 
     twoPi = 6.2831850f;
-    result = fmodf(toAngle - fromAngle, twoPi);
-    if (3.14159274f < __builtin_fabsf(result))
+    rotDelta = fmodf(toAngle - fromAngle, twoPi);
+    if (3.14159274f < __builtin_fabsf(rotDelta))
     {
-        if (result < 0.0f)
+        if (rotDelta < 0.0f)
         {
-            result = result + twoPi;
+            rotDelta = rotDelta + twoPi;
         }
         else
         {
-            result = result - twoPi;
+            rotDelta = rotDelta - twoPi;
         }
     }
-    return result;
+    return rotDelta;
 }
 
 /* Difference toAngle - fromAngle wrapped into the other half-turn (|difference| >= pi). */
 f32 MMathCalcRotFar(f32 fromAngle, f32 toAngle)
 {
     f32 twoPi;
-    f32 result;
+    f32 rotDelta;
 
     twoPi = 6.2831850f;
-    result = fmodf(toAngle - fromAngle, twoPi);
-    if (__builtin_fabsf(result) < 3.14159274f)
+    rotDelta = fmodf(toAngle - fromAngle, twoPi);
+    if (__builtin_fabsf(rotDelta) < 3.14159274f)
     {
-        if (result < 0.0f)
+        if (rotDelta < 0.0f)
         {
-            result = result + twoPi;
+            rotDelta = rotDelta + twoPi;
         }
         else
         {
-            result = result - twoPi;
+            rotDelta = rotDelta - twoPi;
         }
     }
-    return result;
+    return rotDelta;
 }
 
 typedef Vector4 HermiteVector;
 
-float *MMathCalcHermite(float *destination, HermiteVector *tangent_first, HermiteVector *tangent_second,
+float *MMathCalcHermite(float *outVector, HermiteVector *tangent_first, HermiteVector *tangent_second,
                          HermiteVector *endpoint_first, HermiteVector *endpoint_second, float parameter);
 
 void MMathCalcHermitePrm(HermiteVector *tangent_start, HermiteVector *tangent_end,
@@ -191,7 +191,7 @@ void MMathCalcHermitePrm(HermiteVector *tangent_start, HermiteVector *tangent_en
 
 float MMathCalcLength(const Vector4 *vector);
 
-Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source);
+Vector4 *MMathNormalizeVector2(Vector4 *outVector, const Vector4 *inputVector);
 
 INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A000);
 
@@ -210,7 +210,7 @@ INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A000);
  * here (t2), because $8 and $9 would be the fifth and sixth argument
  * registers of this six-argument function.
  */
-float *MMathCalcHermite(float *destination, HermiteVector *tangent_first, HermiteVector *tangent_second,
+float *MMathCalcHermite(float *outVector, HermiteVector *tangent_first, HermiteVector *tangent_second,
                          HermiteVector *endpoint_first, HermiteVector *endpoint_second, float parameter)
 {
     __asm__ __volatile__(
@@ -240,10 +240,10 @@ float *MMathCalcHermite(float *destination, HermiteVector *tangent_first, Hermit
         "vmove.w vf1, vf0\n"
         "sqc2 vf1, 0(%1)\n"
         :
-        : "f"(parameter), "r"(destination), "r"(tangent_first),
+        : "f"(parameter), "r"(outVector), "r"(tangent_first),
           "r"(tangent_second), "r"(endpoint_first), "r"(endpoint_second)
         : "$10", "memory");
-    return destination;
+    return outVector;
 }
 
 void MMathCalcHermitePrm(HermiteVector *tangent_start, HermiteVector *tangent_end,
@@ -282,7 +282,7 @@ INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A4C8);
 INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A600);
 
 /* Float vector times the degree-to-radian factor (no int conversion; the counterpart of MMathDeg2RadVectorI). */
-Vector4 *MMathDeg2RadVector(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathDeg2RadVector(Vector4 *outVector, const Vector4 *inputVector)
 {
     __asm__ __volatile__(
         "li.s $f8, 0.017453292\n"
@@ -291,12 +291,12 @@ Vector4 *MMathDeg2RadVector(Vector4 *destination, const Vector4 *source)
         "lqc2 vf2, 0(%1)\n"
         "vmulx.xyz vf2, vf2, vf1x\n"
         "sqc2 vf2, 0(%0)\n"
-        : : "r"(destination), "r"(source) : "$8", "$f8", "memory");
-    return destination;
+        : : "r"(outVector), "r"(inputVector) : "$8", "$f8", "memory");
+    return outVector;
 }
 
 /* Int vector converted to float, times the degree-to-radian factor. */
-Vector4 *MMathDeg2RadVectorI(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathDeg2RadVectorI(Vector4 *outVector, const Vector4 *inputVector)
 {
     __asm__ __volatile__(
         "li.s $f8, 0.017453292\n"
@@ -306,12 +306,12 @@ Vector4 *MMathDeg2RadVectorI(Vector4 *destination, const Vector4 *source)
         "vitof0.xyz vf2, vf2\n"
         "vmulx.xyz vf2, vf2, vf1x\n"
         "sqc2 vf2, 0(%0)\n"
-        : : "r"(destination), "r"(source) : "$8", "$f8", "memory");
-    return destination;
+        : : "r"(outVector), "r"(inputVector) : "$8", "$f8", "memory");
+    return outVector;
 }
 
 /* Float vector times the radian-to-degree factor (no int conversion; the counterpart of MMathRad2DegVectorI). */
-Vector4 *MMathRad2DegVector(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathRad2DegVector(Vector4 *outVector, const Vector4 *inputVector)
 {
     __asm__ __volatile__(
         "li.s $f8, 57.29578\n"
@@ -320,12 +320,12 @@ Vector4 *MMathRad2DegVector(Vector4 *destination, const Vector4 *source)
         "lqc2 vf2, 0(%1)\n"
         "vmulx.xyz vf2, vf2, vf1x\n"
         "sqc2 vf2, 0(%0)\n"
-        : : "r"(destination), "r"(source) : "$8", "$f8", "memory");
-    return destination;
+        : : "r"(outVector), "r"(inputVector) : "$8", "$f8", "memory");
+    return outVector;
 }
 
 /* Float vector times the radian-to-degree factor, converted to int. */
-Vector4 *MMathRad2DegVectorI(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathRad2DegVectorI(Vector4 *outVector, const Vector4 *inputVector)
 {
     __asm__ __volatile__(
         "li.s $f8, 57.29578\n"
@@ -335,11 +335,11 @@ Vector4 *MMathRad2DegVectorI(Vector4 *destination, const Vector4 *source)
         "vmulx.xyz vf2, vf2, vf1x\n"
         "vftoi0.xyz vf2, vf2\n"
         "sqc2 vf2, 0(%0)\n"
-        : : "r"(destination), "r"(source) : "$8", "$f8", "memory");
-    return destination;
+        : : "r"(outVector), "r"(inputVector) : "$8", "$f8", "memory");
+    return outVector;
 }
 
-Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathNormalizeVector2(Vector4 *outVector, const Vector4 *inputVector)
 {
     __asm__ __volatile__(
         "lqc2 vf1,0(%1)\n\t"
@@ -351,11 +351,11 @@ Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source)
         "vwaitq\n\t"
         "vmulq.xyz vf2xyz,vf1xyz,Q\n\t"
         "sqc2 vf2,0(%0)"
-        : "+r"(destination)
-        : "r"(source)
+        : "+r"(outVector)
+        : "r"(inputVector)
         : "memory"
     );
-    return destination;
+    return outVector;
 }
 
 /* Vector length over x, y and z (VU0 square, sum, square root; the result is a float returned in $f0).
@@ -379,7 +379,7 @@ float MMathCalcLength(const Vector4 *vector)
     return length.x;
 }
 
-float MMathCalcDist(const Vector4 *first, const Vector4 *second);
+float MMathCalcDist(const Vector4 *fromPoint, const Vector4 *toPoint);
 
 INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A820);
 
@@ -440,10 +440,10 @@ float MMathCalcLengthYZ(const Vector4 *vector)
 /* Distance from first to second (MMathCalcDist in X1). The original reserves a 16-byte frame
  * that no instruction touches: without the unused `difference` local (the vector VU0 keeps in
  * vf1) gcc emits no stack adjustment. */
-float MMathCalcDist(const Vector4 *first, const Vector4 *second)
+float MMathCalcDist(const Vector4 *fromPoint, const Vector4 *toPoint)
 {
     Vector4 difference;
-    float result;
+    float distance;
 
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
@@ -457,31 +457,31 @@ float MMathCalcDist(const Vector4 *first, const Vector4 *second)
         "vaddq.x vf1, vf0, Q\n\t"
         "qmfc2.ni $8, vf1\n\t"
         "mtc1 $8, %0"
-        : "=f"(result)
-        : "r"(first), "r"(second)
+        : "=f"(distance)
+        : "r"(fromPoint), "r"(toPoint)
         : "$8", "memory");
-    return result;
+    return distance;
 }
 
-float MMathCalcDistXZ(const Vector4 *first, const Vector4 *second);
-Vector4 *MMathCalcDirVector(Vector4 *destination, const Vector4 *source, const Vector4 *target);
-Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source);
-Vector4 *MMathDivVectorS(Vector4 *destination, const Vector4 *source, float scale);
-Vector4 *MMathCalcAngle(Vector4 *out, const Vector4 *source, const Vector4 *target);
-Vector4 *MMathSubVectorMulS(Vector4 *destination, const Vector4 *first, const Vector4 *second, float scale);
-float MMathVectorDotProduct(const Vector4 *first, const Vector4 *second);
-Vector4 *MMathVectorCrossProduct(Vector4 *destination, const Vector4 *first, const Vector4 *second);
-Vector4 *MMathVectorInterpolation(Vector4 *destination, const Vector4 *first, const Vector4 *second, float parameter);
+float MMathCalcDistXZ(const Vector4 *fromPoint, const Vector4 *toPoint);
+Vector4 *MMathCalcDirVector(Vector4 *outVector, const Vector4 *fromPoint, const Vector4 *toPoint);
+Vector4 *MMathNormalizeVector2(Vector4 *outVector, const Vector4 *inputVector);
+Vector4 *MMathDivVectorS(Vector4 *outVector, const Vector4 *inputVector, float scale);
+Vector4 *MMathCalcAngle(Vector4 *outAngles, const Vector4 *fromPoint, const Vector4 *toPoint);
+Vector4 *MMathSubVectorMulS(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float scale);
+float MMathVectorDotProduct(const Vector4 *lhs, const Vector4 *rhs);
+Vector4 *MMathVectorCrossProduct(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs);
+Vector4 *MMathVectorInterpolation(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float parameter);
 float srsAtan2(float x, float y);
 
 INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A910);
 
 /* Distance from first to second in the XZ plane (MMathCalcDistXZ in X1); the unused
  * `difference` local reproduces the 16-byte frame, as in MMathCalcDist. */
-float MMathCalcDistXZ(const Vector4 *first, const Vector4 *second)
+float MMathCalcDistXZ(const Vector4 *fromPoint, const Vector4 *toPoint)
 {
     Vector4 difference;
-    float result;
+    float distanceXZ;
 
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
@@ -494,18 +494,18 @@ float MMathCalcDistXZ(const Vector4 *first, const Vector4 *second)
         "vaddq.x vf1, vf0, Q\n\t"
         "qmfc2.ni $8, vf1\n\t"
         "mtc1 $8, %0"
-        : "=f"(result)
-        : "r"(first), "r"(second)
+        : "=f"(distanceXZ)
+        : "r"(fromPoint), "r"(toPoint)
         : "$8", "memory");
-    return result;
+    return distanceXZ;
 }
 
 /* Unit vector from source towards target, stored at destination (MMathCalcDirVector in X1).
  * A plain `return MMathNormalizeVector2(...)` compiles to a sibling call (`j`); the original
  * calls it with `jal` and returns its result, which the do { } while (0) reproduces. */
-Vector4 *MMathCalcDirVector(Vector4 *destination, const Vector4 *source, const Vector4 *target)
+Vector4 *MMathCalcDirVector(Vector4 *outVector, const Vector4 *fromPoint, const Vector4 *toPoint)
 {
-    Vector4 *difference = destination;
+    Vector4 *difference = outVector;
     Vector4 *normalized;
 
     __asm__ __volatile__(
@@ -514,27 +514,27 @@ Vector4 *MMathCalcDirVector(Vector4 *destination, const Vector4 *source, const V
         "vsub.xyz vf2, vf2, vf1\n\t"
         "sqc2 vf2, 0(%0)"
         : "+r"(difference)
-        : "r"(source), "r"(target)
+        : "r"(fromPoint), "r"(toPoint)
         : "memory");
     do {
-        normalized = MMathNormalizeVector2(destination, difference);
+        normalized = MMathNormalizeVector2(outVector, difference);
     } while (0);
     return normalized;
 }
 
 /* Heading in the XZ plane from first to second (MMathCalcDir in X1). The srsAtan2 result is
  * left in $f0 by the last call; the declared void return does not change that. */
-void MMathCalcDir(const Vector4 *first, const Vector4 *second)
+void MMathCalcDir(const Vector4 *fromPoint, const Vector4 *toPoint)
 {
     const Vector4 **origin;
 
-    origin = &first;
-    srsAtan2(second->x - (*origin)->x, second->z - (*origin)->z);
+    origin = &fromPoint;
+    srsAtan2(toPoint->x - (*origin)->x, toPoint->z - (*origin)->z);
 }
 
 /* Pitch from source to target to out.x, yaw to out.y; a null source or target defaults to
  * MMathUnitVector (the library's own lui/addiu/movz null-default group inside the VU0 block). */
-Vector4 *MMathCalcAngle(Vector4 *out, const Vector4 *source, const Vector4 *target)
+Vector4 *MMathCalcAngle(Vector4 *outAngles, const Vector4 *fromPoint, const Vector4 *toPoint)
 {
     Vector4 delta;
     float horizontalLength = 0.0f;
@@ -557,15 +557,15 @@ Vector4 *MMathCalcAngle(Vector4 *out, const Vector4 *source, const Vector4 *targ
         "vaddq.x vf1, vf0, Q\n\t"
         "qmfc2.ni $8, vf1\n\t"
         "mtc1 $8, %0"
-        : "+f"(horizontalLength), "=m"(delta), "+r"(source), "+r"(target)
-        : "r"(out)
+        : "+f"(horizontalLength), "=m"(delta), "+r"(fromPoint), "+r"(toPoint)
+        : "r"(outAngles)
         : "$8", "memory");
-    out->x = srsAtan2(delta.y, horizontalLength);
-    out->y = srsAtan2(delta.x, delta.z);
-    return out;
+    outAngles->x = srsAtan2(delta.y, horizontalLength);
+    outAngles->y = srsAtan2(delta.x, delta.z);
+    return outAngles;
 }
 
-Vector4 *MMathCalcOffset(Vector4 *destination, const Vector4 *first, const Vector4 *second)
+Vector4 *MMathCalcOffset(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs)
 {
     __asm__ __volatile__(
         "lqc2 vf5, 0(%0)\n\t"
@@ -586,11 +586,11 @@ Vector4 *MMathCalcOffset(Vector4 *destination, const Vector4 *first, const Vecto
         "vmulaw.xyz ACC, vf7, vf6w\n\t"
         "vmaddw.xyz vf5, vf5, vf0w\n\t"
         "sqc2 vf5, 0(%2)"
-        : : "r"(first), "r"(second), "r"(destination) : "memory");
-    return destination;
+        : : "r"(lhs), "r"(rhs), "r"(outVector) : "memory");
+    return outVector;
 }
 
-Vector4 *MMathCalcOffsetXYZ(Vector4 *destination, const Vector4 *first, const Vector4 *second)
+Vector4 *MMathCalcOffsetXYZ(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs)
 {
     __asm__ __volatile__(
         "lqc2 vf5, 0(%0)\n\t"
@@ -606,11 +606,11 @@ Vector4 *MMathCalcOffsetXYZ(Vector4 *destination, const Vector4 *first, const Ve
         "vmaddx.xz vf6, vf2, vf1x\n\t"
         "vadd.xyz vf5, vf5, vf6\n\t"
         "sqc2 vf5, 0(%2)"
-        : : "r"(first), "r"(second), "r"(destination) : "memory");
-    return destination;
+        : : "r"(lhs), "r"(rhs), "r"(outVector) : "memory");
+    return outVector;
 }
 
-Vector4 *MMathSubVectorMulS(Vector4 *destination, const Vector4 *first, const Vector4 *second, float scale)
+Vector4 *MMathSubVectorMulS(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float scale)
 {
     __asm__ __volatile__(
         "mfc1 $8, %0\n\t"
@@ -620,11 +620,11 @@ Vector4 *MMathSubVectorMulS(Vector4 *destination, const Vector4 *first, const Ve
         "vsub.xyz vf1, vf1, vf2\n\t"
         "vmulx.xyz vf1, vf1, vf3x\n\t"
         "sqc2 vf1, 0(%3)"
-        : : "f"(scale), "r"(first), "r"(second), "r"(destination) : "$8", "memory");
-    return destination;
+        : : "f"(scale), "r"(lhs), "r"(rhs), "r"(outVector) : "$8", "memory");
+    return outVector;
 }
 
-Vector4 *MMathSubVectorDivS(Vector4 *destination, const Vector4 *first, const Vector4 *second, float scale)
+Vector4 *MMathSubVectorDivS(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float scale)
 {
     __asm__ __volatile__(
         "mfc1 $8, %0\n\t"
@@ -636,11 +636,11 @@ Vector4 *MMathSubVectorDivS(Vector4 *destination, const Vector4 *first, const Ve
         "vwaitq\n\t"
         "vmulq.xyz vf1, vf1, Q\n\t"
         "sqc2 vf1, 0(%3)"
-        : : "f"(scale), "r"(first), "r"(second), "r"(destination) : "$8", "memory");
-    return destination;
+        : : "f"(scale), "r"(lhs), "r"(rhs), "r"(outVector) : "$8", "memory");
+    return outVector;
 }
 
-Vector4 *MMathDivVector(Vector4 *destination, const Vector4 *first, const Vector4 *second)
+Vector4 *MMathDivVector(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%0)\n\t"
@@ -656,11 +656,11 @@ Vector4 *MMathDivVector(Vector4 *destination, const Vector4 *first, const Vector
         "vwaitq\n\t"
         "vaddq.z vf3, vf0, Q\n\t"
         "sqc2 vf3, 0(%2)"
-        : : "r"(first), "r"(second), "r"(destination) : "memory");
-    return destination;
+        : : "r"(lhs), "r"(rhs), "r"(outVector) : "memory");
+    return outVector;
 }
 
-Vector4 *MMathDivVectorS(Vector4 *destination, const Vector4 *source, float scale)
+Vector4 *MMathDivVectorS(Vector4 *outVector, const Vector4 *inputVector, float scale)
 {
     __asm__ __volatile__(
         "mfc1 $8, %0\n\t"
@@ -670,11 +670,11 @@ Vector4 *MMathDivVectorS(Vector4 *destination, const Vector4 *source, float scal
         "vwaitq\n\t"
         "vmulq.xyz vf1, vf1, Q\n\t"
         "sqc2 vf1, 0(%2)"
-        : : "f"(scale), "r"(source), "r"(destination) : "$8", "memory");
-    return destination;
+        : : "f"(scale), "r"(inputVector), "r"(outVector) : "$8", "memory");
+    return outVector;
 }
 
-Vector4 *MMathDivVector4(Vector4 *destination, const Vector4 *first, const Vector4 *second)
+Vector4 *MMathDivVector4(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%0)\n\t"
@@ -693,11 +693,11 @@ Vector4 *MMathDivVector4(Vector4 *destination, const Vector4 *first, const Vecto
         "vwaitq\n\t"
         "vaddq.w vf3, vf3, Q\n\t"
         "sqc2 vf3, 0(%2)"
-        : : "r"(first), "r"(second), "r"(destination) : "memory");
-    return destination;
+        : : "r"(lhs), "r"(rhs), "r"(outVector) : "memory");
+    return outVector;
 }
 
-Vector4 *MMathDivVectorS4(Vector4 *destination, const Vector4 *source, float scale)
+Vector4 *MMathDivVectorS4(Vector4 *outVector, const Vector4 *inputVector, float scale)
 {
     __asm__ __volatile__(
         "mfc1 $8, %0\n\t"
@@ -707,17 +707,17 @@ Vector4 *MMathDivVectorS4(Vector4 *destination, const Vector4 *source, float sca
         "vwaitq\n\t"
         "vmulq.xyzw vf1, vf1, Q\n\t"
         "sqc2 vf1, 0(%2)"
-        : : "f"(scale), "r"(source), "r"(destination) : "$8", "memory");
-    return destination;
+        : : "f"(scale), "r"(inputVector), "r"(outVector) : "$8", "memory");
+    return outVector;
 }
 
 /* 128-bit equality test: 1 when the two quadwords are identical, else 0. The hand-written MMI block
  * compares both doubleword halves of the xor mask; the sibling below differs only in the permute
  * before the second movn. The original keeps an untouched 16-byte frame: the unused scratch quadword. */
-int MMathIsVectorEqual(const Vector4 *first, const Vector4 *second)
+int MMathIsVectorEqual(const Vector4 *lhs, const Vector4 *rhs)
 {
     int equal;
-    Vector4 scratch;
+    Vector4 frameQuad;
 
     __asm__ __volatile__(
         "lq $8, 0(%1)\n\t"
@@ -728,15 +728,15 @@ int MMathIsVectorEqual(const Vector4 *first, const Vector4 *second)
         "pexew $10, $10\n\t"
         "movn %0, $0, $10"
         : "=&r"(equal)
-        : "r"(first), "r"(second)
+        : "r"(lhs), "r"(rhs)
         : "$8", "$9", "$10");
     return equal;
 }
 
-int MMathIsVectorEqual4(const Vector4 *first, const Vector4 *second)
+int MMathIsVectorEqual4(const Vector4 *lhs, const Vector4 *rhs)
 {
     int equal;
-    Vector4 scratch;
+    Vector4 frameQuad;
 
     __asm__ __volatile__(
         "lq $8, 0(%1)\n\t"
@@ -747,7 +747,7 @@ int MMathIsVectorEqual4(const Vector4 *first, const Vector4 *second)
         "pcpyud $10, $10, $0\n\t"
         "movn %0, $0, $10"
         : "=&r"(equal)
-        : "r"(first), "r"(second)
+        : "r"(lhs), "r"(rhs)
         : "$8", "$9", "$10");
     return equal;
 }
@@ -755,7 +755,7 @@ int MMathIsVectorEqual4(const Vector4 *first, const Vector4 *second)
 /* Dot product of the xyz lanes, returned in $f0. The asm's float output stays in a register; it is
  * bound to the x field of a Vector4 local only so the function keeps the original's 16-byte frame,
  * which no instruction reads or writes. */
-float MMathVectorDotProduct(const Vector4 *first, const Vector4 *second)
+float MMathVectorDotProduct(const Vector4 *lhs, const Vector4 *rhs)
 {
     Vector4 product;
 
@@ -767,11 +767,11 @@ float MMathVectorDotProduct(const Vector4 *first, const Vector4 *second)
         "vaddz.x vf1, vf1, vf1z\n\t"
         "qmfc2.ni $8, vf1\n\t"
         "mtc1 $8, %0"
-        : "=f"(product.x) : "r"(first), "r"(second) : "$8", "memory");
+        : "=f"(product.x) : "r"(lhs), "r"(rhs) : "$8", "memory");
     return product.x;
 }
 
-Vector4 *MMathVectorCrossProduct(Vector4 *destination, const Vector4 *first, const Vector4 *second)
+Vector4 *MMathVectorCrossProduct(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%0)\n\t"
@@ -780,11 +780,11 @@ Vector4 *MMathVectorCrossProduct(Vector4 *destination, const Vector4 *first, con
         "vopmsub.xyz vf1, vf2, vf1\n\t"
         "vmove.w vf1, vf0\n\t"
         "sqc2 vf1, 0(%2)"
-        : : "r"(first), "r"(second), "r"(destination) : "memory");
-    return destination;
+        : : "r"(lhs), "r"(rhs), "r"(outVector) : "memory");
+    return outVector;
 }
 
-Vector4 *MMathVectorInterpolation(Vector4 *destination, const Vector4 *first, const Vector4 *second, float parameter)
+Vector4 *MMathVectorInterpolation(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float parameter)
 {
     __asm__ __volatile__(
         "mfc1 $8, %0\n\t"
@@ -795,28 +795,37 @@ Vector4 *MMathVectorInterpolation(Vector4 *destination, const Vector4 *first, co
         "vmulaw.xyz ACC, vf1, vf3w\n\t"
         "vmaddx.xyz vf1, vf2, vf3x\n\t"
         "sqc2 vf1, 0(%3)"
-        : : "f"(parameter), "r"(first), "r"(second), "r"(destination) : "$8", "memory");
-    return destination;
+        : : "f"(parameter), "r"(lhs), "r"(rhs), "r"(outVector) : "$8", "memory");
+    return outVector;
 }
 
 /* Row-major 4x4 float matrix. */
 
-Matrix4 *MMathRotateMatrixX(Matrix4 *out, Matrix4 *matrix, float angle);
-Matrix4 *MMathRotateMatrixY(Matrix4 *out, Matrix4 *matrix, float angle);
-Matrix4 *MMathRotateMatrixZ(Matrix4 *out, Matrix4 *matrix, float angle);
-Matrix4 *MMathRotateMatrixXY(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixXYZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixYXZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixZXY(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixZYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixX(Matrix4 *outMatrix, Matrix4 *matrix, float angle);
+Matrix4 *MMathRotateMatrixY(Matrix4 *outMatrix, Matrix4 *matrix, float angle);
+Matrix4 *MMathRotateMatrixZ(Matrix4 *outMatrix, Matrix4 *matrix, float angle);
+Matrix4 *MMathRotateMatrixXY(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixXYZ(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixYXZ(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixZXY(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixZYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025AD00);
+/* destination = source with x, y and z clamped to [minimum, maximum]; w is kept. */
+Vector4 *MMathClampVectorXYZ(Vector4 *outVector, const Vector4 *inputVector, float minimum, float maximum) {
+    __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(inputVector) : "memory");
+    __asm__ __volatile__("mfc1 $8, %0\n\tqmtc2.ni $8, vf2" :  : "f"(minimum) : "$8", "memory");
+    __asm__ __volatile__("mfc1 $8, %0\n\tqmtc2.ni $8, vf3" :  : "f"(maximum) : "$8", "memory");
+    __asm__ __volatile__("vmaxx.xyz vf1, vf1, vf2x" : : : "memory");
+    __asm__ __volatile__("vminix.xyz vf1, vf1, vf3x" : : : "memory");
+    __asm__ __volatile__("sqc2 vf1, 0(%0)" : : "r"(outVector) : "memory");
+    return outVector;
+}
 
 /* The rotation helpers rotate matrix (MMathUnitMatrix when null) about the axes in their name,
  * applied in name order, and store the result in out. vcallms 0xE8 and 0x20 leave the cosine and
  * sine of vf4x in vf1x; the vector forms take the x, y and z angles from angles. */
-Matrix4 *MMathRotateMatrixX(Matrix4 *out, Matrix4 *matrix, float angle)
+Matrix4 *MMathRotateMatrixX(Matrix4 *outMatrix, Matrix4 *matrix, float angle)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -841,11 +850,11 @@ Matrix4 *MMathRotateMatrixX(Matrix4 *out, Matrix4 *matrix, float angle)
         "sqc2 vf7, 16(%1)\n\t"
         "sqc2 vf8, 32(%1)\n\t"
         "sqc2 vf4, 48(%1)"
-        : "+r"(matrix) : "r"(out), "f"(angle) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "f"(angle) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixY(Matrix4 *out, Matrix4 *matrix, float angle)
+Matrix4 *MMathRotateMatrixY(Matrix4 *outMatrix, Matrix4 *matrix, float angle)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -870,11 +879,11 @@ Matrix4 *MMathRotateMatrixY(Matrix4 *out, Matrix4 *matrix, float angle)
         "sqc2 vf2, 16(%1)\n\t"
         "sqc2 vf8, 32(%1)\n\t"
         "sqc2 vf4, 48(%1)"
-        : "+r"(matrix) : "r"(out), "f"(angle) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "f"(angle) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixZ(Matrix4 *out, Matrix4 *matrix, float angle)
+Matrix4 *MMathRotateMatrixZ(Matrix4 *outMatrix, Matrix4 *matrix, float angle)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -899,11 +908,11 @@ Matrix4 *MMathRotateMatrixZ(Matrix4 *out, Matrix4 *matrix, float angle)
         "sqc2 vf8, 16(%1)\n\t"
         "sqc2 vf3, 32(%1)\n\t"
         "sqc2 vf4, 48(%1)"
-        : "+r"(matrix) : "r"(out), "f"(angle) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "f"(angle) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixXY(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles)
+Matrix4 *MMathRotateMatrixXY(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -938,11 +947,11 @@ Matrix4 *MMathRotateMatrixXY(Matrix4 *out, Matrix4 *matrix, const Vector4 *angle
         "sqc2 vf7, 16(%1)\n\t"
         "sqc2 vf8, 0(%1)\n\t"
         "sqc2 vf3, 32(%1)"
-        : "+r"(matrix) : "r"(out), "r"(angles) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "r"(angles) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles)
+Matrix4 *MMathRotateMatrixYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -977,11 +986,11 @@ Matrix4 *MMathRotateMatrixYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angle
         "sqc2 vf7, 0(%1)\n\t"
         "sqc2 vf8, 16(%1)\n\t"
         "sqc2 vf3, 32(%1)"
-        : "+r"(matrix) : "r"(out), "r"(angles) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "r"(angles) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixXYZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles)
+Matrix4 *MMathRotateMatrixXYZ(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -1026,11 +1035,11 @@ Matrix4 *MMathRotateMatrixXYZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angl
         "sqc2 vf3, 32(%1)\n\t"
         "sqc2 vf1, 0(%1)\n\t"
         "sqc2 vf2, 16(%1)"
-        : "+r"(matrix) : "r"(out), "r"(angles) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "r"(angles) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixYXZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles)
+Matrix4 *MMathRotateMatrixYXZ(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -1075,11 +1084,11 @@ Matrix4 *MMathRotateMatrixYXZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angl
         "sqc2 vf3, 32(%1)\n\t"
         "sqc2 vf1, 0(%1)\n\t"
         "sqc2 vf2, 16(%1)"
-        : "+r"(matrix) : "r"(out), "r"(angles) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "r"(angles) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixZXY(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles)
+Matrix4 *MMathRotateMatrixZXY(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -1124,11 +1133,11 @@ Matrix4 *MMathRotateMatrixZXY(Matrix4 *out, Matrix4 *matrix, const Vector4 *angl
         "sqc2 vf2, 16(%1)\n\t"
         "sqc2 vf1, 0(%1)\n\t"
         "sqc2 vf3, 32(%1)"
-        : "+r"(matrix) : "r"(out), "r"(angles) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "r"(angles) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathRotateMatrixZYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles)
+Matrix4 *MMathRotateMatrixZYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles)
 {
     __asm__ __volatile__(
         "lui $8, %%hi(MMathUnitMatrix)\n\t"
@@ -1173,18 +1182,18 @@ Matrix4 *MMathRotateMatrixZYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angl
         "sqc2 vf1, 0(%1)\n\t"
         "sqc2 vf2, 16(%1)\n\t"
         "sqc2 vf3, 32(%1)"
-        : "+r"(matrix) : "r"(out), "r"(angles) : "$8", "memory");
-    return out;
+        : "+r"(matrix) : "r"(outMatrix), "r"(angles) : "$8", "memory");
+    return outMatrix;
 }
 
 /* Row-major 4x4 float matrix. */
 
-Vector4 *MMathApplyMatrix(Vector4 *out, Matrix4 *matrix, const Vector4 *vector);
+Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *vector);
 
-Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs);
-Matrix4 *MMathScaleMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *scale);
+Matrix4 *MMathMulMatrix(Matrix4 *outMatrix, Matrix4 *rhs, Matrix4 *lhs);
+Matrix4 *MMathScaleMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *scale);
 
-Vector4 *MMathApplyMatrix(Vector4 *out, Matrix4 *matrix, const Vector4 *vector)
+Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *vector)
 {
     __asm__ __volatile__(
         "lqc2 $vf1,0(%2)\n\t"
@@ -1197,15 +1206,15 @@ Vector4 *MMathApplyMatrix(Vector4 *out, Matrix4 *matrix, const Vector4 *vector)
         "vmaddaz.xyzw ACCxyzw,$vf4xyzw,$vf1z\n\t"
         "vmaddw.xyzw $vf1xyzw,$vf5xyzw,$vf1w\n\t"
         "sqc2 $vf1,0(%0)"
-        : : "r"(out), "r"(matrix), "r"(vector) : "memory");
-    return out;
+        : : "r"(outVector), "r"(matrix), "r"(vector) : "memory");
+    return outVector;
 }
 
 /*
  * MMathMulMatrix (X1 computes the same 4x4 product): out receives the product lhs x rhs in the
  * row-vector convention of MMathApplyMatrix (each row of lhs times rhs). Returns out.
  */
-Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs) {
+Matrix4 *MMathMulMatrix(Matrix4 *outMatrix, Matrix4 *rhs, Matrix4 *lhs) {
     __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(rhs) : "memory");
     __asm__ __volatile__("lqc2 vf2, 16(%0)" : : "r"(rhs) : "memory");
     __asm__ __volatile__("lqc2 vf3, 32(%0)" : : "r"(rhs) : "memory");
@@ -1230,14 +1239,14 @@ Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs) {
     __asm__ __volatile__("vmadday.xyzw ACC, vf2, vf8y" : : : "memory");
     __asm__ __volatile__("vmaddaz.xyzw ACC, vf3, vf8z" : : : "memory");
     __asm__ __volatile__("vmaddw.xyzw vf8, vf4, vf8w" : : : "memory");
-    __asm__ __volatile__("sqc2 vf5, 0(%0)" : : "r"(out) : "memory");
-    __asm__ __volatile__("sqc2 vf6, 16(%0)" : : "r"(out) : "memory");
-    __asm__ __volatile__("sqc2 vf7, 32(%0)" : : "r"(out) : "memory");
-    __asm__ __volatile__("sqc2 vf8, 48(%0)" : : "r"(out) : "memory");
-    return out;
+    __asm__ __volatile__("sqc2 vf5, 0(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf6, 16(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf7, 32(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf8, 48(%0)" : : "r"(outMatrix) : "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathScaleMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *scale)
+Matrix4 *MMathScaleMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *scale)
 {
     __asm__ __volatile__(
         "lqc2 $vf5,0(%2)\n\t"
@@ -1253,19 +1262,19 @@ Matrix4 *MMathScaleMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *scale)
         "sqc2 $vf2,16(%0)\n\t"
         "sqc2 $vf3,32(%0)\n\t"
         "sqc2 $vf4,48(%0)"
-        : : "r"(out), "r"(matrix), "r"(scale) : "memory");
-    return out;
+        : : "r"(outMatrix), "r"(matrix), "r"(scale) : "memory");
+    return outMatrix;
 }
 
 /* Row-major 4x4 float matrix. */
 
-Vector4 *MMathCalcAngle(Vector4 *out, const Vector4 *source, const Vector4 *target);
-Matrix4 *MMathRotateMatrixYX(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixYXZ(Matrix4 *out, Matrix4 *matrix, const Vector4 *angles);
-Vector4 *MMathApplyMatrix(Vector4 *out, Matrix4 *matrix, const Vector4 *vector);
-Matrix4 *MMathCalcLookAtMatrix(Matrix4 *out, const Vector4 *source, const Vector4 *target, const Vector4 *position, float roll);
-Matrix4 *MMathScaleMatrixRotS(Matrix4 *out, Matrix4 *matrix, float scale);
-Matrix4 *MMathTranslateMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *translation);
+Vector4 *MMathCalcAngle(Vector4 *outAngles, const Vector4 *fromPoint, const Vector4 *toPoint);
+Matrix4 *MMathRotateMatrixYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Matrix4 *MMathRotateMatrixYXZ(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
+Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *vector);
+Matrix4 *MMathCalcLookAtMatrix(Matrix4 *outMatrix, const Vector4 *fromPoint, const Vector4 *toPoint, const Vector4 *position, float roll);
+Matrix4 *MMathScaleMatrixRotS(Matrix4 *outMatrix, Matrix4 *matrix, float scale);
+Matrix4 *MMathTranslateMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *translation);
 struct XglCamera;
 float srsAtan2(float x, float y);
 
@@ -1273,7 +1282,7 @@ float srsAtan2(float x, float y);
 /* out = the transformed +Z point: (0, 0, 1, 1) times the matrix with its row 3 replaced by MMathUnitVector. */ Vector4 *MMathCalcVectorMatrixZ(Vector4 *out, Matrix4 *matrix);
 
 /* out = matrix with rows 0..2 scaled by scale; row 3, the translation row, is copied unchanged. */
-Matrix4 *MMathScaleMatrixRotS(Matrix4 *out, Matrix4 *matrix, float scale)
+Matrix4 *MMathScaleMatrixRotS(Matrix4 *outMatrix, Matrix4 *matrix, float scale)
 {
     __asm__ __volatile__(
         "mfc1 $8, %2\n\t"
@@ -1289,12 +1298,12 @@ Matrix4 *MMathScaleMatrixRotS(Matrix4 *out, Matrix4 *matrix, float scale)
         "sqc2 vf2, 16(%0)\n\t"
         "sqc2 vf3, 32(%0)\n\t"
         "sqc2 vf4, 48(%0)"
-        : : "r"(out), "r"(matrix), "f"(scale) : "$8", "memory");
-    return out;
+        : : "r"(outMatrix), "r"(matrix), "f"(scale) : "$8", "memory");
+    return outMatrix;
 }
 
 /* out = matrix scaled by scale in every row; the w of row 3 is kept. */
-Matrix4 *MMathScaleMatrixS(Matrix4 *out, const Matrix4 *matrix, float scale)
+Matrix4 *MMathScaleMatrixS(Matrix4 *outMatrix, const Matrix4 *matrix, float scale)
 {
     __asm__ __volatile__(
         "mfc1 $8, %2\n\t"
@@ -1311,11 +1320,11 @@ Matrix4 *MMathScaleMatrixS(Matrix4 *out, const Matrix4 *matrix, float scale)
         "sqc2 vf2, 16(%0)\n\t"
         "sqc2 vf3, 32(%0)\n\t"
         "sqc2 vf4, 48(%0)"
-        : : "r"(out), "r"(matrix), "f"(scale) : "$8", "memory");
-    return out;
+        : : "r"(outMatrix), "r"(matrix), "f"(scale) : "$8", "memory");
+    return outMatrix;
 }
 
-Matrix4 *MMathTranslateMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *translation)
+Matrix4 *MMathTranslateMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *translation)
 {
     __asm__ __volatile__(
         "lqc2 $vf5,0(%2)\n\t"
@@ -1331,34 +1340,34 @@ Matrix4 *MMathTranslateMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *tran
         "sqc2 $vf2,16(%0)\n\t"
         "sqc2 $vf3,32(%0)\n\t"
         "sqc2 $vf4,48(%0)"
-        : : "r"(out), "r"(matrix), "r"(translation) : "memory");
-    return out;
+        : : "r"(outMatrix), "r"(matrix), "r"(translation) : "memory");
+    return outMatrix;
 }
 
 /* Pitch and yaw from source to target, roll as z of the angles, YXZ rotation over the identity;
  * a non-null position goes to row 3 with w = 1. */
-Matrix4 *MMathCalcLookAtMatrix(Matrix4 *out, const Vector4 *source, const Vector4 *target,
+Matrix4 *MMathCalcLookAtMatrix(Matrix4 *outMatrix, const Vector4 *fromPoint, const Vector4 *toPoint,
                                const Vector4 *position, float roll)
 {
     Vector4 angles;
 
-    MMathCalcAngle(&angles, source, target);
+    MMathCalcAngle(&angles, fromPoint, toPoint);
     angles.z = roll;
-    MMathRotateMatrixYXZ(out, 0, &angles);
+    MMathRotateMatrixYXZ(outMatrix, 0, &angles);
     /* An early return: the nested if (position != 0) form swaps out and position between $16 and $17. */
     if (position == 0) {
-        return out;
+        return outMatrix;
     }
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
         "vmove.w vf1, vf0\n\t"
         "sqc2 vf1, 48(%0)"
-        : : "r"(out), "r"(position) : "memory");
-    return out;
+        : : "r"(outMatrix), "r"(position) : "memory");
+    return outMatrix;
 }
 
 /* out = matrix with its 3x3 block transposed; the fourth column is kept. */
-Matrix4 *MMathTransposeMatrix3(Matrix4 *out, const Matrix4 *matrix)
+Matrix4 *MMathTransposeMatrix3(Matrix4 *outMatrix, const Matrix4 *matrix)
 {
     __asm__ __volatile__(
         "lqc2 vf6, 0(%1)\n\t"
@@ -1378,12 +1387,12 @@ Matrix4 *MMathTransposeMatrix3(Matrix4 *out, const Matrix4 *matrix)
         "sqc2 vf2, 16(%0)\n\t"
         "sqc2 vf3, 32(%0)\n\t"
         "sqc2 vf4, 48(%0)"
-        : : "r"(out), "r"(matrix) : "memory");
-    return out;
+        : : "r"(outMatrix), "r"(matrix) : "memory");
+    return outMatrix;
 }
 
 /* out = the full 4x4 transpose of matrix. */
-Matrix4 *MMathTransposeMatrix(Matrix4 *out, const Matrix4 *matrix)
+Matrix4 *MMathTransposeMatrix(Matrix4 *outMatrix, const Matrix4 *matrix)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
@@ -1411,29 +1420,72 @@ Matrix4 *MMathTransposeMatrix(Matrix4 *out, const Matrix4 *matrix)
         "sqc2 vf7, 16(%0)\n\t"
         "sqc2 vf8, 32(%0)\n\t"
         "sqc2 vf9, 48(%0)"
-        : : "r"(out), "r"(matrix) : "memory");
-    return out;
+        : : "r"(outMatrix), "r"(matrix) : "memory");
+    return outMatrix;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025B558);
+/* out = inverse of the affine matrix src: transposed 3x3 cofactors over the determinant, translation -(inv3 * t). */
+Matrix4 *MMathInvertAffineMatrix(Matrix4 *outMatrix, float *inputMatrix) {
+    __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(inputMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf2, 16(%0)" : : "r"(inputMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 32(%0)" : : "r"(inputMatrix) : "memory");
+    __asm__ __volatile__("vsub.xyzw vf5, vf0, vf0" : : : "memory");
+    __asm__ __volatile__("vsub.xyzw vf6, vf0, vf0" : : : "memory");
+    __asm__ __volatile__("vsub.xyzw vf7, vf0, vf0" : : : "memory");
+    __asm__ __volatile__("vopmula.xyz ACC, vf2, vf3" : : : "memory");
+    __asm__ __volatile__("vopmsub.xyz vf9, vf3, vf2" : : : "memory");
+    __asm__ __volatile__("vopmula.xyz ACC, vf3, vf1" : : : "memory");
+    __asm__ __volatile__("vopmsub.xyz vf10, vf1, vf3" : : : "memory");
+    __asm__ __volatile__("vopmula.xyz ACC, vf1, vf2" : : : "memory");
+    __asm__ __volatile__("vopmsub.xyz vf11, vf2, vf1" : : : "memory");
+    __asm__ __volatile__("vmul.xyz vf12, vf1, vf9" : : : "memory");
+    __asm__ __volatile__("vaddx.x vf5, vf0, vf9x" : : : "memory");
+    __asm__ __volatile__("vaddy.x vf6, vf0, vf9y" : : : "memory");
+    __asm__ __volatile__("vaddz.x vf7, vf0, vf9z" : : : "memory");
+    __asm__ __volatile__("vaddy.x vf12, vf12, vf12y" : : : "memory");
+    __asm__ __volatile__("vaddx.y vf5, vf0, vf10x" : : : "memory");
+    __asm__ __volatile__("vaddy.y vf6, vf0, vf10y" : : : "memory");
+    __asm__ __volatile__("vaddz.y vf7, vf0, vf10z" : : : "memory");
+    __asm__ __volatile__("vaddz.x vf12, vf12, vf12z" : : : "memory");
+    __asm__ __volatile__("vaddx.z vf5, vf0, vf11x" : : : "memory");
+    __asm__ __volatile__("vaddy.z vf6, vf0, vf11y" : : : "memory");
+    __asm__ __volatile__("vaddz.z vf7, vf0, vf11z" : : : "memory");
+    __asm__ __volatile__("vdiv Q, vf0w, vf12x" : : : "memory");
+    __asm__ __volatile__("lqc2 vf4, 48(%0)" : : "r"(inputMatrix) : "memory");
+    __asm__ __volatile__("vmove.xyzw vf8, vf0" : : : "memory");
+    __asm__ __volatile__("vmulax.xyz ACC, vf5, vf4x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyz ACC, vf6, vf4y" : : : "memory");
+    __asm__ __volatile__("vmaddz.xyz vf8, vf7, vf4z" : : : "memory");
+    __asm__ __volatile__("vwaitq" : : : "memory");
+    __asm__ __volatile__("vsubq.y vf12, vf0, Q" : : : "memory");
+    __asm__ __volatile__("vmulq.xyz vf5, vf5, Q" : : : "memory");
+    __asm__ __volatile__("vmulq.xyz vf6, vf6, Q" : : : "memory");
+    __asm__ __volatile__("vmulq.xyz vf7, vf7, Q" : : : "memory");
+    __asm__ __volatile__("vmuly.xyz vf8, vf8, vf12y" : : : "memory");
+    __asm__ __volatile__("sqc2 vf5, 0(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf6, 16(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf7, 32(%0)" : : "r"(outMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf8, 48(%0)" : : "r"(outMatrix) : "memory");
+    return outMatrix;
+}
 
 /* out = rotation (YX order) that turns the default direction toward target. */
-Matrix4 *MMathCalcMatrixVector(Matrix4 *out, const Vector4 *target)
+Matrix4 *MMathCalcMatrixVector(Matrix4 *outMatrix, const Vector4 *toPoint)
 {
     Vector4 angles;
 
-    MMathCalcAngle(&angles, 0, target);
-    MMathRotateMatrixYX(out, 0, &angles);
-    return out;
+    MMathCalcAngle(&angles, 0, toPoint);
+    MMathRotateMatrixYX(outMatrix, 0, &angles);
+    return outMatrix;
 }
 
 
 /* out = the transformed +Z point: (0, 0, 1, 1) times the matrix with its row 3 replaced by MMathUnitVector. */
-Vector4 *MMathCalcVectorMatrixZ(Vector4 *out, Matrix4 *matrix)
+Vector4 *MMathCalcVectorMatrixZ(Vector4 *outVector, Matrix4 *matrix)
 {
-    Matrix4 local;
+    Matrix4 matrixCopy;
 
-    QuadwordCopyMatrixT0(local, matrix);
+    QuadwordCopyMatrixT0(matrixCopy, matrix);
     __asm__ __volatile__(
         "lui $2, %%hi(MMathUnitVector)\n\t"
         "addiu $2, $2, %%lo(MMathUnitVector)\n\t"
@@ -1443,22 +1495,22 @@ Vector4 *MMathCalcVectorMatrixZ(Vector4 *out, Matrix4 *matrix)
         "vmove.xyw vf1, vf0\n\t"
         "vaddw.z vf1, vf0, vf0w\n\t"
         "sqc2 vf1, 0(%1)"
-        : : "r"(local), "r"(out) : "$2", "memory");
-    MMathApplyMatrix(out, &local, out);
-    return out;
+        : : "r"(matrixCopy), "r"(outVector) : "$2", "memory");
+    MMathApplyMatrix(outVector, &matrixCopy, outVector);
+    return outVector;
 }
 
 /* out = angles from the default direction to the transformed +Z point of matrix. */
-Vector4 *MMathCalcAngleMatrixZ(Vector4 *out, Matrix4 *matrix)
+Vector4 *MMathCalcAngleMatrixZ(Vector4 *outAngles, Matrix4 *matrix)
 {
     Vector4 point;
 
     MMathCalcVectorMatrixZ(&point, matrix);
-    MMathCalcAngle(out, 0, &point);
-    return out;
+    MMathCalcAngle(outAngles, 0, &point);
+    return outAngles;
 }
 
-void MMathRotTransPers(Vector4 *destination, const XglCamera *camera, const Matrix4 *matrix, const Vector4 *point)
+void MMathRotTransPers(Vector4 *outVector, const XglCamera *camera, const Matrix4 *matrix, const Vector4 *point)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%0)\n\t"
@@ -1481,17 +1533,17 @@ void MMathRotTransPers(Vector4 *destination, const XglCamera *camera, const Matr
         "vftoi4.xy vf1, vf4\n\t"
         "vftoi0.zw vf1, vf4\n\t"
         "sqc2 vf1, 0(%4)"
-        : : "r"(point), "r"(matrix), "r"(&camera->screen.screenScale), "r"(&camera->screen.screenOffset), "r"(destination) : "memory");
+        : : "r"(point), "r"(matrix), "r"(&camera->screen.screenScale), "r"(&camera->screen.screenOffset), "r"(outVector) : "memory");
 }
 
 /* Row-major 4x4 float matrix. */
 
 struct XglCamera;
 
-int MMathRotTransPersClip(Vector4 *destination, const struct XglCamera *camera, Matrix4 *matrix, const Vector4 *point);
-int MMathQuatBetweenVectors(Vector4 *destination, const Vector4 *from, const Vector4 *to);
+int MMathRotTransPersClip(Vector4 *outVector, const struct XglCamera *camera, Matrix4 *matrix, const Vector4 *point);
+int MMathQuatBetweenVectors(Vector4 *outQuat, const Vector4 *fromUnit, const Vector4 *toUnit);
 
-Vector4 *MMathQuatToMatrix(Vector4 *destination, const Vector4 *source);
+Vector4 *MMathQuatToMatrix(Vector4 *outVector, const Vector4 *inputQuat);
 
 
 /*
@@ -1500,9 +1552,9 @@ Vector4 *MMathQuatToMatrix(Vector4 *destination, const Vector4 *source);
  * flags are set, else 0. Returns that mark. The ori/cfc2/nop/movn lines are the library's clip-flag
  * read-out. The original keeps an untouched 16-byte frame: the unused scratch quadword.
  */
-int MMathRotTransPersClip(Vector4 *destination, const XglCamera *camera, Matrix4 *matrix, const Vector4 *point)
+int MMathRotTransPersClip(Vector4 *outVector, const XglCamera *camera, Matrix4 *matrix, const Vector4 *point)
 {
-    Vector4 scratch;
+    Vector4 frameQuad;
     int clipped;
 
     __asm__ __volatile__(
@@ -1534,7 +1586,7 @@ int MMathRotTransPersClip(Vector4 *destination, const XglCamera *camera, Matrix4
         "vmr32.w vf1, vf2\n\t"
         "sqc2 vf1, 0(%5)"
         : "=r"(clipped)
-        : "r"(point), "r"(matrix), "r"(&camera->screen.screenScale), "r"(&camera->screen.screenOffset), "r"(destination)
+        : "r"(point), "r"(matrix), "r"(&camera->screen.screenScale), "r"(&camera->screen.screenOffset), "r"(outVector)
         : "$9", "memory");
     return clipped;
 }
@@ -1544,7 +1596,7 @@ int MMathRotTransPersClip(Vector4 *destination, const XglCamera *camera, Matrix4
  * s = sqrt(2 (1 + from.to)), xyz = (from x to) / s, w = s / 2. Nearly opposite vectors
  * (|s| < 0.01) give (0, 1, 0, 0) and return 0; otherwise returns 1.
  */
-int MMathQuatBetweenVectors(Vector4 *destination, const Vector4 *from, const Vector4 *to)
+int MMathQuatBetweenVectors(Vector4 *outQuat, const Vector4 *fromUnit, const Vector4 *toUnit)
 {
     Vector4 arc;
 
@@ -1563,14 +1615,14 @@ int MMathQuatBetweenVectors(Vector4 *destination, const Vector4 *from, const Vec
         "vaddq.x vf3, vf0, Q\n\t"
         "qmfc2.ni $8, vf3\n\t"
         "mtc1 $8, %0"
-        : "=f"(arc.x) : "r"(from), "r"(to) : "$8", "memory");
+        : "=f"(arc.x) : "r"(fromUnit), "r"(toUnit) : "$8", "memory");
     arc.x = __builtin_fabsf(arc.x);
     if (arc.x < 0.01f) {
         __asm__ __volatile__(
             "vsub.xyzw vf4, vf0, vf0\n\t"
             "vaddw.y vf4, vf0, vf0w\n\t"
             "sqc2 vf4, 0(%0)"
-            : : "r"(destination) : "memory");
+            : : "r"(outQuat) : "memory");
         return 0;
     }
     __asm__ __volatile__(
@@ -1582,7 +1634,7 @@ int MMathQuatBetweenVectors(Vector4 *destination, const Vector4 *from, const Vec
         "vwaitq\n\t"
         "vmulq.xyz vf5, vf5, Q\n\t"
         "sqc2 vf5, 0(%0)"
-        : : "r"(destination) : "memory");
+        : : "r"(outQuat) : "memory");
     return 1;
 }
 
@@ -1593,7 +1645,7 @@ int MMathQuatBetweenVectors(Vector4 *destination, const Vector4 *from, const Vec
  * only caller, sdvDrawAlter, passes a row block and ignores the returned
  * pointer.
  */
-Vector4 *MMathQuatToMatrix(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathQuatToMatrix(Vector4 *outVector, const Vector4 *inputQuat)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
@@ -1621,15 +1673,15 @@ Vector4 *MMathQuatToMatrix(Vector4 *destination, const Vector4 *source)
         "sqc2 vf8, 32(%0)\n\t"
         "sqc2 vf7, 16(%0)\n\t"
         "sqc2 vf6, 0(%0)"
-        : : "r"(destination), "r"(source) : "memory");
-    return destination;
+        : : "r"(outVector), "r"(inputQuat) : "memory");
+    return outVector;
 }
 
 /*
  * The same VU0 operations as MMathQuatToMatrix, with the three row zeroings and
  * the vf9 sum scheduled differently. No caller in this unit.
  */
-Vector4 *MMathQuatToMatrixReordered(Vector4 *destination, const Vector4 *source)
+Vector4 *MMathQuatToMatrixReordered(Vector4 *outVector, const Vector4 *inputQuat)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
@@ -1657,6 +1709,6 @@ Vector4 *MMathQuatToMatrixReordered(Vector4 *destination, const Vector4 *source)
         "sqc2 vf8, 32(%0)\n\t"
         "sqc2 vf7, 16(%0)\n\t"
         "sqc2 vf6, 0(%0)"
-        : : "r"(destination), "r"(source) : "memory");
-    return destination;
+        : : "r"(outVector), "r"(inputQuat) : "memory");
+    return outVector;
 }

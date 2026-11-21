@@ -2,7 +2,7 @@
 #include "shared.h"
 
 unsigned short xglSRand(void);
-int ov01RollPercent(int percent);
+int battleRollPercent(int percent);
 int rnd(int max);
 
 #include "main/tu352.h"
@@ -10,7 +10,7 @@ int rnd(int max);
 #include "main/xgl_2.h"
 #include "ov02/tu018.h"
 
-MonsSlot *monsSlotClaim(void *initWord10);
+MonsActorRecord *monsSlotClaim(void *initArgument);
 
 
 
@@ -26,7 +26,7 @@ struct XenoActor;
 
 
 
-/* Indices of XenoActor.rsrc: the model pack (.pxy, xenoActor.c reads it as PxyHeader *), the texture (.txy), the
+/* Indices of XenoActor.rsrc: the model pack (.pxy, xenoActor.c reads it as PxyModelHeader *), the texture (.txy), the
  * hierarchy (.xhr, XenoActorAllocMatrices builds the matrices from it), the motion tables (.xap: slot n is
  * XAct_Rsrc_XAP + n, slots 0..5 = indices 4..9) and a few entries xenoActor.c reads as pointers. The names of the
  * first seven are those of the original's asserts; no assert names the rest. */
@@ -53,11 +53,11 @@ struct XenoActor *XenoActorAlloc(void);
 
 #define ACTOR_STATE_HIDDEN 0x4
 
-struct MonsSlot;
-struct MonsSlot *monsSlotCreate(void);
+struct MonsActorRecord;
+struct MonsActorRecord *monsterSpawn(void);
 
 /*
- * monsSlotNew zeroes the actor's position through a float array, an alias-0 access that keeps the stores after the
+ * monsterClaimInit zeroes the actor's position through a float array, an alias-0 access that keeps the stores after the
  * slot's pointer store. Making XenoActor.position a union would give main's code alias set 0 too and change
  * uwamonoPlayerUpdate and Get_Off_Ladder, so this one site reaches the position through a view that starts like the
  * actor (struct XenoActor of main/xenoActor.h, +0x10).
@@ -68,125 +68,160 @@ typedef struct MonsActorPositionView {
 } MonsActorPositionView;
 
 /*
- * D_00ABD330 is the one-entry table of MonsSlot record pointers and D_00ABD334 its count (scaffold names, splat
- * D_ symbols): monsSlotInsert fills the entry and bumps the count, monsSlotRemove clears it and drops the count.
+ * gMonsActiveSlot is the one-entry table of MonsActorRecord record pointers and gMonsActiveSlotCount its count (scaffold names, splat
+ * D_ symbols): monsActiveInsert fills the entry and bumps the count, monsActiveRemove clears it and drops the count.
  */
-extern struct MonsSlot *D_00ABD330;
-extern int D_00ABD334;
-struct MonsSlot *monsSlotNew();
+extern struct MonsActorRecord *gMonsActiveSlot;
+extern int gMonsActiveSlotCount;
+struct MonsActorRecord *monsterClaimInit();
 void monsSlotEmptyUpdate(void);
-int monsSlotInsert(struct MonsSlot *record);
+int monsActiveInsert(struct MonsActorRecord *record);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88A08);
+typedef int s32;
+typedef long long s64;
+extern s32 gMonsReadyCount;
+
+void monsReadyCountReset(void) {
+    gMonsReadyCount = 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88A18);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88AE0);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88B38);
+s32 monsSlotNullUpdate(void) {
+    return 0;
+}
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88B40);
+s32 monsReadyCountGet(void) {
+    return gMonsReadyCount;
+}
 
 INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88B50);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88B88);
+extern s64 gMonsColor[2];
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88BA8);
-
-/*
- * monsSlotCreate: makes a new MonsSlot with
- * monsSlotNew and inserts it with monsSlotInsert. Returns the record, or 0
- * when monsSlotNew fails. Callers: ov01StreamOpen, ov01StepOpenHandles.
- */
-struct MonsSlot *monsSlotCreate(void) {
-    struct MonsSlot *slot;
-
-    slot = monsSlotNew();
-    if (slot != 0) {
-        monsSlotInsert(slot);
-    }
-    return slot;
+void monsColorStore(s64 *color) {
+    gMonsColor[0] = color[0];
+    gMonsColor[1] = color[1];
 }
 
-void func_00A88C58(struct MonsSlot *slot);
+s32 func_0019F1C0(void *);
 
-struct MonsSlot *monsSlotNew(void *initWord10)
-{
-    struct MonsSlot *slot;
+void monsColorApply(void) {
+    func_0019F1C0(gMonsColor);
+}
 
-    slot = monsSlotClaim(initWord10);
-    if (slot == 0) {
-        return slot;
+/*
+ * monsterSpawn: makes a new MonsActorRecord with
+ * monsterClaimInit and inserts it with monsActiveInsert. Returns the record, or 0
+ * when monsterClaimInit fails. Callers: battleStreamOpen, battleStepOpenHandles.
+ */
+struct MonsActorRecord *monsterSpawn(void) {
+    struct MonsActorRecord *monster;
+
+    monster = monsterClaimInit();
+    if (monster != 0) {
+        monsActiveInsert(monster);
     }
-    slot->initWord10 = initWord10;
-    slot->callback = 0;
-    slot->initWord08 = 0;
-    slot->initWord0C = 0;
-    func_00A88C58(slot);
-    return slot;
+    return monster;
+}
+
+void func_00A88C58(struct MonsActorRecord *slot);
+
+struct MonsActorRecord *monsterClaimInit(void *initArgument)
+{
+    struct MonsActorRecord *monster;
+
+    monster = monsSlotClaim(initArgument);
+    if (monster == 0) {
+        return monster;
+    }
+    monster->initArgument = initArgument;
+    monster->callback = 0;
+    monster->initWord08 = 0;
+    monster->initWord0C = 0;
+    func_00A88C58(monster);
+    return monster;
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88C58);
 
 void monsSlotReleaseRecord(void);
 void XenoActorRelease(struct XenoActor *actor);
-int monsSlotRemove(struct MonsSlot *slot);
+int monsActiveRemove(struct MonsActorRecord *slot);
 
-int monsSlotRelease(struct MonsSlot *slot)
+int monsterRelease(struct MonsActorRecord *monster)
 {
     monsSlotReleaseRecord();
-    XenoActorRelease(slot->actor);
-    return monsSlotRemove(slot);
+    XenoActorRelease(monster->actor);
+    return monsActiveRemove(monster);
 }
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88CE0);
+void monsSlotShowActor(struct MonsActorRecord *monster) {
+    struct XenoActor *actor;
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88CF8);
+    actor = monster->actor;
+    actor->drawFlags &= ~ACTOR_STATE_HIDDEN;
+}
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88D10);
+void monsSlotHideActor(struct MonsActorRecord *monster) {
+    struct XenoActor *actor;
 
-INCLUDE_ASM("asm/nonmatchings/ov02/mons_slot", func_00A88D20);
+    actor = monster->actor;
+    actor->drawFlags |= ACTOR_STATE_HIDDEN;
+}
 
-int monsActiveSlotsGet(struct MonsSlot ***table)
+extern s32 D_00AB7AD4;
+
+void monsValueSet(s32 newValue) {
+    D_00AB7AD4 = newValue;
+}
+
+s32 monsValueGet(void) {
+    return D_00AB7AD4;
+}
+
+int monsActiveSlotsGet(struct MonsActorRecord ***activeSlotsOut)
 {
-    *table = &D_00ABD330;
+    *activeSlotsOut = &gMonsActiveSlot;
     return 1;
 }
 
-int monsSlotInsert(struct MonsSlot *record)
+int monsActiveInsert(struct MonsActorRecord *monster)
 {
-    struct MonsSlot **entry = &D_00ABD330;
-    int *count = &D_00ABD334;
+    struct MonsActorRecord **activeSlot = &gMonsActiveSlot;
+    int *activeSlotCount = &gMonsActiveSlotCount;
 
-    if (*entry == 0) {
-        *entry = record;
-        *count = *count + 1;
+    if (*activeSlot == 0) {
+        *activeSlot = monster;
+        *activeSlotCount = *activeSlotCount + 1;
         return 1;
     }
     return 0;
 }
 
-int monsSlotRemove(struct MonsSlot *slot)
+int monsActiveRemove(struct MonsActorRecord *monster)
 {
-    struct MonsSlot **entry = &D_00ABD330;
-    int *count = &D_00ABD334;
+    struct MonsActorRecord **activeSlot = &gMonsActiveSlot;
+    int *activeSlotCount = &gMonsActiveSlotCount;
 
-    if (*entry == slot) {
-        *entry = 0;
-        *count = *count - 1;
+    if (*activeSlot == monster) {
+        *activeSlot = 0;
+        *activeSlotCount = *activeSlotCount - 1;
         return 1;
     }
     return 0;
 }
 
-/* rnd: uniform integer in 0..max. The same name and signature are extern in the other ov01 TUs and in X1. */
-int rnd(int max)
+/* rnd: uniform integer in 0..upperBound. The same name and signature are extern in the other battle-overlay TUs and in X1. */
+int rnd(int upperBound)
 {
-    return xglSRand() % (max + 1);
+    return xglSRand() % (upperBound + 1);
 }
 
-/* ov01RollPercent: 1 with probability percent/100 (rnd(99) + 1 is 1..100). */
-int ov01RollPercent(int percent)
+/* battleRollPercent: 1 with probability percent/100 (rnd(99) + 1 is 1..100). */
+int battleRollPercent(int percent)
 {
     if (percent < rnd(99) + 1) {
         return 0;

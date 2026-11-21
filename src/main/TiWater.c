@@ -7,9 +7,8 @@
 #include "main/xgl_2.h"
 #include "main/xgl_render.h"
 
-/* Row-major 4x4 float matrix. */
-struct PxyHeader;
-void tiWaterObjectUpdate(struct PxyHeader *header, int stepMode);
+struct PxyModelHeader;
+void tiWaterObjectUpdate(struct PxyModelHeader *pxyModelPack, int stepMode);
 
 #define GS_TEX0_1 0x06
 #define GS_CLAMP_1 0x08
@@ -21,23 +20,23 @@ void tiWaterObjectUpdate(struct PxyHeader *header, int stepMode);
 #define GS_FRAME_1 0x4C
 #define GS_ZBUF_1 0x4E
 #define GS_SET_TEX0(tbp, tbw, psm, tw, th, tcc, tfx, cbp, cpsm, csm, csa, cld) \
-    ((u64)(tbp) | ((u64)(tbw) << 14) | ((u64)(psm) << 20) | ((u64)(tw) << 26) | ((u64)(th) << 30) \
+    ((tbp) | ((tbw) << 14) | ((psm) << 20) | ((tw) << 26) | ((u64)(th) << 30) \
      | ((u64)(tcc) << 34) | ((u64)(tfx) << 35) | ((u64)(cbp) << 37) | ((u64)(cpsm) << 51) \
      | ((u64)(csm) << 55) | ((u64)(csa) << 56) | ((u64)(cld) << 61))
 #define GS_SET_TEX1(lcm, mxl, mmag, mmin, mtba, l, k) \
-    ((u64)(lcm) | ((u64)(mxl) << 2) | ((u64)(mmag) << 5) | ((u64)(mmin) << 6) | ((u64)(mtba) << 9) \
-     | ((u64)(l) << 19) | ((u64)(k) << 32))
+    ((lcm) | ((mxl) << 2) | ((mmag) << 5) | ((mmin) << 6) | ((mtba) << 9) \
+     | ((l) << 19) | ((u64)(k) << 32))
 #define GS_SET_CLAMP(wms, wmt, minu, maxu, minv, maxv) \
-    ((u64)(wms) | ((u64)(wmt) << 2) | ((u64)(minu) << 4) | ((u64)(maxu) << 14) | ((u64)(minv) << 24) \
+    ((wms) | ((wmt) << 2) | ((minu) << 4) | ((maxu) << 14) | ((u64)(minv) << 24) \
      | ((u64)(maxv) << 34))
 #define GS_SET_ALPHA(a, b, c, d, fix) \
-    ((u64)(a) | ((u64)(b) << 2) | ((u64)(c) << 4) | ((u64)(d) << 6) | ((u64)(fix) << 32))
+    ((a) | ((b) << 2) | ((c) << 4) | ((d) << 6) | ((u64)(fix) << 32))
 #define GS_SET_TEST(ate, atst, aref, afail, date, datm, zte, ztst) \
-    ((u64)(ate) | ((u64)(atst) << 1) | ((u64)(aref) << 4) | ((u64)(afail) << 12) | ((u64)(date) << 14) \
-     | ((u64)(datm) << 15) | ((u64)(zte) << 16) | ((u64)(ztst) << 17))
+    ((u64)(ate) | ((atst) << 1) | ((aref) << 4) | ((afail) << 12) | ((date) << 14) \
+     | ((datm) << 15) | ((zte) << 16) | ((ztst) << 17))
 #define GS_SET_FRAME(fbp, fbw, psm, fbmsk) \
-    ((u64)(fbp) | ((u64)(fbw) << 16) | ((u64)(psm) << 24) | ((u64)(fbmsk) << 32))
-#define GS_SET_ZBUF(zbp, psm, zmsk) ((u64)(zbp) | ((u64)(psm) << 24) | ((u64)(zmsk) << 32))
+    ((fbp) | ((fbw) << 16) | ((psm) << 24) | ((u64)(fbmsk) << 32))
+#define GS_SET_ZBUF(zbp, psm, zmsk) ((zbp) | ((psm) << 24) | ((u64)(zmsk) << 32))
 /* CLAMP wrap modes. */
 #define GS_REGION_CLAMP 2
 
@@ -71,9 +70,9 @@ void pxyRequestTextureCopyPass(void);
 typedef unsigned int PadQuadword __attribute__((mode(TI)));
 
 extern PadRecord PadData[2];
-void tiWatSimStepRain(TiWatSimItem *item);
-void tiWatSimRandomizeItem(TiWatSimItem *item, int range);
-void tiWatSimUpdate(float step, TiWatSimItem *item);
+void tiWatSimStepRain(TiWatSimItem *waterItem);
+void tiWatSimRandomizeItem(TiWatSimItem *waterItem, int range);
+void tiWatSimUpdate(float step, TiWatSimItem *waterItem);
 extern int tiWaterDebugMode;
 extern int tiWaterSubCount;
 extern TiWaterSub *tiWaterSubList[];
@@ -124,7 +123,7 @@ extern const char tiWaterMenuMarker[];
 /* Range of the random heights given to a new item. */
 #define TI_WATER_RANDOM_RANGE 30
 
-int tiWaterRegisterSub(TiWaterSub *sub);
+int tiWaterRegisterSub(TiWaterSub *waterSub);
 /* The water state template sent by tiWaterSendStateTemplate, and its length for sceVif1PkAddDataN. */
 extern u64 tiWaterStateTemplate[];
 
@@ -134,7 +133,7 @@ extern u64 tiWaterStateTemplate[];
 #define TI_WATER_TEMPLATE_TEX0_1 (0x70 / 8)
 
 void tiWaterSendStateTemplate(void);
-void tiWaterSendGrid(TiWatSimItem *item, void *program);
+void tiWaterSendGrid(TiWatSimItem *waterItem, void *program);
 /* VU1 microprogram entry points of the water drawing (VU1 micro memory addresses, linked as absolute symbols
  * like sv_get_image_item.c's D_50 / D_80) and the grid tables sent with them. */
 extern unsigned char D_688[];
@@ -153,7 +152,10 @@ extern unsigned char tiWaterDepthGridHeader[];
 #define TI_WATER_ITEM_DRAW_SURFACE 0x4
 #define TI_WATER_ITEM_DRAW_DEPTH 0x2
 
-/* Draws one water item: sends its frame, values and direction, then for each enabled pass the GS state * (clamp, frame on the display page, blend, the frame page as texture, Z test) and the VU1 program with * the item's grid. */ void tiWaterDrawItem(TiWatSimItem *item);
+/* Draws one water item: sends its frame, values and direction, then for each enabled pass the GS state
+ * (clamp, frame on the display page, blend, the frame page as texture, Z test) and the VU1 program with
+ * the item's grid. */
+void tiWaterDrawItem(TiWatSimItem *waterItem);
 /* Data of this TU (the scaffold items, in address order). */
 extern const char tiWaterMenuFormat[24];
 extern const char tiWaterMenuMarker[8];
@@ -234,15 +236,15 @@ extern int D_00550E2C;
 /* Draws one water item: sends its frame, values and direction, then for each enabled pass the GS state
  * (clamp, frame on the display page, blend, the frame page as texture, Z test) and the VU1 program with
  * the item's grid. */
-void tiWaterDrawItem(TiWatSimItem *item)
+void tiWaterDrawItem(TiWatSimItem *waterItem)
 {
     XglPacket *packet = xglPacketGetCurrent();
     XglCamera *camera = xglStudioSelectGetActiveCamera(0);
 
-    tiWaterSendFrame(camera, item->transform.rows);
-    tiWaterSendItemPair(item->drawPair[0], item->drawPair[1]);
-    tiWaterSendDirection(camera, item->transform.rows);
-    if (item->flags & TI_WATER_ITEM_DRAW_SURFACE) {
+    tiWaterSendFrame(camera, waterItem->transform.rows);
+    tiWaterSendItemPair(waterItem->drawPair[0], waterItem->drawPair[1]);
+    tiWaterSendDirection(camera, waterItem->transform.rows);
+    if (waterItem->flags & TI_WATER_ITEM_DRAW_SURFACE) {
         sceVif1PkCnt(packet, 0);
         sceVif1PkOpenDirectHLCode(packet, 0);
         gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(GS_REGION_CLAMP, GS_REGION_CLAMP, 256, 510, 0, 222));
@@ -258,9 +260,9 @@ void tiWaterDrawItem(TiWatSimItem *item)
         sceVif1PkCloseDirectHLCode(packet);
         sceVif1PkCnt(packet, 0);
         sceVif1PkAddCode(packet, TI_WATER_VIF_MSCAL(D_688));
-        tiWaterSendGrid(item, D_003EC020);
+        tiWaterSendGrid(waterItem, D_003EC020);
     }
-    if (item->flags & TI_WATER_ITEM_DRAW_DEPTH) {
+    if (waterItem->flags & TI_WATER_ITEM_DRAW_DEPTH) {
         sceVif1PkCnt(packet, 0);
         sceVif1PkOpenDirectHLCode(packet, 0);
         gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(GS_REGION_CLAMP, GS_REGION_CLAMP, 0, 254, 0, 222));
@@ -280,7 +282,7 @@ void tiWaterDrawItem(TiWatSimItem *item)
         } else {
             sceVif1PkAddCode(packet, TI_WATER_VIF_MSCAL(D_9F0));
         }
-        tiWaterSendGrid(item, D_003EC030);
+        tiWaterSendGrid(waterItem, D_003EC030);
     }
 }
 
@@ -291,13 +293,13 @@ void tiWaterDrawAll(int pass)
     XglPacket *packet = xglPacketGetCurrent();
     unsigned int i;
     unsigned int j;
-    TiWatSimItem *item;
+    TiWatSimItem *waterItem;
 
     if (pass != 0) {
         return;
     }
     for (i = 0; i < tiWaterSubCount; i++) {
-        item = tiWaterSubList[i]->items;
+        waterItem = tiWaterSubList[i]->items;
         gifStateReset();
         if (tiWaterSubList[i]->active != 0) {
             sceVif1PkCnt(packet, 0);
@@ -308,8 +310,8 @@ void tiWaterDrawAll(int pass)
             tiWaterSendStateTemplate();
         }
         for (j = 0; j < tiWaterSubList[i]->active; j++) {
-            tiWaterDrawItem(item);
-            item++;
+            tiWaterDrawItem(waterItem);
+            waterItem++;
         }
     }
     tiWaterSubCount = 0;
@@ -345,7 +347,7 @@ float tiWaterVectorAngle(float x, float y)
 
 void tiWatSimDisturbAll(TiWaterSub *table, Vector4 *pPos);
 void tiWatSimStoreSourcePos(const Vector4 *position);
-extern const float D_0054F824;
+extern const float tiWaterSourceMoveScale;
 void XenoActorEnableChannel(XenoActor *actor);
 
 void tiWaterUpdateSource(XenoActor *actor)
@@ -354,8 +356,8 @@ void tiWaterUpdateSource(XenoActor *actor)
 
     actor->previousPosition.x = actor->position.x;
     actor->previousPosition.z = actor->position.z;
-    actor->position.x += PadData[0].leftX * D_0054F824;
-    actor->position.z += PadData[0].leftY * D_0054F824;
+    actor->position.x += PadData[0].leftX * tiWaterSourceMoveScale;
+    actor->position.z += PadData[0].leftY * tiWaterSourceMoveScale;
     if (PadData[0].held & PAD_CROSS) {
         XenoActorEnableChannel(actor);
     }
@@ -370,15 +372,15 @@ void tiWaterUpdateSource(XenoActor *actor)
 }
 
 /* Steps the rain and the simulation of every item of the sub-object. */
-void tiWaterStepSub(TiWaterSub *sub)
+void tiWaterStepSub(TiWaterSub *waterSub)
 {
-    TiWatSimItem *item = sub->items;
+    TiWatSimItem *waterItem = waterSub->items;
     unsigned int i;
 
-    for (i = 0; i < sub->active; i++) {
-        tiWatSimStepRain(item);
-        tiWatSimUpdate(1.0f, item);
-        item++;
+    for (i = 0; i < waterSub->active; i++) {
+        tiWatSimStepRain(waterItem);
+        tiWatSimUpdate(1.0f, waterItem);
+        waterItem++;
     }
 }
 
@@ -395,33 +397,33 @@ enum TiWaterRsrc {
     XAct_Rsrc_XAP_Ext2 = 6
 };
 
-extern void *D_004C83D8[];
-extern const char D_0053B818[];
-extern const char D_0053B828[];
-extern const char D_0053B838[];
-extern const char D_0053B868[];
-extern const char D_0053B898[];
-extern const char D_0053B8B8[];
-extern const char D_0053B8D8[];
-extern const char D_0053B8E0[];
-extern const char D_0053B908[];
-extern const char D_0053B930[];
-extern const char D_0053B958[];
-extern const char D_0053B988[];
-extern const char D_0053B9A8[];
-extern const char D_0053B9C8[];
-extern const char D_0053B9E8[];
-extern const char D_0053BA08[];
-extern const DoublewordAlignedVector4 D_0053BA30;
+extern void *gifStateModeHook[];
+extern const char tiWaterAssertLandscapeMessage[];
+extern const char tiWaterSourceFileName[];
+extern const char tiWaterLandscapeMdlPath[];
+extern const char tiWaterLandscapeTexPath[];
+extern const char tiWaterAssertLandscapeMdlMessage[];
+extern const char tiWaterAssertLandscapeTexMessage[];
+extern const char tiWaterAssertKosmosMessage[];
+extern const char tiWaterKosmosMdlPath[];
+extern const char tiWaterKosmosTexPath[];
+extern const char tiWaterKosmosXhrPath[];
+extern const char tiWaterKosmosXapPath[];
+extern const char tiWaterAssertKosmosMdlMessage[];
+extern const char tiWaterAssertKosmosTexMessage[];
+extern const char tiWaterAssertKosmosXhrMessage[];
+extern const char tiWaterAssertKosmosXapMessage[];
+extern const char tiWaterAssertKosmosXapExtSlotMessage[];
+extern const DoublewordAlignedVector4 tiWaterModelMulColor;
 void assertFailed(const char *message, const char *file, int line);
 void xglRenderClearFrame(void);
 void xglSleep(void);
 void XenoActorReleaseAll(void);
-void func_0019B708(struct XglCamera **camera, int index);
-void func_0019EAF0(void);
+void studioCameraAt(struct XglCamera **camera, int index);
+void pxyEnableFlag8(void);
 void func_002911C0(void);
 void func_002912B0(void);
-void func_0028D4B0(void);
+void XenoActorPoolInitDefault(void);
 XenoActor *func_0028D670(void);
 int testLoadFile(int *loadAddr, const char *path);
 void func_0028D760(XenoActor *actor);
@@ -438,42 +440,42 @@ void tiWaterSceneLoop(void)
     XenoActor *pKosmos;
 
     heap = 0x00e00000;
-    func_0028D4B0();
+    XenoActorPoolInitDefault();
     pLandscape = func_0028D670();
     if (pLandscape == 0) {
-        assertFailed(D_0053B818, D_0053B828, 569);
+        assertFailed(tiWaterAssertLandscapeMessage, tiWaterSourceFileName, 569);
     }
-    pLandscape->rsrc[XAct_Rsrc_MDL] = testLoadFile(&heap, D_0053B838);
-    pLandscape->rsrc[XAct_Rsrc_TEX] = testLoadFile(&heap, D_0053B868);
+    pLandscape->rsrc[XAct_Rsrc_MDL] = testLoadFile(&heap, tiWaterLandscapeMdlPath);
+    pLandscape->rsrc[XAct_Rsrc_TEX] = testLoadFile(&heap, tiWaterLandscapeTexPath);
     if (pLandscape->rsrc[XAct_Rsrc_MDL] == 0) {
-        assertFailed(D_0053B898, D_0053B828, 572);
+        assertFailed(tiWaterAssertLandscapeMdlMessage, tiWaterSourceFileName, 572);
     }
     if (pLandscape->rsrc[XAct_Rsrc_TEX] == 0) {
-        assertFailed(D_0053B8B8, D_0053B828, 573);
+        assertFailed(tiWaterAssertLandscapeTexMessage, tiWaterSourceFileName, 573);
     }
     pKosmos = func_0028D670();
     if (pKosmos == 0) {
-        assertFailed(D_0053B8D8, D_0053B828, 576);
+        assertFailed(tiWaterAssertKosmosMessage, tiWaterSourceFileName, 576);
     }
-    pKosmos->rsrc[XAct_Rsrc_MDL] = testLoadFile(&heap, D_0053B8E0);
-    pKosmos->rsrc[XAct_Rsrc_TEX] = testLoadFile(&heap, D_0053B908);
-    pKosmos->rsrc[XAct_Rsrc_XHR] = testLoadFile(&heap, D_0053B930);
-    pKosmos->rsrc[XAct_Rsrc_XAP] = testLoadFile(&heap, D_0053B958);
-    pKosmos->rsrc[XAct_Rsrc_XAP_Ext2] = testLoadFile(&heap, D_0053B958);
+    pKosmos->rsrc[XAct_Rsrc_MDL] = testLoadFile(&heap, tiWaterKosmosMdlPath);
+    pKosmos->rsrc[XAct_Rsrc_TEX] = testLoadFile(&heap, tiWaterKosmosTexPath);
+    pKosmos->rsrc[XAct_Rsrc_XHR] = testLoadFile(&heap, tiWaterKosmosXhrPath);
+    pKosmos->rsrc[XAct_Rsrc_XAP] = testLoadFile(&heap, tiWaterKosmosXapPath);
+    pKosmos->rsrc[XAct_Rsrc_XAP_Ext2] = testLoadFile(&heap, tiWaterKosmosXapPath);
     if (pKosmos->rsrc[XAct_Rsrc_MDL] == 0) {
-        assertFailed(D_0053B988, D_0053B828, 587);
+        assertFailed(tiWaterAssertKosmosMdlMessage, tiWaterSourceFileName, 587);
     }
     if (pKosmos->rsrc[XAct_Rsrc_TEX] == 0) {
-        assertFailed(D_0053B9A8, D_0053B828, 588);
+        assertFailed(tiWaterAssertKosmosTexMessage, tiWaterSourceFileName, 588);
     }
     if (pKosmos->rsrc[XAct_Rsrc_XHR] == 0) {
-        assertFailed(D_0053B9C8, D_0053B828, 589);
+        assertFailed(tiWaterAssertKosmosXhrMessage, tiWaterSourceFileName, 589);
     }
     if (pKosmos->rsrc[XAct_Rsrc_XAP] == 0) {
-        assertFailed(D_0053B9E8, D_0053B828, 590);
+        assertFailed(tiWaterAssertKosmosXapMessage, tiWaterSourceFileName, 590);
     }
     if (pKosmos->rsrc[XAct_Rsrc_XAP_Ext2] == 0) {
-        assertFailed(D_0053BA08, D_0053B828, 591);
+        assertFailed(tiWaterAssertKosmosXapExtSlotMessage, tiWaterSourceFileName, 591);
     }
     pKosmos->drawFlags |= 0x01000000;
     func_0028D760(pKosmos);
@@ -485,12 +487,12 @@ void tiWaterSceneLoop(void)
     gifStateSetDecrease(tiWaterDecrease);
     gifStateSetFbp(tiWaterFbp);
     gifStateSetBlur(tiWaterBlur);
-    color = D_0053BA30;
+    color = tiWaterModelMulColor;
     nmlModelSetMulColor(&color);
     while ((PadData[0].heldAndPressed & TI_WATER_EXIT) != TI_WATER_EXIT) {
         xglRenderClearFrame();
-        func_0019EAF0();
-        if ((unsigned short) (PadData[0].pressed & PAD_L2)) {
+        pxyEnableFlag8();
+        if (PadData[0].pressed & PAD_L2) {
             if (++tiWaterDebugMode >= 2) {
                 tiWaterDebugMode = 0;
             }
@@ -502,7 +504,7 @@ void tiWaterSceneLoop(void)
         if (TI_WATER_FRAMES <= pLandscape->frame) {
             pLandscape->frame = 0.0f;
         }
-        func_0019B708(&camera, 0);
+        studioCameraAt(&camera, 0);
         func_002911C0();
         func_002912B0();
         tiWaterUpdateSource(pKosmos);
@@ -510,19 +512,22 @@ void tiWaterSceneLoop(void)
     }
     XenoActorReleaseAll();
     xglRenderClearFrame();
-    D_004C83D8[0] = 0;
+    gifStateModeHook[0] = 0;
 }
+
+/* Byte offset from a header: the pxy header keeps the offset of its sub-blocks as data (see tiWaterObjectUpdate). */
+#define BYTE_OFFSET(base, off) ((unsigned char *) (base) + (off))
 
 /* Per-object update: the word at +0xC0 of the pxy header (waterFlag) is the offset of its water table; registers the
  * table when it has items, steps it when stepMode is 0, and installs the draw callback tiWaterDrawAll. */
-void tiWaterObjectUpdate(PxyHeader *header, int stepMode) {
-    TiWaterSub *sub;
+void tiWaterObjectUpdate(PxyModelHeader *pxyModelPack, int stepMode) {
+    TiWaterSub *waterSub;
 
-    sub = (TiWaterSub *) ((char *) header + header->waterFlag);
-    if (sub->active != 0) {
-        tiWaterRegisterSub(sub);
+    waterSub = (TiWaterSub *) BYTE_OFFSET(pxyModelPack, pxyModelPack->waterFlag);
+    if (waterSub->active != 0) {
+        tiWaterRegisterSub(waterSub);
         if (stepMode == 0) {
-            tiWaterStepSub(sub);
+            tiWaterStepSub(waterSub);
         }
         pxyRequestTextureCopyPass();
         pxySetDrawCallback(tiWaterDrawAll);

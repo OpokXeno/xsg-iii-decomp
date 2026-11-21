@@ -12,7 +12,7 @@ typedef struct SefEntry {
     Vector4 slotVectors[64];        /* +0xCC0 */
     unsigned char unmodeled_10C0[0x1550 - 0x10C0];
     int id;                         /* +0x1550 */
-    int flags;                      /* +0x1554 */
+    int effectEntryFlags;                      /* +0x1554 */
     unsigned char unmodeled_1558[0x155C - 0x1558];
     signed char slotFlags[0x20];    /* +0x155C: bit 0 = slot set */
     unsigned char unmodeled_157C[0x1592 - 0x157C];
@@ -22,9 +22,9 @@ typedef struct SefEntry {
 
 /* The entry table of the effect system in .data at 0x4541A0: 24 entries of 0x15A0 bytes, then the entry count at +0x20710. */
 typedef struct SefEntryTable {
-    SefEntry entries[24];
+    SefEntry effectEntries[24];
     unsigned char unmodeled_20700[0x10];
-    int entryCount;             /* +0x20710 */
+    int effectEntryCount;             /* +0x20710 */
     unsigned char unmodeled_20714[0x0C];
 } SefEntryTable;
 
@@ -34,9 +34,9 @@ typedef struct SefFlagBlock {
     unsigned char unmodeled_04[0x0C];
 } SefFlagBlock;
 
-extern SefFlagBlock D_003E46B0;
+extern SefFlagBlock gGameLoopRuntimeStorage;
 
 /* Clears the status words of D_004C8390; takes no argument. */
-void func_002034F0(void);
+void sefResetDrawState(void);
 
 #endif

@@ -41,13 +41,13 @@ float xglAtan2Angle(float x, float y)
  */
 void xglVu1ReadControlRegisters(void)
 {
-    AlignedVector4 scratch;
+    AlignedVector4 discardedQuad;
     int i;
 
     __asm__ __volatile__("ctc2 %0,$vi1" : : "r"(VU1_CONTROL_WINDOW) : "memory");
     for (i = VU1_REGISTER_QUADS - 1; i >= 0; i--) {
         __asm__ __volatile__("vlqi.xyzw $vf2xyzw,($vi1++)" : : : "memory");
-        __asm__ __volatile__("sqc2 $vf2,0(%0)" : : "r"(&scratch) : "memory");
+        __asm__ __volatile__("sqc2 $vf2,0(%0)" : : "r"(&discardedQuad) : "memory");
     }
 }
 
@@ -58,12 +58,12 @@ void xglVu1ReadControlRegisters(void)
  */
 void xglVu1ReadIntegerRegisters(void)
 {
-    AlignedVector4 scratch;
+    AlignedVector4 discardedQuad;
     int i;
 
     __asm__ __volatile__("ctc2 %0,$vi1" : : "r"(VU1_INTEGER_WINDOW) : "memory");
     for (i = VU1_REGISTER_QUADS - 1; i >= 0; i--) {
         __asm__ __volatile__("vlqi.xyzw $vf2xyzw,($vi1++)" : : : "memory");
-        __asm__ __volatile__("sqc2 $vf2,0(%0)" : : "r"(&scratch) : "memory");
+        __asm__ __volatile__("sqc2 $vf2,0(%0)" : : "r"(&discardedQuad) : "memory");
     }
 }

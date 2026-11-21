@@ -10,9 +10,15 @@ extern int svDrawListFlushCode;
 
 /* A slot seen as its two doublewords. */
 typedef union DrawSlot {
-    Quadword quad;
+    Quadword quadword;
     u64 halves[2];
 } DrawSlot;
+
+/* The slot table seen as slots (DrawSlot) or as the Quadword entries of DrawList. */
+typedef union DrawSlotView {
+    Quadword *quads;
+    DrawSlot *asSlots;
+} DrawSlotView;
 
 void xglSleep(void);
 
@@ -29,9 +35,9 @@ extern PadRecord PadData[2];
 void xglFontDebugPrintf(int x, int y, const char *format, ...);
 void xglRenderClearFrame(void);
 
-void drawListSetFlushCode(int value)
+void drawListSetFlushCode(int flushCode)
 {
-    svDrawListFlushCode = value;
+    svDrawListFlushCode = flushCode;
 }
 
 /* Base of the slot table. */
@@ -59,46 +65,39 @@ void drawListCommitSlots(int increment)
 }
 
 /* Appends one slot passed by value. */
-void drawListAppendSlot(Quadword value)
+void drawListAppendSlot(Quadword slotValue)
 {
-    Quadword *slot;
-
-    /* the byte offset is formed first, then the data pointer is added */
-    slot = (Quadword *) ((svDrawList.end_index * sizeof(Quadword)) + (int) svDrawList.entries);
+    svDrawList.entries[svDrawList.end_index] = slotValue;
     svDrawList.end_index = svDrawList.end_index + 1;
-    *slot = value;
 }
 
 /* Appends one slot given as its two doublewords, the low one first. */
-void drawListAppendSlotHalves(u64 low, u64 high)
+void drawListAppendSlotHalves(u64 lowHalf, u64 highHalf)
 {
-    DrawSlot *slot;
+    DrawSlotView slotView;
 
-    /* the slot is written through the DrawSlot union view (the halves are u64 stores); entries is a Quadword * */
-    slot = (DrawSlot *) &svDrawList.entries[svDrawList.end_index];
-    slot->halves[0] = low;
-    slot->halves[1] = high;
+    /* the slot is written through the DrawSlot union slotView (the halves are u64 stores); entries is a Quadword * */
+    slotView.quads = &svDrawList.entries[svDrawList.end_index];
+    slotView.asSlots->halves[0] = lowHalf;
+    slotView.asSlots->halves[1] = highHalf;
     svDrawList.end_index = svDrawList.end_index + 1;
 }
 
 /* Appends four consecutive slots copied from src. */
-void drawListAppendFourSlots(const Quadword *src)
+void drawListAppendFourSlots(const Quadword *srcSlots)
 {
-    Quadword *dst;
-
-    /* the byte offset is formed first, then the data pointer is added */
-    dst = (Quadword *) ((svDrawList.end_index * sizeof(Quadword)) + (int) svDrawList.entries);
-    svDrawList.end_index = svDrawList.end_index + 4;
-    dst[0] = src[0];
-    dst[1] = src[1];
-    dst[2] = src[2];
-    dst[3] = src[3];
+    int firstSlot = svDrawList.end_index;
+    svDrawList.end_index = firstSlot + 4;
+    svDrawList.entries[firstSlot] = srcSlots[0];
+    svDrawList.entries[firstSlot + 1] = srcSlots[1];
+    svDrawList.entries[firstSlot + 2] = srcSlots[2];
+    svDrawList.entries[firstSlot + 3] = srcSlots[3];
 }
 
 /* Appends one slot copied from src. */
-void drawListAppendSlotCopy(const Quadword *src)
+void drawListAppendSlotCopy(const Quadword *srcSlot)
 {
-    svDrawList.entries[svDrawList.end_index++] = *src;
+    svDrawList.entries[svDrawList.end_index++] = *srcSlot;
 }
 
 /* Shows the reset message until SELECT and START are held together. */

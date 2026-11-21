@@ -93,7 +93,7 @@ struct XglCameraScreen {
 
 struct XglCamera {
     unsigned int active;
-    unsigned int state;
+    unsigned int cameraState;
     int padPort;                     /* +0x8: PadData port read by the pad updates */
     unsigned char unmodeled_0c[4];
     XglCameraScreen screen;
@@ -101,7 +101,7 @@ struct XglCamera {
     unsigned char unmodeled_1f0[0x80];
     CameraVolume volume[1];
     int lookAtLocked;                /* +0x5F0: toggled by button 0x800 */
-    float unknown_5f4;               /* +0x5F4: set to 1.0f by xglCameraInit */
+    float defaultScale;               /* +0x5F4: set to 1.0f by xglCameraInit */
     unsigned char unmodeled_5f8[8];  /* the studio keeps cameras at a 0x600 stride */
 };
 

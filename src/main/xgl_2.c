@@ -4,19 +4,19 @@
 
 /* Row-major 4x4 float matrix. */
 void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation);
-void xglVectorScale(Vector4 *destination, const Vector4 *source, float scale);
-void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
-void xglVectorInner(float *destination, const Vector4 *left, const Vector4 *right);
-void xglVectorOuter(Vector4 *destination, const Vector4 *first, const Vector4 *second);
-void xglVectorLength(float *destination, const Vector4 *vector);
+void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
+void xglVectorScaleXYZ(Vector4 *scaledVector, const Vector4 *vector, float scale);
+void xglVectorInner(float *dotProduct, const Vector4 *left, const Vector4 *right);
+void xglVectorOuter(Vector4 *crossProduct, const Vector4 *first, const Vector4 *second);
+void xglVectorLength(float *length, const Vector4 *vector);
 float xglPointLength(Vector4 *from, Vector4 *to);
 float xglPointLengthXZ(Vector4 *from, Vector4 *to);
-void xglVectorNormal(Vector4 *destination, const Vector4 *source);
-void xglVectorMulMat(Vector4 *destination, Matrix4 matrix, const Vector4 *vector);
-void xglRotTransPersN(ScreenVector4 *destination, Matrix4 matrix, const Vector4 *source, int count, int cameraId);
-void xglMatrixMul(Matrix4 destination, Matrix4 left, Matrix4 right);
-void xglMatrixInverse(Matrix *destination, Matrix *source);
-void xglMatrixTrans(Matrix *destination, Matrix *source, const Vector4 *translation);
+void xglVectorNormal(Vector4 *normalizedVector, const Vector4 *vector);
+void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
+void xglRotTransPersN(ScreenVector4 *screenPoints, Matrix4 matrix, const Vector4 *points, int pointCount, int cameraId);
+void xglMatrixMul(Matrix4 productMatrix, Matrix4 left, Matrix4 right);
+void xglMatrixInverse(Matrix *inverseMatrix, Matrix *matrix);
+void xglMatrixTrans(Matrix *translatedMatrix, Matrix *matrix, const Vector4 *translation);
 void xglMatrixStackUnit(void);
 void xglMatrixStackMul(Matrix4 matrix);
 void xglMatrixStackInverse(void);
@@ -28,9 +28,9 @@ void xglMatrixStackRotZ(float angle);
 void xglMatrixStackSave(Matrix4 matrix);
 void xglMatrixStackLoad(Matrix4 matrix);
 void xglMatrixStackPush(void);
-void xglMatrixStackPop(u32 value);
-void xglMatrixStackMulVector(Vector4 *destination, const Vector4 *source);
-void xglMatrixStackRTPS(ScreenVector4 *destination, const Vector4 *point, Vector4 *screenScale, Vector4 *screenOffset);
+void xglMatrixStackPop(u32 popDepth);
+void xglMatrixStackMulVector(Vector4 *transformedVector, const Vector4 *vector);
+void xglMatrixStackRTPS(ScreenVector4 *screenPoint, const Vector4 *point, Vector4 *screenScale, Vector4 *screenOffset);
 union Matrix;
 
 #include "vu0_macro.h"
@@ -39,21 +39,21 @@ struct XglCamera;
 struct XglCamera *xglStudioGetCamera2(int camera_index);
 float asinf(float value);
 float atan2f(float y, float x);
-extern char D_00000108[];
-extern char D_00000130[];
-extern char D_000001B8[];
-extern char D_00000218[];
-extern char D_000002E8[];
-extern char D_00000310[];
-extern char D_00000338[];
-extern char D_000003D0[];
-extern char D_00000418[];
-extern char D_00000460[];
-extern char D_00000538[];
-extern char D_00000580[];
-extern char D_000005C8[];
-extern char D_00000620[];
-extern char D_00000648[];
+extern char gXglMicroMatrixStackUnit[];
+extern char gXglMicroMatrixStackMul[];
+extern char gXglMicroMatrixStackReverse[];
+extern char gXglMicroMatrixStackInverse[];
+extern char gXglMicroMatrixStackScale[];
+extern char gXglMicroMatrixStackTrans[];
+extern char gXglMicroMatrixStackRotV[];
+extern char gXglMicroMatrixStackRotX[];
+extern char gXglMicroMatrixStackRotY[];
+extern char gXglMicroMatrixStackRotZ[];
+extern char gXglMicroMatrixStackPushUnit[];
+extern char gXglMicroMatrixStackPush[];
+extern char gXglMicroMatrixStackPop[];
+extern char gXglMicroMatrixStackMulVector[];
+extern char gXglMicroMatrixStackRTPS[];
 
 void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation)
 {
@@ -77,17 +77,17 @@ void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation)
 
 float xglAtan2(float y, float x)
 {
-    float s;
-    float r = 0.0028662258f;
-    int swap = 0;
+    float ySquared;
+    float angle = 0.0028662258f;
+    int swapped = 0;
     int quadrant = 0;
-    int *bits = (int *)&y;
+    int *yBits = (int *)&y;
 
     if (y == 0.0f) {
         if (0.0f <= x) {
             return 0.0f;
         }
-        if (*bits & 0x80000000) {
+        if (*yBits & 0x80000000) {
             return -3.1415927f;
         }
         return 3.1415927f;
@@ -115,43 +115,43 @@ float xglAtan2(float y, float x)
     x = __builtin_fabsf(x);
     if (y > x) {
         y = x / y;
-        swap = 1;
+        swapped = 1;
     } else {
         y = y / x;
     }
 
-    s = y * y;
-    r = r * s;
-    r = r - 0.016165737f;
-    r = r * s;
-    r = r + 0.042909615f;
-    r = r * s;
-    r = r - 0.075289637f;
-    r = r * s;
-    r = r + 0.10656264f;
-    r = r * s;
-    r = r - 0.14208899f;
-    r = r * s;
-    r = r + 0.19993551f;
-    r = r * s;
-    r = r - 0.33333147f;
-    r = r * s;
-    r = r + 1.0f;
-    r = r * y;
+    ySquared = y * y;
+    angle = angle * ySquared;
+    angle = angle - 0.016165737f;
+    angle = angle * ySquared;
+    angle = angle + 0.042909615f;
+    angle = angle * ySquared;
+    angle = angle - 0.075289637f;
+    angle = angle * ySquared;
+    angle = angle + 0.10656264f;
+    angle = angle * ySquared;
+    angle = angle - 0.14208899f;
+    angle = angle * ySquared;
+    angle = angle + 0.19993551f;
+    angle = angle * ySquared;
+    angle = angle - 0.33333147f;
+    angle = angle * ySquared;
+    angle = angle + 1.0f;
+    angle = angle * y;
 
-    if (swap) {
-        r = 1.5707964f - r;
+    if (swapped) {
+        angle = 1.5707964f - angle;
     }
     if (quadrant == 1) {
-        r = 3.1415927f - r;
+        angle = 3.1415927f - angle;
     }
     if (quadrant == 2) {
-        r = -r;
+        angle = -angle;
     }
     if (quadrant == 3) {
-        r = r - 3.1415927f;
+        angle = angle - 3.1415927f;
     }
-    return r;
+    return angle;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy64);
@@ -174,65 +174,164 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy2);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy2b);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorDiv);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorDivXYZ);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorMulAdd);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorMulAddXYZ);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorMulSub);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorMulSubXYZ);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorDivAdd);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorDivAddXYZ);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorDivSub);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorDivSubXYZ);
-
-void xglVectorScale(Vector4 *destination, const Vector4 *source, float scale)
+void xglVectorDiv(Vector4 *quotientVector, const Vector4 *left, const Vector4 *right)
 {
-    destination->x = source->x * scale;
-    destination->y = source->y * scale;
-    destination->z = source->z * scale;
-    destination->w = source->w * scale;
+    quotientVector->x = left->x / right->x;
+    quotientVector->y = left->y / right->y;
+    quotientVector->z = left->z / right->z;
+    quotientVector->w = left->w / right->w;
 }
 
-void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale)
+void xglVectorDivXYZ(Vector4 *quotientVector, const Vector4 *left, const Vector4 *right)
 {
-    destination->x = source->x * scale;
-    destination->y = source->y * scale;
-    destination->z = source->z * scale;
-    destination->w = source->w;
+    quotientVector->x = left->x / right->x;
+    quotientVector->y = left->y / right->y;
+    quotientVector->z = left->z / right->z;
+    quotientVector->w = left->w;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorScaleAdd);
+void xglVectorMulAdd(Vector4 *productSum, const Vector4 *multiplicand, const Vector4 *multiplier, const Vector4 *addend)
+{
+    productSum->x = multiplicand->x * multiplier->x + addend->x;
+    productSum->y = multiplicand->y * multiplier->y + addend->y;
+    productSum->z = multiplicand->z * multiplier->z + addend->z;
+    productSum->w = multiplicand->w * multiplier->w + addend->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorScaleAddXYZ);
+void xglVectorMulAddXYZ(Vector4 *productSum, const Vector4 *multiplicand, const Vector4 *multiplier, const Vector4 *addend)
+{
+    productSum->x = multiplicand->x * multiplier->x + addend->x;
+    productSum->y = multiplicand->y * multiplier->y + addend->y;
+    productSum->z = multiplicand->z * multiplier->z + addend->z;
+    productSum->w = multiplicand->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorScaleSub);
+void xglVectorMulSub(Vector4 *productDifference, const Vector4 *multiplicand, const Vector4 *multiplier, const Vector4 *subtrahend)
+{
+    productDifference->x = multiplicand->x * multiplier->x - subtrahend->x;
+    productDifference->y = multiplicand->y * multiplier->y - subtrahend->y;
+    productDifference->z = multiplicand->z * multiplier->z - subtrahend->z;
+    productDifference->w = multiplicand->w * multiplier->w - subtrahend->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorScaleSubXYZ);
+void xglVectorMulSubXYZ(Vector4 *productDifference, const Vector4 *multiplicand, const Vector4 *multiplier, const Vector4 *subtrahend)
+{
+    productDifference->x = multiplicand->x * multiplier->x - subtrahend->x;
+    productDifference->y = multiplicand->y * multiplier->y - subtrahend->y;
+    productDifference->z = multiplicand->z * multiplier->z - subtrahend->z;
+    productDifference->w = multiplicand->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorInter);
+void xglVectorDivAdd(Vector4 *quotientSum, const Vector4 *left, const Vector4 *right, const Vector4 *addend)
+{
+    quotientSum->x = left->x / right->x + addend->x;
+    quotientSum->y = left->y / right->y + addend->y;
+    quotientSum->z = left->z / right->z + addend->z;
+    quotientSum->w = left->w / right->w + addend->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorInterXYZ);
+void xglVectorDivAddXYZ(Vector4 *quotientSum, const Vector4 *left, const Vector4 *right, const Vector4 *addend)
+{
+    quotientSum->x = left->x / right->x + addend->x;
+    quotientSum->y = left->y / right->y + addend->y;
+    quotientSum->z = left->z / right->z + addend->z;
+    quotientSum->w = left->w;
+}
 
-void xglVectorInner(float *destination, const Vector4 *left,
+void xglVectorDivSub(Vector4 *quotientDifference, const Vector4 *left, const Vector4 *right, const Vector4 *subtrahend)
+{
+    quotientDifference->x = left->x / right->x - subtrahend->x;
+    quotientDifference->y = left->y / right->y - subtrahend->y;
+    quotientDifference->z = left->z / right->z - subtrahend->z;
+    quotientDifference->w = left->w / right->w - subtrahend->w;
+}
+
+void xglVectorDivSubXYZ(Vector4 *quotientDifference, const Vector4 *left, const Vector4 *right, const Vector4 *subtrahend)
+{
+    quotientDifference->x = left->x / right->x - subtrahend->x;
+    quotientDifference->y = left->y / right->y - subtrahend->y;
+    quotientDifference->z = left->z / right->z - subtrahend->z;
+    quotientDifference->w = left->w;
+}
+
+void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale)
+{
+    scaledVector->x = vector->x * scale;
+    scaledVector->y = vector->y * scale;
+    scaledVector->z = vector->z * scale;
+    scaledVector->w = vector->w * scale;
+}
+
+void xglVectorScaleXYZ(Vector4 *scaledVector, const Vector4 *vector, float scale)
+{
+    scaledVector->x = vector->x * scale;
+    scaledVector->y = vector->y * scale;
+    scaledVector->z = vector->z * scale;
+    scaledVector->w = vector->w;
+}
+
+void xglVectorScaleAdd(Vector4 *scaledSum, const Vector4 *vector, const Vector4 *addend, float scale)
+{
+    scaledSum->x = vector->x * scale + addend->x;
+    scaledSum->y = vector->y * scale + addend->y;
+    scaledSum->z = vector->z * scale + addend->z;
+    scaledSum->w = vector->w * scale + addend->w;
+}
+
+void xglVectorScaleAddXYZ(Vector4 *scaledSum, const Vector4 *vector, const Vector4 *addend, float scale)
+{
+    scaledSum->x = vector->x * scale + addend->x;
+    scaledSum->y = vector->y * scale + addend->y;
+    scaledSum->z = vector->z * scale + addend->z;
+    scaledSum->w = vector->w;
+}
+
+void xglVectorScaleSub(Vector4 *scaledDifference, const Vector4 *vector, const Vector4 *subtrahend, float scale)
+{
+    scaledDifference->x = vector->x * scale - subtrahend->x;
+    scaledDifference->y = vector->y * scale - subtrahend->y;
+    scaledDifference->z = vector->z * scale - subtrahend->z;
+    scaledDifference->w = vector->w * scale - subtrahend->w;
+}
+
+void xglVectorScaleSubXYZ(Vector4 *scaledDifference, const Vector4 *vector, const Vector4 *subtrahend, float scale)
+{
+    scaledDifference->x = vector->x * scale - subtrahend->x;
+    scaledDifference->y = vector->y * scale - subtrahend->y;
+    scaledDifference->z = vector->z * scale - subtrahend->z;
+    scaledDifference->w = vector->w;
+}
+
+void xglVectorInter(Vector4 *interpolated, const Vector4 *startVector, const Vector4 *endVector, float t)
+{
+    interpolated->x = (endVector->x - startVector->x) * t + startVector->x;
+    interpolated->y = (endVector->y - startVector->y) * t + startVector->y;
+    interpolated->z = (endVector->z - startVector->z) * t + startVector->z;
+    interpolated->w = (endVector->w - startVector->w) * t + startVector->w;
+}
+
+void xglVectorInterXYZ(Vector4 *interpolated, const Vector4 *startVector, const Vector4 *endVector, float t)
+{
+    interpolated->x = (endVector->x - startVector->x) * t + startVector->x;
+    interpolated->y = (endVector->y - startVector->y) * t + startVector->y;
+    interpolated->z = (endVector->z - startVector->z) * t + startVector->z;
+    interpolated->w = endVector->w;
+}
+
+void xglVectorInner(float *dotProduct, const Vector4 *left,
                     const Vector4 *right)
 {
-    *destination = left->x * right->x;
-    *destination = *destination + left->y * right->y;
-    *destination = *destination + left->z * right->z;
+    *dotProduct = left->x * right->x;
+    *dotProduct = *dotProduct + left->y * right->y;
+    *dotProduct = *dotProduct + left->z * right->z;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00195C88);
+float xglVectorInner4(const Vector4 *left, const Vector4 *right)
+{
+    return left->x * right->x + left->y * right->y + left->z * right->z + left->w * right->w;
+}
 
-void xglVectorOuter(Vector4 *destination, const Vector4 *first, const Vector4 *second)
+void xglVectorOuter(Vector4 *crossProduct, const Vector4 *leftVector, const Vector4 *rightVector)
 {
     __asm__ __volatile__(
         "lqc2 vf1, 0(%1)\n\t"
@@ -240,16 +339,55 @@ void xglVectorOuter(Vector4 *destination, const Vector4 *first, const Vector4 *s
         "vopmula.xyz ACC, vf1, vf2\n\t"
         "vopmsub.xyz vf1, vf2, vf1\n\t"
         "sqc2 vf1, 0(%0)"
-        : : "r"(destination), "r"(first), "r"(second) : "memory");
+        : : "r"(crossProduct), "r"(leftVector), "r"(rightVector) : "memory");
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00195CE8);
+void xglVectorOuterNormal(Vector4 *crossNormal, const Vector4 *leftVector, const Vector4 *rightVector)
+{
+    __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(leftVector) : "memory");
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(rightVector) : "memory");
+    __asm__ __volatile__("vopmula.xyz ACC, vf1, vf2" : : : "memory");
+    __asm__ __volatile__("vopmsub.xyz vf1, vf2, vf1" : : : "memory");
+    __asm__ __volatile__("vmul.xyz vf2, vf1, vf1" : : : "memory");
+    __asm__ __volatile__("vaddz.x vf2, vf2, vf2z" : : : "memory");
+    __asm__ __volatile__("vaddy.x vf2, vf2, vf2y" : : : "memory");
+    __asm__ __volatile__("vrsqrt Q, vf0w, vf2x" : : : "memory");
+    __asm__ __volatile__("vwaitq" : : : "memory");
+    __asm__ __volatile__("vmulq.xyz vf1, vf1, Q" : : : "memory");
+    __asm__ __volatile__("sqc2 vf1, 0(%0)" : : "r"(crossNormal) : "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00195D20);
+void xglTriangleOuter(Vector4 *faceCross, const Vector4 *origin, const Vector4 *firstPoint, const Vector4 *secondPoint)
+{
+    __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(origin) : "memory");
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(firstPoint) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(secondPoint) : "memory");
+    __asm__ __volatile__("vsub.xyz vf1, vf1, vf2" : : : "memory");
+    __asm__ __volatile__("vsub.xyz vf3, vf3, vf2" : : : "memory");
+    __asm__ __volatile__("vopmula.xyz ACC, vf1, vf3" : : : "memory");
+    __asm__ __volatile__("vopmsub.xyz vf1, vf3, vf1" : : : "memory");
+    __asm__ __volatile__("sqc2 vf1, 0(%0)" : : "r"(faceCross) : "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00195D48);
+void xglTriangleNormal(Vector4 *faceNormal, const Vector4 *origin, const Vector4 *firstPoint, const Vector4 *secondPoint)
+{
+    __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(origin) : "memory");
+    __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(firstPoint) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(secondPoint) : "memory");
+    __asm__ __volatile__("vsub.xyz vf1, vf1, vf2" : : : "memory");
+    __asm__ __volatile__("vsub.xyz vf3, vf3, vf2" : : : "memory");
+    __asm__ __volatile__("vopmula.xyz ACC, vf1, vf3" : : : "memory");
+    __asm__ __volatile__("vopmsub.xyz vf1, vf3, vf1" : : : "memory");
+    __asm__ __volatile__("vmul.xyz vf2, vf1, vf1" : : : "memory");
+    __asm__ __volatile__("vaddz.x vf2, vf2, vf2z" : : : "memory");
+    __asm__ __volatile__("vaddy.x vf2, vf2, vf2y" : : : "memory");
+    __asm__ __volatile__("vrsqrt Q, vf0w, vf2x" : : : "memory");
+    __asm__ __volatile__("vwaitq" : : : "memory");
+    __asm__ __volatile__("vmulq.xyz vf1, vf1, Q" : : : "memory");
+    __asm__ __volatile__("sqc2 vf1, 0(%0)" : : "r"(faceNormal) : "memory");
+}
 
-void xglVectorLength(float *destination, const Vector4 *vector)
+void xglVectorLength(float *length, const Vector4 *vector)
 {
     __asm__ __volatile__(
         "lqc2 vf3, 0(%1)\n"
@@ -262,13 +400,13 @@ void xglVectorLength(float *destination, const Vector4 *vector)
         "qmfc2 $2, vf4\n"
         "sw $2, 0(%0)\n"
         :
-        : "r"(destination), "r"(vector)
+        : "r"(length), "r"(vector)
         : "$2", "memory");
 }
 
-float xglPointLength(Vector4 *from, Vector4 *to)
+float xglPointLength(Vector4 *startPoint, Vector4 *endPoint)
 {
-    register Vector4 *f = from;
+    register Vector4 *f = startPoint;
     __asm__ __volatile__(
         "lqc2 vf2, 0(%0)\n\t"
         "lqc2 vf3, 0(%1)\n\t"
@@ -281,12 +419,12 @@ float xglPointLength(Vector4 *from, Vector4 *to)
         "vaddq.x vf4x, vf0x, Q\n\t"
         "qmfc2 $2, vf4\n\t"
         "mtc1 $2, $f0"
-        : "+r"(f) : "r"(to) : "$2", "$f0", "memory");
+        : "+r"(f) : "r"(endPoint) : "$2", "$f0", "memory");
 }
 
-float xglPointLengthXZ(Vector4 *from, Vector4 *to)
+float xglPointLengthXZ(Vector4 *startPoint, Vector4 *endPoint)
 {
-    register Vector4 *f = from;
+    register Vector4 *f = startPoint;
     __asm__ __volatile__(
         "lqc2 vf2, 0(%0)\n\t"
         "lqc2 vf3, 0(%1)\n\t"
@@ -298,10 +436,10 @@ float xglPointLengthXZ(Vector4 *from, Vector4 *to)
         "vaddq.x vf4x, vf0x, Q\n\t"
         "qmfc2 $2, vf4\n\t"
         "mtc1 $2, $f0"
-        : "+r"(f) : "r"(to) : "$2", "$f0", "memory");
+        : "+r"(f) : "r"(endPoint) : "$2", "$f0", "memory");
 }
 
-void xglVectorNormal(Vector4 *destination, const Vector4 *source)
+void xglVectorNormal(Vector4 *normalizedVector, const Vector4 *vector)
 {
     __asm__ __volatile__(
         "lqc2 vf2, 0(%1)\n\t"
@@ -313,7 +451,7 @@ void xglVectorNormal(Vector4 *destination, const Vector4 *source)
         "vmulq.xyz vf2xyz, vf2xyz, Q\n\t"
         "sqc2 vf2, 0(%0)"
         :
-        : "r"(destination), "r"(source)
+        : "r"(normalizedVector), "r"(vector)
         : "memory"
     );
 }
@@ -324,7 +462,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorClampXYZ);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglPlaneParameter);
 
-void xglVectorMulMat(Vector4 *destination, Matrix4 matrix,
+void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix,
                      const Vector4 *vector)
 {
     __asm__ __volatile__(
@@ -339,12 +477,12 @@ void xglVectorMulMat(Vector4 *destination, Matrix4 matrix,
         "vmaddw.xyzw vf31xyzw, vf30xyzw, vf1w\n\t"
         "sqc2 vf31, 0(%0)"
         :
-        : "r"(destination), "r"(matrix), "r"(vector)
+        : "r"(transformedVector), "r"(matrix), "r"(vector)
         : "memory"
     );
 }
 
-float xglRotTransPers(ScreenVector4 *destination, float matrix[4][4], Vector4 *point, int cameraId)
+float xglRotTransPers(ScreenVector4 *screenPoint, float matrix[4][4], Vector4 *point, int cameraId)
 {
     XglCamera *camera;
 
@@ -354,15 +492,39 @@ float xglRotTransPers(ScreenVector4 *destination, float matrix[4][4], Vector4 *p
     if (matrix != 0) {
         xglMatrixStackMul(matrix);
     }
-    xglMatrixStackRTPS(destination, point, &camera->screen.screenScale, &camera->screen.screenOffset);
+    xglMatrixStackRTPS(screenPoint, point, &camera->screen.screenScale, &camera->screen.screenOffset);
     xglMatrixStackPop(1);
-    return *(&destination->w);
+    return screenPoint->w;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_001960E8);
+void xglRotTransPersScreen(ScreenVector4 *screenPoint, Matrix4 matrix, Vector4 *point, int cameraId)
+{
+    int x;
+    int y;
+    int xRounded;
+    int yRounded;
+    int xPixel;
+    int yPixel;
 
-void xglRotTransPersN(ScreenVector4 *destination, Matrix4 matrix, const Vector4 *source,
-                   int count, int cameraId)
+    xglRotTransPers(screenPoint, matrix, point, cameraId);
+    x = screenPoint->x;
+    y = screenPoint->y;
+    xRounded = x;
+    if (x < 0) {
+        xRounded = x + 0xF;
+    }
+    yRounded = y;
+    if (y < 0) {
+        yRounded = y + 0xF;
+    }
+    xPixel = (xRounded >> 4) - 0x700;
+    yPixel = (yRounded >> 4) - 0x720;
+    screenPoint->x = xPixel;
+    screenPoint->y = yPixel;
+}
+
+void xglRotTransPersN(ScreenVector4 *screenPoints, Matrix4 matrix, const Vector4 *points,
+                   int pointCount, int cameraId)
 {
     XglCamera *camera;
 
@@ -373,12 +535,12 @@ void xglRotTransPersN(ScreenVector4 *destination, Matrix4 matrix, const Vector4 
         xglMatrixStackMul(matrix);
     }
     {
-        while (count > 0) {
-            xglMatrixStackRTPS(destination, source, &camera->screen.screenScale,
+        while (pointCount > 0) {
+            xglMatrixStackRTPS(screenPoints, points, &camera->screen.screenScale,
                                &camera->screen.screenOffset);
-            source++;
-            destination++;
-            count--;
+            points++;
+            screenPoints++;
+            pointCount--;
         }
     }
     xglMatrixStackPop(1);
@@ -388,7 +550,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00196200);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00196230);
 
-void xglMatrixMul(Matrix4 destination, Matrix4 left, Matrix4 right)
+void xglMatrixMul(Matrix4 productMatrix, Matrix4 left, Matrix4 right)
 {
     __asm__ __volatile__(
         "lqc2 vf2, 0(%2)\n\t"
@@ -420,73 +582,83 @@ void xglMatrixMul(Matrix4 destination, Matrix4 left, Matrix4 right)
         "sqc2 vf4, 32(%0)\n\t"
         "sqc2 vf30, 48(%0)"
         :
-        : "r"(destination), "r"(left), "r"(right)
+        : "r"(productMatrix), "r"(left), "r"(right)
         : "memory"
     );
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixReverse);
 
-void xglMatrixInverse(Matrix *destination, Matrix *source)
+void xglMatrixInverse(Matrix *inverseMatrix, Matrix *matrix)
 {
     float cofactor[16];
     float inverseDeterminant;
 
-    cofactor[0] = source->elements[5] * source->elements[10] - source->elements[6] * source->elements[9];
-    cofactor[1] = source->elements[9] * source->elements[2] - source->elements[10] * source->elements[1];
-    cofactor[2] = source->elements[1] * source->elements[6] - source->elements[2] * source->elements[5];
+    cofactor[0] = matrix->elements[5] * matrix->elements[10] - matrix->elements[6] * matrix->elements[9];
+    cofactor[1] = matrix->elements[9] * matrix->elements[2] - matrix->elements[10] * matrix->elements[1];
+    cofactor[2] = matrix->elements[1] * matrix->elements[6] - matrix->elements[2] * matrix->elements[5];
     cofactor[3] = 0.0f;
-    cofactor[4] = source->elements[6] * source->elements[8] - source->elements[4] * source->elements[10];
-    cofactor[5] = source->elements[10] * source->elements[0] - source->elements[8] * source->elements[2];
-    cofactor[6] = source->elements[2] * source->elements[4] - source->elements[0] * source->elements[6];
+    cofactor[4] = matrix->elements[6] * matrix->elements[8] - matrix->elements[4] * matrix->elements[10];
+    cofactor[5] = matrix->elements[10] * matrix->elements[0] - matrix->elements[8] * matrix->elements[2];
+    cofactor[6] = matrix->elements[2] * matrix->elements[4] - matrix->elements[0] * matrix->elements[6];
     cofactor[7] = 0.0f;
-    cofactor[8] = source->elements[4] * source->elements[9] - source->elements[5] * source->elements[8];
-    cofactor[9] = source->elements[8] * source->elements[1] - source->elements[9] * source->elements[0];
-    cofactor[10] = source->elements[0] * source->elements[5] - source->elements[1] * source->elements[4];
+    cofactor[8] = matrix->elements[4] * matrix->elements[9] - matrix->elements[5] * matrix->elements[8];
+    cofactor[9] = matrix->elements[8] * matrix->elements[1] - matrix->elements[9] * matrix->elements[0];
+    cofactor[10] = matrix->elements[0] * matrix->elements[5] - matrix->elements[1] * matrix->elements[4];
     cofactor[11] = 0.0f;
-    cofactor[12] = cofactor[0] * source->elements[12] + cofactor[4] * source->elements[13]
-        + cofactor[8] * source->elements[14];
-    cofactor[13] = cofactor[1] * source->elements[12] + cofactor[5] * source->elements[13]
-        + cofactor[9] * source->elements[14];
-    cofactor[14] = cofactor[2] * source->elements[12] + cofactor[6] * source->elements[13]
-        + cofactor[10] * source->elements[14];
+    cofactor[12] = cofactor[0] * matrix->elements[12] + cofactor[4] * matrix->elements[13]
+        + cofactor[8] * matrix->elements[14];
+    cofactor[13] = cofactor[1] * matrix->elements[12] + cofactor[5] * matrix->elements[13]
+        + cofactor[9] * matrix->elements[14];
+    cofactor[14] = cofactor[2] * matrix->elements[12] + cofactor[6] * matrix->elements[13]
+        + cofactor[10] * matrix->elements[14];
     cofactor[15] = 1.0f;
-    inverseDeterminant = source->elements[0] * cofactor[0];
-    inverseDeterminant += source->elements[1] * cofactor[4];
-    inverseDeterminant += source->elements[2] * cofactor[8];
+    inverseDeterminant = matrix->elements[0] * cofactor[0];
+    inverseDeterminant += matrix->elements[1] * cofactor[4];
+    inverseDeterminant += matrix->elements[2] * cofactor[8];
     inverseDeterminant = 1.0f / inverseDeterminant;
 
-    destination->elements[0] = cofactor[0] * inverseDeterminant;
-    destination->elements[1] = cofactor[1] * inverseDeterminant;
-    destination->elements[2] = cofactor[2] * inverseDeterminant;
-    destination->elements[3] = 0.0f;
-    destination->elements[4] = cofactor[4] * inverseDeterminant;
-    destination->elements[5] = cofactor[5] * inverseDeterminant;
-    destination->elements[6] = cofactor[6] * inverseDeterminant;
-    destination->elements[7] = 0.0f;
-    destination->elements[8] = cofactor[8] * inverseDeterminant;
-    destination->elements[9] = cofactor[9] * inverseDeterminant;
-    destination->elements[10] = cofactor[10] * inverseDeterminant;
-    destination->elements[11] = 0.0f;
+    inverseMatrix->elements[0] = cofactor[0] * inverseDeterminant;
+    inverseMatrix->elements[1] = cofactor[1] * inverseDeterminant;
+    inverseMatrix->elements[2] = cofactor[2] * inverseDeterminant;
+    inverseMatrix->elements[3] = 0.0f;
+    inverseMatrix->elements[4] = cofactor[4] * inverseDeterminant;
+    inverseMatrix->elements[5] = cofactor[5] * inverseDeterminant;
+    inverseMatrix->elements[6] = cofactor[6] * inverseDeterminant;
+    inverseMatrix->elements[7] = 0.0f;
+    inverseMatrix->elements[8] = cofactor[8] * inverseDeterminant;
+    inverseMatrix->elements[9] = cofactor[9] * inverseDeterminant;
+    inverseMatrix->elements[10] = cofactor[10] * inverseDeterminant;
+    inverseMatrix->elements[11] = 0.0f;
 
     inverseDeterminant = -inverseDeterminant;
-    destination->elements[12] = cofactor[12] * inverseDeterminant;
-    destination->elements[13] = cofactor[13] * inverseDeterminant;
-    destination->elements[14] = cofactor[14] * inverseDeterminant;
-    destination->elements[15] = 1.0f;
+    inverseMatrix->elements[12] = cofactor[12] * inverseDeterminant;
+    inverseMatrix->elements[13] = cofactor[13] * inverseDeterminant;
+    inverseMatrix->elements[14] = cofactor[14] * inverseDeterminant;
+    inverseMatrix->elements[15] = 1.0f;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixScale);
-
-void xglMatrixTrans(Matrix *destination, Matrix *source, const Vector4 *translation)
+void xglMatrixScale(Matrix *scaledMatrix, Matrix *matrix, const Vector4 *scale)
 {
     int column;
 
     for (column = 0; column < 4; column++) {
-        destination->rows[0][column] = source->rows[0][column];
-        destination->rows[1][column] = source->rows[1][column];
-        destination->rows[2][column] = source->rows[2][column];
-        destination->rows[3][column] = source->rows[0][column] * translation->x + source->rows[1][column] * translation->y + source->rows[2][column] * translation->z + source->rows[3][column] * translation->w;
+        scaledMatrix->rows[0][column] = matrix->rows[0][column] * scale->x;
+        scaledMatrix->rows[1][column] = matrix->rows[1][column] * scale->y;
+        scaledMatrix->rows[2][column] = matrix->rows[2][column] * scale->z;
+        scaledMatrix->rows[3][column] = matrix->rows[3][column] * scale->w;
+    }
+}
+
+void xglMatrixTrans(Matrix *translatedMatrix, Matrix *matrix, const Vector4 *translation)
+{
+    int column;
+
+    for (column = 0; column < 4; column++) {
+        translatedMatrix->rows[0][column] = matrix->rows[0][column];
+        translatedMatrix->rows[1][column] = matrix->rows[1][column];
+        translatedMatrix->rows[2][column] = matrix->rows[2][column];
+        translatedMatrix->rows[3][column] = matrix->rows[0][column] * translation->x + matrix->rows[1][column] * translation->y + matrix->rows[2][column] * translation->z + matrix->rows[3][column] * translation->w;
     }
 }
 
@@ -502,7 +674,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixFrustum);
 
 void xglMatrixStackUnit(void)
 {
-    Vu0CallMicro((u32)&D_00000108 >> 3);
+    Vu0CallMicro((u32)&gXglMicroMatrixStackUnit >> 3);
 }
 
 void xglMatrixStackMul(Matrix4 matrix)
@@ -514,17 +686,17 @@ void xglMatrixStackMul(Matrix4 matrix)
         "lqc2 vf6, 32(%1)\n\t"
         "lqc2 vf7, 48(%1)\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_00000130 >> 3), "r"(matrix) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackMul >> 3), "r"(matrix) : "memory");
 }
 
 void xglMatrixStackReverse(void)
 {
-    Vu0CallMicro((u32)&D_000001B8 >> 3);
+    Vu0CallMicro((u32)&gXglMicroMatrixStackReverse >> 3);
 }
 
 void xglMatrixStackInverse(void)
 {
-    Vu0CallMicro((u32)&D_00000218 >> 3);
+    Vu0CallMicro((u32)&gXglMicroMatrixStackInverse >> 3);
 }
 
 void xglMatrixStackScale(const Vector4 *vector)
@@ -534,7 +706,7 @@ void xglMatrixStackScale(const Vector4 *vector)
         "vnop\n\t"
         "lqc2 vf4, 0(%1)\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_000002E8 >> 3), "r"(vector) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackScale >> 3), "r"(vector) : "memory");
 }
 
 void xglMatrixStackTrans(const Vector4 *vector)
@@ -544,7 +716,7 @@ void xglMatrixStackTrans(const Vector4 *vector)
         "vnop\n\t"
         "lqc2 vf4, 0(%1)\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_00000310 >> 3), "r"(vector) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackTrans >> 3), "r"(vector) : "memory");
 }
 
 void xglMatrixStackRotV(const Vector4 *vector, float angle)
@@ -554,7 +726,7 @@ void xglMatrixStackRotV(const Vector4 *vector, float angle)
         "lqc2 vf5, 0(%1)\n\t"
         "qmtc2 %2,$vf4\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_00000338 >> 3), "r"(vector), "r"(angle) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackRotV >> 3), "r"(vector), "r"(angle) : "memory");
 }
 
 void xglMatrixStackRotX(float angle)
@@ -564,7 +736,7 @@ void xglMatrixStackRotX(float angle)
         "vnop\n\t"
         "qmtc2 %1,$vf4\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_000003D0 >> 3), "r"(angle) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackRotX >> 3), "r"(angle) : "memory");
 }
 
 void xglMatrixStackRotY(float angle)
@@ -574,7 +746,7 @@ void xglMatrixStackRotY(float angle)
         "vnop\n\t"
         "qmtc2 %1,$vf4\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_00000418 >> 3), "r"(angle) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackRotY >> 3), "r"(angle) : "memory");
 }
 
 void xglMatrixStackRotZ(float angle)
@@ -584,7 +756,7 @@ void xglMatrixStackRotZ(float angle)
         "vnop\n\t"
         "qmtc2 %1,$vf4\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_00000460 >> 3), "r"(angle) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackRotZ >> 3), "r"(angle) : "memory");
 }
 
 extern char D_4A8[];
@@ -635,25 +807,25 @@ void xglMatrixStackLoad(float matrix[4][4])
 
 void xglMatrixStackPushUnit(void)
 {
-    Vu0CallMicro((u32)&D_00000538 >> 3);
+    Vu0CallMicro((u32)&gXglMicroMatrixStackPushUnit >> 3);
 }
 
 void xglMatrixStackPush(void)
 {
-    Vu0CallMicro((u32)&D_00000580 >> 3);
+    Vu0CallMicro((u32)&gXglMicroMatrixStackPush >> 3);
 }
 
-void xglMatrixStackPop(u32 value)
+void xglMatrixStackPop(u32 popDepth)
 {
     __asm__ __volatile__(
         "ctc2.i %0,$vi27\n\t"
         "vnop\n\t"
         "ctc2 %1,$vi1\n\t"
         "vcallmsr $vi27"
-        : : "r"((u32)&D_000005C8 >> 3), "r"(value) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackPop >> 3), "r"(popDepth) : "memory");
 }
 
-void xglMatrixStackMulVector(Vector4 *destination, const Vector4 *source)
+void xglMatrixStackMulVector(Vector4 *transformedVector, const Vector4 *vector)
 {
     __asm__ __volatile__(
         "ctc2.i %0,$vi27\n\t"
@@ -662,10 +834,10 @@ void xglMatrixStackMulVector(Vector4 *destination, const Vector4 *source)
         "vcallmsr $vi27\n\t"
         "cfc2.i $0,$vi0\n\t"
         "sqc2 vf5, 0(%2)"
-        : : "r"((u32)&D_00000620 >> 3), "r"(source), "r"(destination) : "memory");
+        : : "r"((u32)&gXglMicroMatrixStackMulVector >> 3), "r"(vector), "r"(transformedVector) : "memory");
 }
 
-void xglMatrixStackRTPS(ScreenVector4 *destination, const Vector4 *point, Vector4 *screenScale, Vector4 *screenOffset)
+void xglMatrixStackRTPS(ScreenVector4 *screenPoint, const Vector4 *point, Vector4 *screenScale, Vector4 *screenOffset)
 {
     __asm__ __volatile__(
         "ctc2.i %0, $vi27\n"
@@ -676,23 +848,23 @@ void xglMatrixStackRTPS(ScreenVector4 *destination, const Vector4 *point, Vector
         "cfc2.i $0, $vi0\n"
         "sqc2 vf7, 0(%1)\n"
         :
-        : "r" ((u32)D_00000648 >> 3), "r" (destination), "r" (point), "r" (screenScale), "r" (screenOffset)
+        : "r" ((u32)gXglMicroMatrixStackRTPS >> 3), "r" (screenPoint), "r" (point), "r" (screenScale), "r" (screenOffset)
         : "memory");
 }
 
-void xglMatrix2Quaternion(Matrix *quaternion, Matrix *source)
+void xglMatrix2Quaternion(Matrix *quaternion, Matrix *rotationMatrix)
 {
     float trace;
     float w;
 
-    trace = source->elements[0] + source->elements[5] + source->elements[10];
+    trace = rotationMatrix->elements[0] + rotationMatrix->elements[5] + rotationMatrix->elements[10];
     if (trace > 0.0f) {
         w = __builtin_sqrtf(trace + 1.0f) * 0.5f;
         quaternion->elements[3] = w;
         trace = 0.5f / (w + w);
-        quaternion->elements[0] = (source->elements[6] - source->elements[9]) * trace;
-        quaternion->elements[1] = (source->elements[8] - source->elements[2]) * trace;
-        quaternion->elements[2] = (source->elements[1] - source->elements[4]) * trace;
+        quaternion->elements[0] = (rotationMatrix->elements[6] - rotationMatrix->elements[9]) * trace;
+        quaternion->elements[1] = (rotationMatrix->elements[8] - rotationMatrix->elements[2]) * trace;
+        quaternion->elements[2] = (rotationMatrix->elements[1] - rotationMatrix->elements[4]) * trace;
     } else {
         int nextAxisTable[3] = {1, 2, 0};
         int largestAxis = 0;
@@ -700,27 +872,27 @@ void xglMatrix2Quaternion(Matrix *quaternion, Matrix *source)
         int lastAxis;
         float *largestComponent;
 
-        if (source->elements[0] < source->elements[5]) {
+        if (rotationMatrix->elements[0] < rotationMatrix->elements[5]) {
             largestAxis = 1;
         }
-        if (source->elements[largestAxis * 5] < source->elements[10]) {
+        if (rotationMatrix->elements[largestAxis * 5] < rotationMatrix->elements[10]) {
             largestAxis = 2;
         }
         nextAxis = nextAxisTable[largestAxis];
         lastAxis = nextAxisTable[nextAxis];
         largestComponent = quaternion->elements + largestAxis;
-        w = __builtin_sqrtf(source->elements[largestAxis * 5]
-                  - (source->elements[nextAxis * 5] + source->elements[lastAxis * 5]) + 1.0f)
+        w = __builtin_sqrtf(rotationMatrix->elements[largestAxis * 5]
+                  - (rotationMatrix->elements[nextAxis * 5] + rotationMatrix->elements[lastAxis * 5]) + 1.0f)
             * 0.5f;
         *largestComponent = w;
         trace = 0.5f / (w + w);
-        quaternion->elements[3] = (source->elements[nextAxis * 4 + lastAxis] - source->elements[lastAxis * 4 + nextAxis]) * trace;
-        quaternion->elements[nextAxis] = (source->elements[largestAxis * 4 + nextAxis] + source->elements[nextAxis * 4 + largestAxis]) * trace;
-        quaternion->elements[lastAxis] = (source->elements[largestAxis * 4 + lastAxis] + source->elements[lastAxis * 4 + largestAxis]) * trace;
+        quaternion->elements[3] = (rotationMatrix->elements[nextAxis * 4 + lastAxis] - rotationMatrix->elements[lastAxis * 4 + nextAxis]) * trace;
+        quaternion->elements[nextAxis] = (rotationMatrix->elements[largestAxis * 4 + nextAxis] + rotationMatrix->elements[nextAxis * 4 + largestAxis]) * trace;
+        quaternion->elements[lastAxis] = (rotationMatrix->elements[largestAxis * 4 + lastAxis] + rotationMatrix->elements[lastAxis * 4 + largestAxis]) * trace;
     }
 }
 
-void xglQuaternion2Matrix(Matrix4 destination, const Vector4 *quaternion)
+void xglQuaternion2Matrix(Matrix4 rotationMatrix, const Vector4 *quaternion)
 {
     __asm__ __volatile__(
         "lqc2 vf31, 0(%1)\n\t"
@@ -754,14 +926,18 @@ void xglQuaternion2Matrix(Matrix4 destination, const Vector4 *quaternion)
         "sqc2 vf28, 16(%0)\n\t"
         "sqc2 vf29, 32(%0)"
         :
-        : "r"(destination), "r"(quaternion)
+        : "r"(rotationMatrix), "r"(quaternion)
         : "memory"
     );
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglQuaternionInterpolateLinear);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197110);
+extern unsigned long long gXglRandomSeed[];
+
+void xglSRandInit(void) {
+    gXglRandomSeed[0] = 0x12345678;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197128);
 
@@ -778,12 +954,11 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_001973D0);
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_001973F8);
 
 unsigned long long func_00307E48(unsigned long long multiplicand, unsigned long long multiplier);
-extern unsigned long long D_008BBFC0[];
 
 unsigned short xglSRand(void)
 {
-    D_008BBFC0[0] = func_00307E48(D_008BBFC0[0], 1103515245ULL) + 12345ULL;
-    return (D_008BBFC0[0] >> 16) & 0x7fff;
+    gXglRandomSeed[0] = func_00307E48(gXglRandomSeed[0], 1103515245ULL) + 12345ULL;
+    return (gXglRandomSeed[0] >> 16) & 0x7fff;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197480);

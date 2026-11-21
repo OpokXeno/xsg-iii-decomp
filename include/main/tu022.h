@@ -11,7 +11,7 @@
  * cause or DMAC channel (a negative id ends the table) and the handler. */
 typedef struct XglIntrRecord {
     int handle;
-    int count;
+    int eventCount;
     int id;
     int (*handler)(int cause);
 } XglIntrRecord;

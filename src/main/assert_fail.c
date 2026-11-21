@@ -6,14 +6,12 @@ void assertExit(void);
 
 #include "debug_break.h"
 
-extern const char exitProgramBanner[];
 
 typedef char *va_list;
 
 #define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
 
-extern const char errorBanner[];
-int vprintf(const char *format, va_list args);
+int vprintf(const char *format, va_list formatArgs);
 extern const char exitProgramBanner[64];
 extern const char errorBanner[16];
 
@@ -38,11 +36,11 @@ void assertExit(void) {
 
 /* Fatal error with a printf-style message: prints "> Error!!", the formatted message, then exits. */
 void errorFatal(const char *format, ...) {
-    va_list args;
+    va_list formatArgs;
 
     printf(errorBanner);
-    va_start(args, format);
-    vprintf(format, args);
+    va_start(formatArgs, format);
+    vprintf(format, formatArgs);
     printf(format);
     assertExit();
 }

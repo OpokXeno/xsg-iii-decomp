@@ -1,61 +1,61 @@
 #include "common.h"
 #include "shared.h"
 
-void sjisToEuc(unsigned char *first, unsigned char *second);
+void sjisToEuc(unsigned char *leadByte, unsigned char *trailByte);
 /* Bump pointer of the test heap. */
 extern int testHeapCursor;
 int xglDebFileSize(const char *name);
-int xglDebFileRead(const char *name, void *buffer);
+int xglDebFileRead(const char *name, void *loadAddress);
 void assertFailed(const char *message, const char *file, int line);
-extern const char D_00539DF8[];
-extern const char D_00539E00[];
+extern const char gTestLoadAssertMessage[];
+extern const char gTestSourceFileName[];
 
 /* Reads the named debug file into the test heap at the cursor and returns its address, or 0 when the file is empty. */
 int testLoadFile(int *bufferCursor, const char *name) {
-    int buffer;
-    int size;
+    int loadAddress;
+    int fileSize;
 
-    buffer = 0;
-    size = xglDebFileSize(name);
-    if (size > 0) {
-        buffer = *bufferCursor;
-        *bufferCursor = (buffer + size + 0xF) & ~0xF;
-        if (buffer == 0) {
-            assertFailed(D_00539DF8, D_00539E00, 159);
+    loadAddress = 0;
+    fileSize = xglDebFileSize(name);
+    if (fileSize > 0) {
+        loadAddress = *bufferCursor;
+        *bufferCursor = (loadAddress + fileSize + 0xF) & ~0xF;
+        if (loadAddress == 0) {
+            assertFailed(gTestLoadAssertMessage, gTestSourceFileName, 159);
         }
-        xglDebFileRead(name, (void *) buffer);
+        xglDebFileRead(name, (void *) loadAddress);
     }
-    return buffer;
+    return loadAddress;
 }
 
-/* Converts the two-byte character at first/second in place: the lead byte is doubled and both bytes are
+/* Converts the two-byte character at leadByte/trailByte in place: the lead byte is doubled and both bytes are
  * moved into the Shift-JIS ranges. Only yg2PathReadTaggedText calls it, for each high-bit character. */
-void sjisToEuc(unsigned char *first, unsigned char *second)
+void sjisToEuc(unsigned char *leadByte, unsigned char *trailByte)
 {
     unsigned int leadDoubled;
     unsigned char trailCode;
 
-    leadDoubled = *first << 1;
-    *first = leadDoubled;
-    trailCode = *second;
+    leadDoubled = *leadByte << 1;
+    *leadByte = leadDoubled;
+    trailCode = *trailByte;
     if (trailCode < 0x9F) {
         if ((leadDoubled & 0xFE) < 0x3F) {
-            *first = leadDoubled + 0x9F;
+            *leadByte = leadDoubled + 0x9F;
         } else {
-            *first = leadDoubled + 0x1F;
+            *leadByte = leadDoubled + 0x1F;
         }
-        if (*second >= 0x7F) {
-            *second = *second + 0x60;
+        if (*trailByte >= 0x7F) {
+            *trailByte = *trailByte + 0x60;
         } else {
-            *second = *second + 0x61;
+            *trailByte = *trailByte + 0x61;
         }
     } else {
         if ((leadDoubled & 0xFE) < 0x3F) {
-            *first = leadDoubled + 0xA0;
+            *leadByte = leadDoubled + 0xA0;
         } else {
-            *first = leadDoubled + 0x20;
+            *leadByte = leadDoubled + 0x20;
         }
-        *second = *second + 2;
+        *trailByte = *trailByte + 2;
     }
 }
 
@@ -64,13 +64,13 @@ void testHeapSetCursor(int newCursor) {
     testHeapCursor = newCursor;
 }
 
-/* Bump allocation: returns the next 16-byte aligned address and moves the cursor past size bytes. */
-int testHeapAlloc(int size) {
-    int buffer;
+/* Bump allocation: returns the next 16-byte aligned address and moves the cursor past allocationBytes bytes. */
+int testHeapAlloc(int allocationBytes) {
+    int allocAddress;
     int cursorAfter;
 
-    buffer = (testHeapCursor + 0xF) & ~0xF;
-    cursorAfter = buffer + size;
+    allocAddress = (testHeapCursor + 0xF) & ~0xF;
+    cursorAfter = allocAddress + allocationBytes;
     testHeapCursor = cursorAfter;
-    return buffer;
+    return allocAddress;
 }

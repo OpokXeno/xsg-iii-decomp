@@ -6,17 +6,18 @@
 #include "main/xgl_2.h"
 
 
-union Matrix;
-
-void pxySetMotionGlobalMatrices(union Matrix *global);
-
 extern Matrix *pxyMotionGlobalMatrices;
 
-void pxySetMotionGlobalMatrices(Matrix *global)
+void pxySetMotionGlobalMatrices(Matrix *motionMatrices)
 {
-  pxyMotionGlobalMatrices = global;
+  pxyMotionGlobalMatrices = motionMatrices;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019EEF8);
+typedef int s32;
+extern s32 D_008C2C14;
+
+void nmlModelSetStoreValue(s32 storedValue) {
+    D_008C2C14 = storedValue;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019EF08);

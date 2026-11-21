@@ -21,24 +21,24 @@ extern int EIntr(void);
 
 extern void func_002F8C18(void);
 extern void xglMcReset(void);
-extern u8 D_004B3740[];
+extern u8 gXglMcAgedEntries[];
 void *memset(void *destination, int value, unsigned int count);
 
 void xglMcInitial(void)
 {
     func_002F8C18();
     xglMcReset();
-    memset(D_004B3740, 0, 0x130b0);
+    memset(gXglMcAgedEntries, 0, 0x130b0);
 }
 
 /* Starts a DMA from the IPU output (DMAC channel 3) into memory; count is in quadwords. */
-int myDmaDirectFromIPU(u32 address, u32 count)
+int myDmaDirectFromIPU(u32 destAddress, u32 qwordCount)
 {
-    if ((address >> 16) != DMA_SPR_ADDRESS_HIGH)
-        *D3_MADR = address;
+    if ((destAddress >> 16) != DMA_SPR_ADDRESS_HIGH)
+        *D3_MADR = destAddress;
     else
-        *D3_MADR = (address & DMA_SPR_OFFSET_MASK) + DMA_SPR_FLAG;
-    *D3_QWC = count;
+        *D3_MADR = (destAddress & DMA_SPR_OFFSET_MASK) + DMA_SPR_FLAG;
+    *D3_QWC = qwordCount;
 
     DIntr();
     *D_ENABLEW = *D_ENABLEW | D_ENABLE_HOLD;
@@ -50,11 +50,11 @@ int myDmaDirectFromIPU(u32 address, u32 count)
 /* Starts or stops the IPU input transfer by writing D4_CHCR with the DMA interrupts held off.
  * Static in this file, as in XS1's xgl_1.c: checkdma's delay-slot filling depends on the
  * definition being in the same translation unit. */
-void setD4_CHCR(u32 value)
+void setD4_CHCR(u32 chcrValue)
 {
     DIntr();
     *D_ENABLEW = *D_ENABLEW | D_ENABLE_HOLD;
-    *D4_CHCR = value;
+    *D4_CHCR = chcrValue;
     *D_ENABLEW = *D_ENABLEW & ~D_ENABLE_HOLD;
     EIntr();
 }
@@ -122,8 +122,8 @@ typedef struct XglMovieWork {
     int stripQwords;                    /* +0x44: quadwords per strip row */
     int imageQwords;                    /* +0x48: quadwords of one decoded frame */
     unsigned char unmodeled_4c[0x40];
-    XglMovieSourceHeader *source;       /* +0x8c */
-    int sourceSize;                     /* +0x90 */
+    XglMovieSourceHeader *movieSourceHeader; /* +0x8c */
+    int movieSourceBytes;               /* +0x90 */
     unsigned char unmodeled_94;
     unsigned char streamOpen;           /* +0x95 */
     unsigned char loop;                 /* +0x96 */
@@ -134,14 +134,14 @@ typedef struct XglMovieWork {
     unsigned int dmaQwords;             /* +0xa4 */
     XglDmaRefTag *dmaTag;               /* +0xa8 */
     unsigned char unmodeled_ac[4];
-    unsigned char *imageAddress[2];     /* +0xb0: the two decoded frame buffers */
-    unsigned int packetAddress[2];      /* +0xb8 */
+    unsigned int imageAddress[2];       /* +0xb0: the two decoded frame buffers, as DMA addresses */
+    unsigned long *packetAddress[2];    /* +0xb8 */
     unsigned long long bitbltbuf;       /* +0xc0 */
-    unsigned char bufferIndex;          /* +0xc8 */
+    unsigned char activeBuffer;         /* +0xc8 */
     unsigned char transMode;            /* +0xc9 */
-    unsigned char threshold1;           /* +0xca */
-    unsigned char threshold0;           /* +0xcb */
-    unsigned char *workBuffer;          /* +0xcc: memory-mode decode buffer; 0 uses the scratchpad */
+    unsigned char ipuThresholdHigh;           /* +0xca */
+    unsigned char ipuThresholdLow;           /* +0xcb */
+    unsigned char *decodeBuffer;        /* +0xcc: memory-mode decode buffer; 0 uses the scratchpad */
 } XglMovieWork;
 
 extern void func_002E7348(void *start, void *end);
@@ -151,7 +151,7 @@ typedef struct XglRenderBases {
     unsigned char unmodeled_00[0x18];
     unsigned short flip_base;           /* +0x18 */
     unsigned char unmodeled_1a[2];
-    unsigned short second_base;         /* +0x1c */
+    unsigned short secondFrameBase;     /* +0x1c */
 } XglRenderBases;
 
 extern XglRenderBases sRender;
@@ -160,27 +160,28 @@ extern XglRenderBases sRender;
  * Builds the GS upload packet for one 16-line strip at row y: an A+D setting block, then one
  * image block per macroblock with its TRXPOS and TRXDIR, closed by a REF tag. Returns the next free packet.
  */
-unsigned long *make_gstrans(XglMovieWork *info, int y)
+unsigned long *make_gstrans(XglMovieWork *movie, int stripY)
 {
-    int width = info->width;
-    unsigned long *packet = (unsigned long *) info->packetAddress[info->bufferIndex];
-    unsigned int image = (unsigned int) info->imageAddress[info->bufferIndex];
+    int width = movie->width;
+    unsigned long *packet = movie->packetAddress[movie->activeBuffer];
+    unsigned int macroblockAddress = movie->imageAddress[movie->activeBuffer];
+    XglDmaRefTag *refTag;
     int x;
 
     packet[0] = DMA_TAG_ID_CNT | 3;
     packet[2] = MOVIE_GIF_TAG_AD_2;
     packet[3] = GIF_AD;
     packet[1] = 0;
-    switch (info->transMode) {
+    switch (movie->transMode) {
     case MOVIE_TRANS_BUFFER_0:
     default:
         packet[4] = ((unsigned long) sRender.flip_base << 37) | MOVIE_BITBLTBUF_DBW_512;
         break;
     case MOVIE_TRANS_BUFFER_1:
-        packet[4] = ((unsigned long) sRender.second_base << 37) | MOVIE_BITBLTBUF_DBW_512;
+        packet[4] = ((unsigned long) sRender.secondFrameBase << 37) | MOVIE_BITBLTBUF_DBW_512;
         break;
     case MOVIE_TRANS_BITBLTBUF:
-        packet[4] = info->bitbltbuf;
+        packet[4] = movie->bitbltbuf;
         break;
     }
     packet[5] = GS_BITBLTBUF;
@@ -189,7 +190,7 @@ unsigned long *make_gstrans(XglMovieWork *info, int y)
     packet += 8;
     for (x = 0; x < width; x += MOVIE_MACROBLOCK) {
         packet[1] = 0;
-        packet[4] = ((unsigned long) x << 32) | ((unsigned long) y << 48);
+        packet[4] = ((unsigned long) x << 32) | ((unsigned long) stripY << 48);
         packet[0] = DMA_TAG_ID_CNT | 4;
         packet[2] = MOVIE_GIF_TAG_AD_2;
         packet[3] = GIF_AD;
@@ -199,10 +200,11 @@ unsigned long *make_gstrans(XglMovieWork *info, int y)
         packet[8] = MOVIE_GIF_TAG_IMAGE_BLOCK;
         packet[9] = 0;
         packet += 10;
-        ((XglDmaRefTag *) packet)->address = image;
-        image += MOVIE_MACROBLOCK_BYTES;
-        ((XglDmaRefTag *) packet)->tag = DMA_TAG_ID_REF | MOVIE_MACROBLOCK_QWORDS;
-        ((XglDmaRefTag *) packet)->upperQword = 0;
+        refTag = (XglDmaRefTag *) packet;
+        refTag->address = macroblockAddress;
+        macroblockAddress += MOVIE_MACROBLOCK_BYTES;
+        refTag->tag = DMA_TAG_ID_REF | MOVIE_MACROBLOCK_QWORDS;
+        refTag->upperQword = 0;
         packet += 2;
     }
     ((XglDmaRefTag *) packet)[-1].tag &= DMA_TAG_ID_CLEAR_MASK;
@@ -216,59 +218,59 @@ int xglMovieIpuReset(void);
  * "ipum" header and takes the size, frame count and strip sizes. A bad signature shuts the IPU down.
  * The stream branch of X2's xglMovieOpen is absent from this build.
  */
-int xglMovieOpen(XglMovieWork *info, const char *name)
+int xglMovieOpen(XglMovieWork *movie, const char *streamName)
 {
-    XglMovieSourceHeader *source;
+    XglMovieSourceHeader *movieHeader;
 
-    if (name == 0) {
-        info->dmaControl = MOVIE_D4_CHCR_CHAIN_START;
-        info->dmaAddress = (unsigned int) (info->source + 1);
-        info->dmaQwords = (info->sourceSize - 1) / MOVIE_DMA_QWORD;
-        info->streamOpen = 0;
-        info->dmaTag = 0;
-        info->bitPosition = 0;
+    if (streamName == 0) {
+        movie->dmaControl = MOVIE_D4_CHCR_CHAIN_START;
+        movie->dmaAddress = (unsigned int) (movie->movieSourceHeader + 1);
+        movie->dmaQwords = (movie->movieSourceBytes - 1) / MOVIE_DMA_QWORD;
+        movie->streamOpen = 0;
+        movie->dmaTag = 0;
+        movie->bitPosition = 0;
     }
-    source = info->source;
-    if (source->signature != MOVIE_SIGNATURE_IPUM) {
+    movieHeader = movie->movieSourceHeader;
+    if (movieHeader->signature != MOVIE_SIGNATURE_IPUM) {
         xglMovieIpuReset();
         return 1;
     }
-    info->width = source->width;
-    info->stripQwords = (info->width >> 4) << 6;
-    info->height = source->height;
-    info->imageQwords = (info->height >> 4) * info->stripQwords;
-    info->frameCount = source->frameCount;
-    info->currentFrame = 0;
-    info->bufferIndex = 0;
-    func_002E7348(info, info + 1);
+    movie->width = movieHeader->width;
+    movie->stripQwords = (movie->width >> 4) << 6;
+    movie->height = movieHeader->height;
+    movie->imageQwords = (movie->height >> 4) * movie->stripQwords;
+    movie->frameCount = movieHeader->frameCount;
+    movie->currentFrame = 0;
+    movie->activeBuffer = 0;
+    func_002E7348(movie, movie + 1);
     return 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_1", func_0018B090);
 
 /* Writes D3_CHCR (the IPU output channel) the same way as setD4_CHCR. Inline: the original has this block in its callers. */
-static inline void setD3_CHCR(u32 value)
+static inline void setD3_CHCR(u32 chcrValue)
 {
     DIntr();
     *D_ENABLEW = *D_ENABLEW | D_ENABLE_HOLD;
-    *D3_CHCR = value;
+    *D3_CHCR = chcrValue;
     *D_ENABLEW = *D_ENABLEW & ~D_ENABLE_HOLD;
     EIntr();
 }
 
-int xglMovieRewind(XglMovieWork *info)
+int xglMovieRewind(XglMovieWork *movie)
 {
-    info->currentFrame = 0;
+    movie->currentFrame = 0;
     setD4_CHCR(MOVIE_D4_CHCR_CHAIN_STOP);
     setD3_CHCR(0);
-    if (info->streamOpen == 0) {
-        info->dmaControl = MOVIE_D4_CHCR_CHAIN_START;
-        info->dmaAddress = (unsigned int) (info->source + 1);
-        info->dmaQwords = (info->sourceSize - 1) / MOVIE_DMA_QWORD;
-        info->dmaTag = 0;
-        info->bitPosition = 0;
+    if (movie->streamOpen == 0) {
+        movie->dmaControl = MOVIE_D4_CHCR_CHAIN_START;
+        movie->dmaAddress = (unsigned int) (movie->movieSourceHeader + 1);
+        movie->dmaQwords = (movie->movieSourceBytes - 1) / MOVIE_DMA_QWORD;
+        movie->dmaTag = 0;
+        movie->bitPosition = 0;
     }
-    func_002E7348(info, info + 1);
+    func_002E7348(movie, movie + 1);
     return 0;
 }
 

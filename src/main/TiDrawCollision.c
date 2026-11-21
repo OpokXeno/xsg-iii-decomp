@@ -26,7 +26,7 @@ void xglCurSetRotateY(float angle);
 void xglCurSetTranslate(const Vector4 *vector);
 void tiDrawJointScreenPoints(unsigned int count, const Vector4 *source, ScreenVector4 *destination);
 void tiDrawJointTransformPoints(unsigned int count, Matrix4 matrix, const Vector4 *source, Vector4 *destination);
-void tiDrawJointPackPoints(unsigned int count, const ScreenVector4 *source, const unsigned int *colour, int flag);
+void tiDrawJointPackPoints(unsigned int count, const Vector4 *source, const unsigned int *colour, int flag);
 struct XglCamera;
 struct XglCamera *xglStudioGetActiveCamera(void);
 float cosf(float);
@@ -42,7 +42,9 @@ extern Vector4 tiDrawCollisionRing[TI_COLLISION_RING_POINTS];
 extern Vector4 tiDrawCollisionTransformed[];
 /* Second pass of the ring, the input of the collision fill. */
 extern ScreenVector4 tiDrawCollisionScreenPoints[];
-/* Draws the ring through the object transform: transforms the ring points, projects them to screen and packs the * transformed points into pCol. */ void tiDrawCollisionDrawRing(Matrix4 pTransMat, const unsigned int *pCol);
+/* Draws the ring through the object transform: transforms the ring points, projects them to screen and packs the
+ * transformed points into pCol. */
+void tiDrawCollisionDrawRing(Matrix4 pTransMat, const unsigned int *pCol);
 extern Vector4 tiDrawCollisionTransformed[48];
 extern ScreenVector4 tiDrawCollisionScreenPoints[48];
 
@@ -71,23 +73,23 @@ void tiDrawCollisionBuildRing(float scale)
     xglCurMulRotateX(pCamera->travel.rotation.x);
     xglCurMulRotateZ(pCamera->travel.rotation.z);
     for (; firstPoint < TI_COLLISION_RING_POINTS; firstPoint += 2) {
-        angle = (float)angleIndex * angleStep;
+        angle = angleIndex * angleStep;
         pFirstX = &tiDrawCollisionRing[firstPoint].x;
         pFirstY = &tiDrawCollisionRing[firstPoint + 1].x;
         pFirstY -= 3;
         *pFirstX = cosf(angle) * scale;
-        angle = (float)angleIndex * angleStep;
+        angle = angleIndex * angleStep;
         nextAngleIndex = angleIndex + 1;
         pSecondX = &tiDrawCollisionRing[firstPoint].x;
         pSecondX += 4;
         *pFirstY = sinf(angle) * scale;
         tiDrawCollisionRing[firstPoint].z = 0.0f;
         tiDrawCollisionRing[firstPoint].w = unitW;
-        angle = (float)nextAngleIndex * angleStep;
+        angle = nextAngleIndex * angleStep;
         pSecondY = &tiDrawCollisionRing[firstPoint + 1].x;
         pSecondY++;
         *pSecondX = cosf(angle) * scale;
-        angle = (float)nextAngleIndex * angleStep;
+        angle = nextAngleIndex * angleStep;
         *pSecondY = sinf(angle) * scale;
         tiDrawCollisionRing[firstPoint + 1].z = 0.0f;
         tiDrawCollisionRing[firstPoint + 1].w = unitW;
@@ -97,12 +99,11 @@ void tiDrawCollisionBuildRing(float scale)
     }
 }
 
-void func_002948C0(unsigned int count, const Vector4 *source, const unsigned int *colour, int flag);
 /* Assert strings of tiDrawCollisionDrawRing: the scaffold data at 0x542770 ("pCol"), 0x542778 (the file name)
  * and 0x542790 ("pTransMat"). */
-extern const char D_00542770[];
-extern const char D_00542778[];
-extern const char D_00542790[];
+extern const char tiDrawCollisionAssertPCol[];
+extern const char tiDrawCollisionSourceFile[];
+extern const char tiDrawCollisionAssertTransMat[];
 /* Scaffold data after tiDrawCollisionRing (0x4C9220: the transform buffer, 0x4C9520: the screen buffer). */
 extern Vector4 D_004C9220[48];
 extern ScreenVector4 D_004C9520[48];
@@ -112,14 +113,14 @@ extern ScreenVector4 D_004C9520[48];
 void tiDrawCollisionDrawRing(Matrix4 pTransMat, const unsigned int *pCol)
 {
     if (pCol == 0) {
-        assertFailed(D_00542770, D_00542778, 51);
+        assertFailed(tiDrawCollisionAssertPCol, tiDrawCollisionSourceFile, 51);
     }
     if (pTransMat == 0) {
-        assertFailed(D_00542790, D_00542778, 52);
+        assertFailed(tiDrawCollisionAssertTransMat, tiDrawCollisionSourceFile, 52);
     }
     tiDrawJointTransformPoints(TI_COLLISION_RING_POINTS, pTransMat, tiDrawCollisionRing, D_004C9220);
     tiDrawJointScreenPoints(TI_COLLISION_RING_POINTS, D_004C9220, D_004C9520);
-    func_002948C0(TI_COLLISION_RING_POINTS, D_004C9220, pCol, 0);
+    tiDrawJointPackPoints(TI_COLLISION_RING_POINTS, D_004C9220, pCol, 0);
 }
 
 /* Per-frame collision draw of one object: builds the ring at scale, takes the object transform and fills pCol. */

@@ -4,32 +4,32 @@
 #include "main/tu007.h"
 
 extern PadRecord PadData[2];
-extern unsigned char D_00867380[];
+extern unsigned char gPadDmaBuffer[];
 int func_002F51B8(int mode);
 void func_002F5610(int port, int slot, unsigned char *dma_buffer);
-void func_001863C0(void);
+void xglPadSetDefaults(void);
 void xglPadSetRepeat(int port, unsigned short mask, int delay, int interval);
 
 void xglPadInitial(void) {
-    unsigned int byte_index;
-    unsigned char *first_record_bytes;
-    unsigned char *second_record_bytes;
+    unsigned int clearedByteCount;
+    unsigned char *portZeroRecordBytes;
+    unsigned char *portOneRecordBytes;
     int button;
     int button_index;
     int dead_zone_index;
 
     func_002F51B8(0);
-    func_002F5610(0, 0, D_00867380);
-    func_002F5610(1, 0, D_00867380 + 256);
+    func_002F5610(0, 0, gPadDmaBuffer);
+    func_002F5610(1, 0, gPadDmaBuffer + 256);
 
-    first_record_bytes = (unsigned char *)&PadData[0];
-    second_record_bytes = (unsigned char *)&PadData[1];
-    for (byte_index = 0; byte_index < sizeof(PadRecord); ++byte_index) {
-        *first_record_bytes++ = 0;
-        *second_record_bytes++ = 0;
+    portZeroRecordBytes = (unsigned char *)&PadData[0];
+    portOneRecordBytes = (unsigned char *)&PadData[1];
+    for (clearedByteCount = 0; clearedByteCount < sizeof(PadRecord); ++clearedByteCount) {
+        *portZeroRecordBytes++ = 0;
+        *portOneRecordBytes++ = 0;
     }
 
-    func_001863C0();
+    xglPadSetDefaults();
 
     button = 1;
     for (button_index = 0; button_index < 8; ++button_index) {
@@ -71,6 +71,12 @@ void xglPadSetRepeat(int port, unsigned short mask, int delay, int interval) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_pad", func_00186358);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_pad", func_001863C0);
+typedef int s32;
+s32 func_00186358(s32 port, s32 mask);
+
+void xglPadSetDefaults(void) {
+    xglPadSetRepeat(-1, 0xF000U, 5, 1);
+    func_00186358(-1, 0xF0F0);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_pad", xglPadRead);

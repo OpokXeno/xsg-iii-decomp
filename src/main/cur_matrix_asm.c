@@ -22,16 +22,34 @@ INCLUDE_ASM("asm/main/nonmatchings/cur_matrix_asm", func_001AF648);
 
 INCLUDE_ASM("asm/main/nonmatchings/cur_matrix_asm", func_001AF828);
 
-INCLUDE_ASM("asm/main/nonmatchings/cur_matrix_asm", func_001AF9D0);
+typedef int s32;
+extern s32 D_00551284;
+
+void _CurSetValue(s32 value) {
+    D_00551284 = value;
+}
 
 void _CurMatrixSet(Matrix4 *matrix)
 {
     Vu0SetCurrentMatrix(matrix);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cur_matrix_asm", func_001AF9F0);
+void _CurTransformPoint(void *outPoint, void *inPoint) {
+    __asm__ __volatile__("lqc2 vf31, 0(%0)" : : "r"(inPoint) : "memory");
+    __asm__ __volatile__("vmulax.xyzw ACC, vf27, vf31x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyzw ACC, vf28, vf31y" : : : "memory");
+    __asm__ __volatile__("vmaddaz.xyzw ACC, vf29, vf31z" : : : "memory");
+    __asm__ __volatile__("vmaddw.xyzw vf31, vf30, vf0w" : : : "memory");
+    __asm__ __volatile__("sqc2 vf31, 0(%0)" : : "r"(outPoint) : "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cur_matrix_asm", func_001AFA10);
+void _CurTransformDirection(void *outDirection, void *inDirection) {
+    __asm__ __volatile__("lqc2 vf31, 0(%0)" : : "r"(inDirection) : "memory");
+    __asm__ __volatile__("vmulax.xyzw ACC, vf27, vf31x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyzw ACC, vf28, vf31y" : : : "memory");
+    __asm__ __volatile__("vmaddz.xyzw vf31, vf29, vf31z" : : : "memory");
+    __asm__ __volatile__("sqc2 vf31, 0(%0)" : : "r"(outDirection) : "memory");
+}
 
 void _CurMatrixMul(Matrix4 matrix)
 {
@@ -81,7 +99,7 @@ void _CurMatrixScale(Vector4 *scale) {
 }
 
 int _CurRotTransPersClipScreen(ScreenVector4 *screenOut, const Vector4 *point) {
-    register int clipFlags;
+    int clipFlags;
 
     __asm__ __volatile__(
         "ctc2 $0, $vi18\n"
@@ -115,7 +133,7 @@ int _CurRotTransPersClipScreen(ScreenVector4 *screenOut, const Vector4 *point) {
 }
 
 int _CurBoxVisible(Vector4 *boxMin, Vector4 *boxMax) {
-    register int visible;
+    int visible;
 
     __asm__ __volatile__(
         ".set noat\n"

@@ -21,7 +21,7 @@ void vu0SetCurrentRotationYXZ(Vector4 *angles);
 void vu0TransformPoint(Vector4 *point);
 void vu0TranslateCurrent(Vector4 *offset);
 
-int vu0SetRotationFromDirection(Matrix4 matrix, Vector4 *to, Vector4 *from);
+int vu0SetRotationFromDirection(Matrix4 matrix, Vector4 *targetPoint, Vector4 *sourcePoint);
 
 /* Row 3 of the matrix, which holds the direction while the rotation is built: the zero test reads
  * x and y as one doubleword. */
@@ -142,12 +142,12 @@ void vu0TransformPoint(Vector4 *point)
 }
 
 /* Multiplies the current matrix by a translation: identity rows 0-2 and offset as row 3. */
-void vu0TranslateCurrent(Vector4 *offset)
+void vu0TranslateCurrent(Vector4 *translation)
 {
     __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(vu0IdentityMatrix) : "memory");
     __asm__ __volatile__("lqc2 vf2, 16(%0)" : : "r"(vu0IdentityMatrix) : "memory");
     __asm__ __volatile__("lqc2 vf3, 32(%0)" : : "r"(vu0IdentityMatrix) : "memory");
-    __asm__ __volatile__("lqc2 vf4, 0(%0)" : : "r"(offset) : "memory");
+    __asm__ __volatile__("lqc2 vf4, 0(%0)" : : "r"(translation) : "memory");
     __asm__ __volatile__("vmulax.xyzw ACC, vf1, vf26x" : : : "memory");
     __asm__ __volatile__("vmadday.xyzw ACC, vf2, vf26y" : : : "memory");
     __asm__ __volatile__("vmaddaz.xyzw ACC, vf3, vf26z" : : : "memory");
@@ -169,22 +169,22 @@ void vu0TranslateCurrent(Vector4 *offset)
 /* Sets matrix to the rotation that turns the Z axis towards `to` - `from` (Y rotation from the
  * heading, then X from the pitch) and returns 1; for equal points it becomes the identity and the
  * result is 0. Rows 2 and 3 hold the angles and the direction until the matrix is stored. */
-int vu0SetRotationFromDirection(Matrix4 matrix, Vector4 *to, Vector4 *from)
+int vu0SetRotationFromDirection(Matrix4 matrix, Vector4 *targetPoint, Vector4 *sourcePoint)
 {
     Vu0Direction *direction = (Vu0Direction *) matrix[3];
-    float *angles;
-    int result = 0;
-    int zero;
-    float length;
+    float *angleRow;
+    int isRotated = 0;
+    int isZeroDirection;
+    float horizontalLength;
     float pitch;
 
-    Vu0SubVectorXYZ12(direction, to, from);
-    zero = (direction->bits.z | direction->bits.xy) == 0;
-    if (zero) {
+    Vu0SubVectorXYZ12(direction, targetPoint, sourcePoint);
+    isZeroDirection = (direction->bits.z | direction->bits.xy) == 0;
+    if (isZeroDirection) {
         Vu0SetCurrentIdentity(vu0IdentityMatrix);
     } else {
         pitch = -direction->vector.y;
-        angles = matrix[2];
+        angleRow = matrix[2];
         __asm__ __volatile__(
             "lqc2 vf1, 0(%1)\n\t"
             "vmul.xz vf1, vf1, vf1\n\t"
@@ -195,12 +195,12 @@ int vu0SetRotationFromDirection(Matrix4 matrix, Vector4 *to, Vector4 *from)
             "vaddq.x vf1, vf0, Q\n\t"
             "qmfc2.ni $8, vf1\n\t"
             "mtc1 $8, %0"
-            : "=f"(length) : "r"(direction), "r"(angles) : "$8", "memory");
-        angles[0] = srsAtan2(pitch, length);
-        angles[1] = srsAtan2(direction->vector.x, direction->vector.z);
-        vu0SetCurrentRotationY(angles[1]);
-        vu0RotateCurrentX(angles[0]);
-        result = 1;
+            : "=f"(horizontalLength) : "r"(direction), "r"(angleRow) : "$8", "memory");
+        angleRow[0] = srsAtan2(pitch, horizontalLength);
+        angleRow[1] = srsAtan2(direction->vector.x, direction->vector.z);
+        vu0SetCurrentRotationY(angleRow[1]);
+        vu0RotateCurrentX(angleRow[0]);
+        isRotated = 1;
     }
     __asm__ __volatile__(
         "sqc2 vf26, 0(%0)\n\t"
@@ -208,5 +208,5 @@ int vu0SetRotationFromDirection(Matrix4 matrix, Vector4 *to, Vector4 *from)
         "sqc2 vf28, 32(%0)\n\t"
         "sqc2 vf29, 48(%0)"
         : : "r"(matrix) : "memory");
-    return result;
+    return isRotated;
 }

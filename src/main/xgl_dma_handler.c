@@ -9,15 +9,10 @@
 
 #define XGL_DMAC_CHANNELS 16
 
-extern XglIntrRecord xglIntcRecords[];
-extern XglIntrRecord xglDmaRecords[];
-
 /* INTC cause / DMAC channel -> slot of its record in the table; -1 when none is registered.
  * Both slot maps are volatile: the interrupt handlers read them asynchronously while the
  * main thread (xglIntrInit and the enable/disable calls) writes and tests them. */
 extern volatile int xglIntcSlotMap[];
-
-extern volatile int xglDmaSlotMap[];
 
 /* Timer accumulator of the VIF1 handler (xgl_intc.c): active flag, start count, ticks total. */
 extern int intrTimerActive;
@@ -57,9 +52,9 @@ extern XglIntrRecord xglDmaRecords[8];
  * each bumps the count of its channel's record and returns 0. */
 int xglDmaHandlerVif0(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -68,9 +63,9 @@ int xglDmaHandlerVif0(int channel)
 
 int xglDmaHandlerVif1(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -79,9 +74,9 @@ int xglDmaHandlerVif1(int channel)
 
 int xglDmaHandlerGif(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -90,9 +85,9 @@ int xglDmaHandlerGif(int channel)
 
 int xglDmaHandlerFromIpu(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -101,9 +96,9 @@ int xglDmaHandlerFromIpu(int channel)
 
 int xglDmaHandlerToIpu(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -112,9 +107,9 @@ int xglDmaHandlerToIpu(int channel)
 
 int xglDmaHandlerFromSpr(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -123,9 +118,9 @@ int xglDmaHandlerFromSpr(int channel)
 
 int xglDmaHandlerToSpr(int channel)
 {
-    int *count = &xglDmaRecords[xglDmaSlotMap[channel]].count;
+    int *eventCount = &xglDmaRecords[xglDmaSlotMap[channel]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -135,13 +130,13 @@ int xglDmaHandlerToSpr(int channel)
 /* INTC cause -> its event count, or -1 when no handler is registered for the cause. */
 int xglIntcGetEventCount(int cause)
 {
-    volatile int *slot = &xglIntcSlotMap[cause];
-    int count = -1;
+    volatile int *causeSlot = &xglIntcSlotMap[cause];
+    int eventCount = -1;
 
-    if (*slot >= 0) {
-        count = xglIntcRecords[*slot].count;
+    if (*causeSlot >= 0) {
+        eventCount = xglIntcRecords[*causeSlot].eventCount;
     }
-    return count;
+    return eventCount;
 }
 
 /* Enables INTC cause `cause` through kernel service 0x14 (EnableIntc) when the cause has a
@@ -150,9 +145,9 @@ int xglIntcEnable(unsigned int cause)
 {
     int valid_cause = cause < XGL_INTC_CAUSES;
     int enabled = 0;
-    volatile int *slot = &xglIntcSlotMap[cause];
+    volatile int *causeSlot = &xglIntcSlotMap[cause];
 
-    if (valid_cause && (*slot >= 0)) {
+    if (valid_cause && (*causeSlot >= 0)) {
         EnableIntc(cause, 0);
         enabled = 1;
     }
@@ -164,9 +159,9 @@ int xglIntcDisable(unsigned int cause)
 {
     int valid_cause = cause < XGL_INTC_CAUSES;
     int disabled = 0;
-    volatile int *slot = &xglIntcSlotMap[cause];
+    volatile int *causeSlot = &xglIntcSlotMap[cause];
 
-    if (valid_cause && (*slot >= 0)) {
+    if (valid_cause && (*causeSlot >= 0)) {
         DisableIntc(cause, 0);
         disabled = 1;
     }
@@ -176,13 +171,13 @@ int xglIntcDisable(unsigned int cause)
 /* DMAC channel -> its event count, or -1 when no handler is registered for the channel. */
 int xglDmaGetEventCount(int channel)
 {
-    volatile int *slot = &xglDmaSlotMap[channel];
-    int count = -1;
+    volatile int *channelSlot = &xglDmaSlotMap[channel];
+    int eventCount = -1;
 
-    if (*slot >= 0) {
-        count = xglDmaRecords[*slot].count;
+    if (*channelSlot >= 0) {
+        eventCount = xglDmaRecords[*channelSlot].eventCount;
     }
-    return count;
+    return eventCount;
 }
 
 /* Enables DMAC channel `channel` through kernel service 0x16 (EnableDmac) when a handler
@@ -191,9 +186,9 @@ int xglDmaEnable(unsigned int channel)
 {
     int valid_channel = channel < XGL_DMAC_CHANNELS;
     int enabled = 0;
-    volatile int *slot = &xglDmaSlotMap[channel];
+    volatile int *channelSlot = &xglDmaSlotMap[channel];
 
-    if (valid_channel && (*slot >= 0)) {
+    if (valid_channel && (*channelSlot >= 0)) {
         EnableDmac(channel);
         enabled = 1;
     }
@@ -205,9 +200,9 @@ int xglDmaDisable(unsigned int channel)
 {
     int valid_channel = channel < XGL_DMAC_CHANNELS;
     int disabled = 0;
-    volatile int *slot = &xglDmaSlotMap[channel];
+    volatile int *channelSlot = &xglDmaSlotMap[channel];
 
-    if (valid_channel && (*slot >= 0)) {
+    if (valid_channel && (*channelSlot >= 0)) {
         DisableDmac(channel);
         disabled = 1;
     }

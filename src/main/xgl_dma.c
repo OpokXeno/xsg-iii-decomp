@@ -6,8 +6,8 @@
 
 #define DMA_TAG_ID_REF 0x30000000U
 
-void xglDmaDirectNormal(unsigned int channel, unsigned int address, unsigned int count);
-void xglDmaDirectSrcChain(unsigned int channel, unsigned int address);
+void xglDmaDirectNormal(unsigned int channel, unsigned int memoryAddress, unsigned int quadwordCount);
+void xglDmaDirectSrcChain(unsigned int channel, unsigned int tagAddress);
 
 extern u8 *buffer;
 
@@ -71,7 +71,7 @@ typedef struct XglDmacControl {
 typedef struct XglDmaChannel {
     /* EE DMAC MMIO registers: CHCR +0x00, MADR +0x10, QWC +0x20, TADR +0x30.
      * The hardware updates CHCR while the polling loops wait for completion. */
-    volatile u32 control;
+    volatile u32 chcr;
     u32 reserved_04[3];
     volatile u32 memory_address;
     u32 reserved_14[3];
@@ -81,8 +81,8 @@ typedef struct XglDmaChannel {
 } XglDmaChannel;
 
 typedef struct XglDmaBuffer {
-    u32 *start;
-    u32 *current;
+    u32 *chainStart;
+    u32 *writeCursor;
 } XglDmaBuffer;
 
 /* The first word is the channel pointer; the second word's role is unknown. */
@@ -99,156 +99,149 @@ extern struct MfifoDrainStorage mfifo_drain;
 /* Declared here, not at the top: moving it up changes the original code. */
 #define mfifo_drain mfifo_drain.channel
 
-void xglDmaDirectNormal(u32 channel, u32 address, u32 count)
+void xglDmaDirectNormal(u32 channel, u32 memoryAddress, u32 quadwordCount)
 {
     XglDmaChannel *dma;
 
     if (channel >= XGL_DMA_DIRECT_CHANNELS)
         return;
     dma = tbl[channel];
-    while (dma->control & DMA_CHCR_STR)
+    while (dma->chcr & DMA_CHCR_STR)
         ;
-    dma->quadword_count = count;
-    if ((address >> 16) != DMA_SPR_ADDRESS_HIGH)
-        dma->memory_address = address;
+    dma->quadword_count = quadwordCount;
+    if ((memoryAddress >> 16) != DMA_SPR_ADDRESS_HIGH)
+        dma->memory_address = memoryAddress;
     else
-        dma->memory_address = (address & DMA_SPR_OFFSET_MASK) + DMA_SPR_FLAG;
+        dma->memory_address = (memoryAddress & DMA_SPR_OFFSET_MASK) + DMA_SPR_FLAG;
     *DMAC_STAT = 1U << channel;
-    dma->control = DMA_CHCR_STR | DMA_CHCR_TTE | DMA_CHCR_DIR;
+    dma->chcr = DMA_CHCR_STR | DMA_CHCR_TTE | DMA_CHCR_DIR;
 }
 
-void xglDmaDirectSrcChain(u32 channel, u32 address)
+void xglDmaDirectSrcChain(u32 channel, u32 tagAddress)
 {
     XglDmaChannel *dma;
 
     if (channel >= XGL_DMA_DIRECT_CHANNELS)
         return;
     dma = tbl[channel];
-    while (dma->control & DMA_CHCR_STR)
+    while (dma->chcr & DMA_CHCR_STR)
         ;
     dma->quadword_count = 0;
-    if ((address >> 16) != DMA_SPR_ADDRESS_HIGH)
-        dma->tag_address = address;
+    if ((tagAddress >> 16) != DMA_SPR_ADDRESS_HIGH)
+        dma->tag_address = tagAddress;
     else
-        dma->tag_address = (address & DMA_SPR_OFFSET_MASK) + DMA_SPR_FLAG;
+        dma->tag_address = (tagAddress & DMA_SPR_OFFSET_MASK) + DMA_SPR_FLAG;
     *DMAC_STAT = 1U << channel;
-    dma->control = DMA_CHCR_STR | DMA_CHCR_TTE | DMA_CHCR_MOD_CHAIN | DMA_CHCR_DIR;
+    dma->chcr = DMA_CHCR_STR | DMA_CHCR_TTE | DMA_CHCR_MOD_CHAIN | DMA_CHCR_DIR;
 }
 
-void xglDmaBufferReset(XglDmaBuffer *buffer, u32 *address)
+void xglDmaBufferReset(XglDmaBuffer *dmaBuffer, u32 *startAddress)
 {
-    buffer->start = address;
-    buffer->current = address;
+    dmaBuffer->chainStart = startAddress;
+    dmaBuffer->writeCursor = startAddress;
 }
 
-u32 *xglDmaBufferCnt(XglDmaBuffer *buffer, const u32 *source, u32 count)
+u32 *xglDmaBufferCnt(XglDmaBuffer *dmaBuffer, const u32 *packetWords, u32 quadwordCount)
 {
-    u32 *current = buffer->current;
-    u32 word_index;
+    u32 *writeCursor = dmaBuffer->writeCursor;
+    u32 copiedWords;
 
-    current[0] = DMA_TAG_ID_CNT + count;
-    current[1] = 0;
-    current[2] = 0;
-    current[3] = 0;
-    current += 4;
+    writeCursor[0] = DMA_TAG_ID_CNT + quadwordCount;
+    writeCursor[1] = 0;
+    writeCursor[2] = 0;
+    writeCursor[3] = 0;
+    writeCursor += 4;
     /* Copies count quadwords (count * 4 words) of the caller's data. */
-    for (word_index = 0; word_index < count * 4; word_index++)
-        *current++ = *source++;
-    buffer->current = current;
-    return current;
+    for (copiedWords = 0; copiedWords < quadwordCount * 4; copiedWords++)
+        *writeCursor++ = *packetWords++;
+    dmaBuffer->writeCursor = writeCursor;
+    return writeCursor;
 }
 
-u32 *xglDmaBufferRef(XglDmaBuffer *buffer, u32 address, u32 count)
+u32 *xglDmaBufferRef(XglDmaBuffer *dmaBuffer, u32 dataAddress, u32 quadwordCount)
 {
-    u32 *current = buffer->current;
+    u32 *writeCursor = dmaBuffer->writeCursor;
 
-    current[0] = DMA_TAG_ID_REF + count;
-    current[1] = address;
-    current[2] = 0;
-    current[3] = 0;
-    current += 4;
-    buffer->current = current;
-    return current;
+    writeCursor[0] = DMA_TAG_ID_REF + quadwordCount;
+    writeCursor[1] = dataAddress;
+    writeCursor[2] = 0;
+    writeCursor[3] = 0;
+    writeCursor += 4;
+    dmaBuffer->writeCursor = writeCursor;
+    return writeCursor;
 }
 
-u32 *xglDmaBufferCall(XglDmaBuffer *buffer, u32 address)
+u32 *xglDmaBufferCall(XglDmaBuffer *dmaBuffer, u32 callAddress)
 {
-    u32 *current = buffer->current;
+    u32 *writeCursor = dmaBuffer->writeCursor;
 
-    current[0] = DMA_TAG_ID_CALL;
-    current[1] = address;
-    current[2] = 0;
-    current[3] = 0;
-    current += 4;
-    buffer->current = current;
-    return current;
+    writeCursor[0] = DMA_TAG_ID_CALL;
+    writeCursor[1] = callAddress;
+    writeCursor[2] = 0;
+    writeCursor[3] = 0;
+    writeCursor += 4;
+    dmaBuffer->writeCursor = writeCursor;
+    return writeCursor;
 }
 
-void xglDmaBufferRequest(XglDmaBuffer *buffer, u32 channel)
+void xglDmaBufferRequest(XglDmaBuffer *dmaBuffer, u32 channel)
 {
-    u32 *current = buffer->current;
+    u32 *writeCursor = dmaBuffer->writeCursor;
 
-    current[0] = DMA_TAG_ID_END;
-    current[3] = current[2] = current[1] = 0;
+    writeCursor[0] = DMA_TAG_ID_END;
+    writeCursor[3] = writeCursor[2] = writeCursor[1] = 0;
     FlushCache(0);
-    xglDmaDirectSrcChain(channel, (u32)buffer->start);
-    buffer->current = buffer->start;
+    xglDmaDirectSrcChain(channel, (u32)dmaBuffer->chainStart);
+    dmaBuffer->writeCursor = dmaBuffer->chainStart;
 }
 
-void xglDmaMFIFOSetup(u32 address, u32 size, int channel)
+void xglDmaMFIFOSetup(u32 ringAddress, u32 ringSize, int channel)
 {
-    XglDmaChannel *drain;
-    volatile u32 *ring_base_reg;
-    volatile u32 *ring_size_reg;
-    volatile u32 *spr_madr;
+    XglDmaChannel *drainChannel;
 
     if (channel >= XGL_DMA_DIRECT_CHANNELS)
         return;
-    ring_base_reg = DMAC_RBOR;
-    ring_size_reg = DMAC_RBSR;
     DMAC_CTRL->drain_mode = DMAC_CTRL_MFD_GIF;
-    *ring_base_reg = address;
-    *ring_size_reg = size - MFIFO_QUADWORD;
-    drain = tbl[channel];
-    mfifo_drain = drain;
-    spr_madr = D8_MADR;
-    *spr_madr = address;
-    drain->tag_address = address;
-    drain->quadword_count = 0U;
-    drain->control = DMA_CHCR_STR | DMA_CHCR_MOD_CHAIN;
+    *DMAC_RBOR = ringAddress;
+    *DMAC_RBSR = ringSize - MFIFO_QUADWORD;
+    drainChannel = tbl[channel];
+    mfifo_drain = drainChannel;
+    *D8_MADR = ringAddress;
+    drainChannel->tag_address = ringAddress;
+    drainChannel->quadword_count = 0U;
+    drainChannel->chcr = DMA_CHCR_STR | DMA_CHCR_MOD_CHAIN;
 }
 
-u32 xglDmaMFIFOKick(u32 spr_address, u32 count)
+u32 xglDmaMFIFOKick(u32 scratchpadAddress, u32 quadwordCount)
 {
-    u32 ring_size = *DMAC_RBSR + MFIFO_QUADWORD;
-    XglDmaChannel **drain_slot = &mfifo_drain;
-    XglDmaChannel *drain;
-    u32 room;
+    u32 ringSize = *DMAC_RBSR + MFIFO_QUADWORD;
+    XglDmaChannel *drainChannel;
+    u32 ringFreeBytes;
 
     while (*D8_CHCR & DMA_CHCR_STR)
         ;
-    *D8_SADR = spr_address & DMA_SADR_MASK;
-    *D8_QWC = count;
-    drain = *drain_slot;
+    *D8_SADR = scratchpadAddress & DMA_SADR_MASK;
+    *D8_QWC = quadwordCount;
+    drainChannel = mfifo_drain;
     do {
-        room = (drain->tag_address - *D8_MADR + ring_size) & (ring_size - MFIFO_QUADWORD);
-        if (room == 0)
-            room = ring_size;
-    } while (!(count * MFIFO_QUADWORD < room));
+        ringFreeBytes = (drainChannel->tag_address - *D8_MADR + ringSize) & (ringSize - MFIFO_QUADWORD);
+        if (ringFreeBytes == 0)
+            ringFreeBytes = ringSize;
+    } while (quadwordCount * MFIFO_QUADWORD >= ringFreeBytes);
     *D8_CHCR = DMA_CHCR_STR;
-    return room;
+    return ringFreeBytes;
 }
 
 void xglDmaMFIFOLeave(void)
 {
-    XglDmaChannel *drain;
+    XglDmaChannel *drainChannel;
 
     sceGsSyncPath(0, 0);
     DMAC_CTRL->drain_mode = DMAC_CTRL_MFD_NONE;
     while (*D8_CHCR & DMA_CHCR_STR)
         ;
-    drain = mfifo_drain;
-    while (drain->control & DMA_CHCR_STR)
+    drainChannel = mfifo_drain;
+    while (drainChannel->chcr & DMA_CHCR_STR)
         ;
 }
 

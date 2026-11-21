@@ -1,7 +1,7 @@
 #include "common.h"
 #include "shared.h"
 
-void LOG(const void *data, const char *format, ...);
+void LOG(const void *loggedVector, const char *format, ...);
 
 extern u8 *buffer;
 
@@ -12,24 +12,23 @@ void tracePrint(const char *format, ...);
 
 typedef char *va_list;
 
-extern const char tracePrintFormat[];
 extern int printf(const char *format, ...);
-extern int vsprintf(char *buffer, const char *format, va_list args);
+extern int vsprintf(char *output, const char *format, va_list formatArgs);
 extern const char tracePrintFormat[8];
 
 void tracePrint(const char *format, ...) {
-    va_list args;
-    char buffer[0x100];
+    va_list formatArgs;
+    char formattedText[0x100];
 
-    va_start(args, format);
-    vsprintf(buffer, format, args);
-    printf(tracePrintFormat, buffer);
-    va_end(args);
+    va_start(formatArgs, format);
+    vsprintf(formattedText, format, formatArgs);
+    printf(tracePrintFormat, formattedText);
+    va_end(formatArgs);
 }
 
 /* Log call sites use this variadic no-op (lightSetLogDump passes a vector, a format and an index): it spills
  * its arguments and returns. */
-void LOG(const void *data, const char *format, ...)
+void LOG(const void *loggedVector, const char *format, ...)
 {
 }
 

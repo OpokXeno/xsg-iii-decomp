@@ -22,9 +22,6 @@ void xglMatrixFromAxes(Matrix4 matrix, const Vector4 *axis0, const Vector4 *axis
 
 
 
-
-
-
 XglPacket *xglPacketGetCurrent(void);
 void sceVif1PkCnt(XglPacket *packet, unsigned int count);
 void sceVif1PkAddCode(XglPacket *packet, unsigned int tag);
@@ -56,13 +53,16 @@ void tiWaterSendItemPair(float x, float y);
 #define TIWATER_VU_FIXED 0x3CE
 #define TIWATER_VU_POSITION 0x3D2
 #define TIWATER_VU_DIRECTION 0x3D6
+#define TIWATER_VU_ITEM_PAIR 0x3DA
+#define TIWATER_VU_FRAME_PAIR 0x3DE
 
 /* Caches the packet every send in this TU writes to (xglPacketCaptureCurrent stores it). */
 extern XglPacket *xglCurrentPacket;
 /* Count and entries of the reference table added by xglPacketRefTable. */
 extern int xglPacketRefCount;
 extern u8 xglPacketRefEntries[];
-/* Adds a reference to the table xglPacketRefEntries (xglPacketRefCount entries). */ void xglPacketRefTable(void);
+/* Adds a reference to the table xglPacketRefEntries (xglPacketRefCount entries). */
+void xglPacketRefTable(void);
 
 #include "quadword.h"
 
@@ -92,30 +92,30 @@ extern int tiWaterStripColumns;
  * symbol (the transformed one at +0x10), and two separate symbols change the relocations (.text DIFF). */
 extern Vector4 tiWatSimSourcePos[2];
 
-/* Fills the four rows of matrix from row0..row3 (matrix[r][i] = row r [i]). */
-void xglMatrixFromRows(float matrix[4][4], const float *row0, const float *row1, const float *row2,
-                       const float *row3) {
+/* Fills the four rows of matrix from firstSourceRow..fourthSourceRow (matrix[r][i] = row r [i]). */
+void xglMatrixFromRows(float matrix[4][4], const float *firstSourceRow, const float *secondSourceRow, const float *thirdSourceRow,
+                       const float *fourthSourceRow) {
     unsigned int i;
 
     for (i = 0; i < 4; i++) {
-        float *dst = &matrix[0][i];
-        const float *src = &row0[i];
-        *dst = *src;
+        float *matrixElement = &matrix[0][i];
+        const float *rowElement = &firstSourceRow[i];
+        *matrixElement = *rowElement;
     }
     for (i = 0; i < 4; i++) {
-        float *dst = &matrix[1][i];
-        const float *src = &row1[i];
-        *dst = *src;
+        float *matrixElement = &matrix[1][i];
+        const float *rowElement = &secondSourceRow[i];
+        *matrixElement = *rowElement;
     }
     for (i = 0; i < 4; i++) {
-        float *dst = &matrix[2][i];
-        const float *src = &row2[i];
-        *dst = *src;
+        float *matrixElement = &matrix[2][i];
+        const float *rowElement = &thirdSourceRow[i];
+        *matrixElement = *rowElement;
     }
     for (i = 0; i < 4; i++) {
-        float *dst = &matrix[3][i];
-        const float *src = &row3[i];
-        *dst = *src;
+        float *matrixElement = &matrix[3][i];
+        const float *rowElement = &fourthSourceRow[i];
+        *matrixElement = *rowElement;
     }
 }
 
@@ -135,7 +135,7 @@ void xglPacketEndUnpack(void) {
     sceVif1PkCloseUpkCode(xglCurrentPacket);
 }
 
-/* Count and entries of the reference table added by xglPacketRefTable. */
+/* Table data read by xglPacketRefTable: the entry count at D_00515B00[0] and the entries at D_00515B10. */
 extern int D_00515B00[];
 extern u8 D_00515B10[];
 
@@ -164,22 +164,22 @@ void tiWaterSendTransformed(XglCamera *camera, Matrix4 matrix) {
 }
 
 /* Sends the four quads of data at VU address 0x3C6. */
-void tiWaterSendMatrix(Matrix4 data) {
+void tiWaterSendMatrix(Matrix4 objectMatrix) {
     xglPacketBeginUnpack(TIWATER_VU_MATRIX);
-    sceVif1PkAddUpkData128N(xglCurrentPacket, data, 4);
+    sceVif1PkAddUpkData128N(xglCurrentPacket, objectMatrix, 4);
     xglPacketEndUnpack();
 }
 
-/* Builds the matrix from the axes, copies data into a local matrix with its row 3 xyz cleared, and sends the stack product at VU address 0x3CA. */
-void tiWaterSendOrientedMatrix(Matrix4 data) {
-    Matrix4 local;
+/* Builds the matrix from the axes, copies the object matrix into rotationScale with its row 3 xyz cleared, and sends the stack product at VU address 0x3CA. */
+void tiWaterSendOrientedMatrix(Matrix4 objectMatrix) {
+    Matrix4 rotationScale;
     Matrix4 stack;
 
     xglMatrixFromAxes(stack, &tiWaterAxes[0], &tiWaterAxes[1], &tiWaterAxes[2]);
-    QuadwordCopyMatrix(local, data);
-    local[3][0] = local[3][1] = local[3][2] = 0.0f;
+    QuadwordCopyMatrix(rotationScale, objectMatrix);
+    rotationScale[3][0] = rotationScale[3][1] = rotationScale[3][2] = 0.0f;
     xglMatrixStackLoad(stack);
-    xglMatrixStackMul(local);
+    xglMatrixStackMul(rotationScale);
     xglMatrixStackSave(stack);
     xglPacketBeginUnpack(TIWATER_VU_ORIENTED);
     sceVif1PkAddUpkData128N(xglCurrentPacket, stack, 4);
@@ -224,45 +224,45 @@ void tiWaterSendDirection(XglCamera *camera, Matrix4 transform) {
     xglPacketEndUnpack();
 }
 
-/* Sends the pair (x, y) at VU address 0x3DA. */
+/* Sends the pair (x, y) at VU address TIWATER_VU_ITEM_PAIR (0x3DA). */
 void tiWaterSendItemPair(f32 x, f32 y) {
     f32 xy[2];
 
     xy[0] = x;
     xy[1] = y;
-    xglPacketBeginUnpack(0x3DA);
+    xglPacketBeginUnpack(TIWATER_VU_ITEM_PAIR);
     sceVif1PkAddUpkData128N(xglCurrentPacket, xy, 1);
     xglPacketEndUnpack();
 }
 
-/* Sends the pair (x, y) at VU address 0x3DE. */
+/* Sends the pair (x, y) at VU address TIWATER_VU_FRAME_PAIR (0x3DE). */
 void tiWaterSendFramePair(f32 x, f32 y) {
     f32 xy[2];
 
     xy[0] = x;
     xy[1] = y;
-    xglPacketBeginUnpack(0x3DE);
+    xglPacketBeginUnpack(TIWATER_VU_FRAME_PAIR);
     sceVif1PkAddUpkData128N(xglCurrentPacket, xy, 1);
     xglPacketEndUnpack();
 }
 
 /* Sends one water frame: packet cache, reference table, transformed matrix, matrices, parameter rows, then the pair (0.7, 0.05). */
-void tiWaterSendFrame(XglCamera *camera, Matrix4 data) {
+void tiWaterSendFrame(XglCamera *camera, Matrix4 objectMatrix) {
     nmlPacketSetCurrent();
     xglPacketRefTable();
-    tiWaterSendTransformed(camera, data);
-    tiWaterSendMatrix(data);
-    tiWaterSendOrientedMatrix(data);
+    tiWaterSendTransformed(camera, objectMatrix);
+    tiWaterSendMatrix(objectMatrix);
+    tiWaterSendOrientedMatrix(objectMatrix);
     tiWaterSendFixedMatrix();
     tiWaterSendParamRows(camera);
     tiWaterSendFramePair(0.7f, 0.05f);
 }
 
-/* Writes the strip of columns first..last between grid rows row and row + 1 into the scratchpad and sends it. */
-void tiWaterSendStrip(int first, unsigned int last, int row, WaterStripGrid *grid) {
+/* Writes the strip of columns firstColumn..lastColumn between grid rows row and row + 1 into the scratchpad and sends it. */
+void tiWaterSendStrip(int firstColumn, unsigned int lastColumn, int row, WaterStripGrid *grid) {
     u32 *gifTag = (u32 *)SCRATCH_GIF_TAG;
-    DoublewordVector4 *quad = (DoublewordVector4 *)SCRATCH_QUAD_ROWS;
-    unsigned int quadCount;
+    DoublewordVector4 *quadCursor = (DoublewordVector4 *)SCRATCH_QUAD_ROWS;
+    unsigned int stripQuadCount;
     DoublewordVector4 *vertexCopy;
     Vector4 *gridVertices;
     unsigned int rowStart;
@@ -271,29 +271,29 @@ void tiWaterSendStrip(int first, unsigned int last, int row, WaterStripGrid *gri
     float cellZ;
     XglPacket *packet;
 
-    quadCount = 2 * (last - first) + 2;
+    stripQuadCount = 2 * (lastColumn - firstColumn) + 2;
     gridVertices = (Vector4 *)(grid->vertexBase + grid->vertexOffset);
-    *gifTag = (*gifTag & GIF_TAG_EOP) | (2 * (last - first) + 2);
-    cellX = (float)first * grid->cell + grid->origin.x;
-    cellZ = (float)row * -grid->cell + grid->origin.z;
+    *gifTag = (*gifTag & GIF_TAG_EOP) | (2 * (lastColumn - firstColumn) + 2);
+    cellX = firstColumn * grid->cell + grid->origin.x;
+    cellZ = row * -grid->cell + grid->origin.z;
     rowStart = row * grid->rowStride;
     packet = xglCurrentPacket;
-    vertexCopy = quad + quadCount;
-    for (gridColumn = first; gridColumn <= last; gridColumn++) {
-        quad->vector.x = cellX;
-        quad->vector.y = 0.0f;
-        quad->vector.z = cellZ;
-        quad->vector.w = 1.0f;
-        quad++;
+    vertexCopy = quadCursor + stripQuadCount;
+    for (gridColumn = firstColumn; gridColumn <= lastColumn; gridColumn++) {
+        quadCursor->vector.x = cellX;
+        quadCursor->vector.y = 0.0f;
+        quadCursor->vector.z = cellZ;
+        quadCursor->vector.w = 1.0f;
+        quadCursor++;
         vertexCopy->vector.x = gridVertices[rowStart + gridColumn].x;
         vertexCopy->vector.y = gridVertices[rowStart + gridColumn].y;
         vertexCopy->vector.z = gridVertices[rowStart + gridColumn].z;
         vertexCopy++;
-        quad->vector.x = cellX;
-        quad->vector.y = 0.0f;
-        quad->vector.z = cellZ - grid->cell;
-        quad->vector.w = 1.0f;
-        quad++;
+        quadCursor->vector.x = cellX;
+        quadCursor->vector.y = 0.0f;
+        quadCursor->vector.z = cellZ - grid->cell;
+        quadCursor->vector.w = 1.0f;
+        quadCursor++;
         vertexCopy->vector.x = gridVertices[rowStart + grid->rowStride + gridColumn].x;
         vertexCopy->vector.y = gridVertices[rowStart + grid->rowStride + gridColumn].y;
         vertexCopy->vector.z = gridVertices[rowStart + grid->rowStride + gridColumn].z;
@@ -301,37 +301,37 @@ void tiWaterSendStrip(int first, unsigned int last, int row, WaterStripGrid *gri
         cellX += grid->cell;
     }
     sceVif1PkOpenUpkCode(packet, 0x8000, VIF_CODE_UNPACK_V4_32, 1, 1);
-    sceVif1PkAddUpkData128N(packet, gifTag, 2 * quadCount + 1);
+    sceVif1PkAddUpkData128N(packet, gifTag, 2 * stripQuadCount + 1);
     sceVif1PkCloseUpkCode(packet);
 }
 
 /* Sends the grid: copies the block into the GIF tag, sends the transformed origin, then one strip per row pair and column group. */
-void tiWaterSendGrid(WaterStripGrid *grid, const void *block) {
+void tiWaterSendGrid(WaterStripGrid *grid, const void *gifTagBlock) {
     unsigned int strips;
     unsigned int row;
     unsigned int strip;
-    int first;
+    int firstColumn;
     int column;
     XglPacket *packet;
 
     strips = (grid->rowStride - 1) / tiWaterStripColumns;
     packet = xglCurrentPacket;
     if (grid->rowStride >= 2 && grid->rowCount >= 2) {
-        __builtin_memcpy((void *)SCRATCH_GIF_TAG, block, 16);
+        __builtin_memcpy((void *)SCRATCH_GIF_TAG, gifTagBlock, 16);
         xglVectorMulMat(&tiWatSimSourcePos[1], grid->transform, &tiWatSimSourcePos[0]);
         for (row = 0; row < grid->rowCount - 1; row++) {
             sceVif1PkCnt(packet, 0);
-            first = 0;
+            firstColumn = 0;
             column = 0;
             for (strip = 0; strip < strips; strip++) {
                 column += tiWaterStripColumns;
-                tiWaterSendStrip(first, column, row, grid);
-                first = column;
+                tiWaterSendStrip(firstColumn, column, row, grid);
+                firstColumn = column;
                 sceVif1PkAddCode(packet, VIF_CODE_MSCNT);
             }
             column = column + (grid->rowStride - tiWaterStripColumns * strips) - 1;
-            if (first < column) {
-                tiWaterSendStrip(first, column, row, grid);
+            if (firstColumn < column) {
+                tiWaterSendStrip(firstColumn, column, row, grid);
                 sceVif1PkAddCode(packet, VIF_CODE_MSCNT);
                 xglPacketFlush();
             }

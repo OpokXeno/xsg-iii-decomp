@@ -60,7 +60,7 @@ int _ModelCalcClipMat1Xy(const Vector4 *model)
  * cubic weighting when blend is not negative and the linear weights otherwise. */
 float pxyKeyInterpolate(const Vector4 *keyA, const Vector4 *keyB, float time, float blend)
 {
-    float result;
+    float interpolatedY;
 
     __asm__ __volatile__(
         ".set noat\n\t"
@@ -122,15 +122,15 @@ float pxyKeyInterpolate(const Vector4 *keyA, const Vector4 *keyB, float time, fl
         "mtc1 $2, %0\n\t"
         ".set reorder\n\t"
         ".set at\n\t"
-        : "=&f"(result)
+        : "=&f"(interpolatedY)
         : "r"(keyA), "r"(keyB), "f"(time), "f"(blend)
         : "$1", "$2", "$8", "$f1");
-    return result;
+    return interpolatedY;
 }
 
 /* Loads the four vectors at src, transforms them by the current matrix (vf27-vf29) into
  * the three result vectors and normalizes each result, storing the three vectors at dst. */
-void _CurMatrixMul33normXYZW(float *dst, const float *src)
+void _CurMatrixMul33normXYZW(float *normalizedVertices, const float *vertices)
 {
     __asm__ __volatile__(
         "lqc2 vf20, 0(%1)\n\t"
@@ -194,5 +194,5 @@ void _CurMatrixMul33normXYZW(float *dst, const float *src)
         "sqc2 vf23, 0(%0)\n\t"
         "sqc2 vf24, 16(%0)\n\t"
         "sqc2 vf25, 32(%0)\n\t"
-        : : "r"(dst), "r"(src) : "memory");
+        : : "r"(normalizedVertices), "r"(vertices) : "memory");
 }

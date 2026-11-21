@@ -13,9 +13,9 @@ void xglVectorMulMat(Vector4 *destination, Matrix4 matrix, const Vector4 *vector
 
 
 
-void tiWatSimStepRain(TiWatSimItem *item);
-void tiWatSimRandomizeItem(TiWatSimItem *item, int range);
-void tiWatSimDisturbAll(TiWaterSub *table, Vector4 *pPos);
+void tiWatSimStepRain(TiWatSimItem *waterGrid);
+void tiWatSimRandomizeItem(TiWatSimItem *waterGrid, int heightRange);
+void tiWatSimDisturbAll(TiWaterSub *waterSub, Vector4 *pPos);
 void tiWatSimStoreSourcePos(const Vector4 *position);
 
 #include "quadword.h"
@@ -43,12 +43,12 @@ extern const char tiWatSimPosAssertText[8];
 INCLUDE_ASM("asm/main/nonmatchings/TiWatSim", func_0024CA00);
 
 /* Normal of each interior cell from the height differences of buffer B, scaled by the cell spacing. */
-void tiWatSimComputeNormals(TiWatSimItem *item)
+void tiWatSimComputeNormals(TiWatSimItem *waterGrid)
 {
     DoublewordVector4 *normals; /* stores through the union carry alias set 0, like the original */
     u32 x;
     u32 y;
-    u32 index;
+    u32 cellIndex;
     u32 row;
     float dx;
     float dy;
@@ -56,37 +56,37 @@ void tiWatSimComputeNormals(TiWatSimItem *item)
     float length_squared;
     float inverse;
 
-    normals = (DoublewordVector4 *) (item->block + item->normals_offset);
-    for (y = 1; y < item->rows - 1; y++) {
-        row = y * item->cols;
-        for (x = 1; x < item->cols - 1; x++) {
-            index = row + x;
-            dx = item->height_buffer_b[index - 1] - item->height_buffer_b[index + 1];
-            normals[index].vector.x = dx;
-            dz = item->height_buffer_b[row - item->cols + x] - item->height_buffer_b[row + item->cols + x];
-            normals[index].vector.z = dz;
-            dy = item->cell_spacing + item->cell_spacing;
+    normals = (DoublewordVector4 *) (waterGrid->block + waterGrid->normals_offset);
+    for (y = 1; y < waterGrid->rows - 1; y++) {
+        row = y * waterGrid->cols;
+        for (x = 1; x < waterGrid->cols - 1; x++) {
+            cellIndex = row + x;
+            dx = waterGrid->height_buffer_b[cellIndex - 1] - waterGrid->height_buffer_b[cellIndex + 1];
+            normals[cellIndex].vector.x = dx;
+            dz = waterGrid->height_buffer_b[row - waterGrid->cols + x] - waterGrid->height_buffer_b[row + waterGrid->cols + x];
+            normals[cellIndex].vector.z = dz;
+            dy = waterGrid->cell_spacing + waterGrid->cell_spacing;
             length_squared = dx * dx + dy * dy + dz * dz;
             inverse = 1.0f / length_squared;
-            normals[index].vector.x = dx * inverse;
-            normals[index].vector.y = dy * inverse;
-            normals[index].vector.z = dz * inverse;
+            normals[cellIndex].vector.x = dx * inverse;
+            normals[cellIndex].vector.y = dy * inverse;
+            normals[cellIndex].vector.z = dz * inverse;
         }
     }
 }
 
-/* Rain: when the countdown is zero, one interior cell of the item loses drop_amount * 4.0f and
+/* Rain: when the countdown is zero, one interior cell of the waterGrid loses drop_amount * 4.0f and
  * the countdown is set again. */
-void tiWatSimStepRain(TiWatSimItem *item)
+void tiWatSimStepRain(TiWatSimItem *waterGrid)
 {
     int col;
     int row;
 
     if (tiWatSimRainCountdown == 0) {
-        col = xglSRand() % item->cols;
-        row = xglSRand() % item->rows;
-        if (col != 0 && row != 0 && col != item->cols - 1 && row != item->rows - 1) {
-            item->height_buffer_a[row * item->cols + col] -= item->drop_amount * 4.0f;
+        col = xglSRand() % waterGrid->cols;
+        row = xglSRand() % waterGrid->rows;
+        if (col != 0 && row != 0 && col != waterGrid->cols - 1 && row != waterGrid->rows - 1) {
+            waterGrid->height_buffer_a[row * waterGrid->cols + col] -= waterGrid->drop_amount * 4.0f;
         }
         tiWatSimRainCountdown = xglSRand() % TIWATSIM_RAIN_WAIT_SPREAD + TIWATSIM_RAIN_MIN_WAIT;
     }
@@ -94,86 +94,86 @@ void tiWatSimStepRain(TiWatSimItem *item)
 }
 
 /* Pushes the height buffer down at the grid cell under pPos: the cell loses drop_amount, its four neighbours half of it. */
-void tiWatSimDisturbAt(TiWatSimItem *item, Vector4 *pPos)
+void tiWatSimDisturbAt(TiWatSimItem *waterGrid, Vector4 *pPos)
 {
     Vector4 pos;
-    float half;
+    float neighbourDrop;
     float *mask;
     int col;
     int row;
-    int index;
+    int cellIndex;
 
-    half = item->drop_amount * 0.5f;
-    mask = (float *) (item->block + item->mask_offset);
-    if (item == NULL) {
+    neighbourDrop = waterGrid->drop_amount * 0.5f;
+    mask = (float *) (waterGrid->block + waterGrid->mask_offset);
+    if (waterGrid == NULL) {
         assertFailed(tiWatSimWaterAssertText, tiWatSimSourceFile, 218);
     }
     if (pPos == NULL) {
         assertFailed(tiWatSimPosAssertText, tiWatSimSourceFile, 219);
     }
-    xglVectorMulMat(&pos, item->matrix.rows, pPos);
-    pos.x = pos.x - item->grid_origin_x;
-    pos.z = pos.z - item->grid_origin_z;
-    col = (int) (pos.x / item->cell_spacing);
-    row = (int) (pos.z / -item->cell_spacing);
-    if (col > 0 && col < item->cols - 1 && row > 0 && row < item->rows - 1) {
-        index = row * item->cols + col;
-        if (mask[index] != 0.0f) {
-            item->height_buffer_a[index] = item->height_buffer_a[index] - item->drop_amount;
+    xglVectorMulMat(&pos, waterGrid->matrix.rows, pPos);
+    pos.x = pos.x - waterGrid->grid_origin_x;
+    pos.z = pos.z - waterGrid->grid_origin_z;
+    col = (int) (pos.x / waterGrid->cell_spacing);
+    row = (int) (pos.z / -waterGrid->cell_spacing);
+    if (col > 0 && col < waterGrid->cols - 1 && row > 0 && row < waterGrid->rows - 1) {
+        cellIndex = row * waterGrid->cols + col;
+        if (mask[cellIndex] != 0.0f) {
+            waterGrid->height_buffer_a[cellIndex] = waterGrid->height_buffer_a[cellIndex] - waterGrid->drop_amount;
             if (col - 1 >= 0) {
-                item->height_buffer_a[index - 1] = item->height_buffer_a[index - 1] - half;
+                waterGrid->height_buffer_a[cellIndex - 1] = waterGrid->height_buffer_a[cellIndex - 1] - neighbourDrop;
             }
             if (row - 1 >= 0) {
-                item->height_buffer_a[(row - 1) * item->cols + col] = item->height_buffer_a[(row - 1) * item->cols + col] - half;
+                waterGrid->height_buffer_a[(row - 1) * waterGrid->cols + col] = waterGrid->height_buffer_a[(row - 1) * waterGrid->cols + col] - neighbourDrop;
             }
-            if (col + 1 < item->cols) {
-                item->height_buffer_a[index + 1] = item->height_buffer_a[index + 1] - half;
+            if (col + 1 < waterGrid->cols) {
+                waterGrid->height_buffer_a[cellIndex + 1] = waterGrid->height_buffer_a[cellIndex + 1] - neighbourDrop;
             }
-            if (row + 1 < item->rows) {
-                item->height_buffer_a[(row + 1) * item->cols + col] = item->height_buffer_a[(row + 1) * item->cols + col] - half;
+            if (row + 1 < waterGrid->rows) {
+                waterGrid->height_buffer_a[(row + 1) * waterGrid->cols + col] = waterGrid->height_buffer_a[(row + 1) * waterGrid->cols + col] - neighbourDrop;
             }
         }
     }
 }
 
-/* Disturbs every item of the table at the position pointed to by pPos. */
-void tiWatSimDisturbAll(TiWaterSub *table, Vector4 *pPos)
+/* Disturbs every waterGrid of the table at the position pointed to by pPos. */
+void tiWatSimDisturbAll(TiWaterSub *waterSub, Vector4 *pPos)
 {
-    TiWatSimItem *item;
+    TiWatSimItem *cursorItem;
     u32 i;
 
-    item = table->items;
-    for (i = 0; i < table->active; i++) {
-        tiWatSimDisturbAt(item, pPos);
-        item++;
+    cursorItem = waterSub->items;
+    for (i = 0; i < waterSub->active; i++) {
+        tiWatSimDisturbAt(cursorItem, pPos);
+        cursorItem++;
     }
 }
 
-/* Gives each masked cell of the item a random height in a band scaled by range and clears buffer B. */
-void tiWatSimRandomizeItem(TiWatSimItem *item, int range)
+/* Gives each masked cell of the waterGrid a random height in a band scaled by range and clears buffer B. */
+void tiWatSimRandomizeItem(TiWatSimItem *waterGrid, int heightRange)
 {
     float *mask;
     u32 i;
 
-    mask = (float *) (item->block + item->mask_offset);
-    for (i = 0; i < item->cell_count; i++) {
+    mask = (float *) (waterGrid->block + waterGrid->mask_offset);
+    for (i = 0; i < waterGrid->cell_count; i++) {
         if (mask[i] != 0.0f) {
-            item->height_buffer_a[i] = (float) (xglSRand() % range) * 0.01f - (float) range * 0.005f;
-            item->height_buffer_b[i] = 0.0f;
+            waterGrid->height_buffer_a[i] = (xglSRand() % heightRange) * 0.01f - heightRange * 0.005f;
+            waterGrid->height_buffer_b[i] = 0.0f;
         }
     }
 }
 
-/* Randomizes every item of the table with the same range. */
-void tiWatSimRandomizeAll(TiWaterSub *table, int range)
+/* Randomizes every waterGrid of the table with the same range. */
+void tiWatSimRandomizeAll(TiWaterSub *waterSub, int heightRange)
 {
-    TiWatSimItem *item;
+    TiWatSimItem *cursorItem;
     u32 i;
 
-    item = table->items;
-    for (i = 0; i < table->active; i++) {
-        tiWatSimRandomizeItem(item, range);
-        item++;
+    cursorItem = waterSub->items;
+    for (i = 0; i < waterSub->active; i++) {
+        tiWatSimRandomizeItem(cursorItem, heightRange);
+        cursorItem++;
     }
 }
 

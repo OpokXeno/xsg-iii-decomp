@@ -5,7 +5,7 @@
 
 
 
-/* Messages in a thread's queue (sbChainReset: first 0, last 0xF). */
+/* Messages in a thread's queue (sbQueueReset: first 0, last 0xF). */
 #define SB_QUEUE_LAST 0xF
 
 
@@ -20,99 +20,129 @@ int VM_PLUGIN_CNT_GET(SbThread *thread)
     return thread->stack[thread->sp - 1];
 }
 
-/* Returns the word of argument argIndex (1-based) of the current call. */
-int vmArgGet(SbThread *thread, int argIndex)
+/* Returns the word of argument argumentNumber (1-based) of the current call. */
+int vmArgGet(SbThread *thread, int argumentNumber)
 {
     int *frameTop;
-    int argCount;
+    int argumentCount;
 
     frameTop = thread->stack + thread->sp;
-    argCount = frameTop[-1];
-    if (argCount < argIndex || argIndex == 0) {
+    argumentCount = frameTop[-1];
+    if (argumentCount < argumentNumber || argumentNumber == 0) {
         sbFatal(thread);
     }
-    return frameTop[-2 - (argCount - argIndex)];
+    return frameTop[-2 - (argumentCount - argumentNumber)];
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4058);
+extern f32 gSbArgFloatScale;
 
-/* Returns the tag byte of argument argIndex (1-based) of the current call. */
-int vmArgTagGet(SbThread *thread, int argIndex)
+/* Returns argument argumentNumber (1-based) of the current call as a float, scaled by gSbArgFloatScale. */
+f32 vmArgFloatGet(SbThread *thread, int argumentNumber)
+{
+    return vmArgGet(thread, argumentNumber) * gSbArgFloatScale;
+}
+
+/* Returns the tag byte of argument argumentNumber (1-based) of the current call. */
+int vmArgTagGet(SbThread *thread, int argumentNumber)
 {
     int *frameTop;
     signed char *tagTop;
-    int argCount;
+    int argumentCount;
 
     frameTop = thread->stack + thread->sp;
     tagTop = thread->tags + thread->sp;
-    argCount = frameTop[-1];
-    if (argCount < argIndex || argIndex == 0) {
+    argumentCount = frameTop[-1];
+    if (argumentCount < argumentNumber || argumentNumber == 0) {
         sbFatal(thread);
     }
-    return tagTop[-2 - (argCount - argIndex)];
+    return tagTop[-2 - (argumentCount - argumentNumber)];
 }
 
 /*
- * Reports whether argument argIndex has a zero tag. An index past the frame's argument count returns 1.
+ * Reports whether argument argumentNumber has a zero tag. An index past the frame's argument count returns 1.
  */
-int vmArgTagIsZero(SbThread *thread, int argIndex)
+int vmArgTagIsZero(SbThread *thread, int argumentNumber)
 {
     int *frameTop;
     signed char *tagTop;
-    int argCount;
+    int argumentCount;
 
     frameTop = thread->stack + thread->sp;
     tagTop = thread->tags + thread->sp;
-    if (argIndex == 0) {
+    if (argumentNumber == 0) {
         sbFatal(thread);
     }
-    argCount = frameTop[-1];
-    if (!(argCount >= argIndex)) {
+    argumentCount = frameTop[-1];
+    if (!(argumentCount >= argumentNumber)) {
         return 1;
     }
-    return tagTop[-2 - (argCount - argIndex)] == 0;
+    return tagTop[-2 - (argumentCount - argumentNumber)] == 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4188);
+/* Returns argument argumentNumber of the current call when its tag is nonzero, else fallbackValue. */
+int vmArgGetOrDefault(SbThread *thread, int argumentNumber, int fallbackValue)
+{
+    int argumentValue;
+
+    argumentValue = fallbackValue;
+    if (vmArgTagIsZero(thread, argumentNumber) == 0) {
+        argumentValue = vmArgGet(thread, argumentNumber);
+    }
+    return argumentValue;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D41E0);
 
-/* A keyed table: the words of its index array start index_offset bytes from the table, count entries long; the
+/* A keyed table: the words of its index array start keyIndexOffset bytes from the table, count entries long; the
  * entry data follows the count index words. */
 struct SbKeyTable {
-    int index_offset;                   /* +0x00 */
-    int count;                          /* +0x04 */
+    int keyIndexOffset;                   /* +0x00 */
+    int keyCount;                          /* +0x04 */
 };
 
 /* Table of the image's keys (a leaf in main/tu105). */
-struct SbKeyTable *func_001D1340(struct SbImageHeader *image);
+struct SbKeyTable *sbKeyTable(struct SbImageHeader *image);
 
 /* Address of the keyed entry `key`, or 0 when key is past the table. */
 char *vmKeyedEntryGet(SbThread *thread, int key)
 {
-    struct SbKeyTable *table;
-    char *indexBase;
+    struct SbKeyTable *keyTable;
+    char *keyIndexArray;
 
-    table = func_001D1340(thread->image);
-    if (!(key < table->count)) {
+    keyTable = sbKeyTable(thread->image);
+    if (!(key < keyTable->keyCount)) {
         return 0;
     }
-    indexBase = (char *)table + table->index_offset;
-    return indexBase + table->count * 4 + ((int *)indexBase)[key];
+    keyIndexArray = (char *)keyTable + keyTable->keyIndexOffset;
+    return keyIndexArray + keyTable->keyCount * 4 + ((int *)keyIndexArray)[key];
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4298);
+/* Address of entry `index` of the library image linked into the thread's image (image->keys): the entry
+ * count is at the header's +8, the name index array at its name_table offset, the entry data at the
+ * offset stored at +0x18 (a field the SbImageHeader struct does not name yet). */
+void *sbLibraryEntryGet(SbThread *thread, int libraryEntryIndex)
+{
+    struct SbImageHeader *library;
+    char *nameIndexArray;
+
+    library = thread->image->keys;
+    if (libraryEntryIndex >= library->entry) {
+        return 0;
+    }
+    nameIndexArray = (char *) library + library->name_table;
+    return (char *) library + ((int *) library)[0x18 / 4] + ((int *) nameIndexArray)[libraryEntryIndex];
+}
 
 /* Base of the image's global table (a leaf in main/tu105). */
-int *func_001D1328(struct SbImageHeader *image);
+int *sbGlobalSection(struct SbImageHeader *image);
 
 /* Address of global word `index` of the thread's image, as vmEntryGet computes it. */
-int func_001D42D8(SbThread *thread, int index)
+int sbGlobalEntryGet(SbThread *thread, int globalWordNumber)
 {
-    int base;
+    int globalTableAddress;
 
-    base = (int)func_001D1328(thread->image);
-    return base + func_001D1328(thread->image)[0] + index * 4;
+    globalTableAddress = (int)sbGlobalSection(thread->image);
+    return globalTableAddress + sbGlobalSection(thread->image)[0] + globalWordNumber * 4;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4330);
@@ -122,8 +152,47 @@ void sbFatalReport(SbThread *thread, int pc)
 {
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D43B0);
+extern unsigned char gSbStudioBlock[];
+void cameraTablesReset();
+void cameraPendingClear();
+void cameraSlotsReset();
+struct XglCamera *xglStudioGetCamera2(int camera_index);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4400);
+/* The xgl camera fields this file touches (the full struct is in main/xgl_2.h, not included here). */
+struct XglCamera {
+    unsigned int active;
+    unsigned int cameraState;
+};
+
+/* The block at gSbStudioBlock; its 64-bit word at +0x10 has bit 0 cleared by sbStudioCameraReset. */
+typedef struct SbStudioBlock {
+    unsigned char unmodeled_00[0x10];
+    long long studioFlags; /* +0x10 */
+} SbStudioBlock;
+
+/* The status block at gSbStudioBlock as an lvalue. */
+#define SB_STUDIO_BLOCK (*(SbStudioBlock *) gSbStudioBlock)
+
+void sbStudioCameraReset(void)
+{
+    long long studioFlags;
+
+    xglStudioGetCamera2(0)->cameraState = 4;
+    cameraTablesReset();
+    cameraSlotsReset();
+    cameraPendingClear();
+    studioFlags = SB_STUDIO_BLOCK.studioFlags & (~1);
+    SB_STUDIO_BLOCK.studioFlags = studioFlags;
+}
+
+extern signed char D_003E0173[];
+
+void sbStudioCameraResetIfFlagged(void) {
+    if (D_003E0173[0] == 1) {
+        cameraTablesReset();
+        cameraSlotsReset();
+        cameraPendingClear();
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4448);

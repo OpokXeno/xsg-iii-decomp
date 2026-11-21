@@ -4,34 +4,51 @@ INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E510);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E5B0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E7D0);
+typedef int s32;
+extern s32 gPxyLightDirtyFlag;
 
-INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E7E0);
+void pxyStateSetLightDirty(void) {
+    gPxyLightDirtyFlag = 1;
+}
+
+extern s32 gPxyDirtyFlag;
+
+void pxyStateSetDirty(void) {
+    gPxyDirtyFlag = 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E7F0);
 
 extern unsigned int D_008C2C90[];
 
-void func_0019E808(unsigned int value)
+void pxyStateSetWord0(unsigned int word0)
 {
-    D_008C2C90[0] = value;
+    D_008C2C90[0] = word0;
 }
 
-extern struct {
+typedef struct PxyModelRenderState {
     unsigned char unmodeled_000[0x300];
-    unsigned int flags; /* +0x300 */
-} D_008C28B0;
+    unsigned int renderStatus; /* +0x300 */
+} PxyModelRenderState;
 
-void func_0019E818(void)
+extern PxyModelRenderState gPxyModelRenderStateStorage;
+
+void pxyRenderStatusSetBit10(void)
 {
-    D_008C28B0.flags |= 0x400;
+    gPxyModelRenderStateStorage.renderStatus |= 0x400;
 }
 
-void func_0019E830(const void *src)
+void pxyModelRenderStateLoadLight(const void *lightSet)
 {
-    __builtin_memcpy(&D_008C28B0, src, 0x180);
+    __builtin_memcpy(&gPxyModelRenderStateStorage, lightSet, 0x180);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E8E8);
+PxyModelRenderState *pxyModelRenderStateGet(void) {
+    return &gPxyModelRenderStateStorage;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E8F8);
+void func_001975C8(void *block);
+
+void pxyModelRenderStateInitLight(void) {
+    func_001975C8(&gPxyModelRenderStateStorage);
+}

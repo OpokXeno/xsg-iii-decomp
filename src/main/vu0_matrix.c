@@ -4,7 +4,7 @@
 /* The identity matrix the rotation functions start from (test_128.c defines it). */
 extern const Vector4 vu0IdentityMatrix[4];
 
-void vu0CurMatrixMulRight3(Vector4 *rows);
+void vu0CurMatrixMulRightAffine(Vector4 *rows);
 void vu0SetCurrentRotationX(float angle);
 void vu0SetCurrentRotationY(float angle);
 void vu0SetCurrentRotationZ(float angle);
@@ -12,7 +12,7 @@ void vu0SetCurrentRotationZ(float angle);
 #include "vu0_macro.h"
 
 /* Current matrix = current x [M; (0,0,0,1)] for three argument rows; row 3 is untouched. */
-void vu0CurMatrixMulRight3(Vector4 *rows) {
+void vu0CurMatrixMulRightAffine(Vector4 *rows) {
     __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(rows) : "memory");
     __asm__ __volatile__("lqc2 vf2, 16(%0)" : : "r"(rows) : "memory");
     __asm__ __volatile__("lqc2 vf3, 32(%0)" : : "r"(rows) : "memory");

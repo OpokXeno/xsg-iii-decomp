@@ -15,61 +15,114 @@ INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029F548);
 
 INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029F9A0);
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FA80);
+typedef int s32;
+typedef signed char s8;
+#include "quadword.h"
+/* Parts state returned by func_0029F9A0: flagBits at 0, a float at 4 and a float at 8 (set by XrgPartsSetTime and XrgPartsSetWeight). */
+typedef struct XrgPartsState {
+    s32 flagBits;
+    f32 time;
+    f32 weight;
+} XrgPartsState;
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FAC0);
+XrgPartsState *func_0029F9A0();
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FB00);
+void XrgPartsSetFlags(s32 unused_arg0, s32 unused_arg1, s32 bitsToSet) {
+    XrgPartsState *animPartsState;
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FB28);
+    animPartsState = func_0029F9A0();
+    if (animPartsState != 0) {
+        animPartsState->flagBits |= bitsToSet;
+    }
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FB58);
+void XrgPartsClearFlags(s32 unused_arg0, s32 unused_arg1, s32 bitsToClear) {
+    XrgPartsState *animPartsState;
+
+    animPartsState = func_0029F9A0();
+    if (animPartsState != 0) {
+        animPartsState->flagBits &= ~bitsToClear;
+    }
+}
+
+void XrgPartsResetFlags(void) {
+    XrgPartsState *animPartsState;
+
+    animPartsState = func_0029F9A0();
+    if (animPartsState != 0) {
+        animPartsState->flagBits = 0;
+    }
+}
+
+void XrgPartsSetWeight(f32 newWeight) {
+    XrgPartsState *animPartsState;
+
+    animPartsState = func_0029F9A0();
+    if (animPartsState != 0) {
+        animPartsState->weight = newWeight;
+    }
+}
+
+void XrgPartsSetTime(f32 newTime) {
+    XrgPartsState *animPartsState;
+
+    animPartsState = func_0029F9A0();
+    if (animPartsState != 0) {
+        animPartsState->time = newTime;
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FB88);
 
 INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FC60);
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029FF80);
+s32 xacReadJointCurves24(s32 *, s32, f32);
+
+void XrgReadJointCurves(s32 curveSetIndex) {
+    s32 jointCurveWords[0x18];
+
+    xacReadJointCurves24(&jointCurveWords[0], curveSetIndex, 0.0f);
+}
 
 /* Four-component scale: dst = src * scale (same body as XrgScaleVector in X1 ov12). */
-void XrgScaleVector(Vector4 *dst, Vector4 *src, float scale) {
-    dst->x = src->x * scale;
-    dst->y = src->y * scale;
-    dst->z = src->z * scale;
-    dst->w = src->w * scale;
+void XrgScaleVector(Vector4 *scaledVector, Vector4 *inputVector, float scale) {
+    scaledVector->x = inputVector->x * scale;
+    scaledVector->y = inputVector->y * scale;
+    scaledVector->z = inputVector->z * scale;
+    scaledVector->w = inputVector->w * scale;
 }
 
 /* Componentwise product of two vectors, all four components. */
-void XrgMultiplyVector(Vector4 *dst, Vector4 *lhs, Vector4 *rhs) {
-    dst->x = lhs->x * rhs->x;
-    dst->y = lhs->y * rhs->y;
-    dst->z = lhs->z * rhs->z;
-    dst->w = lhs->w * rhs->w;
+void XrgMultiplyVector(Vector4 *productVector, Vector4 *leftVector, Vector4 *rightVector) {
+    productVector->x = leftVector->x * rightVector->x;
+    productVector->y = leftVector->y * rightVector->y;
+    productVector->z = leftVector->z * rightVector->z;
+    productVector->w = leftVector->w * rightVector->w;
 }
 
 /* In-place accumulate: dst += src, all four components. */
-void XrgAccumulateVector(Vector4 *dst, Vector4 *src) {
-    dst->x += src->x;
-    dst->y += src->y;
-    dst->z += src->z;
-    dst->w += src->w;
+void XrgAccumulateVector(Vector4 *accumulator, Vector4 *addendVector) {
+    accumulator->x += addendVector->x;
+    accumulator->y += addendVector->y;
+    accumulator->z += addendVector->z;
+    accumulator->w += addendVector->w;
 }
 
 /* Scales a quaternion to unit length into destination; a zero length is replaced by 1e-8f before the division. */
-void XrgQuaternionNormalize(Vector4 *destination, Vector4 *source)
+void XrgQuaternionNormalize(Vector4 *normalizedQuat, Vector4 *inputQuat)
 {
     f32 length;
 
-    length = __builtin_sqrtf(source->x * source->x + source->y * source->y + source->z * source->z + source->w * source->w);
+    length = __builtin_sqrtf(inputQuat->x * inputQuat->x + inputQuat->y * inputQuat->y + inputQuat->z * inputQuat->z + inputQuat->w * inputQuat->w);
     if (length == 0.0f)
     {
         length = 0.00000001f;
     }
     length = 1.0f / length;
-    destination->x = source->x * length;
-    destination->y = source->y * length;
-    destination->z = source->z * length;
-    destination->w = source->w * length;
+    normalizedQuat->x = inputQuat->x * length;
+    normalizedQuat->y = inputQuat->y * length;
+    normalizedQuat->z = inputQuat->z * length;
+    normalizedQuat->w = inputQuat->w * length;
 }
 
 /* Quaternion from Euler angles (x, y, z in radians), halved; the product of the three axis rotations, normalised in place. */
@@ -138,57 +191,57 @@ void XrgAxisAngleToQuaternion(Vector4 *quaternion, Vector4 *axis_angle)
     quaternion->z = axis_angle->z * sin_half_angle;
 }
 
-float XrgInnerVector(Vector4 *first, Vector4 *second)
+float XrgInnerVector(Vector4 *leftVector, Vector4 *rightVector)
 {
-    return first->x * second->x + first->y * second->y + first->z * second->z;
+    return leftVector->x * rightVector->x + leftVector->y * rightVector->y + leftVector->z * rightVector->z;
 }
 
-void XrgOuterVector(Vector4 *destination, Vector4 *first, Vector4 *second)
+void XrgOuterVector(Vector4 *crossVector, Vector4 *leftVector, Vector4 *rightVector)
 {
-    destination->x = first->y * second->z - first->z * second->y;
-    destination->y = first->z * second->x - first->x * second->z;
-    destination->z = first->x * second->y - first->y * second->x;
+    crossVector->x = leftVector->y * rightVector->z - leftVector->z * rightVector->y;
+    crossVector->y = leftVector->z * rightVector->x - leftVector->x * rightVector->z;
+    crossVector->z = leftVector->x * rightVector->y - leftVector->y * rightVector->x;
 }
 
-void XrgQuaternionCombine(Vector4 *result, Vector4 *first, Vector4 *second)
+void XrgQuaternionCombine(Vector4 *combinedQuat, Vector4 *leftQuat, Vector4 *rightQuat)
 {
-    Vector4 scaled_first;
-    Vector4 scaled_second;
-    Vector4 cross;
-    Vector4 sum;
+    Vector4 scaledLeft;
+    Vector4 scaledRight;
+    Vector4 crossVector;
+    Vector4 sumVector;
     f32 dot;
 
-    scaled_first = *first;
-    XrgScaleVector(&scaled_first, &scaled_first, first->w);
-    scaled_second = *second;
-    XrgScaleVector(&scaled_second, &scaled_second, second->w);
-    XrgOuterVector(&cross, second, first);
-    sum.x = scaled_first.x + scaled_second.x + cross.x;
-    sum.y = scaled_first.y + scaled_second.y + cross.y;
-    sum.z = scaled_first.z + scaled_second.z + cross.z;
-    sum.w = scaled_first.w + scaled_second.w + cross.w;
-    dot = XrgInnerVector(first, second);
+    scaledLeft = *leftQuat;
+    XrgScaleVector(&scaledLeft, &scaledLeft, leftQuat->w);
+    scaledRight = *rightQuat;
+    XrgScaleVector(&scaledRight, &scaledRight, rightQuat->w);
+    XrgOuterVector(&crossVector, rightQuat, leftQuat);
+    sumVector.x = scaledLeft.x + scaledRight.x + crossVector.x;
+    sumVector.y = scaledLeft.y + scaledRight.y + crossVector.y;
+    sumVector.z = scaledLeft.z + scaledRight.z + crossVector.z;
+    sumVector.w = scaledLeft.w + scaledRight.w + crossVector.w;
+    dot = XrgInnerVector(leftQuat, rightQuat);
     {
-        f32 w = first->w * second->w - dot;
-        result->x = sum.x;
-        result->y = sum.y;
-        result->z = sum.z;
-        result->w = w;
+        f32 w = leftQuat->w * rightQuat->w - dot;
+        combinedQuat->x = sumVector.x;
+        combinedQuat->y = sumVector.y;
+        combinedQuat->z = sumVector.z;
+        combinedQuat->w = w;
     }
 }
 
 /* Hamilton product of two quaternions into result; both operands are copied before the first store, since result may alias one of them. */
-void XrgQuaternionMultiply(Vector4 *result, Vector4 *first, Vector4 *second)
+void XrgQuaternionMultiply(Vector4 *productQuat, Vector4 *leftQuat, Vector4 *rightQuat)
 {
-    Vector4 a;
-    Vector4 b;
+    Vector4 leftCopy;
+    Vector4 rightCopy;
 
-    a = *first;
-    b = *second;
-    result->x = a.w * b.x + a.x * b.w + a.y * b.z - a.z * b.y;
-    result->y = a.w * b.y - a.x * b.z + a.y * b.w + a.z * b.x;
-    result->z = a.w * b.z + a.x * b.y - a.y * b.x + a.z * b.w;
-    result->w = a.w * b.w - a.x * b.x - a.y * b.y - a.z * b.z;
+    leftCopy = *leftQuat;
+    rightCopy = *rightQuat;
+    productQuat->x = leftCopy.w * rightCopy.x + leftCopy.x * rightCopy.w + leftCopy.y * rightCopy.z - leftCopy.z * rightCopy.y;
+    productQuat->y = leftCopy.w * rightCopy.y - leftCopy.x * rightCopy.z + leftCopy.y * rightCopy.w + leftCopy.z * rightCopy.x;
+    productQuat->z = leftCopy.w * rightCopy.z + leftCopy.x * rightCopy.y - leftCopy.y * rightCopy.x + leftCopy.z * rightCopy.w;
+    productQuat->w = leftCopy.w * rightCopy.w - leftCopy.x * rightCopy.x - leftCopy.y * rightCopy.y - leftCopy.z * rightCopy.z;
 }
 
 #include "quadword.h"
@@ -196,51 +249,51 @@ void XrgQuaternionMultiply(Vector4 *result, Vector4 *first, Vector4 *second)
 void xglVectorInner(float *destination, const Vector4 *left, const Vector4 *right);
 
 /* Spherical interpolation from one quaternion toward another, by the angle between them, falling back to a copy of from when they are nearly equal. */
-void XrgQuaternionSlerp(Vector4 *result, Vector4 *from, Vector4 *to, f32 t)
+void XrgQuaternionSlerp(Vector4 *slerpedQuat, Vector4 *startQuat, Vector4 *endQuat, f32 blend)
 {
     f32 dot;
     f32 theta;
-    f32 to_weight;
-    f32 from_weight;
+    f32 endWeight;
+    f32 startWeight;
     f32 inv_sin;
 
-    xglVectorInner(&dot, from, to);
-    XrgQuaternionNormalize(from, from);
-    XrgQuaternionNormalize(to, to);
+    xglVectorInner(&dot, startQuat, endQuat);
+    XrgQuaternionNormalize(startQuat, startQuat);
+    XrgQuaternionNormalize(endQuat, endQuat);
     if (dot > 0.99999f)
     {
-        QuadwordCopy(result, from);
+        QuadwordCopy(slerpedQuat, startQuat);
         return;
     }
     if (dot < -0.2f)
     {
         dot = -dot;
-        from->x = -from->x;
-        from->y = -from->y;
-        from->z = -from->z;
-        from->w = -from->w;
+        startQuat->x = -startQuat->x;
+        startQuat->y = -startQuat->y;
+        startQuat->z = -startQuat->z;
+        startQuat->w = -startQuat->w;
     }
     theta = acosf(dot);
     inv_sin = sinf(theta);
-    to_weight = sinf(theta * t);
-    from_weight = sinf(theta * (1.0f - t));
+    endWeight = sinf(theta * blend);
+    startWeight = sinf(theta * (1.0f - blend));
     inv_sin = 1.0f / inv_sin;
-    result->x = (from->x * from_weight + to->x * to_weight) * inv_sin;
-    result->y = (from->y * from_weight + to->y * to_weight) * inv_sin;
-    result->z = (from->z * from_weight + to->z * to_weight) * inv_sin;
-    result->w = (from->w * from_weight + to->w * to_weight) * inv_sin;
-    XrgQuaternionNormalize(result, result);
+    slerpedQuat->x = (startQuat->x * startWeight + endQuat->x * endWeight) * inv_sin;
+    slerpedQuat->y = (startQuat->y * startWeight + endQuat->y * endWeight) * inv_sin;
+    slerpedQuat->z = (startQuat->z * startWeight + endQuat->z * endWeight) * inv_sin;
+    slerpedQuat->w = (startQuat->w * startWeight + endQuat->w * endWeight) * inv_sin;
+    XrgQuaternionNormalize(slerpedQuat, slerpedQuat);
 }
 
 /* Normalised linear interpolation: result = from + blend * (to - from) on all four components,
  * then renormalised by XrgQuaternionNormalize. */
-void XrgQuaternionLerpNormalized(Vector4 *result, Vector4 *from, Vector4 *to, f32 blend)
+void XrgQuaternionLerpNormalized(Vector4 *lerpedQuat, Vector4 *startQuat, Vector4 *endQuat, f32 blend)
 {
-    result->x = from->x + blend * (to->x - from->x);
-    result->y = from->y + blend * (to->y - from->y);
-    result->z = from->z + blend * (to->z - from->z);
-    result->w = from->w + blend * (to->w - from->w);
-    XrgQuaternionNormalize(result, result);
+    lerpedQuat->x = startQuat->x + blend * (endQuat->x - startQuat->x);
+    lerpedQuat->y = startQuat->y + blend * (endQuat->y - startQuat->y);
+    lerpedQuat->z = startQuat->z + blend * (endQuat->z - startQuat->z);
+    lerpedQuat->w = startQuat->w + blend * (endQuat->w - startQuat->w);
+    XrgQuaternionNormalize(lerpedQuat, lerpedQuat);
 }
 
 /* Unit quaternion (x, y, z, w) to a row-major rotation matrix; the last column is zero except m[3][3] = 1. */

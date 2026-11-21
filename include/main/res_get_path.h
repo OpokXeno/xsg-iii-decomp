@@ -8,7 +8,7 @@
 #include "ov02/tu060.h"
 
 /* The command queue item every handler of unitCommandTable receives (the queue copies its first 0x18 bytes; callers build it as a 0x20-byte local). */
-typedef struct Ov01Command Ov01Command;
+typedef struct BattleUnitCommand BattleUnitCommand;
 
 /*
  * Slide block: the 0x80-byte subobject the slide steps work on. The callers pass it by address
@@ -21,7 +21,7 @@ typedef struct SlideBlock SlideBlock;
 typedef struct StatBlock StatBlock;
 
 /* The command queue item every handler of unitCommandTable receives (the queue copies its first 0x18 bytes; callers build it as a 0x20-byte local). */
-struct Ov01Command {
+struct BattleUnitCommand {
     int command; /* +0x0: the table index unitRunCommands dispatches on; the move dispatchers store the command they run */
     int state; /* +0x4: zero until the one-shot start has run */
     int code; /* +0x8: the key, id or motion code the command carries */

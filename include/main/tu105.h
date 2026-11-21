@@ -13,13 +13,13 @@ typedef struct SbMessage SbMessage;
 /* One native method record (12 bytes, the sbNativeOwnerAdd copy moves it whole): name, the function, a third word. */
 typedef struct SbNativeMethod SbNativeMethod;
 
-/* A thread's message queue (sbChainGet, 0x114 bytes): a ring of message indices from
+/* A thread's message queue (sbQueueGet, 0x114 bytes): a ring of message indices from
  * first to last, the read index head, the write index tail and the count used;
  * sbThreadEnqueue writes messages[tail], sbThreadDequeue reads messages[head]. */
 typedef struct SbQueue SbQueue;
 
 /* One 0x10-byte slot of a thread's slot table: key 0 marks a free slot.
- * sbSlotStore copies whole slots; the rest of the slot is not read here. */
+ * sbThreadSlotStore copies whole slots; the rest of the slot is not read here. */
 typedef struct SbSlot SbSlot;
 
 /*
@@ -62,12 +62,12 @@ struct SbNativeMethod {
     unsigned char unmodeled_08[0x4];    /* +0x08 */
 };
 
-/* A thread's message queue (sbChainGet, 0x114 bytes): a ring of message indices from
+/* A thread's message queue (sbQueueGet, 0x114 bytes): a ring of message indices from
  * first to last, the read index head, the write index tail and the count used;
  * sbThreadEnqueue writes messages[tail], sbThreadDequeue reads messages[head]. */
 struct SbQueue {
-    int first;                          /* +0x00 */
-    int last;                           /* +0x04 */
+    int ringFirstIndex;                          /* +0x00 */
+    int ringLastIndex;                           /* +0x04 */
     int head;                           /* +0x08: read index */
     int tail;                           /* +0x0C: write index */
     int used;                           /* +0x10 */
@@ -75,7 +75,7 @@ struct SbQueue {
 };
 
 /* One 0x10-byte slot of a thread's slot table: key 0 marks a free slot.
- * sbSlotStore copies whole slots; the rest of the slot is not read here. */
+ * sbThreadSlotStore copies whole slots; the rest of the slot is not read here. */
 struct SbSlot {
     int key;                            /* +0x00: 0 marks a free slot */
     int target;                         /* +0x04 */
@@ -97,7 +97,7 @@ struct SbThread {
     int jumpKey;                        /* +0x10: pending slot jump */
     int jumpPosition;                   /* +0x14 */
     struct SbImageHeader *image;        /* +0x18: key (0 marks a free record) */
-    int value;                          /* +0x1C */
+    int entryPc;                          /* +0x1C */
     int *stack;                         /* +0x20 */
     unsigned char *tags;                /* +0x24: one byte per stack word */
     int stackLimit;                     /* +0x28 */

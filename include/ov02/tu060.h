@@ -13,7 +13,7 @@
 typedef struct BattleUnit BattleUnit;
 
 /* The part of a pool entry that unitTblSet reads: the lookup key halfword at +0x3E. */
-typedef struct UnitPoolEntry UnitPoolEntry;
+typedef struct BattleUnitLookupKeyView BattleUnitLookupKeyView;
 
 /* Partial actor: the light block sits at +0x140, the bytes before it are not claimed here. */
 typedef struct LightActor {
@@ -24,16 +24,16 @@ typedef struct LightActor {
 /* Partial battle unit: only the actor pointer at +0x2B4 is claimed. */
 struct BattleUnit {
     unsigned char unmodeled_00[0xC];    /* +0x00 */
-    unsigned int flags;                 /* +0x0C */
+    unsigned int targetingFlags;                 /* +0x0C */
     unsigned char commandQueue[0x12C];  /* +0x10: the command queue (a DataLookup block) */
     unsigned char unmodeled_13C[0x2B0 - 0x13C];
     union {                             /* +0x2B0: one pointer, seen through three partial records */
-        struct UnitPoolEntry *poolEntry; /* lookupKey at +0x3E */
+        struct BattleUnitLookupKeyView *lookupKeyRecord; /* lookupKey at +0x3E */
         struct UnitBitTable *bitTable;   /* byBit[2][32] at +0x90 */
         struct BattleStats *stats;
     };
-    union {                             /* +0x2B4: the unit's motion actor */
-        struct XenoActor *unit;
+    union {                             /* +0x2B4: the motionActor's motion actor */
+        struct XenoActor *motionActor;
         struct LightActor *lightActor;  /* lights at +0x140 of the same actor */
     };
     struct XenoActor *children[4];      /* +0x2B8 */
@@ -42,7 +42,7 @@ struct BattleUnit {
 };
 
 /* The part of a pool entry that unitTblSet reads: the lookup key halfword at +0x3E. */
-struct UnitPoolEntry {
+struct BattleUnitLookupKeyView {
     unsigned char unmodeled_00[0x3E];
     short lookupKey;                    /* +0x3E */
 };

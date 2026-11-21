@@ -3,7 +3,7 @@
 
 /* Row-major 4x4 float matrix. */
 
-void xglMatrixFromAxes(Matrix4 matrix, const Vector4 *axis0, const Vector4 *axis1, const Vector4 *axis2);
+void xglMatrixFromAxes(Matrix4 matrix, const Vector4 *firstRowAxis, const Vector4 *secondRowAxis, const Vector4 *thirdRowAxis);
 void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
 void xglVectorNormal(Vector4 *destination, const Vector4 *source);
 
@@ -22,71 +22,71 @@ void xglVectorNormal(Vector4 *destination, const Vector4 *source);
  */
 void xglVu1ReadFloatRegisters(void)
 {
-    AlignedVector4 scratch;
+    AlignedVector4 discardedQuad;
     int i;
 
     __asm__ __volatile__("ctc2 %0,$vi1" : : "r"(VU1_FLOAT_WINDOW) : "memory");
     for (i = VU1_FLOAT_REGISTER_QUADS - 1; i >= 0; i--) {
         __asm__ __volatile__("vlqi.xyzw $vf2xyzw,($vi1++)" : : : "memory");
-        __asm__ __volatile__("sqc2 $vf2,0(%0)" : : "r"(&scratch) : "memory");
+        __asm__ __volatile__("sqc2 $vf2,0(%0)" : : "r"(&discardedQuad) : "memory");
     }
 }
 
 /* Transposes a 4x4 matrix. The source is copied first because callers pass the
  * same matrix as both arguments (xglMatrixFromAxes). */
-void xglMatrixReverseInPlace(Matrix4 destination, Matrix4 source)
+void xglMatrixReverseInPlace(Matrix4 transposed, Matrix4 original)
 {
-    Matrix4 source_copy;
+    Matrix4 originalCopy;
 
-    QuadwordCopyMatrix(source_copy, source);
-    destination[0][0] = source_copy[0][0];
-    destination[0][1] = source_copy[1][0];
-    destination[0][2] = source_copy[2][0];
-    destination[0][3] = source_copy[3][0];
-    destination[1][0] = source_copy[0][1];
-    destination[1][1] = source_copy[1][1];
-    destination[1][2] = source_copy[2][1];
-    destination[1][3] = source_copy[3][1];
-    destination[2][0] = source_copy[0][2];
-    destination[2][1] = source_copy[1][2];
-    destination[2][2] = source_copy[2][2];
-    destination[2][3] = source_copy[3][2];
-    destination[3][0] = source_copy[0][3];
-    destination[3][1] = source_copy[1][3];
-    destination[3][2] = source_copy[2][3];
-    destination[3][3] = source_copy[3][3];
+    QuadwordCopyMatrix(originalCopy, original);
+    transposed[0][0] = originalCopy[0][0];
+    transposed[0][1] = originalCopy[1][0];
+    transposed[0][2] = originalCopy[2][0];
+    transposed[0][3] = originalCopy[3][0];
+    transposed[1][0] = originalCopy[0][1];
+    transposed[1][1] = originalCopy[1][1];
+    transposed[1][2] = originalCopy[2][1];
+    transposed[1][3] = originalCopy[3][1];
+    transposed[2][0] = originalCopy[0][2];
+    transposed[2][1] = originalCopy[1][2];
+    transposed[2][2] = originalCopy[2][2];
+    transposed[2][3] = originalCopy[3][2];
+    transposed[3][0] = originalCopy[0][3];
+    transposed[3][1] = originalCopy[1][3];
+    transposed[3][2] = originalCopy[2][3];
+    transposed[3][3] = originalCopy[3][3];
 }
 
 /* Builds a 4x4 matrix whose rows are the normalized negated axes, with a last row of (0, 0, 0, 1). */
-void xglMatrixFromAxes(Matrix4 matrix, const Vector4 *axis0, const Vector4 *axis1, const Vector4 *axis2)
+void xglMatrixFromAxes(Matrix4 matrix, const Vector4 *firstRowAxis, const Vector4 *secondRowAxis, const Vector4 *thirdRowAxis)
 {
     Vector4 row;
     unsigned int i;
 
-    xglVectorScaleXYZ(&row, axis0, -1.0f);
+    xglVectorScaleXYZ(&row, firstRowAxis, -1.0f);
     xglVectorNormal(&row, &row);
     for (i = 0; i < 4; i++) {
-        float *dst = matrix[0] + i;
-        float *src = &row.x + i;
+        float *matrixElement = matrix[0] + i;
+        float *rowComponent = &row.x + i;
 
-        *dst = *src;
+        *matrixElement = *rowComponent;
     }
-    xglVectorScaleXYZ(&row, axis1, -1.0f);
+    xglVectorScaleXYZ(&row, secondRowAxis, -1.0f);
     xglVectorNormal(&row, &row);
     {
-        float *src = &row.x;
+        float *rowComponents = &row.x;
 
         for (i = 0; i < 4; i++) {
-            matrix[1][i] = src[i];
+            matrix[1][i] = rowComponents[i];
         }
     }
-    xglVectorScaleXYZ(&row, axis2, -1.0f);
+    xglVectorScaleXYZ(&row, thirdRowAxis, -1.0f);
     xglVectorNormal(&row, &row);
     {
-        float *src = &row.x;
+        float *rowComponents = &row.x;
 
         for (i = 0; i < 4; i++) {
-            matrix[2][i] = src[i];
+            matrix[2][i] = rowComponents[i];
         }
     }
     matrix[3][3] = 1.0f;

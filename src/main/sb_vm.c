@@ -5,76 +5,155 @@
 /* One entry of an image's name table: the name (offset from the header) and its value. */
 typedef struct SbNameEntry {
     int name_offset;
-    int value;
+    int entryPc;
 } SbNameEntry;
 
 /* Thread records of sbThreadTable, and the per-thread areas sbInit clears. */
 #define SB_THREAD_COUNT 32
 /* Words of a thread's operand stack (0x200 bytes). */
 #define SB_STACK_WORDS 0x80
-/* Slots in a thread's slot table (sbSlotFind and sbSlotStore scan 8). */
+/* Slots in a thread's slot table (sbThreadSlotFind and sbThreadSlotStore scan 8). */
 #define SB_SLOT_COUNT 8
-/* Messages in a thread's queue (sbChainReset: first 0, last 0xF). */
+/* Messages in a thread's queue (sbQueueReset: first 0, last 0xF). */
 #define SB_QUEUE_LAST 0xF
 /* The suspended bit of a thread's status word (sbThreadSuspend sets it). */
 #define SB_THREAD_SUSPENDED 0x80000000
+/* Image headers start with these magic words: "SB  " and "SBL ". */
+#define SB_IMAGE_MAGIC 0x20204253
+#define SBL_IMAGE_MAGIC 0x204C4253
+/* Number of opcodes; the handler table of sbRunOpcode has this many entries. */
+#define SB_OPCODE_COUNT 99
+/* Slot keys that sbOpBinary requests for a zero divisor and sbSlotJumpUnhandledKey skips. */
+#define SB_SLOT_KEY_ZERO_DIVIDE 1
+#define SB_SLOT_KEY_SKIP_OPERATION 2
 
 void sbFatal(SbThread *thread);
-int sbThreadEnqueue(struct SbImageHeader *key, int value, SbMessage *message, SbThread *sender);
+int sbThreadEnqueue(struct SbImageHeader *key, int entryPc, SbMessage *message, SbThread *sender);
 struct SbThread;
 void sbFatalReport(struct SbThread *thread, int pc);
 extern SbThread sbThreadTable[SB_THREAD_COUNT];
 /* The per-thread areas: operand stack, slot table and message queue of thread index. */
 extern int sbStacks[SB_THREAD_COUNT][SB_STACK_WORDS];
-extern SbSlot sbSlotTables[SB_THREAD_COUNT][SB_SLOT_COUNT];
+extern SbSlot sbThreadSlotTables[SB_THREAD_COUNT][SB_SLOT_COUNT];
 extern SbQueue sbChains[SB_THREAD_COUNT];
 int sbIsSbImage(struct SbImageHeader *header);
 /* The thread's slot with this key, or 0. */
-SbSlot *sbSlotFind(SbThread *thread, int key);
+SbSlot *sbThreadSlotFind(SbThread *thread, int key);
 int strcmp(const char *a, const char *b);
 int *sbStackGet(int index);
-SbSlot *sbSlotTableGet(int index);
-SbQueue *sbChainGet(int index);
-SbThread *sbFindThread(struct SbImageHeader *key, int value);
-int sbCursorPush(SbThread *thread);
-SbMessage *sbChainEntryGet(SbThread *thread, int index);
+SbSlot *sbThreadSlotsGet(int index);
+SbQueue *sbQueueGet(int index);
+SbThread *sbFindThread(struct SbImageHeader *key, int entryPc);
+int sbQueuePush(SbThread *thread);
+SbMessage *sbQueueEntryGet(SbThread *thread, int index);
 /* Takes the next index from the thread's cursor ring; -1 when it is empty. */
-int sbCursorPop(SbThread *thread);
-int sbChainCountGet(SbThread *thread);
+int sbQueuePop(SbThread *thread);
+int sbQueueCountGet(SbThread *thread);
 int sbNameTableFind(struct SbImageHeader *image, const char *name);
-SbMessage *sbThreadDequeue(struct SbImageHeader *key, int value);
+SbMessage *sbThreadDequeue(struct SbImageHeader *key, int entryPc);
 int func_001D1A50(struct SbImageHeader *image, struct SbImageHeader *library);
-void *func_001D1310(struct SbImageHeader *image);
-/* Creates a thread on the first free record of sbThreadTable for this image and entry: the record * takes the image, the entry and the stack, tag, slot and queue of its index; returns 1, or 0 when all * records are in use. The record is stored in the first zero word of D_0060E0C0, from word 0 (the head * of the free-slot list); when no word is free it is not stored. */ int sbThreadStart(struct SbImageHeader *image, int entry);
+int *func_001D1310(struct SbImageHeader *image);
+/*
+ * Creates a thread on the first free record of sbThreadTable for this image and entry: the record
+ * takes the image, the entry and the stack, tag, slot and queue of its index; returns 1, or 0 when all
+ * records are in use. The record is stored in the first zero word of sbThreadRing, from word 0 (the head
+ * of the free-slot list); when no word is free it is not stored.
+ */
+int sbThreadStart(struct SbImageHeader *image, int entry);
 int func_001D1388(struct SbImageHeader *image, int index);
 void *func_001D1370(struct SbImageHeader *image);
 int sbStackPop(SbThread *thread);
-void sbGlobalSet(SbThread *thread, int index, int value);
-int func_001D2528(SbThread *thread, int index);
+void sbGlobalVariableSet(SbThread *thread, int index, int globalVarContents);
+int sbGlobalVariableGet(SbThread *thread, int index);
+int sbOpLength(unsigned char opcode, int count);
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1108);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1240);
+typedef int s32;
+extern unsigned char D_008E6000[];
+
+u8 *sbBaseBlockIdGet(void) {
+    return D_008E6000;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1250);
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1310);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1328);
+/* A table offset in an image header is a byte offset from the header itself (read at runtime). */
+#define BYTE_OFFSET(headerBase, tableOffset) ((u8 *) (headerBase) + (tableOffset))
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1340);
+unsigned char *sbGlobalSection(struct SbImageHeader *image);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1358);
+unsigned char *sbGlobalSection(struct SbImageHeader *image)
+{
+    int imageOffset;
+
+    imageOffset = image->global_table;
+    if (imageOffset == 0) {
+        return 0;
+    }
+    return BYTE_OFFSET(image, imageOffset);
+}
+
+void *sbKeyTable(struct SbImageHeader *image)
+{
+    int imageOffset;
+
+    imageOffset = image->import_table;
+    if (imageOffset == 0) {
+        return 0;
+    }
+    return BYTE_OFFSET(image, imageOffset);
+}
+
+int *sbNameTable(struct SbImageHeader *image);
+
+int *sbNameTable(struct SbImageHeader *image)
+{
+    int imageOffset;
+
+    imageOffset = image->name_table;
+    if (imageOffset == 0) {
+        return 0;
+    }
+    return (int *) BYTE_OFFSET(image, imageOffset);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1370);
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1388);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D13E0);
+extern SbThread *sbThreadRing[32];
+void func_001D1460();
+void sbRunThread();
+
+void sbRunThreads(void) {
+    int threadIndex;
+    SbThread *thread;
+
+    func_001D1460();
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        thread = sbThreadRing[threadIndex];
+        if ((thread != 0) && (thread->image != 0) && !(thread->status & SB_THREAD_SUSPENDED)) {
+            sbRunThread(thread);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1460);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D14D0);
+void sbRunThread(SbThread *thread) {
+    s32 codeLimit;
+
+    codeLimit = func_001D1310(thread->image)[2];
+    do {
+        if (codeLimit < thread->pc) {
+            sbFatal(thread);
+        }
+        sbSlotJump(thread);
+    } while (sbRunOpcode(thread) == 0);
+}
 
 /* sbStartImage: starts the image at its code entry; an image that is not an SB image spins forever. */
 void sbStartImage(struct SbImageHeader *image)
@@ -82,25 +161,25 @@ void sbStartImage(struct SbImageHeader *image)
     if (!sbIsSbImage(image)) {
         for (;;) { }
     }
-    sbThreadStart(image, ((int *) func_001D1310(image))[1]);
+    sbThreadStart(image, func_001D1310(image)[1]);
     do {
         func_001D1388(image, 1);
     } while (0);
 }
 
-SbSlot *sbSlotTableGet(int index) {
-    return sbSlotTables[index];
+SbSlot *sbThreadSlotsGet(int threadIndex) {
+    return sbThreadSlotTables[threadIndex];
 }
 
 /* The thread's slot with this key, or 0. */
-SbSlot *sbSlotFind(SbThread *thread, int key)
+SbSlot *sbThreadSlotFind(SbThread *thread, int key)
 {
-    SbSlot *slot = thread->slots;
+    SbSlot *candidate = thread->slots;
     int i;
 
-    for (i = 0; i < SB_SLOT_COUNT; i++, slot++) {
-        if (slot->key == key) {
-            return slot;
+    for (i = 0; i < SB_SLOT_COUNT; i++, candidate++) {
+        if (candidate->key == key) {
+            return candidate;
         }
     }
     return 0;
@@ -108,37 +187,37 @@ SbSlot *sbSlotFind(SbThread *thread, int key)
 
 /* Copies entry into the slot with its key, else into the first free slot;
  * returns 0 when the table is full. */
-int sbSlotStore(SbThread *thread, SbSlot *entry)
+int sbThreadSlotStore(SbThread *thread, SbSlot *incomingSlot)
 {
-    SbSlot *slot = sbSlotFind(thread, entry->key);
-    SbSlot *slots;
+    SbSlot *matchingSlot = sbThreadSlotFind(thread, incomingSlot->key);
+    SbSlot *threadSlots;
     int i;
 
-    if (slot == 0) {
-        slots = thread->slots;
+    if (matchingSlot == 0) {
+        threadSlots = thread->slots;
         for (i = 0; i < SB_SLOT_COUNT; i++) {
-            if (slots[i].key == 0) {
-                slot = &slots[i];
+            if (threadSlots[i].key == 0) {
+                matchingSlot = &threadSlots[i];
                 break;
             }
         }
     }
-    if (slot != 0) {
-        *slot = *entry;
+    if (matchingSlot != 0) {
+        *matchingSlot = *incomingSlot;
         return 1;
     }
     return 0;
 }
 
 /* Frees the slot with this key; returns 0 when there is none. */
-int sbSlotRemove(SbThread *thread, int key)
+int sbThreadSlotRemove(SbThread *thread, int key)
 {
-    SbSlot *slot = sbSlotFind(thread, key);
+    SbSlot *matchedSlot = sbThreadSlotFind(thread, key);
 
-    if (slot == 0) {
+    if (matchedSlot == 0) {
         return 0;
     }
-    slot->key = 0;
+    matchedSlot->key = 0;
     return 1;
 }
 
@@ -155,15 +234,15 @@ void sbSlotJumpUnhandledKey(SbThread *thread);
 int sbSlotJump(SbThread *thread)
 {
     int key;
-    SbSlot *slot;
+    SbSlot *jumpSlot;
     int position;
 
     key = thread->jumpKey;
     if (key == 0) {
         return 0;
     }
-    slot = sbSlotFind(thread, key);
-    if (slot == 0) {
+    jumpSlot = sbThreadSlotFind(thread, key);
+    if (jumpSlot == 0) {
         thread->pc = thread->jumpPosition;
         if (key < 3) {
             sbSlotJumpUnhandledKey(thread);
@@ -174,9 +253,9 @@ int sbSlotJump(SbThread *thread)
     position = thread->jumpPosition;
     thread->jumpKey = 0;
     thread->jumpPosition = 0;
-    if (position >= slot->low) {
-        if (slot->high >= position) {
-            thread->pc = slot->target;
+    if (position >= jumpSlot->low) {
+        if (jumpSlot->high >= position) {
+            thread->pc = jumpSlot->target;
             return 1;
         }
     }
@@ -189,17 +268,15 @@ void sbSlotJumpUnhandledKey(SbThread *thread)
     unsigned char opcode;
     int length;
 
-    if (thread->jumpKey == 1) {
+    if (thread->jumpKey == SB_SLOT_KEY_ZERO_DIVIDE) {
         return;
     }
-    if (thread->jumpKey == 2) {
-        opcode = func_001D2498(thread, thread->jumpPosition, 1);
+    if (thread->jumpKey == SB_SLOT_KEY_SKIP_OPERATION) {
+        opcode = sbCodeReadUnsigned(thread, thread->jumpPosition, 1);
         length = sbOpLength(opcode, 0);
-        func_001D2498(thread, thread->jumpPosition + 1, length - 1);
+        sbCodeReadUnsigned(thread, thread->jumpPosition + 1, length - 1);
         func_001D1370(thread->image);
-        do {
-            func_001D1370(thread->image);
-        } while (0);
+        func_001D1370(thread->image);
     }
 }
 
@@ -213,18 +290,18 @@ void sbFatal(SbThread *thread)
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", sbNativeOwnerAdd);
 
-int sbIsSbImage(struct SbImageHeader *header) {
-    if (header == 0) {
+int sbIsSbImage(struct SbImageHeader *image) {
+    if (image == 0) {
         return 0;
     }
-    return header->magic == 0x20204253;
+    return image->magic == SB_IMAGE_MAGIC;
 }
 
-int sbIsSblImage(struct SbImageHeader *header) {
-    if (header == 0) {
+int sbIsSblImage(struct SbImageHeader *image) {
+    if (image == 0) {
         return 0;
     }
-    return header->magic == 0x204C4253;
+    return image->magic == SBL_IMAGE_MAGIC;
 }
 
 /*
@@ -266,78 +343,84 @@ int sbFindNative(const char *ownerName, const char *methodName)
     return -1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1C80);
+extern s32 D_00551500;
+
+s32 sbStateWordGet(void) {
+    return D_00551500;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1C88);
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1CA0);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1CB8);
+extern SbThread D_0060E140[32];
+
+SbThread *sbThreadTableGet(void) {
+    return D_0060E140;
+}
 
 extern SbThread D_0060E140[SB_THREAD_COUNT];
-extern int D_0060E0C0[SB_THREAD_COUNT];
+extern SbThread *sbThreadRing[SB_THREAD_COUNT];
 void *memset(void *dest, int value, unsigned int count);
-unsigned char *func_001D2428(int index);
-void sbChainReset(SbThread *thread);
+unsigned char *sbTagsGet(int index);
+void sbQueueReset(SbThread *thread);
 
 /* Creates a thread on the first free record of sbThreadTable for this image and entry: the record
  * takes the image, the entry and the stack, tag, slot and queue of its index; returns 1, or 0 when all
- * records are in use. The record is stored in the first zero word of D_0060E0C0, from word 0 (the head
+ * records are in use. The record is stored in the first zero word of sbThreadRing, from word 0 (the head
  * of the free-slot list); when no word is free it is not stored. */
-int sbThreadStart(struct SbImageHeader *image, int entry)
+int sbThreadStart(struct SbImageHeader *image, int entryPc)
 {
     SbThread *thread;
-    int index;
-    int slot;
+    int threadIndex;
+    int threadRingIndex;
 
-    index = 0;
-    while (index < SB_THREAD_COUNT) {
-        if (D_0060E140[index].image == 0) {
-            thread = &D_0060E140[index];
-            for (slot = 0; slot < SB_THREAD_COUNT; slot++) {
-                if (D_0060E0C0[slot] == 0) {
-                    D_0060E0C0[slot] = (int) thread;
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        if (D_0060E140[threadIndex].image == 0) {
+            thread = &D_0060E140[threadIndex];
+            for (threadRingIndex = 0; threadRingIndex < SB_THREAD_COUNT; threadRingIndex++) {
+                if (sbThreadRing[threadRingIndex] == 0) {
+                    sbThreadRing[threadRingIndex] = thread;
                     break;
                 }
             }
             memset(thread->wait, 0, 16);
-            thread->pc = entry;
+            thread->pc = entryPc;
             thread->frame = 3;
             thread->image = image;
-            thread->value = entry;
+            thread->entryPc = entryPc;
             thread->sp = 0;
             thread->jumpKey = 0;
             thread->jumpPosition = 0;
-            thread->stack = sbStackGet(index);
-            thread->tags = func_001D2428(index);
-            thread->stackLimit = 128;
-            thread->slots = sbSlotTableGet(index);
-            thread->queue = sbChainGet(index);
-            memset(thread->slots, 0, 128);
-            sbChainReset(thread);
+            thread->stack = sbStackGet(threadIndex);
+            thread->tags = sbTagsGet(threadIndex);
+            thread->stackLimit = SB_STACK_WORDS;
+            thread->slots = sbThreadSlotsGet(threadIndex);
+            thread->queue = sbQueueGet(threadIndex);
+            memset(thread->slots, 0, SB_SLOT_COUNT * sizeof(SbSlot));
+            sbQueueReset(thread);
             thread->status = 0;
             return 1;
         }
-        index++;
     }
     return 0;
 }
 
-SbThread *sbFindThread(struct SbImageHeader *key, int value)
+SbThread *sbFindThread(struct SbImageHeader *key, int entryPc)
 {
-    int index;
+    int threadIndex;
 
-    for (index = 0; index < SB_THREAD_COUNT; index++) {
-        if (D_0060E140[index].image == key && D_0060E140[index].value == value) {
-            return &D_0060E140[index];
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        if (D_0060E140[threadIndex].image == key && D_0060E140[threadIndex].entryPc == entryPc) {
+            return &D_0060E140[threadIndex];
         }
     }
     return 0;
 }
 
-int sbThreadRelease(struct SbImageHeader *key, int value)
+int sbThreadRelease(struct SbImageHeader *key, int entryPc)
 {
-    SbThread *thread = sbFindThread(key, value);
+    SbThread *thread = sbFindThread(key, entryPc);
 
     if (thread == 0) {
         return 0;
@@ -347,68 +430,67 @@ int sbThreadRelease(struct SbImageHeader *key, int value)
 }
 
 /* Pushes one index onto the thread's cursor ring; -1 when the ring is full. */
-int sbCursorPush(SbThread *thread);
+int sbQueuePush(SbThread *thread);
 
-int sbThreadEnqueue(struct SbImageHeader *key, int value, SbMessage *message, SbThread *sender)
+int sbThreadEnqueue(struct SbImageHeader *key, int entryPc, SbMessage *message, SbThread *sender)
 {
     SbThread *thread;
-    SbMessage *entry;
-    int index;
+    SbMessage *queuedMessage;
+    int messageIndex;
 
-    thread = sbFindThread(key, value);
+    thread = sbFindThread(key, entryPc);
     if (thread == 0) {
         return 0;
     }
-    index = sbCursorPush(thread);
-    if (index == -1) {
+    messageIndex = sbQueuePush(thread);
+    if (messageIndex == -1) {
         return 0;
     }
-    entry = sbChainEntryGet(thread, index);
-    *entry = *message;
+    queuedMessage = sbQueueEntryGet(thread, messageIndex);
+    *queuedMessage = *message;
     if (sender != 0) {
-        entry->sender = sender->value;
+        queuedMessage->sender = sender->entryPc;
     } else {
-        entry->sender = -1;
+        queuedMessage->sender = -1;
     }
     return 1;
 }
 
 /* Dequeue side of sbThreadEnqueue: pops the next cursor index of the thread and takes its chain entry. */
-SbMessage *sbThreadDequeue(struct SbImageHeader *key, int value)
+SbMessage *sbThreadDequeue(struct SbImageHeader *key, int entryPc)
 {
     SbThread *thread;
-    int index;
+    int messageIndex;
 
-    thread = sbFindThread(key, value);
+    thread = sbFindThread(key, entryPc);
     if (thread == 0) {
         return 0;
     }
-    if (sbChainCountGet(thread) == 0) {
+    if (sbQueueCountGet(thread) == 0) {
         return 0;
     }
-    index = sbCursorPop(thread);
-    return sbChainEntryGet(thread, index);
+    messageIndex = sbQueuePop(thread);
+    return sbQueueEntryGet(thread, messageIndex);
 }
 
-extern SbNativeMethod D_006172C0[];
+extern SbNativeMethod sbNativeMethodTable[];
 extern int D_00551508;
-int *func_001D1358(struct SbImageHeader *image);
 
 int sbNameTableFind(struct SbImageHeader *image, const char *name)
 {
-    SbNameEntry *entries;
-    char *base;
-    int count;
-    int index;
+    SbNameEntry *nameEntries;
+    char *nameBase;
+    int nameCount;
+    int nameIndex;
 
-    index = 0;
-    count = func_001D1358(image)[1];
-    base = (char *)func_001D1358(image);
-    base = base + func_001D1358(image)[0];
-    entries = (SbNameEntry *)base;
-    for (; index < count; index++) {
-        if (func_0030E68C(name, base + entries[index].name_offset) == 0) {
-            return entries[index].value;
+    nameIndex = 0;
+    nameCount = sbNameTable(image)[1];
+    nameBase = (char *)sbNameTable(image);
+    nameBase = nameBase + sbNameTable(image)[0];
+    nameEntries = (SbNameEntry *)nameBase;
+    for (; nameIndex < nameCount; nameIndex++) {
+        if (func_0030E68C(name, nameBase + nameEntries[nameIndex].name_offset) == 0) {
+            return nameEntries[nameIndex].entryPc;
         }
     }
     return -1;
@@ -416,20 +498,20 @@ int sbNameTableFind(struct SbImageHeader *image, const char *name)
 
 extern int D_00616CC8[];
 
-char *sbNameTableNameOf(struct SbImageHeader *image, int value)
+char *sbNameTableNameOf(struct SbImageHeader *image, int entryPc)
 {
-    SbNameEntry *entries;
-    char *base;
-    int count;
-    int index;
+    SbNameEntry *nameEntries;
+    char *nameBase;
+    int nameCount;
+    int nameIndex;
 
-    count = func_001D1358(image)[1];
-    base = (char *)func_001D1358(image);
-    base = base + func_001D1358(image)[0];
-    entries = (SbNameEntry *)base;
-    for (index = 0; index < count; index++) {
-        if (value == entries[index].value) {
-            return base + entries[index].name_offset;
+    nameCount = sbNameTable(image)[1];
+    nameBase = (char *)sbNameTable(image);
+    nameBase = nameBase + sbNameTable(image)[0];
+    nameEntries = (SbNameEntry *)nameBase;
+    for (nameIndex = 0; nameIndex < nameCount; nameIndex++) {
+        if (entryPc == nameEntries[nameIndex].entryPc) {
+            return nameBase + nameEntries[nameIndex].name_offset;
         }
     }
     return 0;
@@ -439,28 +521,28 @@ char *sbNameTableNameOf(struct SbImageHeader *image, int value)
  * the name is not there. */
 int sbThreadEnqueueByName(struct SbImageHeader *image, const char *name, SbMessage *message)
 {
-    int entry = sbNameTableFind(image, name);
+    int entryPc = sbNameTableFind(image, name);
 
-    if (entry == -1) {
+    if (entryPc == -1) {
         return 0;
     }
-    return sbThreadEnqueue(image, entry, message, 0);
+    return sbThreadEnqueue(image, entryPc, message, 0);
 }
 
 void sbThreadsRelease(struct SbImageHeader *key)
 {
-    int index;
+    int threadIndex;
 
-    for (index = 0; index < SB_THREAD_COUNT; index++) {
-        if (D_0060E140[index].image == key) {
-            sbThreadRelease(key, D_0060E140[index].value);
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        if (D_0060E140[threadIndex].image == key) {
+            sbThreadRelease(key, D_0060E140[threadIndex].entryPc);
         }
     }
 }
 
-int sbThreadSuspend(struct SbImageHeader *key, int value)
+int sbThreadSuspend(struct SbImageHeader *key, int entryPc)
 {
-    SbThread *thread = sbFindThread(key, value);
+    SbThread *thread = sbFindThread(key, entryPc);
 
     if (thread == 0) {
         return 0;
@@ -471,19 +553,19 @@ int sbThreadSuspend(struct SbImageHeader *key, int value)
 
 void sbThreadsSuspend(struct SbImageHeader *key)
 {
-    int index;
+    int threadIndex;
 
-    for (index = 0; index < SB_THREAD_COUNT; index++) {
-        if (D_0060E140[index].image == key) {
-            sbThreadSuspend(key, D_0060E140[index].value);
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        if (D_0060E140[threadIndex].image == key) {
+            sbThreadSuspend(key, D_0060E140[threadIndex].entryPc);
         }
     }
 }
 
 /* Clears the suspended bit of the thread with this key and value; 0 when there is none. */
-int sbThreadResume(struct SbImageHeader *key, int value)
+int sbThreadResume(struct SbImageHeader *key, int entryPc)
 {
-    SbThread *thread = sbFindThread(key, value);
+    SbThread *thread = sbFindThread(key, entryPc);
 
     if (thread == 0) {
         return 0;
@@ -494,159 +576,162 @@ int sbThreadResume(struct SbImageHeader *key, int value)
 
 void sbThreadsResume(struct SbImageHeader *key)
 {
-    int index;
+    int threadIndex;
 
-    for (index = 0; index < SB_THREAD_COUNT; index++) {
-        if (D_0060E140[index].image == key) {
-            sbThreadResume(key, D_0060E140[index].value);
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        if (D_0060E140[threadIndex].image == key) {
+            sbThreadResume(key, D_0060E140[threadIndex].entryPc);
         }
     }
 }
 
-SbQueue *sbChainGet(int index) {
-    return &sbChains[index];
+SbQueue *sbQueueGet(int threadIndex) {
+    return &sbChains[threadIndex];
 }
 
-void sbChainReset(SbThread *thread)
+void sbQueueReset(SbThread *thread)
 {
     SbQueue *queue;
 
     queue = thread->queue;
-    queue->last = SB_QUEUE_LAST;
-    queue->first = 0;
+    queue->ringLastIndex = SB_QUEUE_LAST;
+    queue->ringFirstIndex = 0;
     queue->tail = 0;
     queue->head = 0;
     queue->used = 0;
 }
 
 /* Pushes one index onto the thread's cursor ring; -1 when the ring is full. */
-int sbCursorPush(SbThread *thread)
+int sbQueuePush(SbThread *thread)
 {
-    SbQueue *cursor;
-    int next;
+    SbQueue *queue;
+    int nextTail;
 
-    cursor = thread->queue;
-    if (!(cursor->used < (cursor->last - cursor->first) + 1)) {
+    queue = thread->queue;
+    if (!(queue->used < (queue->ringLastIndex - queue->ringFirstIndex) + 1)) {
         return -1;
     }
-    cursor->used = cursor->used + 1;
-    next = cursor->tail + 1;
-    cursor->tail = next;
-    if (cursor->last < next) {
-        cursor->tail = cursor->first;
+    queue->used = queue->used + 1;
+    nextTail = queue->tail + 1;
+    queue->tail = nextTail;
+    if (queue->ringLastIndex < nextTail) {
+        queue->tail = queue->ringFirstIndex;
     }
-    return cursor->tail;
+    return queue->tail;
 }
 
 /* Takes the next index from the thread's cursor ring; -1 when it is empty. */
-int sbCursorPop(SbThread *thread)
+int sbQueuePop(SbThread *thread)
 {
-    SbQueue *cursor;
-    int next;
+    SbQueue *queue;
+    int nextHead;
 
-    cursor = thread->queue;
-    if (cursor->used <= 0) {
+    queue = thread->queue;
+    if (queue->used <= 0) {
         return -1;
     }
-    next = cursor->head + 1;
-    cursor->used = cursor->used - 1;
-    cursor->head = next;
-    if (cursor->last < next) {
-        cursor->head = cursor->first;
+    nextHead = queue->head + 1;
+    queue->used = queue->used - 1;
+    queue->head = nextHead;
+    if (queue->ringLastIndex < nextHead) {
+        queue->head = queue->ringFirstIndex;
     }
-    return cursor->head;
+    return queue->head;
 }
 
-int sbChainCountGet(SbThread *thread)
+int sbQueueCountGet(SbThread *thread)
 {
     return thread->queue->used;
 }
 
-SbMessage *sbChainEntryGet(SbThread *thread, int index)
+SbMessage *sbQueueEntryGet(SbThread *thread, int messageIndex)
 {
-    return &thread->queue->messages[index];
+    return &thread->queue->messages[messageIndex];
 }
 
-int *sbStackGet(int index) {
-    return sbStacks[index];
+int *sbStackGet(int threadIndex) {
+    return sbStacks[threadIndex];
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D2428);
+extern unsigned char sbThreadTagBytes[];
 
-void sbStackPush(SbThread *thread, int value, int tag);
-int func_001D2498(SbThread *thread, int index, int count);
-unsigned char *func_001D1328(struct SbImageHeader *image);
+unsigned char * sbTagsGet(int threadIndex) {
+    return sbThreadTagBytes + (threadIndex << 7);
+}
 
-unsigned char func_001D2440(SbThread *thread, int index)
+void sbStackPush(SbThread *thread, int stackValue, int tag);
+int sbCodeReadUnsigned(SbThread *thread, int index, int count);
+
+unsigned char sbImageByteAt(SbThread *thread, int codePosition)
 {
-    unsigned char *code;
+    unsigned char *codeStream;
 
-    code = func_001D1310(thread->image);
-    code += *(int *) func_001D1310(thread->image);
-    return code[index];
+    codeStream = (unsigned char *) func_001D1310(thread->image);
+    codeStream += *func_001D1310(thread->image);
+    return codeStream[codePosition];
 }
 
 /*
  * Reads count code bytes, big-endian, from byte offset of the code stream: the code base is the code table
  * (func_001D1310) plus the code offset stored in its first word.
  */
-int func_001D2498(SbThread *thread, int offset, int count)
+int sbCodeReadUnsigned(SbThread *thread, int codePosition, int readWidth)
 {
-    unsigned char *code;
-    int value;
+    unsigned char *codeStream;
+    int bigEndianValue;
     int i;
 
-    code = (unsigned char *) func_001D1310(thread->image) + *(int *) func_001D1310(thread->image);
-    value = 0;
-    if (count > 0) {
-        for (i = count; i != 0; i--) {
-            value <<= 8;
-            value |= code[offset++];
+    codeStream = (unsigned char *) func_001D1310(thread->image) + *func_001D1310(thread->image);
+    bigEndianValue = 0;
+    if (readWidth > 0) {
+        for (i = readWidth; i != 0; i--) {
+            bigEndianValue <<= 8;
+            bigEndianValue |= codeStream[codePosition++];
         }
     }
-    return value;
+    return bigEndianValue;
 }
 
-int func_001D2528(SbThread *thread, int index)
+int sbGlobalVariableGet(SbThread *thread, int globalVarId)
 {
     int *globals;
 
-    globals = (int *) (func_001D1328(thread->image) + *(int *) func_001D1328(thread->image));
-    return globals[index];
+    globals = (int *) (sbGlobalSection(thread->image) + *(int *) sbGlobalSection(thread->image));
+    return globals[globalVarId];
 }
 
-void sbGlobalSet(SbThread *thread, int index, int value)
+void sbGlobalVariableSet(SbThread *thread, int globalVarId, int globalVarContents)
 {
     int *globals;
 
-    globals = (int *) (func_001D1328(thread->image) + *(int *) func_001D1328(thread->image));
-    globals[index] = value;
+    globals = (int *) (sbGlobalSection(thread->image) + *(int *) sbGlobalSection(thread->image));
+    globals[globalVarId] = globalVarContents;
 }
 
-int sbLocalGet(SbThread *thread, int index)
+int sbLocalVariableGet(SbThread *thread, int localVarId)
 {
     int *locals;
 
     locals = thread->stack + thread->frame;
-    return locals[index];
+    return locals[localVarId];
 }
 
-void sbLocalSet(SbThread *thread, int index, int value)
+void sbLocalVariableSet(SbThread *thread, int localVarId, int localVarContents)
 {
     int *locals;
 
     locals = thread->stack + thread->frame;
-    locals[index] = value;
+    locals[localVarId] = localVarContents;
 }
 
 /* Pushes value on the operand stack with its tag byte: a full stack is fatal. */
-void sbStackPush(SbThread *thread, int value, int tag)
+void sbStackPush(SbThread *thread, int stackValue, int tag)
 {
     if (thread->sp >= thread->stackLimit) {
         sbFatal(thread);
     }
     thread->tags[thread->sp] = tag;
-    thread->stack[thread->sp++] = value;
+    thread->stack[thread->sp++] = stackValue;
 }
 
 int sbStackPop(SbThread *thread)
@@ -661,61 +746,61 @@ int sbStackPop(SbThread *thread)
     return thread->stack[top];
 }
 
-extern signed char D_00407B08[];
+extern signed char sbOpLengthTable[];
 
 /* Length of the instruction with this opcode: opcode 98 takes 8 bytes per operand word
- * plus 6; the others use the signed table entry at D_00407B08. */
-int sbOpLength(unsigned char opcode, int count)
+ * plus 6; the others use the signed table entry at sbOpLengthTable. */
+int sbOpLength(unsigned char opcode, int operandCount)
 {
     if (opcode == 98) {
-        return count * 8 + 6;
+        return operandCount * 8 + 6;
     }
-    return D_00407B08[opcode];
+    return sbOpLengthTable[opcode];
 }
 
 /* Opcode table: 99 handlers, then a null word. */
-extern int (*D_00407B70[])(SbThread *, int);
-unsigned char func_001D2440(SbThread *thread, int index);
+extern int (*sbOpHandlers[])(SbThread *, int);
+unsigned char sbImageByteAt(SbThread *thread, int index);
 
 /* One step of the VM: fetch the opcode at pc and run its handler. */
-int sbStep(SbThread *thread)
+int sbRunOpcode(SbThread *thread)
 {
     unsigned int opcode;
-    int original_total;
-    int result;
+    int startPc;
+    int opcodeOutcome;
 
-    opcode = func_001D2440(thread, thread->pc);
-    if (opcode < 99) {
-        original_total = thread->pc;
-        result = D_00407B70[opcode](thread, opcode);
-        if (result == 1) {
-            thread->status = result;
-            thread->pc = original_total;
+    opcode = sbImageByteAt(thread, thread->pc);
+    if (opcode < SB_OPCODE_COUNT) {
+        startPc = thread->pc;
+        opcodeOutcome = sbOpHandlers[opcode](thread, opcode);
+        if (opcodeOutcome == 1) {
+            thread->status = opcodeOutcome;
+            thread->pc = startPc;
         } else {
             thread->status = 0;
         }
-        if (result == 2) {
-            thread->pc = thread->value;
+        if (opcodeOutcome == 2) {
+            thread->pc = thread->entryPc;
         }
     } else {
-        result = 2;
+        opcodeOutcome = 2;
         sbFatal(thread);
     }
-    return result;
+    return opcodeOutcome;
 }
 
-int sbOpNop(SbThread *thread, int opcode)
+int sbOpSkipInstruction(SbThread *thread, int opcode)
 {
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
 
-int sbOpLoadGlobal(SbThread *thread, unsigned char opcode)
+int sbOpNegate(SbThread *thread, unsigned char opcode)
 {
-    int slot;
+    int poppedValue;
 
-    slot = sbStackPop(thread);
-    sbStackPush(thread, -slot, 1);
+    poppedValue = sbStackPop(thread);
+    sbStackPush(thread, -poppedValue, 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -725,117 +810,117 @@ int sbOpLoadGlobal(SbThread *thread, unsigned char opcode)
  * zero-divide jump and pushes 0; an unknown operator is fatal. */
 int sbOpBinary(SbThread *thread, int opcode)
 {
-    int op;
+    int binaryOp;
     int right;
     int left;
-    int value;
+    int binaryResult;
 
     right = sbStackPop(thread);
     left = sbStackPop(thread);
-    op = opcode & 0xff;
-    switch (op) {
+    binaryOp = opcode & 0xff;
+    switch (binaryOp) {
     case 2:
-        value = right + left;
+        binaryResult = right + left;
         break;
     case 3:
-        value = left - right;
+        binaryResult = left - right;
         break;
     case 4:
-        value = left * right;
+        binaryResult = left * right;
         break;
     case 5:
         if (right == 0) {
-            value = 0;
-            sbSlotJumpRequest(thread, 1);
+            binaryResult = 0;
+            sbSlotJumpRequest(thread, SB_SLOT_KEY_ZERO_DIVIDE);
             break;
         }
-        value = left / right;
+        binaryResult = left / right;
         break;
     case 6:
         if (right == 0) {
-            value = 0;
-            sbSlotJumpRequest(thread, 1);
+            binaryResult = 0;
+            sbSlotJumpRequest(thread, SB_SLOT_KEY_ZERO_DIVIDE);
             break;
         }
-        value = left % right;
+        binaryResult = left % right;
         break;
     case 7:
-        value = left | right;
+        binaryResult = left | right;
         break;
     case 8:
-        value = left & right;
+        binaryResult = left & right;
         break;
     case 9:
-        value = left >> right;
+        binaryResult = left >> right;
         break;
     case 10:
-        value = left << right;
+        binaryResult = left << right;
         break;
     case 11:
-        value = left == right;
+        binaryResult = left == right;
         break;
     case 12:
-        value = right < left;
+        binaryResult = right < left;
         break;
     case 13:
-        value = left < right;
+        binaryResult = left < right;
         break;
     case 14:
-        value = left >= right;
+        binaryResult = left >= right;
         break;
     case 15:
-        value = left <= right;
+        binaryResult = left <= right;
         break;
     case 16:
-        value = left != right;
+        binaryResult = left != right;
         break;
     case 17:
-        value = left != 0 || right != 0;
+        binaryResult = left != 0 || right != 0;
         break;
     case 18:
-        value = left != 0 && right != 0;
+        binaryResult = left != 0 && right != 0;
         break;
     default:
         sbFatal(thread);
-        value = 0;
+        binaryResult = 0;
         break;
     }
-    sbStackPush(thread, value, 1);
-    thread->pc += sbOpLength(op, 0);
+    sbStackPush(thread, binaryResult, 1);
+    thread->pc += sbOpLength(binaryOp, 0);
     return 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D2A38);
 
 /* Pushes a word operand: a count of one byte, or two for opcode 0x20; then advances pc past the operation. */
-int sbOpPushWord(SbThread *thread, unsigned char opcode)
+int sbOpPushImmediate(SbThread *thread, unsigned char opcode)
 {
-    int value;
+    int operandValue;
 
-    value = func_001D2498(thread, thread->pc + 1, (opcode == 0x20) ? 2 : 1);
-    sbStackPush(thread, value, 1);
+    operandValue = sbCodeReadUnsigned(thread, thread->pc + 1, (opcode == 0x20) ? 2 : 1);
+    sbStackPush(thread, operandValue, 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
 
-int sbOpPushWord04(SbThread *thread, unsigned char opcode)
+int sbOpPushNameEntryPc(SbThread *thread, unsigned char opcode)
 {
-    int index;
-    int base;
-    int *table;
-    int *entry;
+    int nameIndex;
+    char *nameBase;
+    int *nameTable;
+    SbNameEntry *nameEntries;
 
-    index = func_001D2498(thread, thread->pc + 1, opcode == 0x22 ? 2 : 1);
-    base = (int)func_001D1358(thread->image);
-    table = (int *)func_001D1358(thread->image);
-    base = base + *table;
-    entry = (int *)((index << 3) + base);
-    sbStackPush(thread, entry[1], 4);
+    nameIndex = sbCodeReadUnsigned(thread, thread->pc + 1, opcode == 0x22 ? 2 : 1);
+    nameBase = (char *) sbNameTable(thread->image);
+    nameTable = sbNameTable(thread->image);
+    nameBase = nameBase + *nameTable;
+    nameEntries = (SbNameEntry *) nameBase;
+    sbStackPush(thread, nameEntries[nameIndex].entryPc, 4);
     thread->pc = thread->pc + sbOpLength(opcode, 0);
     return 0;
 }
 
-int sbOpPushWord06(SbThread *thread, unsigned char opcode)
+int sbOpPushNull(SbThread *thread, unsigned char opcode)
 {
     sbStackPush(thread, 0, 0);
     thread->pc += sbOpLength(opcode, 0);
@@ -843,23 +928,23 @@ int sbOpPushWord06(SbThread *thread, unsigned char opcode)
 }
 
 /* Pushes a word operand of the 0x25 family: a count of one byte, or two for opcode 0x25; then advances pc. */
-int sbOpPushWord07(SbThread *thread, unsigned char opcode)
+int sbOpPushTaggedWord(SbThread *thread, unsigned char opcode)
 {
-    int value;
+    int operandValue;
 
-    value = func_001D2498(thread, thread->pc + 1, (opcode == 0x25) ? 2 : 1);
-    sbStackPush(thread, value, 2);
+    operandValue = sbCodeReadUnsigned(thread, thread->pc + 1, (opcode == 0x25) ? 2 : 1);
+    sbStackPush(thread, operandValue, 2);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
 
 /* Pushes a word operand of the 0x27 family: a count of one byte, or two for opcode 0x27; then advances pc. */
-int sbOpPushGlobal(SbThread *thread, unsigned char opcode)
+int sbOpPushGlobalId(SbThread *thread, unsigned char opcode)
 {
-    int value;
+    int operandValue;
 
-    value = func_001D2498(thread, thread->pc + 1, (opcode == 0x27) ? 2 : 1);
-    sbStackPush(thread, value, 3);
+    operandValue = sbCodeReadUnsigned(thread, thread->pc + 1, (opcode == 0x27) ? 2 : 1);
+    sbStackPush(thread, operandValue, 3);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -867,92 +952,92 @@ int sbOpPushGlobal(SbThread *thread, unsigned char opcode)
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D2DC8);
 
 /* Load opcode (51 to 60): reads an operand of 2 bytes (opcodes 51 to 55) or 1 byte (56 to 60),
- * resolves it through sbLocalGet and pushes it with the tag 1 to 5 of the opcode; an unknown
+ * resolves it through sbLocalVariableGet and pushes it with the tag 1 to 5 of the opcode; an unknown
  * opcode is fatal. Then advances pc past the operands. */
-int sbOpPushLocal(SbThread *thread, int opcode)
+int sbOpPushLocalVariable(SbThread *thread, int opcode)
 {
-    unsigned char op;
-    int size;
+    unsigned char opcodeByte;
+    int operandSize;
     int tag;
-    int value;
+    int localIndexOrValue;
 
-    op = opcode & 0xff;
-    switch (op) {
+    opcodeByte = opcode & 0xff;
+    switch (opcodeByte) {
     case 51:
-        size = 2;
+        operandSize = 2;
         tag = 1;
         break;
     case 52:
-        size = 2;
+        operandSize = 2;
         tag = 2;
         break;
     case 53:
-        size = 2;
+        operandSize = 2;
         tag = 3;
         break;
     case 54:
-        size = 2;
+        operandSize = 2;
         tag = 4;
         break;
     case 55:
-        size = 2;
+        operandSize = 2;
         tag = 5;
         break;
     case 56:
-        size = 1;
+        operandSize = 1;
         tag = 1;
         break;
     case 57:
-        size = 1;
+        operandSize = 1;
         tag = 2;
         break;
     case 58:
-        size = 1;
+        operandSize = 1;
         tag = 3;
         break;
     case 59:
-        size = 1;
+        operandSize = 1;
         tag = 4;
         break;
     case 60:
-        size = 1;
+        operandSize = 1;
         tag = 5;
         break;
     default:
-        size = 0;
+        operandSize = 0;
         tag = 0;
         sbFatal(thread);
         break;
     }
-    value = func_001D2498(thread, thread->pc + 1, size);
-    value = sbLocalGet(thread, value);
-    sbStackPush(thread, value, tag);
-    thread->pc += sbOpLength(op, 0);
+    localIndexOrValue = sbCodeReadUnsigned(thread, thread->pc + 1, operandSize);
+    localIndexOrValue = sbLocalVariableGet(thread, localIndexOrValue);
+    sbStackPush(thread, localIndexOrValue, tag);
+    thread->pc += sbOpLength(opcodeByte, 0);
     return 0;
 }
 
 /* Pops the index and then the value and stores the value through the global index; then advances pc past the operation. */
-int sbOpStoreGlobal(SbThread *thread, unsigned char opcode)
+int sbOpAssignGlobal(SbThread *thread, unsigned char opcode)
 {
-    int first;
-    int second;
+    int globalVarId;
+    int storedValue;
 
-    first = sbStackPop(thread);
-    second = sbStackPop(thread);
-    sbGlobalSet(thread, first, second);
+    globalVarId = sbStackPop(thread);
+    storedValue = sbStackPop(thread);
+    sbGlobalVariableSet(thread, globalVarId, storedValue);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
 
 /* Pops the index and then the value and stores the value into the local at index; then advances pc past the operation. */
-int sbOpStoreLocal(SbThread *thread, unsigned char opcode)
+int sbOpAssignLocal(SbThread *thread, unsigned char opcode)
 {
-    int first;
-    int second;
+    int localVarId;
+    int storedValue;
 
-    first = sbStackPop(thread);
-    second = sbStackPop(thread);
-    sbLocalSet(thread, first, second);
+    localVarId = sbStackPop(thread);
+    storedValue = sbStackPop(thread);
+    sbLocalVariableSet(thread, localVarId, storedValue);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -960,12 +1045,12 @@ int sbOpStoreLocal(SbThread *thread, unsigned char opcode)
 /* Pops the index and then the value, stores the value through the global index and keeps the stack depth one word higher; then advances pc. */
 int sbOpStoreGlobalKeep(SbThread *thread, unsigned char opcode)
 {
-    int first;
-    int second;
+    int globalVarId;
+    int storedValue;
 
-    first = sbStackPop(thread);
-    second = sbStackPop(thread);
-    sbGlobalSet(thread, first, second);
+    globalVarId = sbStackPop(thread);
+    storedValue = sbStackPop(thread);
+    sbGlobalVariableSet(thread, globalVarId, storedValue);
     thread->sp++;
     thread->pc += sbOpLength(opcode, 0);
     return 0;
@@ -974,40 +1059,40 @@ int sbOpStoreGlobalKeep(SbThread *thread, unsigned char opcode)
 /* Pops the index and then the value, stores the value into the local at index and keeps the stack depth one word higher; then advances pc. */
 int sbOpStoreLocalKeep(SbThread *thread, unsigned char opcode)
 {
-    int first;
-    int second;
+    int localVarId;
+    int storedValue;
 
-    first = sbStackPop(thread);
-    second = sbStackPop(thread);
-    sbLocalSet(thread, first, second);
+    localVarId = sbStackPop(thread);
+    storedValue = sbStackPop(thread);
+    sbLocalVariableSet(thread, localVarId, storedValue);
     thread->sp++;
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
 
-int func_001D3268(SbThread *thread)
+int sbOpJump(SbThread *thread)
 {
-    int offset;
+    int branchOffset;
 
-    offset = func_001D2498(thread, thread->pc + 1, 2);
-    if (offset & 0x8000) {
-        offset |= 0xffff0000;
+    branchOffset = sbCodeReadUnsigned(thread, thread->pc + 1, 2);
+    if (branchOffset & 0x8000) {
+        branchOffset |= 0xffff0000;
     }
-    thread->pc += offset;
+    thread->pc += branchOffset;
     return 0;
 }
 
 /* Branch on a popped word: a nonzero word falls through past the operation; zero jumps by the signed 16-bit displacement after it. */
 int sbOpJumpIfNotZero(SbThread *thread, unsigned char opcode)
 {
-    int offset;
+    int branchOffset;
 
     if (sbStackPop(thread) == 0) {
-        offset = func_001D2498(thread, thread->pc + 1, 2);
-        if (offset & 0x8000) {
-            offset |= 0xFFFF0000;
+        branchOffset = sbCodeReadUnsigned(thread, thread->pc + 1, 2);
+        if (branchOffset & 0x8000) {
+            branchOffset |= 0xFFFF0000;
         }
-        thread->pc += offset;
+        thread->pc += branchOffset;
     } else {
         thread->pc += sbOpLength(opcode, 0);
     }
@@ -1017,14 +1102,14 @@ int sbOpJumpIfNotZero(SbThread *thread, unsigned char opcode)
 /* Branch on a popped word: a nonzero word jumps by the signed 16-bit displacement after the operation, zero falls through past it. */
 int sbOpJumpIfZero(SbThread *thread, unsigned char opcode)
 {
-    int offset;
+    int branchOffset;
 
     if (sbStackPop(thread) != 0) {
-        offset = func_001D2498(thread, thread->pc + 1, 2);
-        if (offset & 0x8000) {
-            offset |= 0xFFFF0000;
+        branchOffset = sbCodeReadUnsigned(thread, thread->pc + 1, 2);
+        if (branchOffset & 0x8000) {
+            branchOffset |= 0xFFFF0000;
         }
-        thread->pc += offset;
+        thread->pc += branchOffset;
     } else {
         thread->pc += sbOpLength(opcode, 0);
     }
@@ -1037,7 +1122,7 @@ int sbOpEnterFrame(SbThread *thread, unsigned char opcode)
     sbStackPush(thread, 0, 1);
     sbStackPush(thread, thread->frame, 1);
     sbStackPush(thread, 0, 1);
-    sbLocalSet(thread, -1, thread->sp);
+    sbLocalVariableSet(thread, -1, thread->sp);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -1059,9 +1144,9 @@ int sbOpReturn(SbThread *thread)
 int sbOpReturnValue(SbThread *thread)
 {
     int operand;
-    int opcode;
+    int tag;
 
-    opcode = *(signed char *)&thread->tags[thread->sp];
+    tag = (signed char) thread->tags[thread->sp];
     operand = sbStackPop(thread);
     if (thread->sp == 0) {
         sbFatal(thread);
@@ -1070,21 +1155,28 @@ int sbOpReturnValue(SbThread *thread)
     sbStackPop(thread);
     thread->frame = sbStackPop(thread);
     thread->pc = sbStackPop(thread);
-    sbStackPush(thread, operand, opcode);
+    sbStackPush(thread, operand, tag);
     return 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D3610);
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D3770);
+s32 sbOpPushIndirect(SbThread *thread, s32 opcode) {
+    u8 opcodeByte;
+
+    opcodeByte = opcode & 0xFF;
+    sbStackPush(thread, *(s32 *) thread->unmodeled_0C, 1);
+    thread->pc = thread->pc + sbOpLength(opcodeByte, 0);
+    return 0;
+}
 
 int sbOpSpawn(SbThread *thread, unsigned char opcode)
 {
-    int slot;
+    int entryPc;
 
-    slot = sbStackPop(thread);
+    entryPc = sbStackPop(thread);
     thread->pc += sbOpLength(opcode, 0);
-    return (sbThreadStart(thread->image, slot) != 0) ? 0 : 2;
+    return (sbThreadStart(thread->image, entryPc) != 0) ? 0 : 2;
 }
 
 /* Compares the popped key with the thread's entry, advances pc past the operation, and returns 2 unless the image has the key. */
@@ -1094,7 +1186,7 @@ int sbOpKillThread(SbThread *thread, unsigned char opcode)
     int matched;
 
     key = sbStackPop(thread);
-    matched = (thread->value == key) ? 2 : 0;
+    matched = (thread->entryPc == key) ? 2 : 0;
     thread->pc += sbOpLength(opcode, 0);
     if (sbThreadRelease(thread->image, key)) {
         return matched;
@@ -1112,22 +1204,22 @@ int sbOpDrop(SbThread *thread, int opcode)
 INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D3908);
 
 /* Loads the local at the popped index and pushes it; the operation is one of the five load opcodes 84 to 88, anything else is fatal. */
-int sbOpLoadLocal(SbThread *thread, unsigned char opcode)
+int sbOpLoadLocalFromStack(SbThread *thread, unsigned char opcode)
 {
-    int index;
-    int value;
+    int localVarId;
+    int loadedValue;
 
-    index = sbStackPop(thread);
+    localVarId = sbStackPop(thread);
     if ((unsigned int) (opcode - 84) >= 5) {
         sbFatal(thread);
     }
-    value = sbLocalGet(thread, index);
-    sbStackPush(thread, value, 1);
+    loadedValue = sbLocalVariableGet(thread, localVarId);
+    sbStackPush(thread, loadedValue, 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
 
-int sbOpEnd(SbThread *thread, int opcode)
+int sbOpRewindToEntry(SbThread *thread, int opcode)
 {
     thread->pc += sbOpLength(opcode, 0);
     return 2;
@@ -1142,40 +1234,40 @@ int sbOpYield(SbThread *thread, int opcode)
 /* Waits a number of frames: the first run takes the count from the stack, each later run counts it down, and the operation completes at zero. */
 int sbOpWaitFrames(SbThread *thread, unsigned char opcode)
 {
-    int result;
+    int waitResult;
 
     if (thread->status == 0) {
         thread->wait[0] = sbStackPop(thread);
-        result = 1;
+        waitResult = 1;
     } else {
         thread->wait[0] = thread->wait[0] - 1;
         if (thread->wait[0] <= 0) {
             thread->pc += sbOpLength(opcode, 0);
-            result = 0;
+            waitResult = 0;
         } else {
-            result = 1;
+            waitResult = 1;
         }
     }
-    return result;
+    return waitResult;
 }
 
-int func_001D42D8(SbThread *thread, int index);
+SbMessage *sbGlobalEntryGet(SbThread *thread, int index);
 
 /* Send opcode: pops a thread value and an entry index and queues that entry as a
  * message from this thread to the thread with the same key and the popped value. */
 int sbOpSend(SbThread *thread, int opcode)
 {
-    unsigned char opcode16;
-    int value;
-    int index;
+    unsigned char opcodeByte;
+    int targetEntryPc;
+    int globalVarId;
     SbMessage message;
 
-    opcode16 = opcode;
-    value = sbStackPop(thread);
-    index = sbStackPop(thread);
-    message = *(SbMessage *)func_001D42D8(thread, index);
-    sbThreadEnqueue(thread->image, value, &message, thread);
-    thread->pc += sbOpLength(opcode16, 0);
+    opcodeByte = opcode;
+    targetEntryPc = sbStackPop(thread);
+    globalVarId = sbStackPop(thread);
+    message = *sbGlobalEntryGet(thread, globalVarId);
+    sbThreadEnqueue(thread->image, targetEntryPc, &message, thread);
+    thread->pc += sbOpLength(opcodeByte, 0);
     return 0;
 }
 
@@ -1184,36 +1276,36 @@ int sbOpSend(SbThread *thread, int opcode)
  * pushes 0 when there is none. */
 int sbOpReceive(SbThread *thread, int opcode)
 {
-    unsigned char opcode16;
-    int value;
-    int index;
-    SbMessage *entry;
+    unsigned char opcodeByte;
+    int sourceEntryPc;
+    int globalVarId;
+    SbMessage *globalMessage;
     SbMessage *message;
     int received;
 
-    opcode16 = opcode;
-    value = sbStackPop(thread);
-    index = sbStackPop(thread);
-    entry = (SbMessage *)func_001D42D8(thread, index);
-    message = sbThreadDequeue(thread->image, value);
+    opcodeByte = opcode;
+    sourceEntryPc = sbStackPop(thread);
+    globalVarId = sbStackPop(thread);
+    globalMessage = sbGlobalEntryGet(thread, globalVarId);
+    message = sbThreadDequeue(thread->image, sourceEntryPc);
     if (message != 0) {
-        *entry = *message;
+        *globalMessage = *message;
         received = 1;
     } else {
         received = 0;
     }
     sbStackPush(thread, received, 1);
-    thread->pc += sbOpLength(opcode16, 0);
+    thread->pc += sbOpLength(opcodeByte, 0);
     return 0;
 }
 
 /* Adds one to the global at the popped index; then advances pc past the operation. */
 int sbOpIncGlobal(SbThread *thread, unsigned char opcode)
 {
-    int index;
+    int globalVarId;
 
-    index = sbStackPop(thread);
-    sbGlobalSet(thread, index, func_001D2528(thread, index) + 1);
+    globalVarId = sbStackPop(thread);
+    sbGlobalVariableSet(thread, globalVarId, sbGlobalVariableGet(thread, globalVarId) + 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -1221,10 +1313,10 @@ int sbOpIncGlobal(SbThread *thread, unsigned char opcode)
 /* Adds one to the local at the popped index; then advances pc past the operation. */
 int sbOpIncLocal(SbThread *thread, unsigned char opcode)
 {
-    int index;
+    int localVarId;
 
-    index = sbStackPop(thread);
-    sbLocalSet(thread, index, sbLocalGet(thread, index) + 1);
+    localVarId = sbStackPop(thread);
+    sbLocalVariableSet(thread, localVarId, sbLocalVariableGet(thread, localVarId) + 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -1232,10 +1324,10 @@ int sbOpIncLocal(SbThread *thread, unsigned char opcode)
 /* Subtracts one from the global at the popped index; then advances pc past the operation. */
 int sbOpDecGlobal(SbThread *thread, unsigned char opcode)
 {
-    int index;
+    int globalVarId;
 
-    index = sbStackPop(thread);
-    sbGlobalSet(thread, index, func_001D2528(thread, index) - 1);
+    globalVarId = sbStackPop(thread);
+    sbGlobalVariableSet(thread, globalVarId, sbGlobalVariableGet(thread, globalVarId) - 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -1243,10 +1335,10 @@ int sbOpDecGlobal(SbThread *thread, unsigned char opcode)
 /* Subtracts one from the local at the popped index; then advances pc past the operation. */
 int sbOpDecLocal(SbThread *thread, unsigned char opcode)
 {
-    int index;
+    int localVarId;
 
-    index = sbStackPop(thread);
-    sbLocalSet(thread, index, sbLocalGet(thread, index) - 1);
+    localVarId = sbStackPop(thread);
+    sbLocalVariableSet(thread, localVarId, sbLocalVariableGet(thread, localVarId) - 1);
     thread->pc += sbOpLength(opcode, 0);
     return 0;
 }
@@ -1257,26 +1349,26 @@ int sbOpDecLocal(SbThread *thread, unsigned char opcode)
 int sbOpSwitch(SbThread *thread)
 {
     int key;
-    int low;
-    int high;
+    int bisectLow;
+    int bisectHigh;
     int mid;
     int entryKey;
 
     key = sbStackPop(thread);
-    low = 0;
-    high = func_001D2498(thread, thread->pc + 1, 1);
-    while (low < high) {
-        mid = (low + high) / 2;
-        entryKey = func_001D2498(thread, thread->pc + mid * 8 + 6, 4);
+    bisectLow = 0;
+    bisectHigh = sbCodeReadUnsigned(thread, thread->pc + 1, 1);
+    while (bisectLow < bisectHigh) {
+        mid = (bisectLow + bisectHigh) / 2;
+        entryKey = sbCodeReadUnsigned(thread, thread->pc + mid * 8 + 6, 4);
         if (entryKey < key) {
-            low = mid + 1;
+            bisectLow = mid + 1;
         } else if (key < entryKey) {
-            high = mid;
+            bisectHigh = mid;
         } else {
-            thread->pc += func_001D2498(thread, thread->pc + mid * 8 + 10, 4);
+            thread->pc += sbCodeReadUnsigned(thread, thread->pc + mid * 8 + 10, 4);
             return 0;
         }
     }
-    thread->pc += func_001D2498(thread, thread->pc + 2, 4);
+    thread->pc += sbCodeReadUnsigned(thread, thread->pc + 2, 4);
     return 0;
 }

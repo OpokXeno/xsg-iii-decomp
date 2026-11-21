@@ -4,8 +4,8 @@
 #include "debug_break.h"
 
 int xglDebFileSize(const char *name);
-int xglDebFileRead(const char *name, void *buffer);
-int xglDebFileWrite(const char *name, const void *buffer, int size);
+int xglDebFileRead(const char *name, void *fileBytes);
+int xglDebFileWrite(const char *name, const void *fileBytes, int fileByteCount);
 int printf(const char *format, ...);
 
 /*
@@ -18,9 +18,9 @@ int printf(const char *format, ...);
 #define T0_MODE_CUE 0x80
 #define T0_COUNT_MASK 0xffff
 
-void xglTimer0Reset(int mode) {
+void xglTimer0Reset(int timerModeBits) {
     *T0_COUNT = 0;
-    *T0_MODE = mode + T0_MODE_CUE;
+    *T0_MODE = timerModeBits + T0_MODE_CUE;
 }
 
 int xglTimer0Get(void)
@@ -42,14 +42,14 @@ int xglDebFileSize(const char *name)
     return -1;
 }
 
-int xglDebFileRead(const char *name, void *buffer)
+int xglDebFileRead(const char *name, void *fileBytes)
 {
     printf("Don't use xglDebFileRead()\n");
     DEBUG_BREAK();
     return -1;
 }
 
-int xglDebFileWrite(const char *name, const void *buffer, int size)
+int xglDebFileWrite(const char *name, const void *fileBytes, int fileByteCount)
 {
     printf("Don't use xglDebFileWrite()\n");
     DEBUG_BREAK();

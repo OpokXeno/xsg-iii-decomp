@@ -20,74 +20,18 @@ INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E940);
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EB70);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EBE8);
-
-void func_0018ECF0(unsigned int a0, unsigned int a1, unsigned int a2);
-extern const char D_005404E0[];
-int xglCdReadFile(const char *name, void *buffer, int mode, void *notify);
-void func_0018E940(int a0, void *a1);
-void func_00180DD8(unsigned int a0, int a1);
-
-void seLoadMasterBank(void)
-{
-    xglCdReadFile(D_005404E0, (void *)0x01F00000, 0, 0);
-    func_0018E940(0, (void *)0x01F00000);
-    func_00180DD8(0xA4000000, 0x600);
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EC68);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018ECF0);
-
-void seVoiceStartDefault(unsigned int a0)
-{
-    func_0018ECF0(a0, 127, 0xffff);
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018ED68);
-
-int soundDriverReset(void)
-{
-    return korgEvagAllUnitsSoundOff();
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EDA8);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EDD0);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EDD8);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F078);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F098);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F118);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F190);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F1D0);
-
-/* <<< CHUNK se_bank_load */
-
-/* >>> CHUNK sound_driver */
-
-int seVolumeCurve(int level);
-
 /* One 16-byte sound slot. Driver calls take driver_id; the create call takes the voice's work
  * buffer and its size. */
 typedef struct SoundSlot {
     int driver_id;
     struct {
-        unsigned char *buffer;        /* the voice's work buffer, carved from WorkEnd */
-        int buffer_size;
-    } create;                         /* what the create call takes */
+        unsigned char *voiceWorkBuffer;    /* the voice's work buffer, carved from WorkEnd */
+        int voiceWorkSize;
+    } voiceWork;                     /* what the create call takes */
     VolumeRamp ramp;                  /* +0x0C */
 } SoundSlot;
-
 /* The sound control block: a 16-byte head with the song number, the levels and the master volume
- * ramp, then the two sound slots (the label soundSlots is slots[0]). */
+ * ramp, then the two sound slots soundSlots. */
 typedef union SoundControl {
     struct {
         unsigned char initialized;    /* +0x00: nonzero once the driver setup has run */
@@ -99,101 +43,274 @@ typedef union SoundControl {
         unsigned char slot_level;     /* +0x07: default sound slot level */
         unsigned char unmodeled_08[4];
         VolumeRamp master_ramp;       /* +0x0C */
-        SoundSlot slots[2];           /* +0x10 */
+        SoundSlot soundSlots[2];      /* +0x10 */
     };
-    /* The head has a slot's layout too; soundSlotReopen indexes the slots as records[index + 1]. */
-    SoundSlot records[3];
+    /* The head has a slot's layout too; soundSlotReopen indexes the slots as soundSlotRecords[index + 1]. */
+    SoundSlot soundSlotRecords[3];
 } SoundControl;
+typedef struct SoundRecordBlock {
+    unsigned char master_volume; /* +0x00: scales the level of slot 0 */
+    unsigned char volumeLevels[3];
+    int current_song;            /* +0x04 */
+    int driver_work;             /* +0x08 */
+    unsigned char unmodeled_0C[4];
+    int reset_word;              /* +0x10 */
+    int lookupTable[279];        /* +0x14 */
+    unsigned char unmodeled_470[0x534 - 0x470];
+    int table_b[63];             /* +0x534 */
+    SoundSlot soundSlotRecords[4]; /* +0x630 */
+} SoundRecordBlock;
+typedef signed char s8;
+typedef int s32;
+extern unsigned char gSeBankFileExt[];
+extern SoundRecordBlock gSoundRecordBlock;
+extern s32 D_004C7040;
+extern unsigned char gSeBankDirName[];
+void func_001801C0();
+void func_0018EC68();
+
+void seBankLoadNumbered(s32 id, s32 number) {
+    extern void func_0018E4C0();
+    s8 name[0x100];
+
+    func_0018EC68(id);
+    if (number != 0) {
+        func_0018E4C0(name, gSeBankDirName, number, gSeBankFileExt);
+        func_001801C0(id, name, D_004C7040, 0x20000, 0, 0);
+    }
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EBE8);
+
+void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan);
+extern const char gSeMasterBankPath[];
+int xglCdReadFile(const char *name, void *buffer, int mode, void *notify);
+void func_0018E940(int a0, void *bankAddress);
+void func_00180DD8(unsigned int a0, int a1);
+
+void seLoadMasterBank(void)
+{
+    xglCdReadFile(gSeMasterBankPath, (void *)0x01F00000, 0, 0);
+    func_0018E940(0, (void *)0x01F00000);
+    func_00180DD8(0xA4000000, 0x600);
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EC68);
+
+s32 func_001808E0();
+
+void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan) {
+    extern s32 func_0018EDD8();
+    if ((voice & 0xF0000000) == 0x10000000) {
+        func_001808E0(voice & 0x0FFFFFFF, volume & 0xFF, pan & 0xFF);
+        return;
+    }
+    func_0018EDD8(voice & 0xFF, volume, pan);
+}
+
+void seVoiceStartDefault(unsigned int voice)
+{
+    seVoiceStart(voice, 127, 0xffff);
+}
+
+s32 func_0018F1D0();
+
+void soundDriverCheckStatus(s32 driverStatus) {
+    if (driverStatus < 0) {
+        func_0018F1D0();
+    }
+}
+
+int soundDriverReset(void)
+{
+    return korgEvagAllUnitsSoundOff();
+}
+
+s32 func_0017E040();
+
+void soundDriverSetVector(s32 vector) {
+    func_0017E040(vector, vector + 4, vector + 8, vector + 0xC);
+}
+
+void soundDriverNoop(void) {
+
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EDD8);
+
+s32 seVoiceStartDriver(s32 voice) {
+    extern s32 func_0018EDD8();
+    return func_0018EDD8(voice, 0x7F, 0xFFFF);
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F098);
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F118);
+
+void soundDriverSetOutputMode(s32 outputSelect) {
+    extern s32 func_00180978();
+    if (outputSelect != 0) {
+        func_00180978(0, 0xA0000500, 0);
+        return;
+    }
+    func_00180978(outputSelect, 0xA0000600, 0);
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F1D0);
+
+/* <<< CHUNK se_bank_load */
+
+/* >>> CHUNK sound_driver */
+
+int seVolumeCurve(int level);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 extern SoundControl soundCtrl;
-/* Sets the loop flag of the driver voice of the sound slot index, then starts the file fileKey * on that voice. A null slot (the lookup failed) does nothing. */ void soundSlotStartFile(int index, const char *fileKey);
+void soundSlotStartFile(int soundSlotNumber, const char *fileKey);
 void ADXT_SetLpFlg(int id, int value);
 void ADXT_StartFname(int id, const char *key);
 int ADXT_SetOutVol(int id, int value);
 void ADXM_ExecVint(int value);
-SoundSlot *func_0018E490(int index);
+SoundSlot *func_0018E490(int soundSlotNumber);
 int func_00169688(int id, int value);
 void func_0016A908(int id, const char *key);
 
 /* Sets the loop flag of the driver voice of the sound slot index, then starts the file fileKey
  * on that voice. A null slot (the lookup failed) does nothing. */
-void soundSlotStartFile(int index, const char *fileKey)
+void soundSlotStartFile(int soundSlotNumber, const char *fileKey)
 {
-    SoundSlot *slot;
+    SoundSlot *soundSlot;
 
-    slot = func_0018E490(index);
-    if (slot != 0) {
-        func_00169688(slot->driver_id, 1);
-        func_0016A908(slot->driver_id, fileKey);
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot != 0) {
+        func_00169688(soundSlot->driver_id, 1);
+        func_0016A908(soundSlot->driver_id, fileKey);
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F288);
+extern unsigned char gSeAdxFileExt[];
+extern unsigned char gSeAdxDirName[];
+
+/* Formats the file key from the number and starts it on the slot index. */
+void soundSlotStartNumbered(s32 soundSlotNumber, s32 fileNumber) {
+    extern s32 func_0018E4C0();
+    s8 fileKey[0x100];
+
+    func_0018E4C0(fileKey, gSeAdxDirName, fileNumber, gSeAdxFileExt);
+    soundSlotStartFile(soundSlotNumber, fileKey);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F2D0);
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F3F8);
+s32 func_0016A968(s32, s32);
+
+void soundSlotSetValue(s32 soundSlotNumber, s32 driverValue) {
+    SoundSlot *soundSlot;
+
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot != 0) {
+        func_00169688(soundSlot->driver_id, 1);
+        func_0016A968(soundSlot->driver_id, driverValue);
+    }
+}
 
 void func_00169938(int id, int value);
 
 /* Pauses or resumes a sound slot's voice and records the level in its ramp. */
-void soundSlotSetPause(int index, int value)
+void soundSlotSetPause(int soundSlotNumber, int level)
 {
-    SoundSlot *slot;
+    SoundSlot *soundSlot;
 
-    slot = func_0018E490(index);
-    if (slot != 0) {
-        func_00169938(slot->driver_id, value);
-        slot->ramp.set_level = (unsigned char) value;
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot != 0) {
+        func_00169938(soundSlot->driver_id, level);
+        soundSlot->ramp.set_level = level;
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F4A0);
+void soundSlotSetLevelIfStill(s32 soundSlotNumber, s32 level)
+{
+    SoundSlot *soundSlot;
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F4E8);
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot == 0) {
+        return;
+    }
+    if (soundSlot->ramp.set_level == 0) {
+        func_00169938(soundSlot->driver_id, level);
+    }
+}
 
-/* The sound block at D_004C7038 (splat label; the slot records start at +0x630, the table the
+s32 func_00167BC8(s32);
+
+/* Stops a sound slot: the driver stop call, then the voice is set to 0. */
+void soundSlotStop(int soundSlotNumber) {
+    SoundSlot *soundSlot;
+
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot == 0) {
+        return;
+    }
+    func_00167BC8(soundSlot->driver_id);
+    func_00169938(soundSlot->driver_id, 0);
+}
+
+/* The sound block at gSoundRecordBlock (splat label; the slot records start at +0x630, the table the
  * lookup in main/tu019 reads). */
-typedef struct SoundRecordBlock {
-    unsigned char master_volume; /* +0x00: scales the level of slot 0 */
-    unsigned char unmodeled_01[3];
-    int current_song;            /* +0x04 */
-    int driver_work;             /* +0x08 */
-    unsigned char unmodeled_0C[4];
-    int reset_word;              /* +0x10 */
-    int table[279];              /* +0x14 */
-    unsigned char unmodeled_470[0x534 - 0x470];
-    int table_b[63];             /* +0x534 */
-    SoundSlot records[4]; /* +0x630 */
-} SoundRecordBlock;
 
-extern SoundRecordBlock D_004C7038;
+
+
+
+
+
+
+
+
+
+
+
+
 int func_00167CB8(int id);
-void func_0018F4E8(int index);
-void func_0018FC70(int index);
+void soundSlotCreate(int soundSlotNumber);
 
 /* Runs the two per-slot hooks for every sound slot that has a work buffer. */
-void func_0018F538(void)
+void soundSlotsReset(void)
 {
-    int index;
+    int soundSlotNumber;
 
-    for (index = 0; index < 4; index++) {
-        if (D_004C7038.records[index].create.buffer != 0) {
-            func_0018F4E8(index);
-            func_0018FC70(index);
+    for (soundSlotNumber = 0; soundSlotNumber < 4; soundSlotNumber++) {
+        if (gSoundRecordBlock.soundSlotRecords[soundSlotNumber].voiceWork.voiceWorkBuffer != 0) {
+            soundSlotStop(soundSlotNumber);
+            soundSlotCreate(soundSlotNumber);
         }
     }
 }
 
 /* Applies the slot's current ramp level, through the volume curve, to its driver voice. */
-int soundSlotApply(SoundSlot *slot)
+int soundSlotApply(SoundSlot *soundSlot)
 {
     int driver_id;
-    int value;
+    int outVolume;
 
-    driver_id = slot->driver_id;
-    value = seVolumeCurve(slot->ramp.current);
-    return ADXT_SetOutVol(driver_id, value);
+    driver_id = soundSlot->driver_id;
+    outVolume = seVolumeCurve(soundSlot->ramp.currentLevel);
+    return ADXT_SetOutVol(driver_id, outVolume);
 }
 
 int seVolumeRampSet(VolumeRamp *ramp, int level, int step);
@@ -201,78 +318,146 @@ int seVolumeRampSet(VolumeRamp *ramp, int level, int step);
 /* The top of the sound level scale; it is also the divisor of the master volume. */
 #define SOUND_LEVEL_MAX 127
 
-/* The default level of a sound slot, a splat label of its own at D_004C703B. */
-extern unsigned char D_004C703B;
+/* The default level of a sound slot, a splat label of its own at gSoundSlotDefaultLevel. */
+extern unsigned char gSoundSlotDefaultLevel;
 
 /* Sets slot index's level and ramp step; a negative extra only reports whether the ramp is moving. */
-int soundSlotSetVolume(int index, int level, int extra)
+int soundSlotSetVolume(int soundSlotNumber, int level, int rampStep)
 {
-    SoundSlot *slot;
+    SoundSlot *soundSlot;
 
-    slot = func_0018E490(index);
-    if (slot == 0) {
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot == 0) {
         return 0;
     }
-    if (extra < 0) {
-        return slot->ramp.step != 0;
+    if (rampStep < 0) {
+        return soundSlot->ramp.levelDelta != 0;
     }
     if (level < 0) {
-        level = D_004C703B;
+        level = gSoundSlotDefaultLevel;
     }
-    if (index == 0) {
-        level = level * D_004C7038.master_volume / SOUND_LEVEL_MAX;
+    if (soundSlotNumber == 0) {
+        level = level * gSoundRecordBlock.master_volume / SOUND_LEVEL_MAX;
     }
-    if (seVolumeRampSet(&slot->ramp, level <= SOUND_LEVEL_MAX ? level : SOUND_LEVEL_MAX, extra) >= 0) {
-        soundSlotApply(slot);
+    if (seVolumeRampSet(&soundSlot->ramp, level <= SOUND_LEVEL_MAX ? level : SOUND_LEVEL_MAX, rampStep) >= 0) {
+        soundSlotApply(soundSlot);
     }
     return 1;
 }
 
 /* Returns the driver status of slot index's voice, or -1 when the slot is not open. */
-int soundSlotStatus(int index)
+int soundSlotStatus(int soundSlotNumber)
 {
-    SoundSlot *slot;
+    SoundSlot *soundSlot;
 
-    slot = func_0018E490(index);
-    if (slot == 0) {
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot == 0) {
         return -1;
     }
-    return func_00167CB8(slot->driver_id);
+    return func_00167CB8(soundSlot->driver_id);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F6E0);
 
 /* Calls the driver on slot index's voice with value 0; a slot that is not open returns 0. */
-void func_0018F7B0(int index)
+/* Clears the loop flag of the driver voice of the sound slot index (the reset half of soundSlotStartFile). */
+void soundSlotClearLoopFlag(int soundSlotNumber)
 {
-    SoundSlot *slot;
+    SoundSlot *soundSlot;
 
-    slot = func_0018E490(index);
-    if (slot == 0) {
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot == 0) {
         return;
     }
-    func_00169688(slot->driver_id, 0);
+    func_00169688(soundSlot->driver_id, 0);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F7E8);
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F820);
+typedef struct SoundWork {
+    s32 voiceHandle;              /* +0x00: the voice handle, 0 when none */
+    unsigned char *packetData;    /* +0x04: the packet data the voice plays */
+    s32 packetSize;               /* +0x08 */
+    unsigned char unk_0C[4];
+} SoundWork;
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F880);
+extern SoundWork gSoundVoices[4];
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F8C0);
-
-/* The same as soundSlotStartFile. */
-void soundSlotStartKey(int index, const char *fileKey)
+void *soundWorkSource(s32 soundSlotNumber, void *packetData, s32 packetSize)
 {
-    soundSlotStartFile(index, fileKey);
+  void *currentPacketData;
+  void *packetDataArg;
+  s32 isValidIndex;
+  s32 packetSizeArg;
+  SoundWork *soundWork;
+  packetDataArg = packetData;
+  packetSizeArg = packetSize;
+  isValidIndex = soundSlotNumber < 4;
+  if (isValidIndex != 0)
+  {
+    soundWork = &gSoundVoices[soundSlotNumber];
+    if ((packetDataArg != 0) && (packetSizeArg == 0))
+    {
+      currentPacketData = soundWork->packetData;
+      *(void **) packetDataArg = currentPacketData;
+      return currentPacketData;
+    }
+    soundWork->packetData = (unsigned char *) packetDataArg;
+    soundWork->packetSize = packetSizeArg;
+    soundSlotCreate(soundSlotNumber);
+    return;
+  }
+  return (void *) isValidIndex;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F900);
+void soundSlotSetDriverParam(s32 soundSlotNumber, s32 driverParam) {
+    extern s32 func_00160C88(s32, s32);
+    SoundSlot *soundSlot;
+
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot != 0) {
+        func_00160C88(soundSlot->driver_id, driverParam);
+    }
+}
+
+s32 func_00160CD0();
+s32 func_00160CE8();
+
+void soundDriverSetEnable(s32 unused_arg0, s32 driverEnabled) {
+    if (driverEnabled != 0) {
+        func_00160CD0();
+        return;
+    }
+    func_00160CE8();
+}
+
+/* The same as soundSlotStartFile. */
+void soundSlotStartKey(int soundSlotNumber, const char *fileKey)
+{
+    soundSlotStartFile(soundSlotNumber, fileKey);
+}
+
+s32 func_0016A3F8(s32);
+
+void soundDriverSetStreamMode(s32 streamEnable) {
+    extern s32 func_00180978(s32, s32, s32);
+    if (streamEnable != 0) {
+        func_0016A3F8(0);
+        func_00180978(0, 0xA0000800, 0);
+        return;
+    }
+    func_0016A3F8(1);
+    func_00180978(0, 0xA0000900, 0);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", soundApplySettings);
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FAA8);
+void soundSetFullVolume(void) {
+    gSoundRecordBlock.master_volume = 0x7F;
+    gSoundRecordBlock.volumeLevels[0] = 0x7F;
+    gSoundRecordBlock.volumeLevels[1] = 0x7F;
+    gSoundRecordBlock.volumeLevels[2] = 0x7F;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FAC8);
 
@@ -284,9 +469,39 @@ int soundVSyncCallback(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FC70);
+s32 func_00167100(s32 kind, unsigned char *packet, s32 packet_size);
+s32 func_00167588();
+s32 func_00168D48();
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FD18);
+void soundSlotCreate(int soundSlotNumber) {
+    extern s32 func_00160C88();
+    SoundWork *soundWork;
+    s32 voiceHandle;
+
+    soundWork = &gSoundVoices[soundSlotNumber];
+    if (soundWork->voiceHandle != 0) {
+        func_00167588(soundWork->voiceHandle);
+    }
+    if (soundWork->packetData == 0) {
+        soundWork->voiceHandle = 0;
+        return;
+    }
+    voiceHandle = func_00167100(2, soundWork->packetData, soundWork->packetSize);
+    soundWork->voiceHandle = voiceHandle;
+    func_00168D48(voiceHandle, 0x1E);
+    func_00160C88(soundWork->voiceHandle, 1);
+    soundSlotSetVolume(soundSlotNumber, -1, 0);
+}
+
+/* Creates the voice of every sound slot. */
+void soundSlotsCreateAll(void)
+{
+    int soundSlotNumber;
+
+    for (soundSlotNumber = 0; soundSlotNumber < 4; soundSlotNumber++) {
+        soundSlotCreate(soundSlotNumber);
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FD58);
 

@@ -30,7 +30,24 @@ INCLUDE_ASM("asm/main/nonmatchings/sdv_packet", func_001F3788);
 
 INCLUDE_ASM("asm/main/nonmatchings/sdv_packet", func_001F3828);
 
-INCLUDE_ASM("asm/main/nonmatchings/sdv_packet", func_001F38B0);
+typedef int s32;
+extern unsigned char gSdvPacketTable[];
+void *func_001F9B18(s32);
+void *memset(void *destination, s32 value, unsigned int count);
+
+/* Claims one slot of the packet table: returns the slot's base, or 0 when the allocation fails. */
+void *sdvPacketClaim(s32 packetSlotIndex) {
+    unsigned char *packetSlot;
+
+    packetSlot = func_001F9B18(packetSlotIndex);
+    if (packetSlot != 0) {
+        memset(packetSlot, 0, 0x18);
+        packetSlot = &gSdvPacketTable[packetSlotIndex];
+        packetSlot[0xF10] = 0;
+        gSdvPacketTable[0xF51] = packetSlotIndex;
+    }
+    return packetSlot;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sdv_packet", func_001F3900);
 

@@ -8,8 +8,8 @@ void xglDmaDirectNormal(unsigned int channel, unsigned int address, unsigned int
 
 /* GS PMODE register: display circuit enables and the alpha blend value. */
 typedef struct GsPmode {
-    unsigned int en1 : 1;
-    unsigned int en2 : 1;
+    unsigned int firstCircuitEnable : 1;
+    unsigned int secondCircuitEnable : 1;
     unsigned int crtmd : 3;
     unsigned int mmod : 1;
     unsigned int amod : 1;
@@ -41,13 +41,13 @@ typedef struct GsDisplay {
 } GsDisplay;
 
 typedef union GsDispfbRegister {
-    u64 value;
-    GsDispfb field;
+    u64 packed;
+    GsDispfb dispfbFields;
 } GsDispfbRegister;
 
 typedef union GsDisplayRegister {
-    u64 value;
-    GsDisplay field;
+    u64 packed;
+    GsDisplay displayFields;
 } GsDisplayRegister;
 
 /* GS EXTDATA register: the sampling window of the external video input (EXTBUF is a plain 64-bit word). */
@@ -63,8 +63,8 @@ typedef struct GsExtdata {
 } GsExtdata;
 
 typedef union GsExtdataRegister {
-    u64 value;
-    GsExtdata field;
+    u64 packed;
+    GsExtdata extdataFields;
 } GsExtdataRegister;
 
 #include "main/Packet.h"
@@ -83,8 +83,8 @@ typedef struct GsClearEnv {
     u32 gif_tag_high;
     u32 gif_registers_low;
     u32 gif_registers_high;
-    u64 target;
-    u64 target_address;
+    u64 clearAlphaDepthTest;
+    u64 clearAlphaDepthTestAddress;
     u32 color_r;
     u32 color_g;
     u32 color_b;
@@ -95,12 +95,12 @@ typedef struct GsClearEnv {
     u32 right;
     u32 bottom;
     unsigned char unmodeled_48[0x08];
-    u64 restore_target;
-    u64 restore_target_address;
+    u64 restoreAlphaDepthTest;
+    u64 restoreAlphaDepthTestAddress;
 } GsClearEnv;
 
 typedef union GsClearPacket {
-    GsClearEnv value;
+    GsClearEnv env;
     AlignedVector4 quadwords[6];
 } GsClearPacket;
 
@@ -112,15 +112,15 @@ extern GsClearPacket ClearEnv;
  */
 typedef struct GsDispEnv {
     union {
-        u64 flags;
+        u64 pmodeWord;
         GsPmode pmode;
     };
     unsigned char unmodeled_08[8];
-    GsDispfbRegister dispfb1;          /* +0x10 */
-    GsDisplayRegister display1;        /* +0x18 */
+    GsDispfbRegister firstDispfb;          /* +0x10 */
+    GsDisplayRegister firstDisplay;        /* +0x18 */
     unsigned char unmodeled_20[8];
-    GsDispfbRegister dispfb2;          /* +0x28 */
-    GsDisplayRegister display2;        /* +0x30 */
+    GsDispfbRegister secondDispfb;          /* +0x28 */
+    GsDisplayRegister secondDisplay;        /* +0x30 */
     u64 extbuf;                        /* +0x38 */
     GsExtdataRegister extdata;         /* +0x40 */
     u64 extwrite;                      /* +0x48 */
@@ -171,6 +171,8 @@ typedef unsigned int XglQuadword __attribute__((mode(TI)));
 #define GS_EXTDATA 0x120000C0
 #define GS_EXTWRITE 0x120000D0
 #define GS_CSR 0x12001000
+/* A 64-bit GS privileged register, written through its address. */
+#define GS_REG(address) (*(volatile u64 *) (address))
 #define D1_CHCR ((volatile u32 *) 0x10009000)
 #define D2_CHCR ((volatile u32 *) 0x1000A000)
 #define D_ENABLEW ((volatile u32 *) 0x1000F590)
@@ -209,17 +211,17 @@ typedef struct GsXyoffset {
 } GsXyoffset;
 
 typedef struct GsScissor {
-    u64 scax0 : 11;
+    u64 scissorMinX : 11;
     u64 unmodeled_11 : 5;
-    u64 scax1 : 11;
+    u64 scissorMaxX : 11;
     u64 unmodeled_27 : 5;
-    u64 scay0 : 11;
+    u64 scissorMinY : 11;
     u64 unmodeled_43 : 5;
-    u64 scay1 : 11;
+    u64 scissorMaxY : 11;
     u64 unmodeled_59 : 5;
 } GsScissor;
 
-typedef struct GsTest {
+typedef struct GsAlphaDepthTest {
     u64 ate : 1;
     u64 atst : 3;
     u64 aref : 8;
@@ -229,14 +231,14 @@ typedef struct GsTest {
     u64 zte : 1;
     u64 ztst : 2;
     u64 unmodeled_19 : 45;
-} GsTest;
+} GsAlphaDepthTest;
 
 typedef struct GsTexa {
-    u64 ta0 : 8;
+    u64 texelAlphaForZero : 8;
     u64 unmodeled_08 : 7;
     u64 aem : 1;
     u64 unmodeled_16 : 16;
-    u64 ta1 : 8;
+    u64 texelAlphaForOne : 8;
     u64 unmodeled_40 : 24;
 } GsTexa;
 
@@ -291,7 +293,7 @@ typedef struct GsDthe {
 } GsDthe;
 
 typedef struct GsGifRegisters {
-    u64 regs0 : 4;
+    u64 firstRegisterDescriptor : 4;
     u64 unmodeled_04 : 60;
 } GsGifRegisters;
 
@@ -313,26 +315,26 @@ typedef struct GsGifTagControl {
 typedef struct GsDrawEnv {
     GsGifTagControl gif_tag;
     GsGifRegisters gif_registers;
-    GsFrame frame1;
-    u64 frame1_address;
-    GsZbuf zbuf1;
-    u64 zbuf1_address;
-    GsXyoffset xyoffset1;
-    u64 xyoffset1_address;
-    GsScissor scissor1;
-    u64 scissor1_address;
-    GsTest test1;
-    u64 test1_address;
-    GsFrame frame2;
-    u64 frame2_address;
-    GsZbuf zbuf2;
-    u64 zbuf2_address;
-    GsXyoffset xyoffset2;
-    u64 xyoffset2_address;
-    GsScissor scissor2;
-    u64 scissor2_address;
-    GsTest test2;
-    u64 test2_address;
+    GsFrame firstFrame;
+    u64 firstFrameAddress;
+    GsZbuf firstZbuf;
+    u64 firstZbufAddress;
+    GsXyoffset firstXyoffset;
+    u64 firstXyoffsetAddress;
+    GsScissor firstScissor;
+    u64 firstScissorAddress;
+    GsAlphaDepthTest firstAlphaDepthTest;
+    u64 firstAlphaDepthTestAddress;
+    GsFrame secondFrame;
+    u64 secondFrameAddress;
+    GsZbuf secondZbuf;
+    u64 secondZbufAddress;
+    GsXyoffset secondXyoffset;
+    u64 secondXyoffsetAddress;
+    GsScissor secondScissor;
+    u64 secondScissorAddress;
+    GsAlphaDepthTest secondAlphaDepthTest;
+    u64 secondAlphaDepthTestAddress;
     GsPrmodecont prmodecont;
     u64 prmodecont_address;
     GsTexa texa;
@@ -346,7 +348,7 @@ typedef struct GsDrawEnv {
 } GsDrawEnv;
 
 typedef union GsDrawPacket {
-    GsDrawEnv value;
+    GsDrawEnv env;
     XglQuadword quadwords[16];
 } GsDrawPacket;
 
@@ -369,7 +371,7 @@ void xglRenderSyncMove(void);
 void xglRenderDrawEnvMove(void);
 /*
  * dispEnvDispfb1..dispEnvExtwrite are fields of DispEnv (0x00645740, GsDispEnv above):
- * dispfb1 (+0x10), display1 (+0x18), dispfb2 (+0x28), display2 (+0x30),
+ * firstDispfb (+0x10), firstDisplay (+0x18), secondDispfb (+0x28), secondDisplay (+0x30),
  * extbuf (+0x38), extdata (+0x40), extwrite (+0x48). dispEnvTailWork lies just past
  * the 0x50 bytes of GsDispEnv.
  */
@@ -402,10 +404,7 @@ void xglRenderMove(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderSyncInit);
-
-/* X3 scaffold label 0x004c8390: the fields func_00199DA8 reads and writes, at their asm offsets. */
-typedef struct XglRenderSyncFlags {
+typedef struct XglRenderStateBlock {
     unsigned char unmodeled_00[2];
     short psm;                          /* +0x02 */
     unsigned char unmodeled_04[6];
@@ -414,12 +413,35 @@ typedef struct XglRenderSyncFlags {
     unsigned char unmodeled_0e[0x67];   /* +0x0E..+0x74 */
     unsigned char frame_delta;          /* +0x75 */
     unsigned char unmodeled_76[0x0e];   /* +0x76..+0x83 */
-    unsigned char flag_84;              /* +0x84 */
-} XglRenderSyncFlags;
+    unsigned char syncBacklogFull;              /* +0x84 */
+} XglRenderStateBlock;
+typedef int s32;
+typedef signed char s8;
+extern volatile unsigned int gVsyncsSinceFlip;
+extern unsigned char func_00199CE0[];
+s32 func_002F47D8();
 
-extern XglRenderSyncFlags D_004C8390;
-extern signed char D_00551206;
-extern volatile unsigned int D_00551214;
+void xglRenderSyncInit(void) {
+    func_002F47D8(func_00199CE0);
+    gVsyncsSinceFlip = 0;
+}
+
+/* X3 scaffold label 0x004c8390: the fields xglRenderSyncWait reads and writes, at their asm offsets. */
+
+
+
+
+
+
+
+
+
+
+
+
+extern XglRenderStateBlock D_004C8390;
+extern signed char gVsyncsPerFrame;
+extern volatile unsigned int gVsyncsSinceFlip;
 /* Scaffold labels of the callees (config has no name for them). */
 void func_001337B8(void);
 void func_002F32B8(void);
@@ -427,30 +449,30 @@ void func_002F3118(int, int, int, int);
 void func_002F38F0(int);
 int sceGsSyncPath(int, int);
 
-void func_00199DA8(void)
+void xglRenderSyncWait(void)
 {
     u64 *packet;
-    int flag;
+    int pathIdleSeen;
     int pollCount;
     int pathBusy;
 
-    if ((unsigned int) D_00551206 < D_00551214) {
+    if ((unsigned int) gVsyncsPerFrame < gVsyncsSinceFlip) {
         D_004C8390.frame_delta = 1;
     } else {
         D_004C8390.frame_delta = 0;
     }
 
-    flag = 0;
+    pathIdleSeen = 0;
     pathBusy = 0;
-    D_004C8390.flag_84 = 0;
+    D_004C8390.syncBacklogFull = 0;
     for (pollCount = 0; pollCount < 0x80; pollCount++) {
         pathBusy = sceGsSyncPath(1, 0);
         if (pathBusy == 0) {
-            if (D_00551214 >= 3 && flag == 0) {
-                D_004C8390.flag_84 = 1;
+            if (gVsyncsSinceFlip >= 3 && pathIdleSeen == 0) {
+                D_004C8390.syncBacklogFull = 1;
             }
-            flag = 1;
-            if (D_00551214 == D_00551206 || (unsigned int) D_00551206 < D_00551214) {
+            pathIdleSeen = 1;
+            if (gVsyncsSinceFlip == gVsyncsPerFrame || (unsigned int) gVsyncsPerFrame < gVsyncsSinceFlip) {
                 break;
             }
         }
@@ -492,7 +514,7 @@ void func_00199DA8(void)
         func_002F38F0(0);
     }
 
-    D_00551214 = 0;
+    gVsyncsSinceFlip = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199FE8);
@@ -502,7 +524,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A1E8);
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A280);
 
 /* X3 scaffold labels of the display environment block (0x004c81c0) and of ScanLineInterpolate (0x00551210); config names neither. */
-extern GsDispEnv D_004C81C0;
+extern GsDispEnv xglRenderDispEnvBlock;
 extern int D_00551210;
 /* Scaffold labels of the two callees (config has no name for them). */
 void func_002E7348(void *start, void *end);
@@ -510,68 +532,133 @@ void func_002F3748(GsDispEnv *env);
 
 void xglRenderDispEnvMove(void)
 {
-    D_004C81C0.dispfb1.field.fbp = sRender.vram.flip_base;
+    xglRenderDispEnvBlock.firstDispfb.dispfbFields.fbp = sRender.vram.flip_base;
     switch (D_00551210) {
     case 0:
-        D_004C81C0.pmode.en1 = 0;
+        xglRenderDispEnvBlock.pmode.firstCircuitEnable = 0;
         break;
     case 1:
-        D_004C81C0.dispfb2.field.fbp = sRender.vram.flip_base;
-        D_004C81C0.pmode.en1 = D_004C81C0.pmode.en2;
-        D_004C81C0.pmode.alp = 0x80;
-        D_004C81C0.display2.field.dx = D_004C81C0.display1.field.dx;
-        D_004C81C0.display2.field.dy = D_004C81C0.display1.field.dy - 1;
+        xglRenderDispEnvBlock.secondDispfb.dispfbFields.fbp = sRender.vram.flip_base;
+        xglRenderDispEnvBlock.pmode.firstCircuitEnable = xglRenderDispEnvBlock.pmode.secondCircuitEnable;
+        xglRenderDispEnvBlock.pmode.alp = 0x80;
+        xglRenderDispEnvBlock.secondDisplay.displayFields.dx = xglRenderDispEnvBlock.firstDisplay.displayFields.dx;
+        xglRenderDispEnvBlock.secondDisplay.displayFields.dy = xglRenderDispEnvBlock.firstDisplay.displayFields.dy - 1;
         break;
     case 2:
         break;
     }
-    func_002E7348(&D_004C81C0, (u8 *) &D_004C81C0 + 88);
-    func_002F3748(&D_004C81C0);
-    *(volatile u64 *) GS_DISPFB1 = D_004C81C0.dispfb2.value;
-    *(volatile u64 *) GS_DISPLAY1 = D_004C81C0.display2.value;
-    *(volatile u64 *) GS_EXTBUF = D_004C81C0.extbuf;
-    *(volatile u64 *) GS_EXTDATA = D_004C81C0.extdata.value;
-    *(volatile u64 *) GS_EXTWRITE = D_004C81C0.extwrite;
-    *(volatile u64 *) GS_CSR = 16;
+    func_002E7348(&xglRenderDispEnvBlock, (u8 *) &xglRenderDispEnvBlock + 88);
+    func_002F3748(&xglRenderDispEnvBlock);
+    GS_REG(GS_DISPFB1) = xglRenderDispEnvBlock.secondDispfb.packed;
+    GS_REG(GS_DISPLAY1) = xglRenderDispEnvBlock.secondDisplay.packed;
+    GS_REG(GS_EXTBUF) = xglRenderDispEnvBlock.extbuf;
+    GS_REG(GS_EXTDATA) = xglRenderDispEnvBlock.extdata.packed;
+    GS_REG(GS_EXTWRITE) = xglRenderDispEnvBlock.extwrite;
+    GS_REG(GS_CSR) = 16;
 }
 
 void xglRenderClearDepth(void)
 {
-    ClearEnv.value.target = GS_TEST_CLEAR_DEPTH;
+    ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_DEPTH;
 }
 
 void xglRenderClearFrame(void)
 {
-    ClearEnv.value.target = GS_TEST_CLEAR_FRAME;
+    ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_FRAME;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A530);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A558);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A620);
+void xglRenderSyncInit();
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A6C0);
+void xglRenderScanLineInit(void)
+{
+  *((volatile s32 *) 0x10003820) = 0;
+  *((volatile s32 *) 0x10003C20) = 0;
+  D_00551210 = 1;
+  func_002F38F0(0);
+  if (D_004C8390.unmodeled_76[0xA] == 0)
+  {
+    if (!(D_004C8390.unmodeled_76[0xB] != 0))
+    {
+      func_002F3118(0, 1, 2, 0);
+    }
+    else
+    {
+      func_002F3118(0, 0, 0x50, 1);
+    }
+  }
+  else
+  {
+    func_002F3118(0, 1, 3, 0);
+  }
+  xglRenderSyncInit();
+}
+
+extern unsigned char xglRenderStartFlag[];
+s32 func_0019A280();
+void xglRenderScanLineInit();
+void xglRenderDispEnvFlagSet();
+s32 xglIntcEnable();
+
+void xglRenderStart(s32 startMode) {
+    xglRenderStartFlag[0] = startMode;
+    xglRenderScanLineInit();
+    xglIntcEnable(5);
+    func_0019A280();
+    xglRenderDispEnvFlagSet();
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A6F0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A798);
+/* The fade bytes sit just past XglRenderStateBlock, which must keep its 0x86-byte size (the object records it). */
+typedef struct XglRenderFadeView {
+  unsigned char unmodeled_00[0x86];
+  unsigned char fade_gain;            /* +0x86 */
+  unsigned char fade_level;           /* +0x87 */
+} XglRenderFadeView;
+#define D_004C8390_FADE (*(XglRenderFadeView *) &D_004C8390)
+
+s32 xglRenderFadeAlpha(void)
+{
+  s32 scaled;
+  scaled = (D_004C8390_FADE.fade_level * D_004C8390_FADE.fade_gain) >> 7;
+  return (scaled >= 0x100) ? (0xFF) : (scaled);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A7C0);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AB00);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC10);
+void xglRenderDispEnvFlagClear(void) {
+    xglRenderDispEnvBlock.pmodeWord &= ~2;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC30);
+void xglRenderDispEnvFlagSet(void) {
+    xglRenderDispEnvBlock.pmodeWord |= 2;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC50);
+extern s8 xglRenderLocked;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC60);
+void xglRenderLockSet(void) {
+    xglRenderLocked = 1;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC68);
+void xglRenderLockClear(void) {
+    xglRenderLocked = 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC70);
+extern s8 xglRenderHeld;
+
+void xglRenderHoldClear(void) {
+    xglRenderHeld = 0;
+}
+
+void xglRenderHoldSet(void) {
+    xglRenderHeld = 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC80);
 
@@ -581,11 +668,21 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019ADD8);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AE90);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AEF8);
+extern s32 D_004C8400[];
+extern s32 xglRenderGlobalFadeValue;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AF08);
+void xglRenderGlobalFadeReset(void) {
+    xglRenderGlobalFadeValue = 0;
+    D_004C8400[0] = 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AF10);
+s32 xglRenderGlobalFadeValueGet(void) {
+    return xglRenderGlobalFadeValue;
+}
+
+void xglRenderGlobalFadeValueSet(s32 fadeValue) {
+    xglRenderGlobalFadeValue = fadeValue;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderGlobalFadeSet);
 
@@ -593,11 +690,36 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B020);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B3C0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B480);
+extern s32 xglRenderFadeGifWord[];
+extern unsigned char D_004C8412[];
+s32 xglRenderFadeAlpha();
+s32 sceVif1PkRef();
+
+void xglRenderGlobalFadeSend(void) {
+    s32 alpha;
+    XglPacket *packet;
+
+    if (D_004C8412[0] == 0) {
+        alpha = xglRenderFadeAlpha();
+        xglRenderFadeGifWord[0] = alpha;
+        packet = xglPacketGetCurrent();
+        /* the GIF packet starts 0x44 bytes (17 words) before the fade word */
+        sceVif1PkRef(packet, &xglRenderFadeGifWord[-0x11], 0x15, 0, 0, 0);
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B670);
+extern s8 xglRenderMovieActive;
+s32 func_0019ADD8();
+s32 moviePlayerInit();
+
+void xglRenderMovieBegin(void) {
+    D_004C8412[0] = 1;
+    xglRenderMovieActive = 1;
+    func_0019ADD8();
+    moviePlayerInit();
+}
 
 void xglRenderFrame(void) {
     xglRenderMove();
@@ -605,6 +727,12 @@ void xglRenderFrame(void) {
     xglPadRead();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B6C0);
+extern s32 xglRenderIoActive;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B6D0);
+void xglRenderIoBegin(void) {
+    xglRenderIoActive = 1;
+}
+
+void xglRenderIoEnd(void) {
+    xglRenderIoActive = 0;
+}

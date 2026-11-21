@@ -7,7 +7,46 @@ void vu0NormalizeVf20(void);
 void vu0CurMatrixMul(Matrix4 matrix);
 void vu0CurMatrixMulRight(Vector4 *rows);
 
-INCLUDE_ASM("asm/main/nonmatchings/vu0_vector", func_00207B20);
+typedef int s32;
+
+/* The effect owner record: the 32 effect slot numbers of the owner sit at +0xFC. */
+typedef struct SefEffectOwner {
+    unsigned char unk_00[0xFC];
+    short slotIds[32];
+} SefEffectOwner;
+
+/* One 0x6C-byte effect slot: its id at +0x60 and its flags at +0x64. */
+typedef struct SefEffectSlot {
+    unsigned char unk_00[0x60];
+    int effectId;
+    unsigned int effectFlags;
+} SefEffectSlot;
+
+SefEffectSlot *sefGetEffectSlot(s32 index);
+
+s32 countFlaggedSefEntries(SefEffectOwner *owner) {
+    short *idCursor;
+    short effectSlotIndex;
+    s32 flaggedCount;
+    s32 i;
+    SefEffectSlot *effectSlot;
+
+    flaggedCount = 0;
+    if (owner != 0) {
+        idCursor = owner->slotIds;
+        for (i = 0; i < 32; i++) {
+            effectSlotIndex = *idCursor;
+            idCursor += 1;
+            effectSlot = sefGetEffectSlot(effectSlotIndex);
+            if ((effectSlot != 0) && (effectSlot->effectId != 0)) {
+                if (effectSlot->effectFlags & 2) {
+                    flaggedCount = flaggedCount + 1;
+                }
+            }
+        }
+    }
+    return flaggedCount;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/vu0_vector", func_00207BA0);
 

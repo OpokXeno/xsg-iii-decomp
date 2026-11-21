@@ -5,13 +5,44 @@
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9A978);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9AAA8);
+typedef signed char s8;
+typedef int s32;
 
-INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9AAC0);
+/* The counter record counterReachesLimit reads: the count is at +0x24. The record's own type is not claimed here. */
+typedef struct CounterRecord {
+    unsigned char unmodeled_00[0x24];
+    s32 count;                          /* +0x24 */
+} CounterRecord;
+
+/* The limit record counterReachesLimit reads: the limit is at +0x08. */
+typedef struct LimitRecord {
+    unsigned char unmodeled_00[0x8];
+    s32 limit;                          /* +0x08 */
+} LimitRecord;
+
+/* Returns 1 when the count of counter has reached the limit of limit, 0 while it is still below. */
+s32 counterReachesLimit(CounterRecord *counter, LimitRecord *limit)
+{
+  if (counter->count < limit->limit)
+  {
+    return 0;
+  }
+  return 1;
+}
+
+s32 monsSessionTryEnd();
+
+s32 unitTryStartPending(void) {
+    return monsSessionTryEnd() != 0;
+}
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9AAE0);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9AB58);
+s32 func_00A9E4D8();
+
+void unitPollBusyState(void) {
+    func_00A9E4D8();
+}
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9AB70);
 
@@ -29,9 +60,8 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu062", func_00A9AB70);
 
 
 
-struct FadeTask *ov01TaskClaim(void);
-void ov01TaskRelease(struct FadeTask *task);
-/* * unitFadeOutStep (fade-out step): progress falls by step. At 0.0 or below the * unit's actor and every child actor go to alpha 0, the task is released and * unit->fade is cleared. Otherwise the progress is written as alpha to the * unit's actor and to each child actor. */
+struct FadeTask *battleTaskClaim(void);
+void battleTaskRelease(struct FadeTask *task);
 void unitFadeOutStep(struct FadeTask *task);
 
 /*
@@ -41,28 +71,28 @@ void unitFadeOutStep(struct FadeTask *task);
  * unit's actor and to each child actor.
  */
 void unitFadeOutStep(struct FadeTask *task) {
-    struct BattleUnit *unit;
+    struct BattleUnit *battleUnit;
     float progress;
-    int slotIndex;
+    int childIndex;
 
-    unit = task->unit;
+    battleUnit = task->unit;
     progress = task->progress - task->step;
     task->progress = progress;
     if (progress <= 0.0f) {
-        unit->unit->alpha = 0.0f;
-        for (slotIndex = 0; slotIndex < UNIT_CHILD_COUNT; slotIndex++) {
-            if (unit->children[slotIndex] != 0) {
-                unit->children[slotIndex]->alpha = 0.0f;
+        battleUnit->motionActor->alpha = 0.0f;
+        for (childIndex = 0; childIndex < UNIT_CHILD_COUNT; childIndex++) {
+            if (battleUnit->children[childIndex] != 0) {
+                battleUnit->children[childIndex]->alpha = 0.0f;
             }
         }
-        ov01TaskRelease(task);
-        unit->fade = 0;
+        battleTaskRelease(task);
+        battleUnit->fade = 0;
         return;
     }
-    unit->unit->alpha = progress;
-    for (slotIndex = 0; slotIndex < UNIT_CHILD_COUNT; slotIndex++) {
-        if (unit->children[slotIndex] != 0) {
-            unit->children[slotIndex]->alpha = task->progress;
+    battleUnit->motionActor->alpha = progress;
+    for (childIndex = 0; childIndex < UNIT_CHILD_COUNT; childIndex++) {
+        if (battleUnit->children[childIndex] != 0) {
+            battleUnit->children[childIndex]->alpha = task->progress;
         }
     }
 }

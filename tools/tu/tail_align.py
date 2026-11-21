@@ -72,8 +72,9 @@ def verified_extended_tail(root, tu, manifest=None):
     following = [item for item in manifest['tus']
                  if item['unit'] == tu['unit'] and item['ordinal'] == tu['ordinal'] + 1
                  and int(item['text']['start'], 16) == end]
-    if (len(following) != 1 or not following[0]['text'].get('empty') or
-            following[0]['text']['size'] != 0 or
+    # X3 bulk integration (user order 2026-11-21): the next TU need not be empty; it must start exactly at `end`
+    # (16-byte aligned, checked by declared_tail_padding). The zero bytes and the hashes below still decide.
+    if (len(following) != 1 or
             any(int(func['va'], 16) + func['size'] > code_end
                 for func in tu['functions'])):
         return False

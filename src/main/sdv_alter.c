@@ -34,17 +34,17 @@ typedef union SdvStripHeader {
 
 void sefMemZero(void *dest, int size);
 void *memset(void *destination, int value, unsigned int count);
-void func_00258B78(void);
-void func_001E7E50(int slot, int flag);
+void gifStateClearModeHook(void);
+void slotReleaseChecked(int slot, int flag);
 
-/* One 128-byte record of the table at D_0062F850; sdvFindFreeSpecialWork takes the first record whose word at +0x04 is zero. */
+/* One 128-byte record of the table at gSdvSpecialRecords; sdvFindFreeSpecialWork takes the first record whose word at +0x04 is zero. */
 typedef struct SdvSpecialRecord {
     unsigned char unmodeled_00[0x04];
     unsigned int inUse;
     unsigned char unmodeled_08[0x78];
 } SdvSpecialRecord;
 
-extern SdvSpecialRecord D_0062F850[];
+extern SdvSpecialRecord gSdvSpecialRecords[];
 
 /* One alter record, 0xE70 bytes; sdvInitAlter zeroes all of it. Only the two bytes sdvDestroyAlter reads are named. */
 typedef struct SdvAlterHeader {
@@ -57,43 +57,43 @@ typedef struct SdvAlter {
     unsigned char unmodeled_000[0xAF2];
     short owner;               /* +0xAF2 compared with the owner argument of sdvDestroyOwnerAlters */
     unsigned char unmodeled_AF4[0xE10 - 0xAF4];
-    SdvAlterHeader header;
+    SdvAlterHeader alterHeader;
     signed char specialSlot;   /* +0xE1E: the special record sdvClearSpecialRecord clears */
-    signed char otherSlot;     /* +0xE1F: first argument of func_001E7E50 in sdvDestroyAlter */
+    signed char ownedSlot;     /* +0xE1F: first argument of slotReleaseChecked in sdvDestroyAlter */
     unsigned char unmodeled_E20[0xE70 - 0xE20];
 } SdvAlter;
 
-/* The 49 alter records (0xE70 bytes each) start at D_00630850. */
-extern SdvAlter D_00630850[];
+/* The 49 alter records (0xE70 bytes each) start at gSdvAlters. */
+extern SdvAlter gSdvAlters[];
 
 INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001EEF18);
 
 void sdvResetSpecialWork(void)
 {
-    memset(D_0062F850, 0, 4096);
-    func_00258B78();
+    memset(gSdvSpecialRecords, 0, 4096);
+    gifStateClearModeHook();
 }
 
 int sdvFindFreeSpecialWork(void)
 {
-    SdvSpecialRecord *table = D_0062F850;
-    SdvSpecialRecord *record;
-    int i;
+    SdvSpecialRecord *specialRecords = gSdvSpecialRecords;
+    SdvSpecialRecord *specialRecord;
+    int freeSpecialSlot;
 
-    record = &table[1];
-    for (i = 1; i < 32; i++, record++) {
-        if (record->inUse == 0) {
-            return i;
+    specialRecord = &specialRecords[1];
+    for (freeSpecialSlot = 1; freeSpecialSlot < 32; freeSpecialSlot++, specialRecord++) {
+        if (specialRecord->inUse == 0) {
+            return freeSpecialSlot;
         }
     }
     return 0;
 }
 
 /* Clears the record of one special slot; slot 0 is kept. */
-void sdvClearSpecialRecord(int slot)
+void sdvClearSpecialRecord(int specialSlot)
 {
-    if (slot > 0) {
-        memset(&D_0062F850[slot], 0, sizeof(SdvSpecialRecord));
+    if (specialSlot > 0) {
+        memset(&gSdvSpecialRecords[specialSlot], 0, sizeof(SdvSpecialRecord));
     }
 }
 
@@ -105,7 +105,18 @@ INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001EF598);
 
 INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001EFD88);
 
-INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001EFF20);
+typedef int s32;
+extern s32 D_0055109C;
+
+s32 sdvAddressInWindow(void) {
+    s32 addressIsInWindow;
+
+    addressIsInWindow = 0;
+    if (D_0055109C <= 0x1014D003) {
+        addressIsInWindow = D_0055109C > 0x1013FFFF;
+    }
+    return addressIsInWindow;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001EFF50);
 
@@ -122,36 +133,37 @@ INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001F1220);
 
 void sdvDestroyAlter(SdvAlter *alter)
 {
-    func_001E7E50(alter->otherSlot, 0);
+    slotReleaseChecked(alter->ownedSlot, 0);
     sdvClearSpecialRecord(alter->specialSlot);
     sefMemZero(alter, sizeof(*alter));
 }
 
+/* Visits the 49 alters in address order while the counter runs down (the original loop shape). The header pointer
+   is stepped by sizeof(SdvAlter) and the alter is rebuilt from the byte offset: typed indexing (&table[i], a pointer
+   walk, &table[i].alterHeader) changed the codegen. */
 void sdvDestroyOwnerAlters(int owner)
 {
-    SdvAlter *table;
-    SdvAlterHeader *header;
+    SdvAlter *alters;
+    SdvAlterHeader *alterHeader;
     SdvAlter *alter;
     int i;
-    unsigned int offset;
-    unsigned int cursor;
+    unsigned int alterByteOffset;
 
     if (owner < 0) {
         return;
     }
-    offset = 0;
-    table = D_00630850;
-    header = &D_00630850[0].header;
-    for (i = 0; i < 49; i++) {
-        cursor = offset;
-        if (header->active != 0) {
-            alter = (SdvAlter *)(cursor + (unsigned int)table);
+    alterByteOffset = 0;
+    alters = gSdvAlters;
+    alterHeader = &gSdvAlters[0].alterHeader;
+    for (i = 48; i >= 0; i--) {
+        if (alterHeader->active != 0) {
+            alter = (SdvAlter *)(alterByteOffset + (unsigned int)alters);
             if (alter->owner == owner) {
                 sdvDestroyAlter(alter);
             }
         }
-        header = (SdvAlterHeader *)((char *)header + sizeof(SdvAlter));
-        offset += sizeof(SdvAlter);
+        alterHeader = (SdvAlterHeader *)((char *)alterHeader + sizeof(SdvAlter));
+        alterByteOffset += sizeof(SdvAlter);
     }
 }
 
@@ -172,20 +184,20 @@ void sdvPacketFlushMscnt(void)
  * Masking the address inside the sceVif1PkRef call loads the mask after the calls instead of before them
  * (fndiff 44 insns, 5/48 in place; this form 48/48).
  */
-void sdvSetStripHeader(SdvStripHeader *header, int unused, int qwc, int primitiveCount, int strip)
+void sdvSetStripHeader(SdvStripHeader *stripHeader, int unused, int qwc, int primitiveCount, int strip)
 {
     XglPacket *packet;
     void *physical;
 
-    physical = (void *)((unsigned int)header & SDV_PHYSICAL_ADDRESS_MASK);
+    physical = (void *)((unsigned int)stripHeader & SDV_PHYSICAL_ADDRESS_MASK);
     packet = xglPacketGetCurrent();
     sdvPacketFlushMscnt();
-    header->quad[0] = 0;
-    header->quad[1] = 0;
-    header->layout.unpack = ((qwc - 1) << 16) | 0x6C008000;
-    header->layout.primitiveCount = primitiveCount;
-    header->layout.strip = strip;
-    header->layout.loopCount |= primitiveCount;
+    stripHeader->quad[0] = 0;
+    stripHeader->quad[1] = 0;
+    stripHeader->layout.unpack = ((qwc - 1) << 16) | 0x6C008000;
+    stripHeader->layout.primitiveCount = primitiveCount;
+    stripHeader->layout.strip = strip;
+    stripHeader->layout.loopCount |= primitiveCount;
     sceVif1PkRef(packet, physical, qwc, 0, 0, 0);
 }
 
@@ -196,7 +208,7 @@ void sdvInitAlters(void)
     SdvAlter *alter;
     int i;
 
-    alter = D_00630850;
+    alter = gSdvAlters;
     for (i = 0; i < 49; i++) {
         sdvInitAlter(alter);
         alter++;
@@ -208,7 +220,7 @@ void sdvDestroyAlters(void)
     SdvAlter *alter;
     int i;
 
-    alter = D_00630850;
+    alter = gSdvAlters;
     for (i = 0; i < 49; i++) {
         sdvDestroyAlter(alter);
         alter++;
@@ -222,13 +234,30 @@ void sdvExecAlters(void)
     int i;
 
     for (i = 0; i < 49; i++) {
-        if (D_00630850[i].header.active != 0) {
-            func_001F17D0(&D_00630850[i]);
+        if (gSdvAlters[i].alterHeader.active != 0) {
+            func_001F17D0(&gSdvAlters[i]);
         }
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", func_001F3458);
+/* The work block of an owner whose alters sdvExecOwnerAlters runs; only its owner id is named. */
+typedef struct SdvOwnerWork {
+    unsigned char unmodeled_000[0x13E];
+    short ownerId;             /* +0x13E compared with SdvAlter.owner */
+} SdvOwnerWork;
+
+void sdvExecOwnerAlters(SdvOwnerWork *ownerWork) {
+    SdvAlter *alter;
+    s32 i;
+
+    alter = gSdvAlters;
+    for (i = 0; i < 49; i++) {
+        if ((alter->alterHeader.active != 0) && (alter->owner == ownerWork->ownerId)) {
+            func_001F17D0(alter);
+        }
+        alter++;
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sdv_alter", sdvDrawAlters);
 

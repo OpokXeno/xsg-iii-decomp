@@ -4,7 +4,7 @@
 #include "common.h"
 
 /* One 232-byte entry of the two lookup pools of this TU; its lookup key is the halfword at +62. */
-typedef struct Ov02PoolLookup {
+typedef struct BattlePoolLookup {
     unsigned char unmodeled_00[8];
     int word56;
     unsigned short half60;
@@ -17,128 +17,170 @@ typedef struct Ov02PoolLookup {
     unsigned char unmodeled_5C[4];
     unsigned short half142;
     unsigned char unmodeled_60[88];
-} Ov02PoolLookup;
+} BattlePoolLookup;
 
-typedef struct Ov02PoolEntry {
+typedef struct BattlePoolEntry {
     unsigned char unmodeled_00[6];
-    short half6;
-    short half8;
-    short half10;
-    short half12;
+    short unk_06;
+    short unk_08;
+    short unk_0A;
+    short unk_0C;
     unsigned char unmodeled_0E[2];
-    signed char byte16;
-    signed char byte17;
-    signed char byte18;
-    signed char byte19;
-    unsigned char byte20;
+    signed char unk_10;
+    signed char unk_11;
+    signed char unk_12;
+    signed char unk_13;
+    unsigned char unk_14;
     unsigned char unmodeled_15[27];
-    Ov02PoolLookup lookup;
-} Ov02PoolEntry;
+    BattlePoolLookup keyBlock;
+} BattlePoolEntry;
 
 /* Owner record; its pool entry pointer sits at +688. */
-typedef struct Ov02Owner {
+typedef struct BattlePoolOwner {
     unsigned char unmodeled_00[688];
-    Ov02PoolEntry *entry;
+    BattlePoolEntry *poolEntry;
     unsigned char unmodeled_AC[92];
-} Ov02Owner;
+} BattlePoolOwner;
 
-Ov02PoolEntry *func_00A982F0(int key);
-Ov02PoolEntry *battleEntryFindByKey(int key);
-Ov02PoolEntry *func_00A87550(int key);
+BattlePoolEntry *battleEntrySlot(int key);
+BattlePoolEntry *battleEntryFindByKey(int key);
+BattlePoolEntry *ov02GetExpRecord(int key);
 int func_00A87740(int key, int index);
-Ov02PoolEntry *func_00A84488(int index);
+BattlePoolEntry *ov02PoolEntryGet(int index);
 void func_00A876C8(int key, int index);
-void func_00A988E0(Ov02PoolEntry *entry, int keyA, int keyB);
-void calcPara2OrgSub(Ov02Owner *owner);
+void func_00A988E0(BattlePoolEntry *entry, int keyA, int keyB);
+void calcPara2OrgSub(BattlePoolOwner *owner);
 void *memset(void *dst, int value, unsigned int size);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A982E8);
+typedef int s32;
 
-INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A982F0);
+/* Keys below BATTLE_KEY_LIMIT live in pool A (10 entries); the others in pool B (5 entries). */
+#define BATTLE_KEY_LIMIT 18
+#define BATTLE_POOL_A_COUNT 10
+#define BATTLE_POOL_B_COUNT 5
+
+void battleEntryNoop(void) {
+
+}
+
+extern BattlePoolEntry gBattleKeySlots[];
+
+BattlePoolEntry * battleEntrySlot(int key) {
+    if (!(key < BATTLE_KEY_LIMIT)) {
+        return 0;
+    }
+    return gBattleKeySlots + (key - 1);
+}
 
 INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A98330);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A984B8);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A98590);
+s32 func_00A866C0();
+s32 func_00A92318();
+s32 func_00A984B8();
+void battleEntryCopy(BattlePoolEntry *keySlot, BattlePoolEntry *ownerPoolEntry);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A98600);
+void unitSideInitEntry(BattlePoolOwner *owner, s32 key) {
+    BattlePoolEntry *ownerEntry;
+    BattlePoolEntry *keySlot;
 
-extern Ov02PoolEntry D_00AC3C60[];
+    ownerEntry = owner->poolEntry;
+    if (key < BATTLE_KEY_LIMIT) {
+        keySlot = battleEntrySlot(key);
+        battleEntryCopy(keySlot, ownerEntry);
+    } else {
+        func_00A984B8(ownerEntry, key);
+    }
+    func_00A866C0(owner);
+    func_00A92318(owner);
+}
 
-Ov02PoolEntry *battleEntryFindByKey(int key)
+extern BattlePoolEntry gBattlePoolA[];
+extern BattlePoolEntry gBattlePoolB[];
+
+/* Clears both pools. */
+void battleEntryClearPools(void) {
+    memset(gBattlePoolA, 0, 0x910U);
+    memset(gBattlePoolB, 0, 0x488U);
+}
+
+extern BattlePoolEntry gBattlePoolA[];
+
+BattlePoolEntry *battleEntryFindByKey(int key)
 {
-    int index;
+    int candidateIndex;
 
-    for (index = 0; index < 10; index++) {
-        if (D_00AC3C60[index].lookup.key == key) {
-            return &D_00AC3C60[index];
+    for (candidateIndex = 0; candidateIndex < BATTLE_POOL_A_COUNT; candidateIndex++) {
+        if (gBattlePoolA[candidateIndex].keyBlock.key == key) {
+            return &gBattlePoolA[candidateIndex];
         }
     }
     return 0;
 }
 
-extern Ov02PoolEntry D_00AC4570[];
+extern BattlePoolEntry gBattlePoolB[];
 
 /* Attaches key to the first free entry of the pool it selects; keys below 18 first reuse the entry that already holds them. */
-Ov02PoolEntry *battleEntryAcquire(void *unused, int key)
+BattlePoolEntry *battleEntryAcquire(void *unused, int key)
 {
-    Ov02PoolEntry *entry;
-    int index;
+    BattlePoolEntry *acquiredEntry;
+    int candidateIndex;
 
-    entry = 0;
-    if (key < 18) {
-        entry = battleEntryFindByKey(key);
-        if (entry != 0) {
-            return entry;
+    acquiredEntry = 0;
+    if (key < BATTLE_KEY_LIMIT) {
+        acquiredEntry = battleEntryFindByKey(key);
+        if (acquiredEntry != 0) {
+            return acquiredEntry;
         }
-        for (index = 0; index < 10; index++) {
-            if (D_00AC3C60[index].lookup.key == 0) {
-                D_00AC3C60[index].lookup.key = key;
-                entry = &D_00AC3C60[index];
+        for (candidateIndex = 0; candidateIndex < BATTLE_POOL_A_COUNT; candidateIndex++) {
+            if (gBattlePoolA[candidateIndex].keyBlock.key == 0) {
+                gBattlePoolA[candidateIndex].keyBlock.key = key;
+                acquiredEntry = &gBattlePoolA[candidateIndex];
                 break;
             }
         }
     } else {
-        for (index = 0; index < 5; index++) {
-            if (D_00AC4570[index].lookup.key == 0) {
-                D_00AC4570[index].lookup.key = key;
-                entry = &D_00AC4570[index];
+        for (candidateIndex = 0; candidateIndex < BATTLE_POOL_B_COUNT; candidateIndex++) {
+            if (gBattlePoolB[candidateIndex].keyBlock.key == 0) {
+                gBattlePoolB[candidateIndex].keyBlock.key = key;
+                acquiredEntry = &gBattlePoolB[candidateIndex];
                 break;
             }
         }
     }
-    return entry;
+    return acquiredEntry;
 }
 
 /* Clears the key of the owner's pool entry; returns 1 when the owner has one, else 0. */
-int battleEntryRelease(Ov02Owner *owner)
+int battleEntryRelease(BattlePoolOwner *owner)
 {
-    Ov02PoolEntry *entry;
+    BattlePoolEntry *ownerPoolEntry;
 
-    entry = owner->entry;
-    if (entry != 0) {
-        entry->lookup.key = 0;
+    ownerPoolEntry = owner->poolEntry;
+    if (ownerPoolEntry != 0) {
+        ownerPoolEntry->keyBlock.key = 0;
         return 1;
     }
     return 0;
 }
 
-void func_00A98770(Ov02PoolEntry *src, Ov02PoolEntry *dst)
+/* Copies a pool entry and applies the per-key fix-up of keys 13..16. */
+void battleEntryCopy(BattlePoolEntry *keySlot, BattlePoolEntry *ownerPoolEntry)
 {
-    *dst = *src;
-    switch (dst->lookup.key) {
+    *ownerPoolEntry = *keySlot;
+    switch (ownerPoolEntry->keyBlock.key) {
     case 13:
-        func_00A988E0(dst, 7, 6);
+        func_00A988E0(ownerPoolEntry, 7, 6);
         return;
     case 14:
-        func_00A988E0(dst, 3, 4);
+        func_00A988E0(ownerPoolEntry, 3, 4);
         return;
     case 15:
-        func_00A988E0(dst, 5, 1);
+        func_00A988E0(ownerPoolEntry, 5, 1);
         return;
     case 16:
-        func_00A988E0(dst, 2, 0);
+        func_00A988E0(ownerPoolEntry, 2, 0);
         break;
     }
 }
@@ -148,41 +190,47 @@ INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A988E0);
 /* Attaches the pool entry of every key from 1 to 17 to a local owner and copies it. */
 void calcPara2Org(void)
 {
-    Ov02Owner owner;
-    Ov02PoolEntry *entry;
+    BattlePoolOwner owner;
+    BattlePoolEntry *foundEntry;
     int key;
 
-    for (key = 1; key < 18; key++) {
-        entry = battleEntryFindByKey(key);
-        if (entry != 0) {
-            owner.entry = entry;
+    for (key = 1; key < BATTLE_KEY_LIMIT; key++) {
+        foundEntry = battleEntryFindByKey(key);
+        if (foundEntry != 0) {
+            owner.poolEntry = foundEntry;
             calcPara2OrgSub(&owner);
         }
     }
 }
 
 /* Copies the owner's pool entry into the entry allocated for its key; a zero word56 becomes 1. */
-void calcPara2OrgSub(Ov02Owner *owner)
+void calcPara2OrgSub(BattlePoolOwner *owner)
 {
-    Ov02PoolEntry *src;
-    Ov02PoolEntry *dst;
-    int word56;
+    BattlePoolEntry *ownerPoolEntry;
+    BattlePoolEntry *keySlotEntry;
+    int ownerWord56;
 
-    src = owner->entry;
-    dst = func_00A982F0(src->lookup.key);
-    word56 = src->lookup.word56;
-    dst->lookup.word56 = word56;
-    if (word56 == 0) {
-        dst->lookup.word56 = 1;
+    ownerPoolEntry = owner->poolEntry;
+    keySlotEntry = battleEntrySlot(ownerPoolEntry->keyBlock.key);
+    ownerWord56 = ownerPoolEntry->keyBlock.word56;
+    keySlotEntry->keyBlock.word56 = ownerWord56;
+    if (ownerWord56 == 0) {
+        keySlotEntry->keyBlock.word56 = 1;
     }
-    dst->lookup.half60 = src->lookup.half60;
-    dst->lookup.half130 = src->lookup.half130;
-    dst->lookup.half142 = src->lookup.half142;
-    dst->lookup.half136 = src->lookup.half136;
+    keySlotEntry->keyBlock.half60 = ownerPoolEntry->keyBlock.half60;
+    keySlotEntry->keyBlock.half130 = ownerPoolEntry->keyBlock.half130;
+    keySlotEntry->keyBlock.half142 = ownerPoolEntry->keyBlock.half142;
+    keySlotEntry->keyBlock.half136 = ownerPoolEntry->keyBlock.half136;
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A98D58);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A98E98);
+s32 func_00A98D58();
 
-INCLUDE_ASM("asm/nonmatchings/ov02/calc", func_00A98EB0);
+s32 unitSideGet(s32 unitId) {
+    return func_00A98D58(unitId, 0);
+}
+
+void unitSideTouch(s32 unitId) {
+    func_00A98D58(unitId, 1);
+}

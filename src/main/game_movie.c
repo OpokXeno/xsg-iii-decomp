@@ -44,179 +44,27 @@ char *caption_nextline(char *cursor)
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B2368);
 
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B24E8);
-
-#include "main/tu007.h"
-
-char *func_001B2368(char *cursor, int *frames);
-int xglFontGetStringWidth(const char *text);
-extern const char D_0053F588[];
-extern const char D_0053F590[];
-extern const char D_0053F598[];
-
-char *caption_getparam(char *cursor, int *time, char *out)
-{
-    int frames;
-    char ch;
-    char *text;
-    char *next;
-    int width;
-
-    if ((*cursor >= '0' && *cursor <= '9') || *cursor == '+') {
-        frames = *time;
-        next = func_001B2368(cursor, &frames);
-        cursor = next;
-        for (;;) {
-            ch = *cursor++;
-            out += 2;
-            text = out;
-            while (ch != '\\' && ch != '\r' && ch != '\n') {
-                if (ch == '[') {
-                    __builtin_memcpy(out, D_0053F588, 8);
-                    while (*out != 0) {
-                        out++;
-                    }
-                    ch = *cursor++;
-                    while (ch != '/') {
-                        *out++ = ch;
-                        ch = *cursor++;
-                    }
-                    __builtin_memcpy(out, D_0053F590, 8);
-                    while (*out != 0) {
-                        out++;
-                    }
-                    ch = *cursor++;
-                    while (ch != ']') {
-                        *out++ = ch;
-                        ch = *cursor++;
-                    }
-                    __builtin_memcpy(out, D_0053F598, 8);
-                    while (*out != 0) {
-                        out++;
-                    }
-                } else {
-                    *out++ = ch;
-                }
-                ch = *cursor++;
-            }
-            *out = 0;
-            width = xglFontGetStringWidth(text);
-            text[-2] = 1;
-            text[-1] = ~(width / 2);
-            if (ch != '\\') {
-                break;
-            }
-            *out++ = '\n';
-            cursor++;
-        }
-    } else {
-        frames = -1;
-    }
-    *time = frames;
-    *out = 0;
-    return caption_nextline(cursor);
-}
-
-char *caption_getparam(char *cursor, int *time, char *out);
-extern unsigned char D_00771240[];
-extern const char D_0053F5A0[];
-
-int caption_convert(char *text)
-{
-    char *dst;
-    char *src;
-    char *next;
-    int time;
-
-    dst = text;
-    D_00771240[0] = 0;
-    xglFontGetStringWidth(D_0053F5A0);
-    src = caption_nextline(text);
-    time = 0;
-    next = caption_getparam(src, &time, text);
-    if (time == 0) {
-        while (*dst++ != 0) {
-        }
-        src = next;
-    } else {
-        *text = 0;
-        dst = text + 1;
-    }
-    time = 0;
-    do {
-        src = caption_getparam(src, &time, dst + 2);
-        dst[0] = time;
-        dst[1] = time >> 8;
-        dst += 4;
-        while (*dst++ != 0) {
-        }
-    } while (time >= 0);
-    return dst - text;
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B28C0);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B2E18);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B2F60);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B30D8);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3110);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3120);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3200);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B32F8);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3510);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3548);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3670);
-
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3858);
-
-/* Quadword (128-bit) type of the DMA packet unions. */
+typedef signed char s8;
+typedef int s32;
 typedef unsigned int XglQuadword __attribute__((mode(TI)));
-
-typedef union GameOverDmaPacket4 {
-    u64 words[4];
+typedef union ImageSyncPacket {
+    u64 doublewords[4];
     XglQuadword quadwords[2];
-} GameOverDmaPacket4;
-
-typedef union GameOverDmaPacket6 {
-    u64 words[6];
+} ImageSyncPacket;
+typedef union ImageFlushPacket {
+    u64 doublewords[6];
     XglQuadword quadwords[3];
-} GameOverDmaPacket6;
-
-/* An image of the synopsis screen and its size in pixels and in quadwords. */
+} ImageFlushPacket;
 typedef struct GameSynopsisPanel {
     void *image;
     int width;
     int height;
     int qwc;
 } GameSynopsisPanel;
-
-void DrawImage(void *framebuffer);
-void GameSynopsisDrawPanel(GameSynopsisPanel *panel, int x, int y, int alpha);
-extern XglRenderState sRender;
-void xglSleep(void);
-void sceVif1PkCnt(XglPacket *packet, unsigned int count);
-void sceVif1PkAddDataN(XglPacket *packet, const void *data, unsigned int qwc);
-
-typedef union GameOverDmaPacket12 {
-    u64 words[12];
+typedef union ImageBitbltPacket {
+    u64 doublewords[12];
     XglQuadword quadwords[6];
-} GameOverDmaPacket12;
-
-void redraw_frame(void *framebuffer);
-extern GameOverDmaPacket12 TestEnv_0_002BCD00;
-extern GameOverDmaPacket4 TransEnv_1_002BCD60;
-extern GameOverDmaPacket6 FlushEnv_2_002BCD80;
-
-/* The 28-word VIF payload at 0x002BCDB0 that GameSynopsisDrawPanel sends first. */
+} ImageBitbltPacket;
 typedef struct GameSynopsisPanelHeader {
     u8 unmodeled_00[0x40];
     u64 extent;                 /* +0x40: width in the low word, height in the high word */
@@ -224,8 +72,6 @@ typedef struct GameSynopsisPanelHeader {
     int qwc;                    /* +0x60: the image's quadword count */
     u8 unmodeled_64[0x0C];
 } GameSynopsisPanelHeader;
-
-/* The 44-word VIF payload at 0x002BCE20 that GameSynopsisDrawPanel sends second. */
 typedef struct GameSynopsisPanelRect {
     u8 unmodeled_00[0x6C];
     int alpha;                  /* +0x6C */
@@ -240,21 +86,254 @@ typedef struct GameSynopsisPanelRect {
     int bottom_right_y;         /* +0xA4 */
     u8 unmodeled_A8[0x08];
 } GameSynopsisPanelRect;
+typedef union BackdropPacket {
+    u64 doublewords[20];
+    XglQuadword quadwords[10];
+} BackdropPacket;
+typedef struct GameSynopsisWaitState {
+    int pending;
+    int crossfadeOutValue;
+    int crossfadeInValue;
+    GameSynopsisPanel panel;
+    u8 unmodeled_1C[0x04];
+} GameSynopsisWaitState;
+
+char *func_001B2368(char *cursor, int *frames);
+
+s8 *caption_parseFrameArg(s8 *cursor, s32 *frames) {
+    if (*cursor != 0x2C) {
+        return func_001B2368(cursor, frames);
+    }
+    return cursor + 1;
+}
+
+#include "main/tu007.h"
+
+int xglFontGetStringWidth(const char *text);
+extern const char captionTagStart[];
+extern const char captionTagSeparator[];
+extern const char captionTagEnd[];
+
+char *caption_getparam(char *cursor, int *captionFrames, char *outCursor)
+{
+    int frames;
+    char ch;
+    char *textStart;
+    char *afterFrameArg;
+    int width;
+
+    if ((*cursor >= '0' && *cursor <= '9') || *cursor == '+') {
+        frames = *captionFrames;
+        afterFrameArg = func_001B2368(cursor, &frames);
+        cursor = afterFrameArg;
+        for (;;) {
+            ch = *cursor++;
+            outCursor += 2;
+            textStart = outCursor;
+            while (ch != '\\' && ch != '\r' && ch != '\n') {
+                if (ch == '[') {
+                    __builtin_memcpy(outCursor, captionTagStart, 8);
+                    while (*outCursor != 0) {
+                        outCursor++;
+                    }
+                    ch = *cursor++;
+                    while (ch != '/') {
+                        *outCursor++ = ch;
+                        ch = *cursor++;
+                    }
+                    __builtin_memcpy(outCursor, captionTagSeparator, 8);
+                    while (*outCursor != 0) {
+                        outCursor++;
+                    }
+                    ch = *cursor++;
+                    while (ch != ']') {
+                        *outCursor++ = ch;
+                        ch = *cursor++;
+                    }
+                    __builtin_memcpy(outCursor, captionTagEnd, 8);
+                    while (*outCursor != 0) {
+                        outCursor++;
+                    }
+                } else {
+                    *outCursor++ = ch;
+                }
+                ch = *cursor++;
+            }
+            *outCursor = 0;
+            width = xglFontGetStringWidth(textStart);
+            textStart[-2] = 1;
+            textStart[-1] = ~(width / 2);
+            if (ch != '\\') {
+                break;
+            }
+            *outCursor++ = '\n';
+            cursor++;
+        }
+    } else {
+        frames = -1;
+    }
+    *captionFrames = frames;
+    *outCursor = 0;
+    return caption_nextline(cursor);
+}
+
+char *caption_getparam(char *cursor, int *captionFrames, char *outCursor);
+extern unsigned char captionPlayMode[];
+extern const char D_0053F5A0[];
+
+int caption_convert(char *text)
+{
+    char *writeCursor;
+    char *readCursor;
+    char *nextLine;
+    int captionFrames;
+
+    writeCursor = text;
+    captionPlayMode[0] = 0;
+    xglFontGetStringWidth(D_0053F5A0);
+    readCursor = caption_nextline(text);
+    captionFrames = 0;
+    nextLine = caption_getparam(readCursor, &captionFrames, text);
+    if (captionFrames == 0) {
+        while (*writeCursor++ != 0) {
+        }
+        readCursor = nextLine;
+    } else {
+        *text = 0;
+        writeCursor = text + 1;
+    }
+    captionFrames = 0;
+    do {
+        readCursor = caption_getparam(readCursor, &captionFrames, writeCursor + 2);
+        writeCursor[0] = captionFrames;
+        writeCursor[1] = captionFrames >> 8;
+        writeCursor += 4;
+        while (*writeCursor++ != 0) {
+        }
+    } while (captionFrames >= 0);
+    return writeCursor - text;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B28C0);
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B2E18);
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B2F60);
+
+extern s8 *captionTextBegin;
+extern s8 *captionTextCursor;
+
+void caption_begin(s8 *text)
+{
+    if (text != 0) {
+        captionTextBegin = text;
+        captionTextCursor = text;
+        caption_convert(text);
+    }
+}
+
+void caption_rewind(void) {
+    captionTextCursor = captionTextBegin;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3120);
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3200);
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B32F8);
+
+s32 func_001B3120();
+s32 func_001B32F8();
+
+void captionPlayIndex(s32 captionIndex) {
+    if (captionPlayMode[0] == 1) {
+        func_001B32F8(captionIndex);
+        return;
+    }
+    func_001B3120(captionIndex, 1);
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3548);
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3670);
+
+INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3858);
+
+
+
+
+
+
+
+
+
+
+
+
+/* An image of the synopsis screen and its size in pixels and in quadwords. */
+
+
+
+
+
+
+
+void DrawImage(u8 *framebuffer);
+void GameSynopsisDrawPanel(GameSynopsisPanel *panel, int x, int y, int alpha);
+extern XglRenderState sRender;
+void xglSleep(void);
+void sceVif1PkCnt(XglPacket *packet, unsigned int count);
+void sceVif1PkAddDataN(XglPacket *packet, const void *data, unsigned int qwc);
+
+
+
+
+
+
+void redraw_frame(void *framebuffer);
+extern ImageBitbltPacket TestEnv_0_002BCD00;
+extern ImageSyncPacket TransEnv_1_002BCD60;
+extern ImageFlushPacket FlushEnv_2_002BCD80;
+
+/* The 28-word VIF payload at 0x002BCDB0 that GameSynopsisDrawPanel sends first. */
+
+
+
+
+
+
+
+
+/* The 44-word VIF payload at 0x002BCE20 that GameSynopsisDrawPanel sends second. */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 extern GameSynopsisPanelHeader gameSynopsisPanelHeaderPacket;
 extern GameSynopsisPanelRect gameSynopsisPanelRectPacket;
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B3D50);
 
-extern u16 D_004C83A6[];
-extern GameOverDmaPacket12 D_004ADC20;
-extern GameOverDmaPacket4 D_004ADC80;
-extern GameOverDmaPacket6 D_004ADCA0;
+extern u16 movieFramebufferBasePage[];
+extern ImageBitbltPacket movieImageBitbltPacket;
+extern ImageSyncPacket movieImageSyncPacket;
+extern ImageFlushPacket movieImageFlushPacket;
 
-void DrawImage(void *framebuffer)
+void DrawImage(u8 *framebuffer)
 {
     XglPacket *packet;
-    u16 msb;
+    u64 msb;
 
     if (framebuffer == 0) {
         return;
@@ -264,14 +343,15 @@ void DrawImage(void *framebuffer)
     /* BITBLTBUF: destination page buffer_select << 5, destination width 8
      * (512 pixels) in bits 48-53. */
     msb = 0x8000;
-    D_004ADC20.words[4] = ((u64)D_004C83A6[0] << 37) | ((u64)msb << 36);
+    movieImageBitbltPacket.doublewords[4] = ((u64)movieFramebufferBasePage[0] << 37) | (msb << 36);
+
     sceVif1PkCnt(packet, 0);
-    sceVif1PkAddDataN(packet, D_004ADC20.words, 0x18);
-    sceVif1PkRef(packet, D_004ADC80.words, 2, 0, 0, 0);
+    sceVif1PkAddDataN(packet, movieImageBitbltPacket.doublewords, 0x18);
+    sceVif1PkRef(packet, movieImageSyncPacket.doublewords, 2, 0, 0, 0);
     sceVif1PkRef(packet, framebuffer, 0x7000, 0, 0x51007000, 0);
-    sceVif1PkRef(packet, D_004ADC80.words, 2, 0, 0, 0);
-    sceVif1PkRef(packet, (u8 *)framebuffer + 0x70000, 0x7000, 0, 0x51007000, 0);
-    sceVif1PkRef(packet, D_004ADCA0.words, 3, 0, 0, 0);
+    sceVif1PkRef(packet, movieImageSyncPacket.doublewords, 2, 0, 0, 0);
+    sceVif1PkRef(packet, &framebuffer[0x70000], 0x7000, 0, 0x51007000, 0);
+    sceVif1PkRef(packet, movieImageFlushPacket.doublewords, 3, 0, 0, 0);
 }
 
 void GameSynopsisDrawPanel(GameSynopsisPanel *panel, int x, int y, int alpha)
@@ -307,14 +387,14 @@ void GameSynopsisDrawPanel(GameSynopsisPanel *panel, int x, int y, int alpha)
     sceVif1PkAddDataN(packet, &gameSynopsisPanelRectPacket, 44);
 }
 
-extern u16 D_004C839E[];
+extern u16 movieBackdropBasePage[];
 
-typedef union GameOverDmaPacket20 {
-    u64 words[20];
-    XglQuadword quadwords[10];
-} GameOverDmaPacket20;
 
-extern GameOverDmaPacket20 D_004ADDF0;
+
+
+
+
+extern BackdropPacket movieBackdropPacket;
 void FlushCache(int mode);
 
 void DrawBack(int alpha)
@@ -324,12 +404,12 @@ void DrawBack(int alpha)
 
     nonnegative_alpha = alpha < 0 ? 0 : alpha;
     gs_frame_address_bits = 0xc800;
-    D_004ADDF0.words[6] =
-        (0x24120000 | (D_004C839E[0] << 5)) |
+    movieBackdropPacket.doublewords[6] =
+        (0x24120000 | (movieBackdropBasePage[0] << 5)) |
         (gs_frame_address_bits << 0x13);
-    D_004ADDF0.words[8] = (nonnegative_alpha << 32) | 100;
+    movieBackdropPacket.doublewords[8] = (nonnegative_alpha << 32) | 100;
     FlushCache(0);
-    sceVif1PkRef(xglPacketGetCurrent(), D_004ADDF0.words, 10, 0, 0, 0);
+    sceVif1PkRef(xglPacketGetCurrent(), movieBackdropPacket.doublewords, 10, 0, 0, 0);
 }
 
 void redraw_frame(void *framebuffer) {
@@ -344,66 +424,112 @@ INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B41E8);
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B43C8);
 
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B45B8);
+extern unsigned char movieCdReadBuffer[];
+s32 func_00181C18();
+s32 func_001B43C8();
+s32 xglCdReadFile();
+
+void movieCdLoadAndStart(s32 location, s32 mode) {
+    func_00181C18(movieCdReadBuffer);
+    xglCdReadFile(movieCdReadBuffer - 4, location, 0, 0);
+    func_001B43C8(location, mode);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B4618);
 
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B47C0);
+extern unsigned char movieTextHeaderString[];
+s32 xglFontPrintDirect();
+
+void movieTextPrintEntry(u8 **textTable, s32 textIndex) {
+    xglFontPrintDirect(movieTextHeaderString);
+    xglFontPrintDirect(textTable[10]);
+    xglFontPrintDirect(textTable[textIndex]);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B4810);
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B4B88);
 
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B4FA8);
+void fontPrintOptionalTriple(void *prefix, char *text, s32 suffix) {
+    if (prefix != 0) {
+        xglFontPrintDirect();
+    }
+    if (text != 0) {
+        xglFontPrintDirect(text);
+    }
+    if (suffix != 0) {
+        xglFontPrintDirect(suffix);
+    }
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B5010);
+extern char movieLabelPrefix[];
+void fontPrintOptionalTriple();
+void moviePrintLabelValue(char *labelText, int labelValue);
 
-INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B5038);
+void moviePrintLabelValue(char *labelText, int labelValue) {
+    fontPrintOptionalTriple(movieLabelPrefix, labelText, labelValue);
+}
+
+extern char movieStatusTitle[];
+extern char D_0053F750[];
+extern char D_0053F758[];
+extern char D_0053F760[];
+extern char D_0053F768[];
+extern char D_0053F770[];
+
+void moviePrintStatusRows(void *prefix, s32 statusRowValue) {
+    moviePrintLabelValue(movieStatusTitle, 0);
+    fontPrintOptionalTriple(prefix, D_0053F750, statusRowValue);
+    fontPrintOptionalTriple(prefix, D_0053F758, statusRowValue);
+    fontPrintOptionalTriple(prefix, D_0053F760, statusRowValue);
+    fontPrintOptionalTriple(prefix, D_0053F768, statusRowValue);
+    fontPrintOptionalTriple(prefix, D_0053F770, statusRowValue);
+}
+
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B50D8);
 
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B5618);
 
-/* Pending wait state at D_00771260: the flag starts the wait, the panel is the synopsis image. */
-typedef struct GameSynopsisWaitState {
-    int pending;
-    int unmodeled_04;
-    int unmodeled_08;
-    GameSynopsisPanel panel;
-    u8 unmodeled_1C[0x04];
-} GameSynopsisWaitState;
+/* Pending wait state at synopsisCrossfadeState: the flag starts the wait, the panel is the synopsis image. */
 
-extern GameSynopsisWaitState D_00771260;
-extern const char D_0053F8D0[];
+
+
+
+
+
+
+
+extern GameSynopsisWaitState synopsisCrossfadeState;
+extern const char synopsisAlphaLabelFormat[];
 extern PadRecord PadData[2];
 int GameMpeg2Play(char *destination, const char *format, ...);
-void seVoiceStartDefault(int);
-void func_001B5010(char *buffer, int value);
-void func_001BBEA8(void);
+void seVoiceStartDefault(unsigned int handle);
+void sefFlagSetBit26(void);
 
 int GameSynopsisCrossfadeWait(void)
 {
-    char buffer[256];
+    char labelBuffer[256];
     int alpha;
 
     alpha = 0;
-    if (D_00771260.pending == 0) {
+    if (synopsisCrossfadeState.pending == 0) {
         return 0;
     }
-    D_00771260.pending = 0;
+    synopsisCrossfadeState.pending = 0;
     seVoiceStartDefault(4);
     for (;;) {
-        GameSynopsisDrawPanel(&D_00771260.panel, 512 - D_00771260.panel.width, 448 - D_00771260.panel.height, 128);
+        GameSynopsisDrawPanel(&synopsisCrossfadeState.panel, 512 - synopsisCrossfadeState.panel.width, 448 - synopsisCrossfadeState.panel.height, 128);
         alpha += 4;
         if (alpha > 128) {
             alpha = 128;
         }
-        GameMpeg2Play(buffer, D_0053F8D0, 128 - alpha);
-        func_001B5010(buffer, D_00771260.unmodeled_04);
-        GameMpeg2Play(buffer, D_0053F8D0, alpha);
-        func_001B5010(buffer, D_00771260.unmodeled_08);
+        GameMpeg2Play(labelBuffer, synopsisAlphaLabelFormat, 128 - alpha);
+        moviePrintLabelValue(labelBuffer, synopsisCrossfadeState.crossfadeOutValue);
+        GameMpeg2Play(labelBuffer, synopsisAlphaLabelFormat, alpha);
+        moviePrintLabelValue(labelBuffer, synopsisCrossfadeState.crossfadeInValue);
         if ((PadData[0].heldAndPressed & 0x800010c) == 0x800010c) {
-            func_001BBEA8();
+            sefFlagSetBit26();
             return 1;
         }
         if ((PadData[0].pressed & 0x60) == 0) {
@@ -413,9 +539,9 @@ int GameSynopsisCrossfadeWait(void)
         }
     }
     seVoiceStartDefault(2);
-    GameSynopsisDrawPanel(&D_00771260.panel, 512 - D_00771260.panel.width, 448 - D_00771260.panel.height, 128);
+    GameSynopsisDrawPanel(&synopsisCrossfadeState.panel, 512 - synopsisCrossfadeState.panel.width, 448 - synopsisCrossfadeState.panel.height, 128);
     xglSleep();
-    GameSynopsisDrawPanel(&D_00771260.panel, 512 - D_00771260.panel.width, 448 - D_00771260.panel.height, 128);
+    GameSynopsisDrawPanel(&synopsisCrossfadeState.panel, 512 - synopsisCrossfadeState.panel.width, 448 - synopsisCrossfadeState.panel.height, 128);
     xglSleep();
     return 0;
 }

@@ -5,7 +5,7 @@
 
 #include "quadword.h"
 
-void cfeRotateVectorXY(float *result, const float *angles);
+void cfeDirectionFromAngles(float *direction, const float *angles);
 void xglVectorMulMat(Vector4 *destination, Matrix4 matrix, const Vector4 *vector);
 void xglMatrixStackUnit(void);
 void xglMatrixStackRotX(float angle);
@@ -13,10 +13,53 @@ void xglMatrixStackRotY(float angle);
 void xglMatrixStackSave(Matrix4 matrix);
 extern const AlignedVector4 cfeForwardVector;
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019E918);
+typedef int s32;
+typedef struct PxyModelRenderState {
+    u8 unmodeled_000[0x300];
+    int renderStatus; /* +0x300 */
+    u8 unmodeled_304[0x308 - 0x304];
+    int shadowMode; /* +0x308 */
+    u8 unmodeled_30c[0x330 - 0x30c];
+    Matrix4 *jointMatrices; /* +0x330 */
+    u8 unmodeled_334[0x360 - 0x334];
+    float shadowAlpha; /* +0x360 */
+    u8 unmodeled_364[0x368 - 0x364];
+    float shadowOffsetX; /* +0x368 */
+    float shadowOffsetY; /* +0x36c */
+    u8 unmodeled_370[0x394 - 0x370];
+    int renderLevel; /* +0x394 */
+    u8 unmodeled_398[0x39c - 0x398];
+    float animTime; /* +0x39c */
+    u8 unmodeled_3a0[0x3a4 - 0x3a0];
+    float shadowPlaneHeight; /* +0x3a4 */
+    u8 unmodeled_3a8[0x3bc - 0x3a8];
+    Matrix4 *globalMatrices; /* +0x3bc */
+    u8 unmodeled_3c0[0x3d0 - 0x3c0];
+    float planeParamY; /* +0x3d0 */
+    u8 unmodeled_3d4[0x3d8 - 0x3d4];
+    float planeParamX; /* +0x3d8 */
+    u8 unmodeled_3dc[0x3e4 - 0x3dc];
+    int stateFlags3E4; /* +0x3e4 */
+    u8 unmodeled_3e8[0x4d0 - 0x3e8];
+    int latchedValueA; /* +0x4d0 */
+    u8 unmodeled_4d4[0x4e0 - 0x4d4];
+    int latchedValueB; /* +0x4e0 */
+    u8 unmodeled_4e4[0x698 - 0x4e4];
+    int drawFlags; /* +0x698 */
+    u8 unmodeled_69c[0x6a8 - 0x69c];
+    int freezeAnimation; /* +0x6a8 */
+    u8 unmodeled_6ac[0x6e8 - 0x6ac];
+    float shadowScale; /* +0x6e8 */
+} PxyModelRenderState;
+extern s32 gPxySyncMode;
+extern PxyModelRenderState gPxyModelRenderStateStorage;
+
+void pxySetSyncMode(s32 syncMode) {
+    gPxySyncMode = syncMode;
+}
 
 /* The vector cfeForwardVector rotated by angles[0] about X and angles[1] about Y. */
-void cfeRotateVectorXY(float *result, const float *angles)
+void cfeDirectionFromAngles(float *direction, const float *angles)
 {
     Matrix4 matrix;
     AlignedVector4 vector = cfeForwardVector;
@@ -26,142 +69,183 @@ void cfeRotateVectorXY(float *result, const float *angles)
     xglMatrixStackRotY(angles[1]);
     xglMatrixStackSave(matrix);
     xglVectorMulMat(&vector, matrix, &vector);
-    QuadwordCopy(result, &vector);
+    QuadwordCopy(direction, &vector);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019E9A8);
 
 INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EA60);
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EAC0);
-
-/* The word block at 0x8c28b0 that holds the joint and global matrix pointers and the flags word. */
-typedef struct PxyGlobalBlock {
-    u8 unmodeled_000[0x300];
-    int renderStatus; /* +0x300 */
-    u8 unmodeled_304[0x308 - 0x304];
-    int shadowMode; /* +0x308 */
-    u8 unmodeled_30c[0x330 - 0x30c];
-    Matrix4 *jointMatrices; /* +0x330 */
-    u8 unmodeled_334[0x360 - 0x334];
-    float shadowAlpha; /* +0x360 */
-    u8 unmodeled_364[0x394 - 0x364];
-    int flags; /* +0x394 */
-    u8 unmodeled_398[0x39c - 0x398];
-    float animTime; /* +0x39c */
-    u8 unmodeled_3a0[0x3a4 - 0x3a0];
-    float shadowPlaneHeight; /* +0x3a4 */
-    u8 unmodeled_3a8[0x3bc - 0x3a8];
-    Matrix4 *globalMatrices; /* +0x3bc */
-    u8 unmodeled_3c0[0x698 - 0x3c0];
-    int pxyFlags; /* +0x698 */
-    u8 unmodeled_69c[0x6a8 - 0x69c];
-    int freezeAnimation; /* +0x6a8 */
-    u8 unmodeled_6ac[0x6e8 - 0x6ac];
-    float shadowScale; /* +0x6e8 */
-} PxyGlobalBlock;
-
-extern PxyGlobalBlock D_008C28B0;
+void pxySetShadowOffset(f32 offsetX, f32 offsetY)
+{
+    gPxyModelRenderStateStorage.shadowOffsetX = offsetX;
+    gPxyModelRenderStateStorage.shadowOffsetY = offsetY;
+}
 
 void pxyRequestTextureCopyPass(void)
 {
-    D_008C28B0.pxyFlags |= 0x2;
+    gPxyModelRenderStateStorage.drawFlags |= 0x2;
 }
 
-void func_0019EAF0(void)
+void pxyEnableFlag8(void)
 {
-    D_008C28B0.pxyFlags |= 0x8;
+    gPxyModelRenderStateStorage.drawFlags |= 0x8;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EB08);
+void pxyEnableFlag800000(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x800000;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EB28);
+void pxySetOverlayAlphaMaskMode(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x2000;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EB40);
+void pxySkipOverlayDraw(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x200;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EB58);
+void pxyRequestFrameClearOnly(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x4000;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EB70);
+void pxySetShadowUploadFlag(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x20000;
+}
 
 void pxyFreezeAnimation(void)
 {
-    D_008C28B0.freezeAnimation = 1;
-    D_008C28B0.renderStatus |= 0x2;
+    gPxyModelRenderStateStorage.freezeAnimation = 1;
+    gPxyModelRenderStateStorage.renderStatus |= 0x2;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EBB0);
+void pxySetHeaderScanEnabled(s32 enabled) {
+    if (enabled != 0) {
+        gPxyModelRenderStateStorage.drawFlags |= 0x10;
+    }
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EBD0);
+void pxyEnableFlag80000(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x80000;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EBF0);
+void pxySetShadowProjectOff(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x40000;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EC10);
+void pxySkipTextureUpload(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x40;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EC28);
+void pxySetBlackFog(void) {
+    gPxyModelRenderStateStorage.drawFlags |= 0x80;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EC40);
-
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EC58);
-
-void func_0019EC70(void)
+void pxySetStateFlag4(void)
 {
-    D_008C28B0.renderStatus |= 0x20000;
-    D_008C28B0.pxyFlags |= 0x8000;
+    gPxyModelRenderStateStorage.stateFlags3E4 |= 0x4;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EC98);
+void pxyEnableRenderFlag800(void) {
+    gPxyModelRenderStateStorage.renderStatus |= 0x800;
+}
+
+void pxyEnableRenderFlag20000(void)
+{
+    gPxyModelRenderStateStorage.renderStatus |= 0x20000;
+    gPxyModelRenderStateStorage.drawFlags |= 0x8000;
+}
+
+extern s32 pxyStoredValue;
+
+void pxySetStoredValue(s32 storedValue) {
+    pxyStoredValue = storedValue;
+}
 
 void pxySetAnimTime(float time)
 {
-    D_008C28B0.animTime = time;
-    D_008C28B0.renderStatus |= 0x100;
+    gPxyModelRenderStateStorage.animTime = time;
+    gPxyModelRenderStateStorage.renderStatus |= 0x100;
 }
 
-void func_0019ECC8(void)
+void pxyEnableRenderFlag40000(void)
 {
-    D_008C28B0.renderStatus |= 0x40000;
-    D_008C28B0.pxyFlags |= 0x100000;
+    gPxyModelRenderStateStorage.renderStatus |= 0x40000;
+    gPxyModelRenderStateStorage.drawFlags |= 0x100000;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019ECF8);
+void pxyEnableRenderFlag10000(void) {
+    gPxyModelRenderStateStorage.renderStatus |= 0x10000;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019ED18);
+extern s32 pxyPendingFlag;
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019ED28);
+void pxySetPendingFlag(void) {
+    pxyPendingFlag = 1;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019ED48);
+void pxyLatchValueA(s32 valueToLatch)
+{
+    if (gPxyModelRenderStateStorage.latchedValueA == 0)
+    {
+        gPxyModelRenderStateStorage.latchedValueA = valueToLatch;
+    }
+}
+
+void pxyLatchValueB(s32 valueToLatch)
+{
+    if (gPxyModelRenderStateStorage.latchedValueB == 0)
+    {
+        gPxyModelRenderStateStorage.latchedValueB = valueToLatch;
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019ED68);
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EDF0);
-
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", pxySetDrawCallback);
-
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EE28);
-
-void pxyAddFlags(int flags)
-{
-    D_008C28B0.flags |= flags;
+void pxyEnableFlag400000(s32 enabled) {
+    if (enabled != 0) {
+        gPxyModelRenderStateStorage.drawFlags |= 0x400000;
+    }
 }
 
-void pxySetShadowMode(int mode, float alpha, float planeHeight, float scale)
+extern s32 pxyDrawCallback;
+
+void pxySetDrawCallback(s32 drawCallback) {
+    pxyDrawCallback = drawCallback;
+}
+
+extern s32 pxyCameraEnabled[];
+
+void pxySetCameraEnabled(s32 camera, s32 enabled) {
+    pxyCameraEnabled[camera] = enabled;
+}
+
+void pxyAddRenderLevel(int levelBits)
+{
+    gPxyModelRenderStateStorage.renderLevel |= levelBits;
+}
+
+void pxySetShadowMode(int shadowMode, float alpha, float planeHeight, float scale)
 {
     if (alpha <= 0.0f) {
         return;
     }
-    D_008C28B0.shadowScale = scale;
-    D_008C28B0.shadowAlpha = alpha;
-    D_008C28B0.shadowPlaneHeight = planeHeight;
-    D_008C28B0.shadowMode = mode;
-    if (mode == 4 || mode == 1 || mode == 5) {
-        D_008C28B0.renderStatus |= 0x2;
+    gPxyModelRenderStateStorage.shadowScale = scale;
+    gPxyModelRenderStateStorage.shadowAlpha = alpha;
+    gPxyModelRenderStateStorage.shadowPlaneHeight = planeHeight;
+    gPxyModelRenderStateStorage.shadowMode = shadowMode;
+    if (shadowMode == 4 || shadowMode == 1 || shadowMode == 5) {
+        gPxyModelRenderStateStorage.renderStatus |= 0x2;
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EEB8);
-
-void pxySetJointMatrices(Matrix4 *joints, Matrix4 *global)
+void pxySetPlaneParams(f32 paramX, f32 paramY)
 {
-    D_008C28B0.jointMatrices = joints;
-    D_008C28B0.globalMatrices = global;
+    gPxyModelRenderStateStorage.planeParamX = paramX;
+    gPxyModelRenderStateStorage.planeParamY = paramY;
+}
+
+void pxySetJointMatrices(Matrix4 *joints, Matrix4 *globalMatrices)
+{
+    gPxyModelRenderStateStorage.jointMatrices = joints;
+    gPxyModelRenderStateStorage.globalMatrices = globalMatrices;
 }

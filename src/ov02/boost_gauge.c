@@ -9,24 +9,44 @@ INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A815B0);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A815D8);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A81600);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A81618);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A81740);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A81770);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A817C8);
-
-/* Boost gauge of one battle unit: maximum stock, stock and progress toward the next stock. */
 struct BoostGauge {
     signed char maxStock;                   /* +0x00 */
     signed char stock;                      /* +0x01 */
     signed char progress;                   /* +0x02 */
 };
-
+typedef int s32;
 int func_00A81770(struct BoostGauge *gauge, int amount);
+void boostGaugeAddProgress(struct BoostGauge *gauge, int amount);
+extern s32 gBoostGaugeTable[];
+
+void *boostGaugeAt(s32 gaugeIndex) {
+    return &gBoostGaugeTable[gaugeIndex];
+}
+
+INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A81618);
+
+struct BoostGauge *func_00A815D8();
+
+void boostGaugeAddStockCurrent(s32 unusedUnit, s32 amount) {
+    struct BoostGauge *gauge;
+    gauge = func_00A815D8();
+    func_00A81770(gauge, amount);
+}
+
+INCLUDE_ASM("asm/nonmatchings/ov02/boost_gauge", func_00A81770);
+
+void boostGaugeAddProgressCurrent(s32 unusedUnit, s32 amount) {
+    struct BoostGauge *gauge;
+    gauge = func_00A815D8();
+    boostGaugeAddProgress(gauge, amount);
+}
+
+/* Boost gauge of one battle unit: maximum stock, stock and progress toward the next stock. */
+
+
+
+
+
 
 void boostGaugeAddProgress(struct BoostGauge *gauge, int amount)
 {

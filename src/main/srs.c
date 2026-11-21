@@ -3,47 +3,121 @@
 /* Sprintf-shaped varargs callee; the link name of 0x0030E1B8 (test_050.c declares it the same way). */
 int GameMpeg2Play(char *destination, const char *format, ...);
 /* Kind-prefix pointer table at 0x004AD6A0 (scaffold data of this TU). */
-extern char *D_004AD6A0[4];
+extern char *srsEffectKindPrefix[4];
 
-void srsFormatEffectStem(int effectNo, char *buffer, int withSubNo)
+void srsFormatEffectStem(int effectNo, char *stemBuffer, int withSubNo)
 {
     int effectKind = (effectNo >> 28) & 3;
     int effectIndex = (effectNo >> 12) & 0x3ff;
     int effectSub = effectNo & 0x3ff;
 
     if (effectNo < 0) {
-        GameMpeg2Play(buffer, "bad effect no:%d", effectNo);
+        GameMpeg2Play(stemBuffer, "bad effect no:%d", effectNo);
         return;
     }
     if (effectKind == 3) {
-        GameMpeg2Play(buffer, "%s%04d", D_004AD6A0[3], effectNo & 0x0fffffff);
+        GameMpeg2Play(stemBuffer, "%s%04d", srsEffectKindPrefix[3], effectNo & 0x0fffffff);
         return;
     }
     if (withSubNo != 0) {
-        GameMpeg2Play(buffer, "%s%03d_%03d", D_004AD6A0[effectKind], effectIndex, effectSub);
+        GameMpeg2Play(stemBuffer, "%s%03d_%03d", srsEffectKindPrefix[effectKind], effectIndex, effectSub);
         return;
     }
-    GameMpeg2Play(buffer, "%s%03d", D_004AD6A0[effectKind], effectIndex);
+    GameMpeg2Play(stemBuffer, "%s%03d", srsEffectKindPrefix[effectKind], effectIndex);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/srs", func_0020F790);
 
-INCLUDE_ASM("asm/main/nonmatchings/srs", func_0020F9E0);
+typedef signed char s8;
+typedef int s32;
+typedef unsigned char u8;
+typedef unsigned int u32;
+extern s32 gSrsEffectFileSuffixKindThree;
+extern s32 gSrsEffectFileSuffixKindBelowThree;
+extern s8 gSrsEffectNameBuffer;
+s32 func_0030E3D0(s8 *stemBuffer, s32 *format);
 
-INCLUDE_ASM("asm/main/nonmatchings/srs", func_0020FA70);
+s8 *srsEffectNameGet(s32 effectNo) {
+    if (!(effectNo > 0)) {
+        return 0;
+    }
+    srsFormatEffectStem(effectNo, &gSrsEffectNameBuffer, 1);
+    if (((effectNo >> 0x1C) & 3) == 3) {
+        func_0030E3D0(&gSrsEffectNameBuffer, &gSrsEffectFileSuffixKindThree);
+    } else {
+        func_0030E3D0(&gSrsEffectNameBuffer, &gSrsEffectFileSuffixKindBelowThree);
+    }
+    return &gSrsEffectNameBuffer;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/srs", func_0020FBE8);
+extern const s8 gSrsAssetFormatCeRepeatTag[];
+extern const s8 gSrsAssetFormatCdChars[];
+extern const s8 gSrsAssetFormatEfPosition[];
+extern const s8 gSrsAssetFormatEfFallback[];
+extern const s8 gSrsAssetFormatNameOnly[];
+extern s8 gSrsAssetNameBuffer[];
+u32 func_00181C18();
+s32 xglCdGetFileSize();
 
-INCLUDE_ASM("asm/main/nonmatchings/srs", func_0020FC48);
+s8 *srsBuildAssetName(s8 *name, s32 isLoaded)
+{
+    s8 nameSixthChar;
+    s8 nameSeventhChar;
+    u32 position;
 
-/* Maps a kind-0 key whose index is 300..340 to slot (key - 1) & 0xF; any other key gives 100. */
+    if (isLoaded != 0) {
+        if (name[0] == 'c' && name[1] == 'e' && (nameSixthChar = name[6]) == '9' && (nameSeventhChar = name[7]) == nameSixthChar && name[8] == nameSeventhChar) {
+            position = func_00181C18(0);
+            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatCeRepeatTag, position, (position >> 8) & 0xFFFF, name);
+        } else {
+            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatCdChars, name[0], name[1], name[2], name);
+        }
+    } else if (name[0] == 'e' && name[1] == 'f') {
+        position = func_00181C18(0);
+        GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatEfPosition, position, (position >> 8) & 0xFFFF, name);
+        if (xglCdGetFileSize(gSrsAssetNameBuffer) < 0) {
+            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatEfFallback, name);
+        }
+    } else {
+        GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatNameOnly, name);
+    }
+    return gSrsAssetNameBuffer;
+}
+
+s8 *srsEffectNameGet(s32 effectNo);
+s8 *srsBuildAssetName(s8 *name, s32 isLoaded);
+s32 func_0020FE10(s32);
+
+void srsEffectPrepare(s32 effectNo) {
+    s8 *effectName;
+    s32 assetLoadResult;
+
+    effectName = srsEffectNameGet(effectNo);
+    if (effectName != 0) {
+        assetLoadResult = func_0020FE10(effectNo);
+        srsBuildAssetName(effectName, assetLoadResult == 0);
+    }
+}
+
+s32 srsNormalizeEffectKey(s32 effectKey)
+{
+  u32 effectIndex;
+  effectIndex = (effectKey >> 0xC) & 0x3FF;
+  if ((!((effectKey >> 0x1C) & 3)) && ((effectIndex - 0x12C) < 0x29U))
+  {
+    effectKey = ((effectKey - 1) & (~0xF)) + 1;
+  }
+  return effectKey;
+}
+
+/* Maps a kind-0 key whose index is 300..340 to effectSlot (key - 1) & 0xF; any other key gives 100. */
 int srsGetEffectSlot(int effectKey)
 {
-    int effectIndex = (effectKey >> 12) & 0x3ff;
-    int slot = 100;
+    u32 effectIndex = (effectKey >> 12) & 0x3ff;
+    int effectSlot = 100;
 
-    if (((effectKey >> 28) & 3) == 0 && (unsigned int) (effectIndex - 300) < 41) {
-        slot = (effectKey - 1) & 0xf;
+    if (((effectKey >> 28) & 3) == 0 && (effectIndex - 300) < 41) {
+        effectSlot = (effectKey - 1) & 0xf;
     }
-    return slot;
+    return effectSlot;
 }

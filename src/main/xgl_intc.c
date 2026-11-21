@@ -36,9 +36,9 @@ int xglIntcHandlerTimer1(int cause);
 
 int xglIntcHandlerGs(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -47,9 +47,9 @@ int xglIntcHandlerGs(int cause)
 
 int xglIntcHandlerVblankStart(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -58,9 +58,9 @@ int xglIntcHandlerVblankStart(int cause)
 
 int xglIntcHandlerVblankEnd(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -69,9 +69,9 @@ int xglIntcHandlerVblankEnd(int cause)
 
 int xglIntcHandlerVif0(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -80,13 +80,13 @@ int xglIntcHandlerVif0(int cause)
 
 /* The VIF1 handler and timer accumulator. It reads the EE timer 1 count (0x10000800). When
  * intrTimerActive is set it adds the ticks since the start count to intrTimerAccum and clears the
- * flag; otherwise it sets the flag and records the start count. It also bumps its count and
- * cancels a VIF1 stall. */
+ * flag; otherwise it sets the flag and records the start count. It also bumps its event count and
+* cancels a VIF1 stall. */
 int xglIntcHandlerVif1(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     if (intrTimerActive) {
         intrTimerAccum += *T1_COUNT - intrTimerStart;
         intrTimerActive = 0;
@@ -117,9 +117,9 @@ int intrTimerGetAccum(void)
 
 int xglIntcHandlerVu0(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -128,9 +128,9 @@ int xglIntcHandlerVu0(int cause)
 
 int xglIntcHandlerVu1(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -139,9 +139,9 @@ int xglIntcHandlerVu1(int cause)
 
 int xglIntcHandlerIpu(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -150,9 +150,9 @@ int xglIntcHandlerIpu(int cause)
 
 int xglIntcHandlerTimer0(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");
@@ -161,9 +161,9 @@ int xglIntcHandlerTimer0(int cause)
 
 int xglIntcHandlerTimer1(int cause)
 {
-    int *count = &xglIntcRecords[xglIntcSlotMap[cause]].count;
+    int *eventCount = &xglIntcRecords[xglIntcSlotMap[cause]].eventCount;
 
-    (*count)++;
+    (*eventCount)++;
     /* The end of an INTC/DMAC handler (SDK eekernel.h ExitHandler): sync, then re-enable interrupts. */
     __asm__ volatile("sync" ::: "memory");
     __asm__ volatile("ei" ::: "memory");

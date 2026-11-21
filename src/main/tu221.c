@@ -6,20 +6,24 @@
 extern GifStatusBlock gifStatus;
 /* Scaffold data without a config name (splat names): the per-mode table of pointer-sized entries, and the
  * word the selected entry is copied into. */
-extern void *D_003EB7C0[];
-extern void *D_004C83D8[];
+extern void *gifStateEffectDraws[];
+extern void *gifStateModeHook[];
 
-void gifStateSetMode(int mode)
+void gifStateSetMode(int effectMode)
 {
-    if (mode < 6) {
-        D_004C83D8[0] = D_003EB7C0[mode];
-        gifStatus.state = mode;
+    if (effectMode < 6) {
+        gifStateModeHook[0] = gifStateEffectDraws[effectMode];
+        gifStatus.state = effectMode;
         gifStatus.ratio = 1.0f;
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu221", func_00258B78);
+void gifStateClearModeHook(void) {
+    gifStateModeHook[0] = 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu221", func_00258B88);
+void gifStateNoOp(void) {
+
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu221", func_00258B90);

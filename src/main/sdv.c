@@ -6,7 +6,12 @@ void *memset(void *destination, int value, unsigned int count);
 
 extern unsigned char sdvSpecialBuf[];
 
-INCLUDE_ASM("asm/main/nonmatchings/sdv", func_00193820);
+typedef int s32;
+extern s32 D_005511EC;
+
+void sdvStoreValue(s32 storedValue) {
+    D_005511EC = storedValue;
+}
 
 void sdvInitSpecialWork(void)
 {

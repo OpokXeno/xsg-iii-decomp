@@ -101,8 +101,8 @@
       "0x005402c0"
      ],
      "generated_by": [
-      "xglMcExecute",
-      "xglMcCreateStep"
+      "xglMcStartQueuedRequest",
+      "xglMcAdvanceCreateRequest"
      ],
      "c_owned_symbols": [
       "jtbl_00540250",
@@ -621,7 +621,7 @@
       "D_005412D0"
      ],
      "also_referenced_by_c": [
-      "D_005412E0"
+      "xglLightConeEdgeTemplate"
      ],
      "basis": {
       "kind": "derived",
@@ -741,7 +741,7 @@
       "0x0053e398"
      ],
      "generated_by": [
-      "sbOpPushLocal"
+      "sbOpPushLocalVariable"
      ],
      "c_owned_symbols": [
       "jtbl_0053E370"
@@ -767,15 +767,15 @@
       "0x0054fc5c"
      ],
      "generated_by": [
-      "func_001ED8A0"
+      "sdvStepSequence"
      ],
      "c_owned_symbols": [
       "D_0054FC54",
       "D_0054FC58"
      ],
      "also_referenced_by_c": [
-      "D_0054FC5C",
-      "D_0054FC60"
+      "gSdvHundredthScale",
+      "gSdvTenthScale"
      ],
      "basis": {
       "kind": "derived",
@@ -997,7 +997,7 @@
       "D_0054F820"
      ],
      "also_referenced_by_c": [
-      "D_0054F824"
+      "tiWaterSourceMoveScale"
      ],
      "basis": {
       "kind": "derived",
@@ -1025,8 +1025,8 @@
       "D_0054F6E0"
      ],
      "also_referenced_by_c": [
-      "D_0054F6E4",
-      "D_0054F6E8"
+      "gifBlurScaleFloor",
+      "gifBlurScaleStep"
      ],
      "basis": {
       "kind": "derived",
@@ -1315,7 +1315,7 @@
       "0x0054fdd8"
      ],
      "generated_by": [
-      "func_0028F2D0"
+      "XenoActorUpdateDistanceFade"
      ],
      "c_owned_symbols": [
       "D_0054FDD4"
@@ -1365,7 +1365,7 @@
       "0x0054fe0c"
      ],
      "generated_by": [
-      "func_00291D88"
+      "xenoActorSetFocusDirection"
      ],
      "c_owned_symbols": [
       "D_0054FE04",
@@ -1482,7 +1482,7 @@
       "D_005501B0"
      ],
      "also_referenced_by_c": [
-      "D_005501B4"
+      "gTiDynCollPlaneFraction"
      ],
      "basis": {
       "kind": "derived",
@@ -1807,7 +1807,7 @@
      ],
      "also_referenced_by_c": [
       "D_00542C30",
-      "D_00542C90"
+      "xacKeyHeaderAssertText"
      ],
      "basis": {
       "kind": "derived",
@@ -1878,7 +1878,7 @@
       "0x005501a8"
      ],
      "generated_by": [
-      "func_002A4B78"
+      "xacEvalCubicKeys"
      ],
      "c_owned_symbols": [
       "D_005501A4"

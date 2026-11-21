@@ -28,12 +28,12 @@ void vu0NormalizeVf20(void);
 Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source);
 
 /* Triangle wave record of the camera shake: value is the current amplitude, step the amount it decays
- * per cycle; period and phase are in frames, hold delays the decay, remaining counts the cycles left. */
+ * per cycle; period and wavePhase are in frames, hold delays the decay, remaining counts the cycles left. */
 typedef struct CameraWave {
-    float value;                                /* +0x00 */
-    float step;                                 /* +0x04 */
+    float amplitude;                            /* +0x00 */
+    float decayPerCycle;                        /* +0x04 */
     unsigned short period;                      /* +0x08 */
-    unsigned short phase;                       /* +0x0A */
+    unsigned short wavePhase;                       /* +0x0A */
     unsigned short hold;                        /* +0x0C */
     unsigned short remaining;                   /* +0x0E */
 } CameraWave;
@@ -64,7 +64,7 @@ typedef struct CameraRange {
     unsigned char rangeFlag;                    /* +0x0F */
     float northAngle;                           /* +0x10: the camera yaw the stick directions are relative to */
     unsigned char unmodeled_0014[0xC];
-    Vector4 offset;                             /* +0x20: the look-at offset above the anchor */
+    Vector4 lookAtOffset;                             /* +0x20: the look-at offset above the anchor */
     Vector4 angleLimits;                        /* +0x30: pitch min and max, yaw min and max */
     Vector4 lockPosition;                       /* +0x40: the camera position, w is the perspective */
     Vector4 lookAt;                             /* +0x50: the look-at point, w is the roll */
@@ -83,11 +83,11 @@ typedef struct CameraPose {
  * current camera and the values its transitions start from and end at. The offsets in the comments are
  * gameWork offsets. */
 typedef struct GameWorkCamera {
-    unsigned short flags;                       /* +0xD0: CAMERA_FLAG_* bits (game_camera.c) */
+    unsigned short cameraFlags;                       /* +0xD0: CAMERA_FLAG_* bits (game_camera.c) */
     unsigned char cameraType;                   /* +0xD2: the camera type of the active record */
     unsigned char cameraSubType;                /* +0xD3: cleared with typeState when the camera type changes */
-    signed char recordIndex;                    /* +0xD4: the camera record in use */
-    signed char mode;                           /* +0xD5: set by GameCameraChangeID */
+    signed char activeRecordIndex;                    /* +0xD4: the camera record in use */
+    signed char changeMode;                           /* +0xD5: set by GameCameraChangeID */
     unsigned char allSlotsFlagA;                /* +0xD6 */
     unsigned char allSlotsFlagB;                /* +0xD7: also the anchor pending flag of the range update */
     unsigned char previousRecordIndex;          /* +0xD8 */
@@ -101,11 +101,11 @@ typedef struct GameWorkCamera {
     unsigned char unmodeled_00F1[0xF];
     CameraWave waves[3];                        /* +0x100 */
     float sway[4];                              /* +0x130 */
-    CameraSlot slot[4];                         /* +0x140: 0 look-at, 1 position and angles, 2 perspective, 3 roll */
-    CameraRange range;                          /* +0x180: the current camera, laid out like a camera record range */
-    CameraPose from;                            /* +0x1F0: the values a slot transition starts from */
-    CameraPose to;                              /* +0x220: the values a slot transition ends at */
-    Vector4 fromOffset;                         /* +0x250: the offset the position transition starts from */
+    CameraSlot transitionSlots[4];                         /* +0x140: 0 look-at, 1 position and angles, 2 perspective, 3 roll */
+    CameraRange currentCameraRange;                          /* +0x180: the current camera, laid out like a camera record range */
+    CameraPose transitionFrom;                            /* +0x1F0: the values a slot transition starts from */
+    CameraPose transitionTo;                              /* +0x220: the values a slot transition ends at */
+    Vector4 transitionFromOffset;                         /* +0x250: the offset the position transition starts from */
     Vector4 anchorOffset;                       /* +0x260: the anchor offset vector */
     float anchorBase[3];                        /* +0x270 */
     unsigned char unmodeled_027C[0x4];
@@ -116,7 +116,7 @@ typedef struct GameWorkSlope {
     float x;
     float z;
     float push;
-    float speed;
+    float travelSpeed;
 } GameWorkSlope;
 
 /* The light sets of the scene, one per light set. */
@@ -135,10 +135,10 @@ typedef struct MapBits {
 
 /* The resource record gameWork.active points at, handed to mapResourceLoadCallback. */
 typedef struct MainActive {
-    PxyHeader *object;          /* +0x00 */
+    PxyModelHeader *resourceHeader;          /* +0x00 */
     int jpegData;               /* +0x04 */
     unsigned char unmodeled_08[0x04];
-    struct MapFixupBlock *block; /* +0x0C: the collision block mapLoadBlock registers */
+    struct MapFixupBlock *collisionBlock; /* +0x0C: the collision block mapLoadBlock registers */
     unsigned char *imageHead;   /* +0x10 */
     int imageOffset;            /* +0x14 */
     unsigned char unmodeled_18[0x08];
@@ -148,14 +148,14 @@ typedef struct MainActive {
     short offsetX;              /* +0x2A */
     unsigned short height;      /* +0x2C */
     unsigned short width;       /* +0x2E */
-    ScreenVector4 view;         /* +0x30: the backdrop origin projected by mapBackdropDraw (x is the row, y the column) */
+    ScreenVector4 backdropOrigin;         /* +0x30: the backdrop origin projected by mapBackdropDraw (x is the row, y the column) */
 } MainActive;
 
 struct SbImageHeader;
 
 /* The game work block (0x1B30 bytes, one object owned by game_data.c): the scene state, the camera, the
  * player parameters, the light sets and the event flags. The offsets in the comments are gameWork
- * offsets. control, camera.flags and anchorIndex are plain words; a function that depends on reading
+ * offsets. control, camera.cameraFlags and anchorIndex are plain words; a function that depends on reading
  * one of them with alias set 0 (after the stores before it) reads it through a local one-member union
  * view. */
 typedef struct GameWork {
@@ -239,16 +239,16 @@ int MMathMatrixBetweenVectors(Matrix4 *destination, const Vector4 *from, const V
  * the cursor steps to; value is the sample the cursor takes from it. */
 typedef struct SefKeyframe {
     short frame;                                     /* +0x00 */
-    short next;                                      /* +0x02 */
-    unsigned short value;                            /* +0x04 */
+    short nextKeyIndex;                              /* +0x02 */
+    unsigned short sampleValue;                            /* +0x04 */
     unsigned char unmodeled_006[2];
 } SefKeyframe;
 
 /* A track's cursor: the current key index, the sampled value and the
  * playback frame (float). */
 typedef struct SefKeyCursor {
-    short index;                                     /* +0x00 */
-    unsigned short value;                            /* +0x02 */
+    short keyIndex;                                  /* +0x00 */
+    unsigned short sampleValue;                            /* +0x02 */
     float frame;                                     /* +0x04 */
 } SefKeyCursor;
 
@@ -260,27 +260,27 @@ extern int sefDraw3DFlag[];
 /* One 0x2C0-byte entry of the table at sefPtAllocatorState. head and tail are the free-slot ring indices of
  * sefPtFreeSlots and are used only through entry 0 (the ring control block); the getters return the entry's data,
  * which starts after a 16-byte prefix. */
-typedef struct SefSlot {
-    int head;
-    int tail;
+typedef struct SefPtRingControl {
+    int freeHead;
+    int freeTail;
     unsigned char unmodeled_08[0x10 - 0x08];
-    unsigned char data[0x2C0 - 0x10];
-} SefSlot;
+    unsigned char allocatorBytes[0x2C0 - 0x10];
+} SefPtRingControl;
 
-extern SefSlot *sefPtAllocatorState;
+extern SefPtRingControl *sefPtAllocatorState;
 extern int sefPtAllocCount;
 extern short sefPtFreeSlots[1104];
 
 /* A track cursor: the key index it is on, the running time and the
  * interpolated samples the track readers store. */
 typedef struct SefTrackCursor {
-    short index;
+    short keyIndex;
     short sampled_s16;
     float time;
     float sampled;
 } SefTrackCursor;
 
-extern f32 D_00453EBC[];
+extern f32 sefTrackFrameStep[];
 SefTrackKey *sefAdvanceTrackCursor(SefTrackKey *keys, SefTrackCursor *cursor);
 extern s16 sefInitialized;
 void sefDrawEffect3DCallback(void);
@@ -288,18 +288,18 @@ void sefDrawEffect3D(void);
 
 /* One 0x18-byte record of the entry count table: four counters, their sum at +0x10 and an unused word.
  * The record after the last entry (index 44) holds the running sums of the counters and of the totals. */
-typedef struct SefEntryCount {
-    unsigned int counts[4];                     /* +0x00 */
-    unsigned int total;                         /* +0x10 */
+typedef struct SefEffectTally {
+    unsigned int laneCounts[4];                     /* +0x00 */
+    unsigned int grandTotal;                         /* +0x10 */
     unsigned int unmodeled_14;                  /* +0x14 */
-} SefEntryCount;
+} SefEffectTally;
 
-extern SefEntryCount D_0076C000[];
+extern SefEffectTally sefEffectTallies[];
 
-/* Address of entry index in the table D_0076C000 (SefEntryCount, 0x18 bytes each). */
-SefEntryCount *sefEntryCountsEntryGet(int index)
+/* Address of entry index in the table sefEffectTallies (SefEffectTally, 0x18 bytes each). */
+SefEffectTally *sefEffectTallyAt(int tallyIndex)
 {
-    return &D_0076C000[index];
+    return &sefEffectTallies[tallyIndex];
 }
 
 int sefGetDraw2DFlag(void) {
@@ -310,37 +310,157 @@ int sefGetDraw3DFlag(void) {
     return sefDraw3DFlag[0];
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_001F9BB8);
+typedef struct SefTrackKey16 {
+    unsigned char unmodeled_0000[0xC];
+    short key;                                  /* +0x0C */
+    signed char nextKeyIndex;                           /* +0x0E */
+    unsigned char unmodeled_000F[0x1];
+} SefTrackKey16;
+typedef struct SefEffectSlot {
+    short lineHandles[32];                          /* +0x00 */
+    unsigned char lineTags[32];                     /* +0x40 */
+    int id;                                         /* +0x60 */
+    unsigned int flags;                             /* +0x64 */
+    short effectKind;                               /* +0x68 */
+    signed char lineCount;                          /* +0x6A */
+} SefEffectSlot;
+typedef struct SefHermiteKey {
+    unsigned char unmodeled_00[12];
+    short key;                                  /* +12 */
+    signed char nextKeyIndex;                            /* +14 */
+    unsigned char unmodeled_0F;
+} SefHermiteKey;
+typedef struct SefVectorTrackKey {
+    unsigned char unmodeled_0000[0xC];
+    short key;                                  /* +0x0C */
+    signed char nextKeyIndex;                           /* +0x0E */
+    unsigned char unmodeled_000F[0x1];
+} SefVectorTrackKey;
+typedef struct SefColorTrackCursor {
+    SefTrackCursor track;                            /* +0x00 */
+    unsigned char unmodeled_00c[0x10 - 0x0c];
+    int color[4];                                    /* +0x10 */
+} SefColorTrackCursor;
+typedef struct SefAnalyzeRecord {
+    short time;                                 /* +0x00 */
+    unsigned char unmodeled_02[1];
+    unsigned char flags;                        /* +0x03 */
+    short imageId;                              /* +0x04 */
+    short altImageId;                           /* +0x06 */
+    short secondaryImageId;                             /* +0x08 */
+    short secondaryPaletteId;                          /* +0x0A */
+    unsigned char unmodeled_0C[2];
+} SefAnalyzeRecord;
+typedef struct SefImagePacket {
+    float scaledWidth;                          /* +0x00 */
+    float scaledHeight;                         /* +0x04 */
+    const void *image;                          /* +0x08 */
+    const void *palette;                        /* +0x0C */
+    unsigned long long tex0;                    /* +0x10 */
+    float time;                                 /* +0x18 */
+    unsigned short flags;                       /* +0x1C */
+    unsigned short resourceKind;                /* +0x1E */
+} SefImagePacket;
+typedef struct SvTypeListEntry {
+    void *pixelData;                                 /* +0x00 */
+    unsigned char unmodeled_04[0x0C - 0x04];
+    unsigned short resourceKind;                /* +0x0C */
+    unsigned char unmodeled_0E[0x12 - 0x0E];
+    unsigned short texBasePointer;                 /* +0x12 */
+    unsigned short bitsPerPixel;                /* +0x14 */
+    unsigned short bufferWidthPixels;           /* +0x16 */
+    unsigned short width;                       /* +0x18 */
+    unsigned short height;                      /* +0x1A */
+    unsigned short textureWidthExponent;        /* +0x1C */
+    unsigned short textureHeightExponent;       /* +0x1E */
+} SvTypeListEntry;
+typedef struct SefEffectRecord {
+    unsigned char unmodeled_00[0x08];
+    short entryId;                              /* +0x08 */
+} SefEffectRecord;
+typedef struct SefEntryTableShort {
+    SefEntry entries[24];
+    unsigned char unmodeled_20700[0x10];
+    int entryCount;                             /* +0x20710 */
+} SefEntryTableShort;
+typedef struct SefPtAllocatorEntry {
+    unsigned char unmodeled_00[0x10];
+    unsigned char allocatorBytes[0x270 - 0x10];
+} SefPtAllocatorEntry;
+typedef unsigned int Quadword __attribute__((mode(TI)));
+typedef union SefQuadwordView {
+    Quadword quadword;
+    unsigned int wordLanes[4];
+} SefQuadwordView;
+typedef struct SefNoiseTable {
+    f32 samples[1024];
+    unsigned char unmodeled_1000[12];
+    int sampleCursor;
+} SefNoiseTable;
+typedef struct SefLinkedObjectRecord {
+    unsigned char unmodeled_000[0x155C];
+    unsigned char flags;             /* +0x155C */
+} SefLinkedObjectRecord;
+typedef struct SefPartPlacement {
+    Matrix4 matrix;                  /* +0x000 */
+    unsigned char unmodeled_040[0xA0 - 0x40];
+    Vector4 translation;             /* +0x0A0 */
+    unsigned char unmodeled_0B0[0xC0 - 0xB0];
+    Vector4 scale;                   /* +0x0C0 */
+    unsigned char unmodeled_0D0[0x200 - 0xD0];
+    Vector4 point;                   /* +0x200 */
+} SefPartPlacement;
+typedef struct SefGlobalTransform {
+    Matrix4 matrix;                  /* +0x00 */
+    Vector4 position;                /* +0x40 */
+    float scale;                     /* +0x50 */
+    short scaled;                    /* +0x54: nonzero when scale applies */
+    short kind;                      /* +0x56 */
+} SefGlobalTransform;
+typedef struct SefGroupTimer {
+    float center[4];               /* +0x00: x, y, z, w of the group centre */
+    int owner;                     /* +0x10: owner id compared by sefGetGroupCenter and sefRegisterGroupCenter */
+    short remaining;               /* +0x14: frames left; zero or less means the entry is free */
+    unsigned short key;            /* +0x16: second id of the group, compared as an unsigned short */
+    unsigned char unmodeled_18[8]; /* +0x18..0x1F: not read by the code in this unit */
+} SefGroupTimer;
+typedef signed char s8;
+typedef int s32;
+extern s32 sefDrawEnabledFlag[];
 
-void sefSumEntryCounts(void)
+s32 sefGetDrawEnabledFlag(void) {
+    return sefDrawEnabledFlag[0];
+}
+
+void sefSumEffectTallies(void)
 {
-    SefEntryCount *counts;
-    SefEntryCount *sum;
-    unsigned char *cursor;
+    SefEffectTally *tallyTable;
+    SefEffectTally *tallyBase;
+    unsigned int *cursor;
     int i;
 
-    counts = D_0076C000;
-    counts[44].counts[0] = 0;
-    counts[44].counts[1] = 0;
-    counts[44].counts[2] = 0;
-    counts[44].counts[3] = 0;
-    counts[44].total = 0;
-    sum = counts;
-    counts = counts + 44;
-    cursor = (unsigned char *)sum + 0x10;
+    tallyTable = sefEffectTallies;
+    tallyTable[44].laneCounts[0] = 0;
+    tallyTable[44].laneCounts[1] = 0;
+    tallyTable[44].laneCounts[2] = 0;
+    tallyTable[44].laneCounts[3] = 0;
+    tallyTable[44].grandTotal = 0;
+    tallyBase = tallyTable;
+    tallyTable = tallyTable + 44;
+    cursor = &tallyBase[0].grandTotal;
     for (i = 0; i < 44; i++) {
-        unsigned int *total = (unsigned int *)cursor;
-        unsigned int w2 = total[-2];
-        unsigned int first_pair = total[-4] + w2;
-        unsigned int second_pair = total[-1] + total[-3];
+        unsigned int *tallyTotal = cursor;
+        unsigned int laneTwoCount = tallyTotal[-2];
+        unsigned int evenLaneSum = tallyTotal[-4] + laneTwoCount;
+        unsigned int oddLaneSum = tallyTotal[-1] + tallyTotal[-3];
 
-        *total = first_pair + second_pair;
-        sum[44].counts[0] += total[-4];
-        sum[44].counts[1] += total[-3];
-        sum[44].counts[3] += total[-1];
-        sum[44].counts[2] += total[-2];
-        sum[44].total += *total;
-        cursor += 24;
+        *tallyTotal = evenLaneSum + oddLaneSum;
+        tallyBase[44].laneCounts[0] += tallyTotal[-4];
+        tallyBase[44].laneCounts[1] += tallyTotal[-3];
+        tallyBase[44].laneCounts[3] += tallyTotal[-1];
+        tallyBase[44].laneCounts[2] += tallyTotal[-2];
+        tallyBase[44].grandTotal += *tallyTotal;
+        cursor += 6;
     }
 }
 
@@ -365,17 +485,17 @@ void sefAddVectorFraction(Vector4 *vector, void *addend)
 
 void sefMemZero(void *dest, int size);
 /* The request buffer zeroed by sevInitPtAllocator (0x340 bytes). */
-extern unsigned char sefRequestBuffer[];
+extern unsigned char sefRequestKeyBlock[];
 
 void sevInitPtAllocator(void)
 {
     int i;
-    int count;
+    int allocatorCount;
 
     sefMemZero(sefPtAllocatorState, 0xA7950);
-    sefMemZero(sefRequestBuffer, 736);
-    count = sefPtAllocCount;
-    for (i = 0; i < count; i++) {
+    sefMemZero(sefRequestKeyBlock, 736);
+    allocatorCount = sefPtAllocCount;
+    for (i = 0; i < allocatorCount; i++) {
         sefPtFreeSlots[i] = i;
     }
 }
@@ -383,102 +503,161 @@ void sevInitPtAllocator(void)
 /* Takes the next free slot index from the sefPtFreeSlots ring (head side); returns -1 when the ring is empty. */
 int sevAllocPtAllocator(void)
 {
-    SefSlot *ring = sefPtAllocatorState;
-    int head = ring->head;
-    int next = head + 1;
-    int handle;
+    SefPtRingControl *ring = sefPtAllocatorState;
+    int head = ring->freeHead;
+    int nextHead = head + 1;
+    int allocatedSlot;
 
-    if (!(next < sefPtAllocCount)) {
-        next = 0;
+    if (!(nextHead < sefPtAllocCount)) {
+        nextHead = 0;
     }
-    if (next == ring->tail) {
+    if (nextHead == ring->freeTail) {
         return -1;
     }
-    handle = sefPtFreeSlots[head];
-    ring->head = next;
-    return handle;
+    allocatedSlot = sefPtFreeSlots[head];
+    ring->freeHead = nextHead;
+    return allocatedSlot;
 }
 
-void sevFreePtAllocator(int handle)
+void sevFreePtAllocator(int freedSlot)
 {
-    SefSlot *ring = sefPtAllocatorState;
-    int tail = ring->tail;
-    int next;
+    SefPtRingControl *ring = sefPtAllocatorState;
+    int tail = ring->freeTail;
+    int nextTail;
 
-    if (handle < 0) {
+    if (freedSlot < 0) {
         return;
     }
-    if (!(handle < sefPtAllocCount)) {
+    if (!(freedSlot < sefPtAllocCount)) {
         return;
     }
-    if (ring->head == tail) {
+    if (ring->freeHead == tail) {
         return;
     }
-    next = tail + 1;
-    sefPtFreeSlots[tail] = handle;
-    ring->tail = next;
-    if (!(next < sefPtAllocCount)) {
-        ring->tail = 0;
+    nextTail = tail + 1;
+    sefPtFreeSlots[tail] = freedSlot;
+    ring->freeTail = nextTail;
+    if (!(nextTail < sefPtAllocCount)) {
+        ring->freeTail = 0;
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_001F9F48);
+extern unsigned char sefKeyframeStepBlock[];
+/* The step table sefKeyframeStepBlock: the float step of the keyframe cursors at +0xC. */
+typedef struct SefCursorStepBlock {
+    unsigned char unmodeled_00[0xC];            /* +0x00..0x0B: not read by this unit */
+    f32 frameStep;                              /* +0x0C */
+} SefCursorStepBlock;
+#define sefStepTable (*(SefCursorStepBlock *) sefKeyframeStepBlock)
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_001F9FF0);
+/* One 8-byte key of a keyframe table: the time is read unsigned, link is the signed index of the next key (-1 ends
+ * the track) and value is the sample the key holds. */
+typedef struct SefKeyframeEntry {
+    unsigned short time;                        /* +0x00 */
+    short nextKeyIndex;                                 /* +0x02 */
+    float sampleValue;                                /* +0x04 */
+} SefKeyframeEntry;
+
+SefKeyframeEntry *sefAdvanceKeyframeCursor(SefKeyframeEntry *keyTable, SefTrackCursor *cursor)
+{
+    f32 jumpTime;
+    f32 frameTime;
+    s32 linkedIndex;
+    SefKeyframeEntry *currentKey;
+
+    frameTime = cursor->time + sefStepTable.frameStep;
+    currentKey = &keyTable[cursor->keyIndex];
+    cursor->time = frameTime;
+    if ((frameTime < 4096.0f) && (currentKey[1].time <= frameTime)) {
+        currentKey++;
+        linkedIndex = currentKey->nextKeyIndex;
+        if (linkedIndex >= 0) {
+            cursor->keyIndex = (u16) currentKey->nextKeyIndex;
+            currentKey = &keyTable[linkedIndex];
+            jumpTime = currentKey->time + sefStepTable.frameStep;
+            cursor->time = jumpTime;
+        } else {
+            cursor->keyIndex = (u16) cursor->keyIndex + 1;
+        }
+    }
+    return currentKey;
+}
+
+SefVectorTrackKey *sefAdvanceVectorKeyframeCursor(SefVectorTrackKey *keyTable, SefTrackCursor *cursor) {
+    f32 frameTime;
+    s32 linkedIndex;
+    SefVectorTrackKey *currentKey;
+
+    frameTime = cursor->time + *sefTrackFrameStep;
+    currentKey = &keyTable[cursor->keyIndex];
+    cursor->time = frameTime;
+    if ((frameTime < 4096.0f) && (currentKey[1].key <= frameTime)) {
+        currentKey++;
+        linkedIndex = currentKey->nextKeyIndex;
+        if (linkedIndex >= 0) {
+            cursor->keyIndex = linkedIndex;
+            currentKey = &keyTable[linkedIndex];
+            cursor->time = currentKey->key;
+        } else {
+            cursor->keyIndex = (u16) cursor->keyIndex + 1;
+        }
+    }
+    return currentKey;
+}
 
 SefTrackKey *sefAdvanceTrackCursor(SefTrackKey *keys, SefTrackCursor *cursor)
 {
     f32 time;
     int frame;
     SefTrackKey *key;
-    short next_index;
+    short nextKeyIndex;
 
-    time = cursor->time + D_00453EBC[0];
-    key = &keys[cursor->index];
-    frame = (int)time;
+    time = cursor->time + sefTrackFrameStep[0];
+    key = &keys[cursor->keyIndex];
+    frame = time;
     cursor->time = time;
     if (frame < SEF_TRACK_END_KEY && key->key != SEF_TRACK_END_KEY && frame >= (key + 1)->key) {
         key++;
-        next_index = (short)key->link;
-        if (next_index >= 0) {
-            cursor->index = key->link;
-            key = &keys[next_index];
-            cursor->time = (f32)key->key;
+        nextKeyIndex = (short)key->nextKeyIndex;
+        if (nextKeyIndex >= 0) {
+            cursor->keyIndex = key->nextKeyIndex;
+            key = &keys[nextKeyIndex];
+            cursor->time = key->key;
         } else {
-            cursor->index = (s16)((u16)cursor->index + 1);
+            cursor->keyIndex = (u16) cursor->keyIndex + 1;
         }
     }
     return key;
 }
 
 /* One 16-byte key of a vector track: the key time is the short at +0x0C and the link the signed byte at +0x0E. */
-typedef struct SefTrackKey16 {
-    unsigned char unmodeled_0000[0xC];
-    short key;                                  /* +0x0C */
-    signed char link;                           /* +0x0E */
-    unsigned char unmodeled_000F[0x1];
-} SefTrackKey16;
 
-SefTrackKey16 *sefAdvanceVectorTrackCursor(SefTrackKey16 *keys, SefTrackCursor *cursor)
+
+
+
+
+
+
+SefVectorTrackKey *sefAdvanceVectorTrackCursor(SefVectorTrackKey *keys, SefTrackCursor *cursor)
 {
     f32 time;
     int frame;
-    SefTrackKey16 *key;
-    signed char next_index;
+    SefVectorTrackKey *key;
+    signed char nextKeyIndex;
 
-    time = cursor->time + D_00453EBC[0];
-    key = &keys[cursor->index];
-    frame = (int)time;
+    time = cursor->time + sefTrackFrameStep[0];
+    key = &keys[cursor->keyIndex];
+    frame = time;
     cursor->time = time;
     if (frame < SEF_TRACK_END_KEY && key->key != SEF_TRACK_END_KEY && frame >= (key + 1)->key) {
         key++;
-        next_index = key->link;
-        if (next_index >= 0) {
-            cursor->index = next_index;
-            key = &keys[next_index];
-            cursor->time = (f32)key->key;
+        nextKeyIndex = key->nextKeyIndex;
+        if (nextKeyIndex >= 0) {
+            cursor->keyIndex = nextKeyIndex;
+            key = &keys[nextKeyIndex];
+            cursor->time = key->key;
         } else {
-            cursor->index = (s16)((u16)cursor->index + 1);
+            cursor->keyIndex = (u16) cursor->keyIndex + 1;
         }
     }
     return key;
@@ -487,81 +666,73 @@ SefTrackKey16 *sefAdvanceVectorTrackCursor(SefTrackKey16 *keys, SefTrackCursor *
 /* Number of point handles in one local effect record. */
 #define SEF_LINE_PARTICLE_COUNT 0x100
 
-/* The fields of a local effect record that the point-handle functions of this unit read and write:
- * the handle array and the count of handles still held. */
-typedef struct SefLocalPointRecord {
-    unsigned char unmodeled_0000[0x69C];
-    short pointHandles[SEF_LINE_PARTICLE_COUNT];    /* +0x69C */
-    unsigned char unmodeled_089C[0x89E - 0x89C];
-    unsigned short pointCount;                      /* +0x89E: decremented when a handle is freed */
-} SefLocalPointRecord;
 
 /* The fields of an effect slot that the slot init and destroy functions of this unit touch: the id,
  * the flags word (bit 31 cleared on init), the kind and the line count. */
-typedef struct SefEffectSlot {
-    short lineHandles[32];                          /* +0x00 */
-    unsigned char lineTags[32];                     /* +0x40 */
-    int id;                                         /* +0x60 */
-    unsigned int flags;                             /* +0x64 */
-    short kind;                                     /* +0x68 */
-    unsigned char lineCount;                        /* +0x6A */
-} SefEffectSlot;
 
-/* One 16-byte entry of the table that func_001FA1C0 reads; the names are provisional until the callers give them. */
-typedef struct SefEntry16 {
-    unsigned char unmodeled_00[12];
-    short field12;                                  /* +12 */
-    signed char field14;                            /* +14 */
-    unsigned char unmodeled_0F;
-} SefEntry16;
+
+
+
+
+
+
+
+
+/* One 16-byte entry of the table that MMathHermiteKeyNeighbors reads; the names are provisional until the callers give them. */
+
+
+
+
+
+
 
 void *memset(void *destination, int value, unsigned int size);
 void sefFreeEffectData(SefEffectSlot *slot, int index);
 
-void func_001FA1C0(SefEntry16 *entries, SefEntry16 **out0, SefEntry16 **out1, SefEntry16 **out2, SefEntry16 **out3)
+void MMathHermiteKeyNeighbors(SefHermiteKey *keys, SefHermiteKey **outPreviousKey, SefHermiteKey **outCurrentKey, SefHermiteKey **outNextKey, SefHermiteKey **outAfterNextKey)
 {
-    SefEntry16 *head;
-    SefEntry16 *mid;
-    SefEntry16 *tail;
+    SefHermiteKey *previousKey;
+    SefHermiteKey *nextKey;
+    SefHermiteKey *afterNextKey;
 
-    head = &entries[-1];
-    if (entries[0].field12 == 0) {
-        head = entries;
+    previousKey = &keys[-1];
+    if (keys[0].key == 0) {
+        previousKey = keys;
     }
-    mid = &entries[1];
-    tail = &entries[2];
-    if (entries[1].field12 == 4096) {
-        mid = entries;
-        tail = entries;
-    } else if (entries[1].field14 >= 0) {
-        tail = &entries[entries[1].field14];
+    nextKey = &keys[1];
+    afterNextKey = &keys[2];
+    if (keys[1].key == 4096) {
+        nextKey = keys;
+        afterNextKey = keys;
+    } else if (keys[1].nextKeyIndex >= 0) {
+        afterNextKey = &keys[keys[1].nextKeyIndex];
     }
-    if (entries[2].field12 == 4096 && entries[1].field14 < 0) {
-        tail = mid;
+    if (keys[2].key == 4096 && keys[1].nextKeyIndex < 0) {
+        afterNextKey = nextKey;
     }
-    *out0 = head;
-    *out1 = entries;
-    *out2 = mid;
-    *out3 = tail;
+    *outPreviousKey = previousKey;
+    *outCurrentKey = keys;
+    *outNextKey = nextKey;
+    *outAfterNextKey = afterNextKey;
 }
 
-float sefEaseCurve(int mode, float time, float duration)
+float sefEaseCurve(int easeMode, float time, float duration)
 {
     float scale;
-    float half;
+    float halfDuration;
     float doubled;
     float rate;
 
     scale = 1.0f / duration;
-    switch (mode) {
+    switch (easeMode) {
     case 1:
         doubled = scale + scale;
-        half = duration * 0.5f;
-        if (time <= half) {
+        halfDuration = duration * 0.5f;
+        if (time <= halfDuration) {
             rate = time * doubled;
             rate = rate * rate * rate * rate * 0.5f;
         } else {
-            rate = 1.0f - (time - half) * doubled;
+            rate = 1.0f - (time - halfDuration) * doubled;
             rate = 1.0f - rate * rate * rate * rate * 0.5f;
         }
         break;
@@ -589,19 +760,19 @@ float sefEaseCurve(int mode, float time, float duration)
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FA338);
 
 /* One 16-byte key of a vector track: the key time is the short at +0x0C and the link the signed byte at +0x0E. */
-typedef struct SefVectorTrackKey {
-    unsigned char unmodeled_0000[0xC];
-    short key;                                  /* +0x0C */
-    signed char link;                           /* +0x0E */
-    unsigned char unmodeled_000F[0x1];
-} SefVectorTrackKey;
+
+
+
+
+
+
 
 /* A colour track's cursor: the track cursor, then the four integer colour lanes written at +0x10. */
-typedef struct SefColorTrackCursor {
-    SefTrackCursor track;                            /* +0x00 */
-    unsigned char unmodeled_00c[0x10 - 0x0c];
-    int color[4];                                    /* +0x10 */
-} SefColorTrackCursor;
+
+
+
+
+
 
 /* Samples a colour track at the cursor's time: the two keys the cursor spans are interpolated per lane,
  * scaled by the track's colour, clamped to 255 and stored as integers in the cursor's colour lanes. */
@@ -609,18 +780,18 @@ void sefSampleColorTrack(SefVectorTrackKey *keys, SefColorTrackCursor *cursor, c
 {
     SefVectorTrackKey *key;
     int *lanes;
-    short start;
-    short end;
+    short startKey;
+    short endKey;
     float fraction;
 
-    key = &keys[cursor->track.index];
+    key = &keys[cursor->track.keyIndex];
     if ((key + 1)->key != SEF_TRACK_END_KEY) {
         lanes = cursor->color;
         key = sefAdvanceVectorTrackCursor(keys, &cursor->track);
-        start = key->key;
-        end = (key + 1)->key;
-        if (start != end) {
-            fraction = (cursor->track.time - (float)start) / (float)(end - start);
+        startKey = key->key;
+        endKey = (key + 1)->key;
+        if (startKey != endKey) {
+            fraction = (cursor->track.time - startKey) / (endKey - startKey);
             __asm__ __volatile__(
                 "lqc2 vf1, 0(%0)\n\t"
                 "lqc2 vf2, 16(%0)\n\t"
@@ -649,17 +820,17 @@ void sefSampleTrack(SefTrackKey *keys, SefTrackCursor *cursor)
     SefTrackKey *key;
     f32 sample;
 
-    key = &keys[cursor->index];
+    key = &keys[cursor->keyIndex];
     if ((key + 1)->key == SEF_TRACK_END_KEY) {
-        sample = key->value;
+        sample = key->sampleValue;
     } else {
         key = sefAdvanceTrackCursor(keys, cursor);
         if (key->key == (key + 1)->key) {
             return;
         }
-        sample = ((key + 1)->value - key->value)
-               * ((cursor->time - (f32)key->key) / (f32)((key + 1)->key - key->key))
-               + key->value;
+        sample = ((key + 1)->sampleValue - key->sampleValue)
+               * ((cursor->time - key->key) / ((key + 1)->key - key->key))
+               + key->sampleValue;
     }
     cursor->sampled = sample;
 }
@@ -669,7 +840,7 @@ void sefSampleTrackTruncated(SefTrackKey *keys, SefTrackCursor *cursor)
     SefTrackKey *key;
     f32 sample;
 
-    key = &keys[cursor->index];
+    key = &keys[cursor->keyIndex];
     if (key->key == SEF_TRACK_END_KEY || (key + 1)->key == SEF_TRACK_END_KEY) {
         return;
     }
@@ -677,58 +848,60 @@ void sefSampleTrackTruncated(SefTrackKey *keys, SefTrackCursor *cursor)
     if (key->key == (key + 1)->key) {
         return;
     }
-    sample = ((key + 1)->value - key->value)
-           * ((cursor->time - (f32)key->key) / (f32)((key + 1)->key - key->key))
-           + key->value;
-    cursor->sampled_s16 = (short)sample;
+    sample = ((key + 1)->sampleValue - key->sampleValue)
+           * ((cursor->time - key->key) / ((key + 1)->key - key->key))
+           + key->sampleValue;
+    cursor->sampled_s16 = sample;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FA6B8);
+void sefSampleKeyframeTrack(SefKeyframeEntry *keyTable, SefTrackCursor *cursor) {
+    cursor->sampled = sefAdvanceKeyframeCursor(keyTable, cursor)->sampleValue;
+}
 
 void sefSampleKeyframeValue(SefKeyframe *keys, SefKeyCursor *cursor) {
-    cursor->value = ((SefKeyframe *)sefAdvanceTrackCursor((SefTrackKey *)keys, (SefTrackCursor *)cursor))->value;
+    cursor->sampleValue = ((SefKeyframe *)sefAdvanceTrackCursor((SefTrackKey *)keys, (SefTrackCursor *)cursor))->sampleValue;
 }
 
 /* Builds in destination the rotation that turns axis onto the normalized direction (MMathMatrixBetweenVectors);
  * returns 0 without touching destination for a zero direction. */
-int sefSetSlotDirection(Matrix4 *destination, const Vector4 *direction, const Vector4 *axis)
+int sefSetSlotDirection(Matrix4 *directionMatrix, const Vector4 *direction, const Vector4 *axis)
 {
     Vector4 normalized;
-    int is_zero;
+    int isZeroDirection;
 
-    is_zero = ((*(int *)&direction->z | *(u64 *)direction) == 0);
-    if (is_zero) {
+    isZeroDirection = ((*(int *)&direction->z | *(u64 *)direction) == 0);
+    if (isZeroDirection) {
         return 0;
     }
     MMathNormalizeVector2(&normalized, direction);
-    MMathMatrixBetweenVectors(destination, axis, &normalized);
+    MMathMatrixBetweenVectors(directionMatrix, axis, &normalized);
     return 1;
 }
 
-void sefSetSlotDirectionBetween(void *state, Vector4 *minuend, Vector4 *subtrahend, const Vector4 *axis) {
+void sefSetSlotDirectionBetween(void *slotMatrix, Vector4 *minuend, Vector4 *subtrahend, const Vector4 *axis) {
     Vector4 delta;
 
     Vu0SefSubVectorXYZ(&delta, minuend, subtrahend);
-    sefSetSlotDirection(state, &delta, axis);
+    sefSetSlotDirection(slotMatrix, &delta, axis);
 }
 
 /* result = the normalized (first - second) when flags has 0x400, else the
  * normalized (second - first); xyz only. The normalizing subroutine works on
  * vf20 in place. */
-void sefNormalizeDifference(Vector4 *result, const Vector4 *first, const Vector4 *second, int flags) {
+void sefNormalizeDifference(Vector4 *normalizedOut, const Vector4 *firstPoint, const Vector4 *secondPoint, int directionFlags) {
     __asm__ __volatile__(
         "lqc2 vf20, 0(%0)\n"
         "lqc2 vf1, 0(%1)\n"
         :
-        : "r"(first), "r"(second)
+        : "r"(firstPoint), "r"(secondPoint)
         : "memory");
-    if ((flags & 0x400) != 0) {
+    if ((directionFlags & 0x400) != 0) {
         __asm__ __volatile__("vsub.xyz vf20, vf20, vf1" : : : "memory");
     } else {
         __asm__ __volatile__("vsub.xyz vf20, vf1, vf20" : : : "memory");
     }
     vu0NormalizeVf20();
-    __asm__ __volatile__("sqc2 vf20, 0(%0)" : : "r"(result) : "memory");
+    __asm__ __volatile__("sqc2 vf20, 0(%0)" : : "r"(normalizedOut) : "memory");
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FA808);
@@ -758,56 +931,56 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FCC28);
 extern SefLocalData *sefLineDataRecords;
 int sefAllocLineData(void);
 
-void sefFreeLocalData(SefLocalData *data, unsigned int index)
+void sefFreeLocalData(SefLocalData *lineData, unsigned int pointIndex)
 {
-    if (index < SEF_LINE_PARTICLE_COUNT) {
-        sevFreePtAllocator(data->pointHandles[index]);
-        data->pointHandles[index] = -1;
-        if (data->pointCount != 0) {
-            data->pointCount--;
+    if (pointIndex < SEF_LINE_PARTICLE_COUNT) {
+        sevFreePtAllocator(lineData->pointHandles[pointIndex]);
+        lineData->pointHandles[pointIndex] = -1;
+        if (lineData->pointCount != 0) {
+            lineData->pointCount--;
         }
     }
 }
 
-int sefAllocLocalData(SefLocalData *data)
+int sefAllocLocalData(SefLocalData *lineData)
 {
-    int index;
-    int end;
-    int handle;
+    int pointIndex;
+    int scanEnd;
+    int pointHandle;
 
-    index = data->cursor;
-    end = (index - 1) & (SEF_LINE_PARTICLE_COUNT - 1);
-    if (data->allocScanFlag == 0) {
-        if (data->pointHandles[index] >= 0) {
+    pointIndex = lineData->cursor;
+    scanEnd = (pointIndex - 1) & (SEF_LINE_PARTICLE_COUNT - 1);
+    if (lineData->allocScanFlag == 0) {
+        if (lineData->pointHandles[pointIndex] >= 0) {
             return -1;
         }
     } else {
-        for (; index != end; index = (index + 1) & (SEF_LINE_PARTICLE_COUNT - 1)) {
-            if (data->pointHandles[index] < 0) {
+        for (; pointIndex != scanEnd; pointIndex = (pointIndex + 1) & (SEF_LINE_PARTICLE_COUNT - 1)) {
+            if (lineData->pointHandles[pointIndex] < 0) {
                 break;
             }
         }
-        if (index == end) {
+        if (pointIndex == scanEnd) {
             return -1;
         }
     }
-    handle = sevAllocPtAllocator();
-    if (handle < 0) {
+    pointHandle = sevAllocPtAllocator();
+    if (pointHandle < 0) {
         return -1;
     }
-    data->pointHandles[index] = handle;
-    data->cursor = (index + 1) & (SEF_LINE_PARTICLE_COUNT - 1);
-    data->pointCount++;
-    return index;
+    lineData->pointHandles[pointIndex] = pointHandle;
+    lineData->cursor = (pointIndex + 1) & (SEF_LINE_PARTICLE_COUNT - 1);
+    lineData->pointCount++;
+    return pointIndex;
 }
 
-void sefDestroyLocalData(SefLocalPointRecord *data)
+void sefDestroyLocalData(SefLocalData *lineData)
 {
     int i;
 
-    for (i = 0; i < SEF_LINE_PARTICLE_COUNT && data->pointCount != 0; i++) {
-        if (data->pointHandles[i] >= 0) {
-            sefFreeLocalData(data, i);
+    for (i = 0; i < SEF_LINE_PARTICLE_COUNT && lineData->pointCount != 0; i++) {
+        if (lineData->pointHandles[i] >= 0) {
+            sefFreeLocalData(lineData, i);
         }
     }
 }
@@ -815,23 +988,23 @@ void sefDestroyLocalData(SefLocalPointRecord *data)
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FD000);
 
 /* The count of local effect records in use slots: the first free one is claimed and its index returned. */
-extern int D_0055106C;
+extern int sefLineDataCount;
 
 int sefAllocLineData(void)
 {
     SefLocalData *line;
-    int index;
+    int lineIndex;
 
-    index = 0;
-    if (D_0055106C > 0) {
+    lineIndex = 0;
+    if (sefLineDataCount > 0) {
         line = sefLineDataRecords;
         do {
             if (line->inUse == 0) {
                 line->inUse = 32;
-                return index;
+                return lineIndex;
             }
             line++;
-        } while (++index < D_0055106C);
+        } while (++lineIndex < sefLineDataCount);
     }
     return -1;
 }
@@ -840,12 +1013,12 @@ void sefFreeLineData(int lineIndex)
 {
     SefLocalData *line;
 
-    if (lineIndex >= 0 && lineIndex < D_0055106C) {
+    if (lineIndex >= 0 && lineIndex < sefLineDataCount) {
         line = 0;
         if (lineIndex >= 0) {
             line = sefLineDataRecords + lineIndex;
         }
-        sefDestroyLocalData((SefLocalPointRecord *)line);
+        sefDestroyLocalData(line);
         line->inUse = 0;
     }
 }
@@ -861,144 +1034,144 @@ void sefFreeLineData(int lineIndex)
 
 /* One 14-byte entry of an object's animation list: time is the key, 4096 ends the list; the flags byte
  * is read from the list head only. */
-typedef struct SefAnalyzeRecord {
-    short time;                                 /* +0x00 */
-    unsigned char unmodeled_02[1];
-    unsigned char flags;                        /* +0x03 */
-    short imageId;                              /* +0x04 */
-    short altImageId;                           /* +0x06 */
-    short imageId2;                             /* +0x08 */
-    short altImageId2;                          /* +0x0A */
-    unsigned char unmodeled_0C[2];
-} SefAnalyzeRecord;
+
+
+
+
+
+
+
+
+
+
 
 /* One 32-byte image packet. */
-typedef struct SefImagePacket {
-    float scaledWidth;                          /* +0x00 */
-    float scaledHeight;                         /* +0x04 */
-    const void *image;                          /* +0x08 */
-    const void *palette;                        /* +0x0C */
-    unsigned long long tex0;                    /* +0x10 */
-    float time;                                 /* +0x18 */
-    unsigned short flags;                       /* +0x1C */
-    unsigned short resourceKind;                /* +0x1E */
-} SefImagePacket;
+
+
+
+
+
+
+
+
+
+
 
 /* The image mapper entry read through svGetImageListItem (owner: sv_get_image_item_142.c). */
-typedef struct SvTypeListEntry {
-    void *data;                                 /* +0x00 */
-    unsigned char unmodeled_04[0x0C - 0x04];
-    unsigned short resourceKind;                /* +0x0C */
-    unsigned char unmodeled_0E[0x12 - 0x0E];
-    unsigned short basePointer;                 /* +0x12 */
-    unsigned short bitsPerPixel;                /* +0x14 */
-    unsigned short bufferWidthPixels;           /* +0x16 */
-    unsigned short width;                       /* +0x18 */
-    unsigned short height;                      /* +0x1A */
-    unsigned short textureWidthExponent;        /* +0x1C */
-    unsigned short textureHeightExponent;       /* +0x1E */
-} SvTypeListEntry;
 
-/* The current effect record (sefCurrentRecord): only the entry id at +0x08 is read here. */
-typedef struct SefEffectRecord {
-    unsigned char unmodeled_00[0x08];
-    short entryId;                              /* +0x08 */
-} SefEffectRecord;
 
-extern SefEffectRecord *sefCurrentRecord;
+
+
+
+
+
+
+
+
+
+
+
+
+/* The current effect record (sefCurrentEffectRecord): only the entry id at +0x08 is read here. */
+
+
+
+
+
+extern SefEffectRecord *sefCurrentEffectRecord;
 SvTypeListEntry *svGetImageListItem(int type, unsigned int flags);
 
 /* The animation object: its record list at +0x17C, the 30 image packets at +0x1A0 and the 8 alternate
  * packets after them at +0x560. */
 typedef struct SefAnimObject {
     unsigned char unmodeled_0000[0x17C];
-    SefAnalyzeRecord *records;                  /* +0x17C */
+    SefAnalyzeRecord *animRecordTable;               /* +0x17C */
     unsigned char unmodeled_0180[0x1A0 - 0x180];
     SefImagePacket packets[SEF_IMAGE_PACKET_COUNT]; /* +0x1A0 */
     SefImagePacket altPackets[SEF_ALT_PACKET_COUNT]; /* +0x560 */
 } SefAnimObject;
 
-int sefAnalyzeAnim(SefAnimObject *object)
+int sefAnalyzeAnim(SefAnimObject *animObject)
 {
     int packetCount;
-    SefAnalyzeRecord *records;
-    SefImagePacket *packet;
-    SefImagePacket *altPacket;
+    SefAnalyzeRecord *animRecords;
+    SefImagePacket *imagePacket;
+    SefImagePacket *altImagePacket;
     short *altPaletteId;
     int psm;
 
-    records = object->records;
+    animRecords = animObject->animRecordTable;
     packetCount = 0;
-    if (records->time != SEF_LIST_END) {
-        altPacket = object->altPackets;
-        packet = object->packets;
+    if (animRecords->time != SEF_LIST_END) {
+        altImagePacket = animObject->altPackets;
+        imagePacket = animObject->packets;
         do {
-            int flags;
+            int packetFlags;
             short mapperIndex;
             float animScale;
             SvTypeListEntry *image;
             SvTypeListEntry *palette;
 
-            flags = records->flags;
-            mapperIndex = sefCurrentRecord->entryId;
-            if ((flags & 0x10) != 0) {
-                if (records[packetCount].imageId == 0 || records[packetCount].altImageId == 0) {
-                    memset(packet, 0, 0x20);
-                    packet->resourceKind = 4;
-                    packet->flags = flags;
+            packetFlags = animRecords->flags;
+            mapperIndex = sefCurrentEffectRecord->entryId;
+            if ((packetFlags & 0x10) != 0) {
+                if (animRecords[packetCount].imageId == 0 || animRecords[packetCount].altImageId == 0) {
+                    memset(imagePacket, 0, 0x20);
+                    imagePacket->resourceKind = 4;
+                    imagePacket->flags = packetFlags;
                     break;
                 }
             }
-            if ((records[packetCount].imageId & 0x100) != 0) {
-                image = svGetImageListItem(0, records[packetCount].imageId);
-                palette = svGetImageListItem(0, records[packetCount].altImageId);
+            if ((animRecords[packetCount].imageId & 0x100) != 0) {
+                image = svGetImageListItem(0, animRecords[packetCount].imageId);
+                palette = svGetImageListItem(0, animRecords[packetCount].altImageId);
             } else {
-                image = svGetImageListItem(mapperIndex, records[packetCount].imageId);
-                palette = svGetImageListItem(mapperIndex, records[packetCount].altImageId);
+                image = svGetImageListItem(mapperIndex, animRecords[packetCount].imageId);
+                palette = svGetImageListItem(mapperIndex, animRecords[packetCount].altImageId);
             }
             if (image != 0 && palette != 0) {
                 if (packetCount < SEF_IMAGE_PACKET_COUNT) {
                     animScale = SEF_IMAGE_PACKET_SCALE;
-                    packet->flags = flags;
-                    packet->time = (float)records[packetCount].time;
-                    packet->scaledWidth = (float)image->width * animScale;
-                    packet->scaledHeight = (float)image->height * animScale;
-                    packet->resourceKind = image->resourceKind;
+                    imagePacket->flags = packetFlags;
+                    imagePacket->time = animRecords[packetCount].time;
+                    imagePacket->scaledWidth = image->width * animScale;
+                    imagePacket->scaledHeight = image->height * animScale;
+                    imagePacket->resourceKind = image->resourceKind;
                     psm = image->bitsPerPixel == 8 ? SEF_GS_PSMT8 : SEF_GS_PSMT4;
-                    packet->image = image->data;
-                    packet->palette = palette->data;
-                    packet->tex0 = GS_SET_TEX0(image->basePointer, image->bufferWidthPixels >> 6,
+                    imagePacket->image = image->pixelData;
+                    imagePacket->palette = palette->pixelData;
+                    imagePacket->tex0 = GS_SET_TEX0(image->texBasePointer, image->bufferWidthPixels >> 6,
                         psm, image->textureWidthExponent, image->textureHeightExponent, 1, 0,
-                        palette->basePointer, 0, 0, 0, 1);
-                    if (records[packetCount].imageId2 != 0 &&
-                        *(altPaletteId = &records[packetCount].altImageId2) != 0) {
-                        image = svGetImageListItem(mapperIndex, records[packetCount].imageId2);
+                        palette->texBasePointer, 0, 0, 0, 1);
+                    if (animRecords[packetCount].secondaryImageId != 0 &&
+                        *(altPaletteId = &animRecords[packetCount].secondaryPaletteId) != 0) {
+                        image = svGetImageListItem(mapperIndex, animRecords[packetCount].secondaryImageId);
                         palette = svGetImageListItem(mapperIndex, *altPaletteId);
                         if (image != 0 && palette != 0) {
                             if (packetCount < SEF_ALT_PACKET_COUNT) {
-                                packet->flags |= 0x4000;
-                                packet[SEF_IMAGE_PACKET_COUNT].image = image->data;
-                                packet[SEF_IMAGE_PACKET_COUNT].scaledWidth = (float)image->width * animScale;
-                                packet[SEF_IMAGE_PACKET_COUNT].scaledHeight = (float)image->height * animScale;
-                                packet[SEF_IMAGE_PACKET_COUNT].resourceKind = image->resourceKind;
-                                packet[SEF_IMAGE_PACKET_COUNT].palette = palette->data;
+                                imagePacket->flags |= 0x4000;
+                                imagePacket[SEF_IMAGE_PACKET_COUNT].image = image->pixelData;
+                                imagePacket[SEF_IMAGE_PACKET_COUNT].scaledWidth = image->width * animScale;
+                                imagePacket[SEF_IMAGE_PACKET_COUNT].scaledHeight = image->height * animScale;
+                                imagePacket[SEF_IMAGE_PACKET_COUNT].resourceKind = image->resourceKind;
+                                imagePacket[SEF_IMAGE_PACKET_COUNT].palette = palette->pixelData;
                                 psm = image->bitsPerPixel == 8 ? SEF_GS_PSMT8 : SEF_GS_PSMT4;
-                                packet[SEF_IMAGE_PACKET_COUNT].tex0 = GS_SET_TEX0(image->basePointer,
+                                imagePacket[SEF_IMAGE_PACKET_COUNT].tex0 = GS_SET_TEX0(image->texBasePointer,
                                     image->bufferWidthPixels >> 6, psm, image->textureWidthExponent,
-                                    image->textureHeightExponent, 1, 0, palette->basePointer, 0, 0, 0, 1);
+                                    image->textureHeightExponent, 1, 0, palette->texBasePointer, 0, 0, 0, 1);
                             }
                         } else {
-                            memset(altPacket, 0, 0x20);
+                            memset(altImagePacket, 0, 0x20);
                         }
                     }
                 }
             } else {
-                memset(packet, 0, 0x20);
+                memset(imagePacket, 0, 0x20);
             }
-            altPacket++;
-            packet++;
+            altImagePacket++;
+            imagePacket++;
             packetCount++;
-        } while (records[packetCount].time != SEF_LIST_END);
+        } while (animRecords[packetCount].time != SEF_LIST_END);
     }
     return packetCount;
 }
@@ -1011,111 +1184,111 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FE6F0);
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FF1A0);
 
-void sefInitEffectData(SefEffectSlot *slot, int id, int kind)
+void sefInitEffectData(SefEffectSlot *effectSlot, int id, int effectKind)
 {
-    unsigned int flags;
+    unsigned int effectFlags;
 
-    memset(slot, -1, 64);
-    slot->id = id;
-    flags = slot->flags & 0x7FFFFFFF;
-    slot->kind = kind;
-    slot->flags = flags;
-    slot->lineCount = 0;
+    memset(effectSlot, -1, 64);
+    effectSlot->id = id;
+    effectFlags = effectSlot->flags & 0x7FFFFFFF;
+    effectSlot->effectKind = effectKind;
+    effectSlot->flags = effectFlags;
+    effectSlot->lineCount = 0;
 }
 
-void sefDestroyEffectData(SefEffectSlot *slot)
+void sefDestroyEffectData(SefEffectSlot *effectSlot)
 {
     int i;
 
-    if (slot->id != 0) {
+    if (effectSlot->id != 0) {
         for (i = 0; i < 32; i++) {
-            sefFreeEffectData(slot, i);
+            sefFreeEffectData(effectSlot, i);
         }
     }
-    slot->kind = 0;
-    slot->id = 0;
-    slot->flags = 0;
+    effectSlot->effectKind = 0;
+    effectSlot->id = 0;
+    effectSlot->flags = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FF7B0);
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FF838);
 
-SefLocalData *sefAllocEffectData(SefEffectSlot *slot, int tag)
+SefLocalData *sefAllocEffectData(SefEffectSlot *effectSlot, int tag)
 {
-    short *handle;
+    short *lineHandlePtr;
     int lineSlot;
     int lineHandle;
 
-    lineSlot = (signed char)slot->lineCount;
+    lineSlot = effectSlot->lineCount;
     if ((unsigned int)lineSlot >= 32) {
         return 0;
     }
-    handle = &slot->lineHandles[lineSlot];
-    if (*handle >= 0) {
+    lineHandlePtr = &effectSlot->lineHandles[lineSlot];
+    if (*lineHandlePtr >= 0) {
         return 0;
     }
     lineHandle = sefAllocLineData();
     if (lineHandle < 0) {
         return 0;
     }
-    *handle = lineHandle;
-    slot->lineTags[lineSlot] = tag;
-    slot->lineCount++;
+    *lineHandlePtr = lineHandle;
+    effectSlot->lineTags[lineSlot] = tag;
+    effectSlot->lineCount++;
     return &sefLineDataRecords[lineHandle];
 }
 
-void sefFreeEffectData(SefEffectSlot *slot, int index)
+void sefFreeEffectData(SefEffectSlot *effectSlot, int lineSlot)
 {
-    short *handle;
+    short *lineHandlePtr;
 
-    if ((unsigned int)index < 32) {
-        handle = &slot->lineHandles[index];
-        if (*handle >= 0) {
-            sefFreeLineData(*handle);
-            *handle = -1;
+    if ((unsigned int)lineSlot < 32) {
+        lineHandlePtr = &effectSlot->lineHandles[lineSlot];
+        if (*lineHandlePtr >= 0) {
+            sefFreeLineData(*lineHandlePtr);
+            *lineHandlePtr = -1;
         }
     }
 }
 
-void sefOrEntryFlags(int key, int flags);
-void sefClearEntryFlags(int key, int flags);
+void sefSetEntryFlagsByKey(int key, int flags);
+void sefClearEntryFlagsByKey(int key, int flags);
 
-void sefApplySlotFlags(int wordMask, int flagBits, int setBits)
+void sefApplyRequestKeyBits(int wordMask, int flagBits, int setBits)
 {
     void (*applyBits)(int, int);
-    int *requestWords;
+    int *requestKeys;
 
-    requestWords = (int *)sefRequestBuffer;
-    applyBits = setBits ? sefOrEntryFlags : sefClearEntryFlags;
+    requestKeys = (int *)sefRequestKeyBlock;
+    applyBits = setBits ? sefSetEntryFlagsByKey : sefClearEntryFlagsByKey;
     if (wordMask == 0) {
-        applyBits(requestWords[0], flagBits);
+        applyBits(requestKeys[0], flagBits);
         return;
     }
     if (wordMask & 1) {
-        applyBits(requestWords[0], flagBits);
+        applyBits(requestKeys[0], flagBits);
     }
     if (wordMask & 4) {
-        applyBits(requestWords[1], flagBits);
+        applyBits(requestKeys[1], flagBits);
     }
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_001FFA50);
 
 /* The line data pool: the splat label of the pool, owned by the bss of main/tu127. */
-extern unsigned char D_00660FA0[];
+extern unsigned char sefEffectSlots[];
 
 void sefClearLineDataRecords(void)
 {
-    memset(D_00660FA0, 0, 0x6978);
+    memset(sefEffectSlots, 0, 0x6978);
 }
 
 /* The record block of this unit (the splat label of main/sef_131 bss that sefLineDataRecords points to). */
-extern unsigned char D_00667920[];
+extern unsigned char sefLineDataBlock[];
 
-void sefResetPool(void)
+void sefClearLineRecordBlock(void)
 {
-    memset(D_00667920, 0, 0x5C4E0);
+    memset(sefLineDataBlock, 0, 0x5C4E0);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00200180);
@@ -1139,9 +1312,9 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_002010C8);
 /* The eight-word scheduler entry func_002010C8 (still INCLUDE_ASM); the parameter types are provisional. */
 int func_002010C8(int table, int request, int offset, int loadTag, int delayFrames, int reuseIndex, int flag, int extra);
 
-int sefCreateScheduler(int table, int request, int offset, int loadTag, int reuseIndex)
+int sefCreateScheduler(int tableId, int scheduleRequest, int scheduleOffset, int loadTag, int reuseIndex)
 {
-    return func_002010C8(table, request, offset, loadTag, 0, reuseIndex, 1, 0);
+    return func_002010C8(tableId, scheduleRequest, scheduleOffset, loadTag, 0, reuseIndex, 1, 0);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00201508);
@@ -1152,7 +1325,22 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_002017E0);
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00201808);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00201898);
+extern const Matrix4 MMathUnitMatrix;
+void func_00201808(void *destination, const void *source);
+
+void sefSetMatrixOrUnit(void *destinationMatrix, const void *sourceMatrix) {
+    if (sourceMatrix != 0) {
+        func_00201808(destinationMatrix, sourceMatrix);
+        return;
+    }
+    __asm__ __volatile__("lqc2 vf1, 32(%0)" : : "r"(MMathUnitMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf2, 16(%0)" : : "r"(MMathUnitMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(MMathUnitMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf0, 48(%0)" : : "r"(destinationMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf1, 32(%0)" : : "r"(destinationMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf2, 16(%0)" : : "r"(destinationMatrix) : "memory");
+    __asm__ __volatile__("sqc2 vf3, 0(%0)" : : "r"(destinationMatrix) : "memory");
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_002018E8);
 
@@ -1172,69 +1360,69 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_00202CC8);
 
 /* The table of tu118.h without its 0x0C-byte tail: the .extern size recorded in each object differs per TU, so the
  * unification waits for one agreed size. */
-typedef struct SefEntryTableShort {
-    SefEntry entries[24];
-    unsigned char unmodeled_20700[0x10];
-    int entryCount;                             /* +0x20710 */
-} SefEntryTableShort;
 
-extern SefEntryTableShort D_004541A0;
 
-void sefOrEntryFlags(int key, int flags)
+
+
+
+
+extern SefEntryTableShort sefEffectEntryTable;
+
+void sefSetEntryFlagsByKey(int key, int flagBits)
 {
-    SefEntry *entry;
-    int index;
+    SefEntry *foundEntry;
+    int effectEntryIndex;
 
     if (key == 0) {
         return;
     }
-    index = 0;
-    if (D_004541A0.entryCount <= 0) {
+    effectEntryIndex = 0;
+    if (sefEffectEntryTable.entryCount <= 0) {
         return;
     }
-    if (D_004541A0.entries[0].id == key) {
-        D_004541A0.entries[0].flags |= flags;
+    if (sefEffectEntryTable.entries[0].id == key) {
+        sefEffectEntryTable.entries[0].effectEntryFlags |= flagBits;
         return;
     }
-next:
-    index++;
-check:
-    if (index >= D_004541A0.entryCount) {
+nextCandidate:
+    effectEntryIndex++;
+candidateCheck:
+    if (effectEntryIndex >= sefEffectEntryTable.entryCount) {
         return;
     }
-    entry = &D_004541A0.entries[index];
-    if (entry->id != key) {
-        goto next;
+    foundEntry = &sefEffectEntryTable.entries[effectEntryIndex];
+    if (foundEntry->id != key) {
+        goto nextCandidate;
     }
-    entry->flags |= flags;
+    foundEntry->effectEntryFlags |= flagBits;
 }
 
-void sefClearEntryFlags(int key, int flags)
+void sefClearEntryFlagsByKey(int key, int flagBits)
 {
-    SefEntry *entry;
-    int index;
+    SefEntry *foundEntry;
+    int effectEntryIndex;
 
     if (key == 0) {
         return;
     }
-    entry = &D_004541A0.entries[0];
-    index = 0;
-    if (D_004541A0.entryCount <= 0) {
+    foundEntry = &sefEffectEntryTable.entries[0];
+    effectEntryIndex = 0;
+    if (sefEffectEntryTable.entryCount <= 0) {
         return;
     }
-    if (entry->id != key) {
-        goto loop;
+    if (foundEntry->id != key) {
+        goto candidateLoop;
         do {
-            entry = 0;
-loop:
-            index++;
-            if (index >= D_004541A0.entryCount) {
+            foundEntry = 0;
+candidateLoop:
+            effectEntryIndex++;
+            if (effectEntryIndex >= sefEffectEntryTable.entryCount) {
                 return;
             }
-            entry = &D_004541A0.entries[index];
-        } while (entry->id != key);
+            foundEntry = &sefEffectEntryTable.entries[effectEntryIndex];
+        } while (foundEntry->id != key);
     }
-    entry->flags &= ~flags;
+    foundEntry->effectEntryFlags &= ~flagBits;
 }
 
 int tiMRPackageGetNodeMatrix(Vector4 *block, void *arg);
@@ -1242,17 +1430,17 @@ Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs);
 extern const Matrix4 MMathUnitMatrix;
 
 /* Multiplies the actor's local matrix into out when apply is set; an actor without a block gets the identity and returns 0. */
-int sefActorMulLocalMatrix(XenoActor *actor, void *arg, Matrix4 *out, int apply)
+int sefActorMulLocalMatrix(XenoActor *actor, void *actorNodeArg, Matrix4 *combinedMatrix, int multiplyLocal)
 {
     if (actor == 0) {
-        Vu0CopyUnitMatrix(out, &MMathUnitMatrix);
+        Vu0CopyUnitMatrix(combinedMatrix, &MMathUnitMatrix);
         return 0;
     }
-    if (tiMRPackageGetNodeMatrix(&actor->shadowB, arg) == 0) {
+    if (tiMRPackageGetNodeMatrix(&actor->shadowB, actorNodeArg) == 0) {
         return 0;
     }
-    if (apply != 0) {
-        MMathMulMatrix(out, &actor->localMatrix, out);
+    if (multiplyLocal != 0) {
+        MMathMulMatrix(combinedMatrix, &actor->localMatrix, combinedMatrix);
     }
     return 1;
 }
@@ -1263,86 +1451,162 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_002030E8);
 
 SefEntry *sefFindEntryById(int key)
 {
-    SefEntryTableShort *table;
-    SefEntry *entry;
+    SefEntryTableShort *effectTable;
+    SefEntry *foundEntry;
     int i;
 
     if (key != 0) {
-        table = &D_004541A0;
-        for (i = 0; i < table->entryCount; i++) {
-            entry = &table->entries[i];
-            if (entry->id == key) {
-                return entry;
+        effectTable = &sefEffectEntryTable;
+        for (i = 0; i < effectTable->entryCount; i++) {
+            foundEntry = &effectTable->entries[i];
+            if (foundEntry->id == key) {
+                return foundEntry;
             }
         }
     }
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203360);
+f32 sefGetEntryScale(s32 id) {
+    SefEntry *foundEntry;
+    f32 scale;
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203390);
+    foundEntry = sefFindEntryById(id);
+    scale = 1.0f;
+    if (foundEntry != 0) {
+        scale = *(f32 *) foundEntry->unmodeled_1558;
+    }
+    return scale;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002033C8);
+extern unsigned char sefEffectOwner[];
+extern unsigned char sefSetupArg[];
+extern s32 sefSetupPending;
+void func_001936F0(void *owner, s32 message, void *argument);
+void func_001E8CB8(s32 mode);
 
-void func_001ED2E8(void);
+void sefFlushPendingEffectSetup(void) {
+    if (sefSetupPending != 0) {
+        func_001936F0(sefEffectOwner, 0x1709, sefSetupArg);
+    }
+    func_001E8CB8(1);
+}
+
+extern unsigned char sefTeardownArg[];
+extern s32 sefTeardownPending;
+void func_001E8E70(void);
+
+void sefFlushPendingEffectTeardown(void) {
+    if (sefTeardownPending != 0) {
+        func_001936F0(sefEffectOwner, 0x1719, sefTeardownArg);
+        sefTeardownPending = 0;
+    }
+    func_001E8E70();
+}
+
+void sefAdvanceStepCounter(void);
 void sdvExecAlters(void);
 void func_001F8680(void);
 extern int D_00551084;
-extern int D_00551088;
+extern int gSdvHitReceived;
 
-void sefExecStep(void)
+void sefRunEffectStep(void)
 {
-    memset(D_0076C000, 0, sizeof(SefEntryCount) * 45);
-    func_001ED2E8();
+    memset(sefEffectTallies, 0, sizeof(SefEffectTally) * 45);
+    sefAdvanceStepCounter();
     sdvExecAlters();
     func_001F8680();
-    sefSumEntryCounts();
+    sefSumEffectTallies();
     D_00551084 = 0;
-    D_00551088 = 0;
+    gSdvHitReceived = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203450);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002034F0);
+extern unsigned char D_004C8390[];
 
-extern int D_0055107C;
-s16 func_001F52C0(void);
+/* The block D_004C8390 as far as this unit reads it: four words cleared by sefResetDrawState; the rest is not read here. */
+typedef struct SefDrawStateBlock {
+    unsigned char unmodeled_00[0x20];           /* +0x00..0x1F: not read by this unit */
+    s32 word20;                                 /* +0x20 */
+    unsigned char unmodeled_24[0x2C - 0x24];    /* +0x24..0x2B: not read by this unit */
+    s32 word2C;                                 /* +0x2C */
+    unsigned char unmodeled_30[0x3C - 0x30];    /* +0x30..0x3B: not read by this unit */
+    s32 word3C;                                 /* +0x3C */
+    unsigned char unmodeled_40[0x5C - 0x40];    /* +0x40..0x5B: not read by this unit */
+    s32 word5C;                                 /* +0x5C */
+} SefDrawStateBlock;
+#define sefDrawStateBlock (*(SefDrawStateBlock *) D_004C8390)
+
+void sefResetDrawState(void)
+{
+    sefDrawStateBlock.word5C = 0;
+    sefDrawStateBlock.word3C = 0;
+    sefDrawStateBlock.word20 = 0;
+    sefDrawStateBlock.word2C = 0;
+}
+
+extern int sefDrawEnabled;
+s16 sefGetDraw2DOverride(void);
 void sefGetCameraPos(Matrix4 *dest);
 void svDrawScene2D(void);
 
 void sefDrawEffect2D(void)
 {
-    if (D_0055107C != 0) {
-        if (sefGetDraw2DFlag() != 0 || func_001F52C0() != 0) {
+    if (sefDrawEnabled != 0) {
+        if (sefGetDraw2DFlag() != 0 || sefGetDraw2DOverride() != 0) {
             sefGetCameraPos(sefCameraMatrix);
             svDrawScene2D();
         }
     }
 }
 
-int func_001F52D0(void);
-void func_0020E6F8(void);
+int sefGetDraw3DOverride(void);
+void svDrawSceneEffects(void);
 
-void func_00203568(void)
+void sefDrawEffectList3D(void)
 {
-    if (D_0055107C != 0) {
-        if (sefGetDraw3DFlag() != 0 || func_001F52D0() != 0) {
+    if (sefDrawEnabled != 0) {
+        if (sefGetDraw3DFlag() != 0 || sefGetDraw3DOverride() != 0) {
             sefGetCameraPos(sefCameraMatrix);
-            func_0020E6F8();
+            svDrawSceneEffects();
         }
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002035C0);
+void svDrawEffectRecords3D(void);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", sefDrawEffect3D);
+void sefDrawEffectRecords3D(void) {
+    if (gGameLoopRuntimeStorage.flags & 0x40000400) {
+        sefResetDrawState();
+        return;
+    }
+    if (sefDrawEnabled != 0) {
+        sefGetCameraPos(sefCameraMatrix);
+        svDrawEffectRecords3D();
+    }
+}
+
+s32 sefGetDrawEnabledFlag(void);
+
+void sefDrawEffect3D(void) {
+    extern s32 sefGetDrawEnabledFlag();
+    if ((sefDrawEnabled != 0) && (sefGetDrawEnabledFlag() != 0)) {
+        svDrawScene3D();
+    }
+}
 
 void sefDrawEffect3DCallback(void) {
     sefDrawEffect3D();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203668);
+extern s32 sefDraw3DForced;
+
+void sefDrawEffect3DFlagged(void) {
+    sefDraw3DForced = 1;
+    sefDrawEffect3D();
+    sefDraw3DForced = 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203690);
 
@@ -1359,7 +1623,7 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203690);
 SefEffectRecord *sefGetScheduler(void);
 
 struct SefLocalData;
-struct SefGroupObject;
+struct SefRecordOwner;
 struct SefLocalData *sefGetLineAdr(int entryIndex);
 
 /* Particles per line-data record. */
@@ -1368,63 +1632,95 @@ struct SefLocalData *sefGetLineAdr(int entryIndex);
 
 /* The request buffer: 0x340 bytes (SefRequestBuffer view); +0x100 (0x8046F0) and sefRequestParentMatrixPointer (+0x300) are
  * labels inside it. */
-extern unsigned char sefRequestBuffer[0x340];
+extern unsigned char sefRequestKeyBlock[0x340];
 
 typedef struct SefTrackKey16 {
     float value[3];                                  /* +0x00 */
     short key;
-    signed char link;
+    signed char nextKeyIndex;
     unsigned char unmodeled_00f[1];
 } SefTrackKey16;
 
-#define sefCurrentRecord (*(SefEffectRecord **)&sefCurrentRecord)
+#define sefCurrentEffectRecord (*(SefEffectRecord **)&sefCurrentEffectRecord)
 extern SefLocalData *sefLineDataRecords;
 extern SefEffectRecord *sefEffectRecords;
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002037D0);
+/* One 0x40-byte slot of the table at D_004749F0 (0x24 slots, cleared by sefClearEntryTable and sefClearEntryTableSlot). */
+typedef struct SefTableSlot {
+    unsigned char unmodeled_00[0x40];
+} SefTableSlot;
+
+extern SefTableSlot D_004749F0[];
+
+void sefClearEntryTable(void) {
+    memset(D_004749F0, 0, 0x900U);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_002037F8);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203858);
+void sefClearEntryTableSlot(s8 slotNumber) {
+    s8 signedSlotNumber;
+    u32 unsignedSlotNumber;
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002038A8);
+    signedSlotNumber = slotNumber;
+    unsignedSlotNumber = signedSlotNumber & 0xFF;
+    if (unsignedSlotNumber < 0x24U) {
+        memset(&D_004749F0[signedSlotNumber], 0, 0x40U);
+    }
+}
+
+s32 sefMakeEffectHandle(s32 handleClass, s32 handleId, s32 handleTag) {
+    if (handleClass == 3) {
+        return handleId | 0x30000000;
+    }
+    return (handleClass << 0x1C) | (handleId << 0xC) | handleTag;
+}
 
 SefLinkedContext *sefGetBattleData(void)
 {
-    return (SefLinkedContext *) sefRequestBuffer;
+    return (SefLinkedContext *) sefRequestKeyBlock;
 }
 
 /* One 0x270-byte entry of the table at sefPtAllocatorState (the stride the getters step by); data is the array at +0x10. */
-typedef struct SefPtAllocatorEntry {
-    unsigned char unmodeled_00[0x10];
-    unsigned char data[0x270 - 0x10];
-} SefPtAllocatorEntry;
+
+
+
+
 
 #define sefPtAllocatorState (*(SefPtAllocatorEntry **)&sefPtAllocatorState)
 extern int sefPtAllocCount;
 
-unsigned char *sevGetPtAllocator2(int slotIndex)
+unsigned char *sevGetPtAllocator2(int allocatorIndex)
 {
-    if (slotIndex < 0 || slotIndex >= sefPtAllocCount) {
+    if (allocatorIndex < 0 || allocatorIndex >= sefPtAllocCount) {
         return 0;
     }
-    return sefPtAllocatorState[slotIndex].data;
+    return sefPtAllocatorState[allocatorIndex].allocatorBytes;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203928);
+extern s32 sefEffectSlotCount;
+
+void *sefGetEffectSlot(s32 effectIndex) {
+    if ((effectIndex >= 0) && (effectIndex < sefEffectSlotCount)) {
+        return sefEffectSlots + (effectIndex * 0x6C);
+    }
+    return 0;
+}
 
 /* Returns line-data record entryIndex, or null for a negative index. */
-SefLocalData *sefGetLineAdr(int entryIndex)
+SefLocalData *sefGetLineAdr(int lineIndex)
 {
-    if (entryIndex < 0) {
+    if (lineIndex < 0) {
         return 0;
     }
-    return &sefLineDataRecords[entryIndex];
+    return &sefLineDataRecords[lineIndex];
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203990);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002039E0);
+void sefClearEffectTallies(void) {
+    memset(sefEffectTallies, 0, 0x438U);
+}
 
 /* Returns the base of the effect record table. */
 SefEffectRecord *sefGetScheduler(void)
@@ -1435,35 +1731,41 @@ SefEffectRecord *sefGetScheduler(void)
 /* Returns the record most recently stored by sefDestroyRecordEffects (the current record). */
 SefEffectRecord *sefGetNowScheduler(void)
 {
-    return sefCurrentRecord;
+    return sefCurrentEffectRecord;
 }
 
-unsigned char *sefGetParentLine(int checkedIndex, int slotIndex)
+unsigned char *sefGetParentLine(int checkedIndex, int allocatorIndex)
 {
-    unsigned char *data;
+    unsigned char *parentLineBytes;
 
-    if (checkedIndex >= 0 && slotIndex >= 0) {
-        data = 0;
-        if (slotIndex < sefPtAllocCount) {
-            data = sefPtAllocatorState[slotIndex].data;
+    if (checkedIndex >= 0 && allocatorIndex >= 0) {
+        parentLineBytes = 0;
+        if (allocatorIndex < sefPtAllocCount) {
+            parentLineBytes = sefPtAllocatorState[allocatorIndex].allocatorBytes;
         }
-        return data;
+        return parentLineBytes;
     }
     return 0;
 }
 
 #undef SefTrackKey16
-#undef sefCurrentRecord
+#undef sefCurrentEffectRecord
 #undef sefPtAllocatorState
 /* <<< CHUNK sef_132 */
 
 /* >>> CHUNK tu133 */
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203A68);
+extern Vector4 sefDefaultAxis;
+
+void sefSetSlotDirectionDefaultAxis(f32 (*directionMatrix)[4][4], Vector4 *direction) {
+    sefSetSlotDirection(directionMatrix, direction, &sefDefaultAxis);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203A88);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00203AF8);
+void sefSetSlotDirectionBetweenDefaultAxis(void *slotMatrix, Vector4 *minuend, Vector4 *subtrahend) {
+    sefSetSlotDirectionBetween(slotMatrix, minuend, subtrahend, &sefDefaultAxis);
+}
 
 /* <<< CHUNK tu133 */
 
@@ -1498,12 +1800,12 @@ Matrix4 *MMathScaleMatrix(Matrix4 *out, Matrix4 *matrix, const Vector4 *scale);
 struct XglCamera;
 
 struct XglCamera *xglStudioGetActiveCamera(void);
-extern const Vector4 sefDefaultOffset;
+extern const Vector4 sefDefaultPoint;
 
-typedef union SefQuadBlock {
-    Quadword quad;
-    unsigned int words[4];
-} SefQuadBlock;
+
+
+
+
 
 /* The LCG of the seed: multiplier 0xF82D and increment 0x303B; the high 15 bits (SEF_RAND_MASK) are the sample. */
 #define SEF_RAND_MULTIPLIER 0xF82Du
@@ -1518,11 +1820,11 @@ extern int sefNoiseReady;
 
 /* 1024 uniform noise samples in [-0.5, 0.5) with a read index. sefNoiseNextVector reads three samples at a time and
  * can read the three floats after the 1024th, which sefNoiseInit also fills (1027 samples in all). */
-typedef struct SefNoiseTable {
-    f32 samples[1024];
-    unsigned char unmodeled_1000[12];
-    int nextIndex;
-} SefNoiseTable;
+
+
+
+
+
 
 extern SefNoiseTable sefNoiseTable;
 /* Single-precision 2*pi, read from the scaffold literal sefTwoPi of this unit. */
@@ -1532,34 +1834,34 @@ extern unsigned int sefRandVectorIncrements[4];
 extern f32 sefCircleAngleScale;
 
 /* Stores value into each of the size / 4 words starting at dest. */
-void sefMemFillWords(void *dest, int value, int size) {
-    int *word;
-    int count;
+void sefMemFillWords(void *fillMemory, int fillPattern, int fillByteLength) {
+    int *wordCursor;
+    int wordsLeft;
 
-    word = dest;
-    count = size >> 2;
-    if (count > 0) {
+    wordCursor = fillMemory;
+    wordsLeft = fillByteLength >> 2;
+    if (wordsLeft > 0) {
         do {
-            count -= 1;
-            *word = value;
-            word += 1;
-        } while (count != 0);
+            wordsLeft -= 1;
+            *wordCursor = fillPattern;
+            wordCursor += 1;
+        } while (wordsLeft != 0);
     }
 }
 
-void sefMemZero(void *dest, int size)
+void sefMemZero(void *zeroedMemory, int byteLength)
 {
-    SefQuadBlock *blocks = dest;
-    int block_count = size >> 4;
-    int word_count = (size & 0xf) >> 2;
-    SefQuadBlock *tailBlock = blocks + block_count;
+    SefQuadwordView *quadwordBase = zeroedMemory;
+    int quadwordCount = byteLength >> 4;
+    int tailWordCount = (byteLength & 0xf) >> 2;
+    SefQuadwordView *tailBlock = quadwordBase + quadwordCount;
     int i;
 
-    for (i = 0; i < block_count; i++) {
-        blocks[i].quad = 0;
+    for (i = 0; i < quadwordCount; i++) {
+        quadwordBase[i].quadword = 0;
     }
-    for (i = 0; i < word_count; i++) {
-        tailBlock->words[i] = 0;
+    for (i = 0; i < tailWordCount; i++) {
+        tailBlock->wordLanes[i] = 0;
     }
 }
 
@@ -1573,7 +1875,7 @@ void sefNoiseInit(void)
     if (sefNoiseReady == 0) {
         sefNoiseReady = 1;
         MMathRandomSeed(0);
-        sefNoiseTable.nextIndex = 0;
+        sefNoiseTable.sampleCursor = 0;
         cursor = (f32 *)&sefNoiseTable;
         for (i = 0; i < 1027; i++) {
             sample = MMathMakeRandom() - 0.5f;
@@ -1590,26 +1892,26 @@ f32 sefRandf(void)
 
     sefRandSeed = sefRandSeed * SEF_RAND_MULTIPLIER + SEF_RAND_INCREMENT;
     bits = (sefRandSeed >> 16) & SEF_RAND_MASK;
-    return (f32)bits * (1.0f / 32768.0f);
+    return bits * (1.0f / 32768.0f);
 }
 
 /* Returns the next noise sample and advances the read index of the noise table. */
 f32 sefNoiseNext(void)
 {
-    int index = sefNoiseTable.nextIndex;
+    int sampleIndex = sefNoiseTable.sampleCursor;
 
-    sefNoiseTable.nextIndex = (index + 1) & 0x3FF;
-    return sefNoiseTable.samples[index];
+    sefNoiseTable.sampleCursor = (sampleIndex + 1) & 0x3FF;
+    return sefNoiseTable.samples[sampleIndex];
 }
 
 /* Random float in [0.75, 1): one LCG step of sefRandSeed, the high 15 bits scaled by 2^-15, times 0.25, plus 0.75. */
 f32 sefRandfUpperQuarter(void)
 {
-    unsigned int seed;
+    unsigned int nextSeed;
 
-    seed = sefRandSeed * SEF_RAND_MULTIPLIER + SEF_RAND_INCREMENT;
-    sefRandSeed = seed;
-    return (f32) (int) ((seed >> 16) & SEF_RAND_MASK) * 3.0517578125e-05f * 0.25f + 0.75f;
+    nextSeed = sefRandSeed * SEF_RAND_MULTIPLIER + SEF_RAND_INCREMENT;
+    sefRandSeed = nextSeed;
+    return (int) ((nextSeed >> 16) & SEF_RAND_MASK) * 3.0517578125e-05f * 0.25f + 0.75f;
 }
 
 /* Random angle in [0, 2*pi): the same LCG step as sefRandf, scaled by 2^-15 and then by 2*pi. */
@@ -1619,11 +1921,11 @@ f32 sefRandAngle(void)
 
     sefRandSeed = sefRandSeed * SEF_RAND_MULTIPLIER + SEF_RAND_INCREMENT;
     bits = (sefRandSeed >> 16) & 0x7FFF;
-    return (f32)bits * (1.0f / 32768.0f) * sefTwoPi;
+    return bits * (1.0f / 32768.0f) * sefTwoPi;
 }
 
 /* Random vector: steps the x, y and z seeds of the vector LCG (times 0xF82D, then all four lanes plus the increments in one paddw), keeps the high 15 bits of each lane and converts them to floats in out. */
-void sefRandVector(Vector4 *out)
+void sefRandVector(Vector4 *randomVector)
 {
     unsigned int *laneSeeds;
     Quadword mask;                  /* the 128-bit literal of the original: 0x7FFF in x, y and z, but only 1 in w */
@@ -1643,7 +1945,7 @@ void sefRandVector(Vector4 *out)
         "qmtc2 $8, vf1\n"
         "vitof0.xyzw vf1, vf1\n"
         "sqc2 vf1, 0(%0)\n"
-        : : "r"(out), "r"(laneSeeds), "r"(sefRandVectorIncrements), "r"(mask) : "$8", "$9", "memory");
+        : : "r"(randomVector), "r"(laneSeeds), "r"(sefRandVectorIncrements), "r"(mask) : "$8", "$9", "memory");
 }
 
 /* Three random coordinates in [-0.5, 0.5), drawn in x, y, z order; w is set to 1. */
@@ -1656,9 +1958,9 @@ void sefNoiseNextVector(Vector4 *pos)
 }
 
 /* Writes the position transformed by the matrix into dest (the position's translation merged into the matrix). */
-void sefMergeMatrixPos(Matrix4 *dest, Matrix4 *matrix, const Vector4 *position)
+void sefMergeMatrixPos(Matrix4 *destinationMatrix, Matrix4 *matrix, const Vector4 *position)
 {
-    QuadwordMergeMatrixPosition(dest, matrix, position);
+    QuadwordMergeMatrixPosition(destinationMatrix, matrix, position);
 }
 
 /* Builds the effect matrix in out (the scratchpad when out is null): the identity rows of MMathUnitMatrix are copied
@@ -1666,15 +1968,15 @@ void sefMergeMatrixPos(Matrix4 *dest, Matrix4 *matrix, const Vector4 *position)
  * Returns how many of the three steps ran. */
 int sefBuildEffectMatrix(const Vector4 *rotation, const Vector4 *translation, const Vector4 *scale, Matrix4 *out)
 {
-    Matrix4 *dest;
+    Matrix4 *destMatrix;
     const Matrix4 *unitMatrix;
     int stepsRun;
     int hasTranslation;
     int hasRotation;
 
-    dest = out;
-    if (dest == 0) {
-        dest = (Matrix4 *)0x70000000;
+    destMatrix = out;
+    if (destMatrix == 0) {
+        destMatrix = (Matrix4 *)0x70000000;
     }
     stepsRun = 0;
     unitMatrix = &MMathUnitMatrix;
@@ -1687,37 +1989,37 @@ int sefBuildEffectMatrix(const Vector4 *rotation, const Vector4 *translation, co
         "sqc2 $vf2, 16(%0)\n"
         "sqc2 $vf3, 0(%0)\n"
         :
-        : "r" (dest), "r" (unitMatrix)
+        : "r" (destMatrix), "r" (unitMatrix)
         : "memory");
     hasTranslation = (*(int *)&translation->z | *(u64 *)translation) != 0;
     if (hasTranslation) {
-        QuadwordCopyT0((*dest)[3], translation);
+        QuadwordCopyT0((*destMatrix)[3], translation);
         stepsRun = 1;
     }
     hasRotation = (*(int *)&rotation->z | *(u64 *)rotation) != 0;
     if (hasRotation) {
-        MMathRotateMatrixZYX(dest, dest, rotation);
+        MMathRotateMatrixZYX(destMatrix, destMatrix, rotation);
         stepsRun++;
     }
     if (scale != 0 && !(scale->x == 1.0f && scale->y == 1.0f && scale->z == 1.0f)) {
-        MMathScaleMatrix(dest, dest, scale);
+        MMathScaleMatrix(destMatrix, destMatrix, scale);
         stepsRun++;
     }
     return stepsRun;
 }
 
-void sefGetCameraPos(Matrix4 *dest)
+void sefGetCameraPos(Matrix4 *destMatrix)
 {
     XglCamera *camera = xglStudioGetActiveCamera();
 
-    if (dest == 0) {
-        dest = sefCameraMatrix;
+    if (destMatrix == 0) {
+        destMatrix = sefCameraMatrix;
     }
-    sefMergeMatrixPos(dest, &camera->travel.transform, &sefDefaultOffset);
+    sefMergeMatrixPos(destMatrix, &camera->travel.transform, &sefDefaultPoint);
 }
 
 /* VU0 product of a Vector4 and a column-major matrix: destination = matrix * vector. */
-void sefApplyMatrixVector(Vector4 *destination, Matrix4 *matrix, Vector4 *vector)
+void sefApplyMatrixVector(Vector4 *transformedVector, Matrix4 *matrix, Vector4 *vector)
 {
     __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(vector) : "memory");
     __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(matrix) : "memory");
@@ -1727,17 +2029,17 @@ void sefApplyMatrixVector(Vector4 *destination, Matrix4 *matrix, Vector4 *vector
     __asm__ __volatile__("vmadday.xyzw ACC, vf3, vf1y" : : : "memory");
     __asm__ __volatile__("vmaddaz.xyzw ACC, vf4, vf1z" : : : "memory");
     __asm__ __volatile__("vmaddw.xyzw vf1, vf0, vf1w" : : : "memory");
-    __asm__ __volatile__("sqc2 vf1, 0(%0)" : : "r"(destination) : "memory");
+    __asm__ __volatile__("sqc2 vf1, 0(%0)" : : "r"(transformedVector) : "memory");
 }
 
 /* Copies one 16-byte vector through t0 with the R5900 quadword load and store. */
-static inline void sefCopyQuadword(Vector4 *dest, const void *src)
+static inline void sefCopyQuadword(Vector4 *destVector, const void *sourceVector)
 {
     __asm__ __volatile__(
         "lq $8, 0(%2)\n"
         "sq $8, 0(%1)\n"
-        : "+m"(*dest)
-        : "r"(dest), "r"(src)
+        : "+m"(*destVector)
+        : "r"(destVector), "r"(sourceVector)
         : "$8", "memory");
 }
 
@@ -1746,42 +2048,50 @@ SefEntry *sefFindEntryById(int key);
 
 /* Copies the vector of slot of the record found by key into *destination when that slot's flag byte is set, and
  * returns bit 0 of the flag byte (0 without a record). */
-int sefCopyRecordSlotVector(Vector4 *destination, int key, int slot)
+int sefCopyRecordSlotVector(Vector4 *destinationVector, int key, int vectorSlot)
 {
-    SefEntry *entry = sefFindEntryById(key);
+    SefEntry *foundEntry = sefFindEntryById(key);
 
-    if (entry == 0) {
+    if (foundEntry == 0) {
         return 0;
     }
-    if (entry->slotFlags[slot] != 0) {
-        sefCopyQuadword(destination, &entry->slotVectors[slot]);
+    if (foundEntry->slotFlags[vectorSlot] != 0) {
+        sefCopyQuadword(destinationVector, &foundEntry->slotVectors[vectorSlot]);
     }
-    return entry->slotFlags[slot] & 1;
+    return foundEntry->slotFlags[vectorSlot] & 1;
 }
 
 /* Partial view of one linked object record: its flag byte at +0x155C, bit 0 is the in-use bit. */
-typedef struct SefObject {
-    unsigned char unmodeled_000[0x155C];
-    unsigned char flags;             /* +0x155C */
-} SefObject;
+
+
+
+
 
 /* Returns bit 0 of flag byte linkIndex of the linked object table (objectOffset), or 0 without a link. */
-int sefGetLinkedFlag(int linkIndex)
+int sefGetLinkedFlag(int linkedFlagIndex)
 {
-    SefLinkedContext *context = sefGetBattleData();
-    int offset = context->objectOffset;
+    SefLinkedContext *linkedContext = sefGetBattleData();
+    int linkedObjectOffset = linkedContext->objectOffset;
 
-    if (offset == 0) {
+    if (linkedObjectOffset == 0) {
         return 0;
     }
-    return ((SefObject *)(linkIndex + offset))->flags & 1;
+    return ((SefLinkedObjectRecord *)(linkedFlagIndex + linkedObjectOffset))->flags & 1;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00204080);
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00204118);
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_002042E0);
+void func_00204118(void *matrix, const void *source);
+void func_0020F2E8(void *output, void *input);
+
+void sefApplySourceMatrix(void *transformedOutput, const void *sourceMatrixBlock) {
+    Matrix4 matrix;
+
+    func_00204118(matrix, sourceMatrixBlock);
+    func_0020F2E8(transformedOutput, matrix);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00204318);
 
@@ -1794,36 +2104,36 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_002046F8);
 /* The point writer of this unit, still hand-written asm: it writes the point of kind into dest from source. */
 void func_002046F8(Vector4 *dest, const Vector4 *source, int kind);
 
-/* Kinds 321 and 322 are passed on as kind 256; a NULL source reads sefDefaultOffset. The w component is set to 1.0f. */
-void sefGetPosition(Vector4 *dest, const Vector4 *source, int kind)
+/* Kinds 321 and 322 are passed on as kind 256; a NULL source reads sefDefaultPoint. The w component is set to 1.0f. */
+void sefGetPosition(Vector4 *resultPoint, const Vector4 *sourcePoint, int pointKind)
 {
-    if ((unsigned int)(kind - 321) < 2) {
-        kind = 256;
+    if ((unsigned int)(pointKind - 321) < 2) {
+        pointKind = 256;
     }
-    if (source == 0) {
-        source = &sefDefaultOffset;
+    if (sourcePoint == 0) {
+        sourcePoint = &sefDefaultPoint;
     }
-    func_002046F8(dest, source, kind);
-    dest->w = 1.0f;
+    func_002046F8(resultPoint, sourcePoint, pointKind);
+    resultPoint->w = 1.0f;
 }
 
 void vu0TransformPoint(Vector4 *point);
 
 /* Partial view of a part's transform state: the matrix rows (vf26..vf28), the vector at +0xA0 (loaded into vf29), the scale
  * at +0xC0 and the point at +0x200 that vu0TransformPoint transforms. */
-typedef struct SefPartPlacement {
-    Matrix4 matrix;                  /* +0x000 */
-    unsigned char unmodeled_040[0xA0 - 0x40];
-    Vector4 translation;             /* +0x0A0 */
-    unsigned char unmodeled_0B0[0xC0 - 0xB0];
-    Vector4 scale;                   /* +0x0C0 */
-    unsigned char unmodeled_0D0[0x200 - 0xD0];
-    Vector4 point;                   /* +0x200 */
-} SefPartPlacement;
+
+
+
+
+
+
+
+
+
 
 /* Transforms the part's point (mode 0: transform, then scale; mode != 0: scale, then transform when mode >= 0), adds the
  * offset's w term when offset is given, and writes the result to out. */
-void sefTransformPartPoint(SefPartPlacement *part, Vector4 *out, int mode, const Vector4 *offset)
+void sefTransformPartPoint(SefPartPlacement *placement, Vector4 *resultPoint, int transformMode, const Vector4 *offsetVector)
 {
     __asm__ __volatile__(
         "lqc2 vf26, 0(%0)\n"
@@ -1831,9 +2141,9 @@ void sefTransformPartPoint(SefPartPlacement *part, Vector4 *out, int mode, const
         "lqc2 vf28, 32(%0)\n"
         "lqc2 vf29, 0(%1)\n"
         :
-        : "r"(part), "r"(&part->translation)
+        : "r"(placement), "r"(&placement->translation)
         : "memory");
-    if (mode != 0) {
+    if (transformMode != 0) {
         __asm__ __volatile__(
             "lqc2 vf1, 0(%0)\n"
             "vmulx.xyzw vf26, vf26, vf1x\n"
@@ -1841,13 +2151,13 @@ void sefTransformPartPoint(SefPartPlacement *part, Vector4 *out, int mode, const
             "vmulz.xyzw vf28, vf28, vf1z\n"
             "vmulw.xyzw vf29, vf29, vf1w\n"
             :
-            : "r"(&part->scale), "m"(part->scale));
-        if (mode >= 0) {
-            Vector4 *point = &part->point;
+            : "r"(&placement->scale), "m"(placement->scale));
+        if (transformMode >= 0) {
+            Vector4 *point = &placement->point;
             vu0TransformPoint(point);
         }
     } else {
-        vu0TransformPoint(&part->point);
+        vu0TransformPoint(&placement->point);
         __asm__ __volatile__(
             "lqc2 vf1, 0(%0)\n"
             "vmulx.xyzw vf26, vf26, vf1x\n"
@@ -1855,10 +2165,10 @@ void sefTransformPartPoint(SefPartPlacement *part, Vector4 *out, int mode, const
             "vmulz.xyzw vf28, vf28, vf1z\n"
             "vmulw.xyzw vf29, vf29, vf1w\n"
             :
-            : "r"(&part->scale)
+            : "r"(&placement->scale)
             : "memory");
     }
-    if (offset != 0) {
+    if (offsetVector != 0) {
         __asm__ __volatile__(
             "lqc2 vf1, 0(%0)\n"
             "vmulax.xyzw ACC, vf26, vf1x\n"
@@ -1866,13 +2176,13 @@ void sefTransformPartPoint(SefPartPlacement *part, Vector4 *out, int mode, const
             "vmaddaz.xyzw ACC, vf28, vf1z\n"
             "vmaddw.xyzw vf29, vf29, vf1w\n"
             :
-            : "r"(offset)
+            : "r"(offsetVector)
             : "memory");
     }
     __asm__ __volatile__(
         "sqc2 vf29, 0(%0)\n"
         :
-        : "r"(out)
+        : "r"(resultPoint)
         : "memory");
 }
 
@@ -1887,7 +2197,7 @@ void sefGetCirclePos(Vector4 *pos, f32 radius)
     f32 angle;
 
     sefRandSeed = sefRandSeed * SEF_RAND_MULTIPLIER + SEF_RAND_INCREMENT;
-    angle = (f32)(int)((sefRandSeed >> 16) & SEF_RAND_MASK) / SEF_NOISE_SCALE * sefCircleAngleScale;
+    angle = (int)((sefRandSeed >> 16) & SEF_RAND_MASK) / SEF_NOISE_SCALE * sefCircleAngleScale;
     Vu0SetOrigin(pos);
     pos->x = xglCos(angle) * radius;
     pos->z = xglSin(angle) * radius;
@@ -1899,7 +2209,7 @@ Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source);
 
 /* Unit direction from the three floats x, y and z (w is left as it was), normalized and then scaled by scale in x, y
  * and z. */
-void func_00205518(Vector4 *vector, float x, float y, float z, float scale)
+void sefSetUnitDirectionScaled(Vector4 *vector, float x, float y, float z, float scale)
 {
     vector->x = x;
     vector->y = y;
@@ -1926,10 +2236,10 @@ void sefGetCubePosTop(Vector4 *pos, const Vector4 *extent)
 }
 
 /* Random point of the centred cube [-0.5, 0.5)^3 scaled by the extent vector. */
-void sefGetCubePosCenter(Vector4 *destination, Vector4 *scale)
+void sefGetCubePosCenter(Vector4 *destinationPoint, Vector4 *scale)
 {
-    sefNoiseNextVector(destination);
-    Vu0SefMulVectorXYZ(destination, destination, scale);
+    sefNoiseNextVector(destinationPoint);
+    Vu0SefMulVectorXYZ(destinationPoint, destinationPoint, scale);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00205638);
@@ -1950,32 +2260,32 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_00206D78);
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00206F18);
 
-#define D_004541A0 (*(SefEntryTable *)&D_004541A0)
-extern Vector4 D_004748A0;
+#define sefEffectEntryTable (*(SefEntryTable *)&sefEffectEntryTable)
+extern Vector4 sefOriginVector;
 
 /* Zeroes the origin, then clears the flags of every entry and the short at +0x1592 of each. */
-void sefResetEntryFlags(void)
+void sefResetEntryFlagsAndOrigin(void)
 {
-    SefEntry *entry;
+    SefEntry *effectEntry;
     int i;
 
-    Vu0SetOrigin(&D_004748A0);
-    for (i = 0; i < D_004541A0.entryCount; i++) {
-        entry = &D_004541A0.entries[i];
-        entry->flags = 0;
-        *(short *) &entry->unmodeled_157C[0x1592 - 0x157C] = 0;
+    Vu0SetOrigin(&sefOriginVector);
+    for (i = 0; i < sefEffectEntryTable.effectEntryCount; i++) {
+        effectEntry = &sefEffectEntryTable.effectEntries[i];
+        effectEntry->effectEntryFlags = 0;
+        *(short *) &effectEntry->unmodeled_157C[0x1592 - 0x157C] = 0;
     }
 }
 
 /* TU-local view of D_004ABFD0 (the same 0x58-byte transform block as SefPartTransform in
  * sv_get_image_item_143.c; no header defines it yet). */
-typedef struct SefGlobalTransform {
-    Matrix4 matrix;                  /* +0x00 */
-    Vector4 position;                /* +0x40 */
-    float scale;                     /* +0x50 */
-    short scaled;                    /* +0x54: nonzero when scale applies */
-    short kind;                      /* +0x56 */
-} SefGlobalTransform;
+
+
+
+
+
+
+
 
 extern SefGlobalTransform D_004ABFD0;
 Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs);
@@ -1984,7 +2294,7 @@ Vector4 *MMathApplyMatrix(Vector4 *out, Matrix4 *matrix, const Vector4 *vector);
 /* Places the part: the combined matrix of the placement and the global transform (its translation first offset by the
  * global position when the scale applies), applied to the placement's point when mode >= 0, otherwise the matrix's
  * position row copied to out. Returns the global scale when the scale applies, else 1. */
-float sefPlacePart(SefPartPlacement *placement, Vector4 *out, int mode)
+float sefPlacePart(SefPartPlacement *placement, Vector4 *resultPoint, int placeMode)
 {
     Matrix4 combined;
     float scale = 1.0f;
@@ -2005,13 +2315,13 @@ float sefPlacePart(SefPartPlacement *placement, Vector4 *out, int mode)
     } else {
         sefMergeMatrixPos(&combined, &placement->matrix, &placement->translation);
     }
-    if (mode >= 0) {
+    if (placeMode >= 0) {
         Vector4 *point = &placement->point;
 
-        MMathApplyMatrix(out, &combined, point);
+        MMathApplyMatrix(resultPoint, &combined, point);
         return scale;
     }
-    sefCopyQuadword(out, combined[3]);
+    sefCopyQuadword(resultPoint, combined[3]);
     return scale;
 }
 
@@ -2019,49 +2329,49 @@ INCLUDE_ASM("asm/main/nonmatchings/sef", func_002071F8);
 
 INCLUDE_ASM("asm/main/nonmatchings/sef", func_00207490);
 
-#undef D_004541A0
+#undef sefEffectEntryTable
 /* <<< CHUNK sef_134 */
 
 /* >>> CHUNK sef_135 */
 
-int sefFlagTest(int mask);
+int sefEffectFlagTest(int mask);
 
-void sefFlagSet(int mask);
+void sefEffectFlagSet(int mask);
 void sefTickGroupTimers(void);
 void sefGetGroupCenter(float *center, int owner, unsigned short key);
 
 #define SEF_GROUP_ENTRY_COUNT 8
 
 /*
- * One group timer, 0x20 bytes, eight of them in sefGroupTable. sefRegisterGroupCenter fills it for a tracked group
+ * One group timer, 0x20 bytes, eight of them in sefGroupTimers. sefRegisterGroupCenter fills it for a tracked group
  * (the centre of the group's objects, the owner id and the key that name the group) with 600 frames on the timer;
  * sefTickGroupTimers counts `remaining` down; sefGetGroupCenter reads the centre back by owner and key.
  */
-typedef struct SefGroupEntry {
-    float center[4];               /* +0x00: x, y, z, w of the group centre */
-    int owner;                     /* +0x10: owner id compared by sefGetGroupCenter and sefRegisterGroupCenter */
-    short remaining;               /* +0x14: frames left; zero or less means the entry is free */
-    unsigned short key;            /* +0x16: second id of the group, compared as an unsigned short */
-    unsigned char unmodeled_18[8]; /* +0x18..0x1F: not read by the code in this unit */
-} SefGroupEntry;
 
-extern SefGroupEntry sefGroupTable[SEF_GROUP_ENTRY_COUNT];
-/* sefFlagWord is one flag word; sefExecEffect tests bit 1 of it through sefFlagTest. */
-extern int sefFlagWord;
-void sefFlagClear(int mask);
+
+
+
+
+
+
+
+extern SefGroupTimer sefGroupTimers[SEF_GROUP_ENTRY_COUNT];
+/* sefEffectFlags is one flag word; sefExecEffect tests bit 1 of it through sefEffectFlagTest. */
+extern int sefEffectFlags;
+void sefEffectFlagClear(int mask);
 
 /* Counts every group timer down by one frame, stopping at zero. */
 void sefTickGroupTimers(void)
 {
-    SefGroupEntry *entry;
-    int index;
+    SefGroupTimer *groupTimer;
+    int timerIndex;
 
-    entry = sefGroupTable;
-    for (index = SEF_GROUP_ENTRY_COUNT - 1; index >= 0; index--) {
-        if (entry->remaining > 0) {
-            entry->remaining = entry->remaining - 1;
+    groupTimer = sefGroupTimers;
+    for (timerIndex = SEF_GROUP_ENTRY_COUNT - 1; timerIndex >= 0; timerIndex--) {
+        if (groupTimer->remaining > 0) {
+            groupTimer->remaining = groupTimer->remaining - 1;
         }
-        entry++;
+        groupTimer++;
     }
 }
 
@@ -2071,17 +2381,17 @@ void sefTickGroupTimers(void)
  */
 void sefGetGroupCenter(float *center, int owner, unsigned short key)
 {
-    SefGroupEntry *entry;
-    int index;
+    SefGroupTimer *groupTimer;
+    int timerIndex;
 
     Vu0SetOrigin(center);
-    entry = sefGroupTable;
-    for (index = 0; index < SEF_GROUP_ENTRY_COUNT; index++) {
-        if (entry->owner == owner && entry->key == key) {
-            QuadwordCopyT0(center, entry->center);
+    groupTimer = sefGroupTimers;
+    for (timerIndex = 0; timerIndex < SEF_GROUP_ENTRY_COUNT; timerIndex++) {
+        if (groupTimer->owner == owner && groupTimer->key == key) {
+            QuadwordCopyT0(center, groupTimer->center);
             return;
         }
-        entry++;
+        groupTimer++;
     }
 }
 
@@ -2090,7 +2400,7 @@ void sefGetGroupCenter(float *center, int owner, unsigned short key)
 #define SEF_RECORD_EXCLUDE_FLAG 0x8000000
 
 /* Effect record count word (gp-24972); the scaffold has no name for it yet. */
-extern int D_00551064;
+extern int sefEffectRecordCount;
 
 SefEffectRecord *sefGetScheduler(void);
 Vector4 *MMathDivVectorS(Vector4 *destination, const Vector4 *source, float scale);
@@ -2099,9 +2409,9 @@ Vector4 *MMathDivVectorS(Vector4 *destination, const Vector4 *source, float scal
  * Copies a group centre into its timer entry. Both registration paths share one copy block in the original, which
  * gcc only produces when the two copies come from the same asm statement.
  */
-static inline void sefGroupStoreCenter(SefGroupEntry *entry, Vector4 *centre)
+static inline void sefGroupStoreCenter(SefGroupTimer *groupTimer, Vector4 *centre)
 {
-    QuadwordCopyT0(entry->center, centre);
+    QuadwordCopyT0(groupTimer->center, centre);
 }
 
 /*
@@ -2111,154 +2421,162 @@ static inline void sefGroupStoreCenter(SefGroupEntry *entry, Vector4 *centre)
  */
 void sefRegisterGroupCenter(int owner, unsigned short key)
 {
-    int index;
+    int scanIndex;
     int seenCount;
     int seenIndex;
-    SefEffectRecord *records;
-    SefEffectRecord *record;
-    SefGroupObject *object;
-    SefGroupObject *seen[SEF_GROUP_MEMBER_MAX];
-    AlignedVector4 sum;
+    SefEffectRecord *effectRecords;
+    SefEffectRecord *effectRecord;
+    SefRecordOwner *groupMember;
+    SefRecordOwner *seen[SEF_GROUP_MEMBER_MAX];
+    AlignedVector4 centerSum;
     Vector4 *center;
-    SefGroupEntry *entry;
+    SefGroupTimer *groupTimer;
 
-    records = sefGetScheduler();
-    center = &sum;
+    effectRecords = sefGetScheduler();
+    center = &centerSum;
     seenCount = 0;
     Vu0SetOrigin(center);
-    for (index = 0; index < D_00551064; index++) {
-        record = &records[index];
-        if (record->inUse == 0 || record->ownerKey != owner) {
+    for (scanIndex = 0; scanIndex < sefEffectRecordCount; scanIndex++) {
+        effectRecord = &effectRecords[scanIndex];
+        if (effectRecord->inUse == 0 || effectRecord->ownerKey != owner) {
             continue;
         }
-        object = record->object;
-        if (object == 0 || record->value != key) {
+        groupMember = effectRecord->ownedObject;
+        if (groupMember == 0 || effectRecord->groupKey != key) {
             continue;
         }
-        if (record->flags & SEF_RECORD_EXCLUDE_FLAG) {
+        if (effectRecord->ownerGroupFlags & SEF_RECORD_EXCLUDE_FLAG) {
             continue;
         }
         for (seenIndex = 0; seenIndex < seenCount; seenIndex++) {
-            if (seen[seenIndex] == record->object) {
+            if (seen[seenIndex] == effectRecord->ownedObject) {
                 break;
             }
         }
         if (seenIndex != seenCount) {
             continue;
         }
-        /* center.xyz += object position; no memory clobber, so the record count load stays hoisted */
+        /* center.xyz += groupMember position; no memory clobber, so the effectRecord count load stays hoisted */
         __asm__ __volatile__(
             "lqc2 vf1, 0(%1)\n"
             "lqc2 vf2, 0(%2)\n"
             "vadd.xyz vf1, vf1, vf2\n"
             "sqc2 vf1, 0(%0)\n"
             :
-            : "r" (center), "r" (center), "r" (&object->position));
-        seen[seenCount] = object;
+            : "r" (center), "r" (center), "r" (&groupMember->position));
+        seen[seenCount] = groupMember;
         seenCount++;
         if (seenCount >= SEF_GROUP_MEMBER_MAX) {
             break;
         }
     }
     if (seenCount >= 2) {
-        MMathDivVectorS(center, center, (float) seenCount);
+        MMathDivVectorS(center, center, seenCount);
     }
 
-    for (index = 0; index < SEF_GROUP_ENTRY_COUNT; index++) {
-        entry = &sefGroupTable[index];
-        if (entry->owner == owner && entry->key == key) {
-            entry->remaining = SEF_GROUP_TIMER_FRAMES;
-            entry->key = key;
-            sefGroupStoreCenter(entry, center);
+    for (scanIndex = 0; scanIndex < SEF_GROUP_ENTRY_COUNT; scanIndex++) {
+        groupTimer = &sefGroupTimers[scanIndex];
+        if (groupTimer->owner == owner && groupTimer->key == key) {
+            groupTimer->remaining = SEF_GROUP_TIMER_FRAMES;
+            groupTimer->key = key;
+            sefGroupStoreCenter(groupTimer, center);
             return;
         }
     }
 
-    for (index = 0; index < SEF_GROUP_ENTRY_COUNT; index++) {
-        entry = &sefGroupTable[index];
-        if (entry->remaining == 0) {
-            entry->remaining = SEF_GROUP_TIMER_FRAMES;
-            entry->owner = owner;
-            entry->key = key;
-            sefGroupStoreCenter(entry, center);
+    for (scanIndex = 0; scanIndex < SEF_GROUP_ENTRY_COUNT; scanIndex++) {
+        groupTimer = &sefGroupTimers[scanIndex];
+        if (groupTimer->remaining == 0) {
+            groupTimer->remaining = SEF_GROUP_TIMER_FRAMES;
+            groupTimer->owner = owner;
+            groupTimer->key = key;
+            sefGroupStoreCenter(groupTimer, center);
             return;
         }
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", func_00207948);
+extern unsigned char sefOverrideFlag[];
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", sefFlagSet);
+u8 *sefGetFogOverrideBlock(void) {
+    return sefOverrideFlag;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/sef", sefFlagClear);
+void sefEffectFlagSet(s32 mask) {
+    sefEffectFlags |= mask;
+}
 
-int sefFlagTest(int mask) {
-    return sefFlagWord & mask;
+void sefEffectFlagClear(s32 mask) {
+    sefEffectFlags &= ~mask;
+}
+
+int sefEffectFlagTest(int mask) {
+    return sefEffectFlags & mask;
 }
 
 void sefFlagToggle(int mask) {
-    sefFlagWord ^= mask;
+    sefEffectFlags ^= mask;
 }
 
-void sefFlagUpdateBit1(int selector) {
+void sefEffectFlagUpdateFromSign(int selector) {
     if (selector < 0) {
         sefFlagToggle(1);
         return;
     }
     if (selector > 0) {
-        sefFlagSet(1);
+        sefEffectFlagSet(1);
         return;
     }
-    sefFlagClear(1);
+    sefEffectFlagClear(1);
 }
 
 /* Counts the records of owner under key that the owner-group flags do not exclude. */
 int sefCountOwnerGroupRecords(int owner, unsigned short key)
 {
-    SefEffectRecord *record;
-    int index;
-    int count;
+    SefEffectRecord *effectRecord;
+    int scanIndex;
+    int matchCount;
 
-    count = 0;
-    record = sefGetScheduler();
-    for (index = 0; index < D_00551064; index++) {
-        if (record->inUse != 0 && record->ownerKey == owner && record->value == key) {
-            if ((record->flags & SEF_RECORD_EXCLUDE_FLAG) == 0) {
-                count += 1;
+    matchCount = 0;
+    effectRecord = sefGetScheduler();
+    for (scanIndex = 0; scanIndex < sefEffectRecordCount; scanIndex++) {
+        if (effectRecord->inUse != 0 && effectRecord->ownerKey == owner && effectRecord->groupKey == key) {
+            if ((effectRecord->ownerGroupFlags & SEF_RECORD_EXCLUDE_FLAG) == 0) {
+                matchCount += 1;
             }
         }
-        record++;
+        effectRecord++;
     }
-    return count;
+    return matchCount;
 }
 
 /* Clears the mask bits of the records of owner under key, except records that carry SEF_RECORD_EXCLUDE_FLAG. */
 void sefClearOwnerGroupFlags(int owner, unsigned short key, int mask)
 {
-    SefEffectRecord *record;
-    int slot;
+    SefEffectRecord *effectRecord;
+    int scanIndex;
     int scanLimit;
-    int recordCount;
+    int recordLimit;
     int keepBit;
-    int flags;
+    int recordBits;
 
-    record = sefGetScheduler();
-    scanLimit = D_00551064;
-    slot = 0;
+    effectRecord = sefGetScheduler();
+    scanLimit = sefEffectRecordCount;
+    scanIndex = 0;
     if (scanLimit > 0) {
         keepBit = SEF_RECORD_EXCLUDE_FLAG;
-        recordCount = scanLimit;
+        recordLimit = scanLimit;
         do {
-            if (record->inUse != 0 && record->ownerKey == owner && record->value == key) {
-                flags = record->flags;
-                if ((flags & keepBit) == 0) {
-                    record->flags = flags & ~mask;
-                    scanLimit = recordCount;
+            if (effectRecord->inUse != 0 && effectRecord->ownerKey == owner && effectRecord->groupKey == key) {
+                recordBits = effectRecord->ownerGroupFlags;
+                if ((recordBits & keepBit) == 0) {
+                    effectRecord->ownerGroupFlags = recordBits & ~mask;
+                    scanLimit = recordLimit;
                 }
             }
-            slot += 1;
-            record++;
-        } while (slot < scanLimit);
+            scanIndex += 1;
+            effectRecord++;
+        } while (scanIndex < scanLimit);
     }
 }
 

@@ -26,14 +26,14 @@ void xglMatrixStackRotY(float angle);
 void xglMatrixStackRotZ(float angle);
 void xglMatrixStackSave(Matrix4 matrix);
 void xglVectorNormal(Vector4 *destination, const Vector4 *source);
-extern const AlignedVector4 D_00541D50;
-extern const AlignedVector4 D_00541D60;
-extern const AlignedVector4 D_00541D70;
-extern const AlignedVector4 D_00541D80;
-extern const AlignedVector4 D_00541D90;
+extern const AlignedVector4 cullingForwardAxisVector;
+extern const AlignedVector4 cullingCornerLowerLeftVector;
+extern const AlignedVector4 cullingCornerLowerRightVector;
+extern const AlignedVector4 cullingCornerUpperRightVector;
+extern const AlignedVector4 cullingCornerUpperLeftVector;
 
-/* func_0019BA78: builds the volume transform from its position, rotation and scale, then the four corners. */
-void func_0019BA78(CullingVolume *volume)
+/* xglCullingVolumeSetup: builds the volume transform from its position, rotation and scale, then the four corners. */
+void xglCullingVolumeSetup(CullingVolume *volume)
 {
     AlignedVector4 forwardAxis;
     AlignedVector4 lowerLeft;
@@ -50,22 +50,54 @@ void func_0019BA78(CullingVolume *volume)
     xglMatrixStackSave(volume->transform);
     xglMatrixStackInverse();
     xglMatrixStackSave(volume->inverseTransform);
-    forwardAxis = D_00541D50;
+    forwardAxis = cullingForwardAxisVector;
     Vu0ApplyMatrix33XYZ(&volume->normalizedDirection, &volume->transform, &forwardAxis);
     xglVectorNormal(&volume->normalizedDirection, &volume->normalizedDirection);
-    lowerLeft = D_00541D60;
-    lowerRight = D_00541D70;
-    upperRight = D_00541D80;
-    upperLeft = D_00541D90;
+    lowerLeft = cullingCornerLowerLeftVector;
+    lowerRight = cullingCornerLowerRightVector;
+    upperRight = cullingCornerUpperRightVector;
+    upperLeft = cullingCornerUpperLeftVector;
     Vu0ApplyMatrixXYZ(&volume->cullingCorners[0], &volume->transform, &lowerLeft);
     Vu0ApplyMatrixXYZ(&volume->cullingCorners[1], &volume->transform, &lowerRight);
     Vu0ApplyMatrixXYZ(&volume->cullingCorners[2], &volume->transform, &upperRight);
     Vu0ApplyMatrixXYZ(&volume->cullingCorners[3], &volume->transform, &upperLeft);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019BC50);
+typedef int s32;
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", _FacePoint);
+void xglCullingVolumeDisplay(void *volumeRecord) {
+
+}
+
+void _FacePoint(void *hitPoint, void *lineStart, void *lineEnd, void *planeNormal, void *planePoint) {
+    __asm__ __volatile__("lqc2 vf22, 0(%0)" : : "r"(planeNormal) : "memory");
+    __asm__ __volatile__("lqc2 vf20, 0(%0)" : : "r"(lineStart) : "memory");
+    __asm__ __volatile__("lqc2 vf21, 0(%0)" : : "r"(lineEnd) : "memory");
+    __asm__ __volatile__("lqc2 vf23, 0(%0)" : : "r"(planePoint) : "memory");
+    __asm__ __volatile__("vmulw.xyz vf14, vf22, vf22w" : : : "memory");
+    __asm__ __volatile__("vmulw.xyz vf14, vf14, vf20w" : : : "memory");
+    __asm__ __volatile__("vadd.xyz vf23, vf23, vf14" : : : "memory");
+    __asm__ __volatile__("vaddx.x vf10, vf0, vf22x" : : : "memory");
+    __asm__ __volatile__("vaddy.x vf11, vf0, vf22y" : : : "memory");
+    __asm__ __volatile__("vaddz.x vf12, vf0, vf22z" : : : "memory");
+    __asm__ __volatile__("vsub.xyz vf19, vf21, vf20" : : : "memory");
+    __asm__ __volatile__("vmulax.x ACC, vf10, vf21x" : : : "memory");
+    __asm__ __volatile__("vmadday.x ACC, vf11, vf21y" : : : "memory");
+    __asm__ __volatile__("vmaddz.x vf17, vf12, vf21z" : : : "memory");
+    __asm__ __volatile__("vmulax.x ACC, vf10, vf19x" : : : "memory");
+    __asm__ __volatile__("vmadday.x ACC, vf11, vf19y" : : : "memory");
+    __asm__ __volatile__("vmaddz.x vf18, vf12, vf19z" : : : "memory");
+    __asm__ __volatile__("vmulax.x ACC, vf10, vf23x" : : : "memory");
+    __asm__ __volatile__("vmadday.x ACC, vf11, vf23y" : : : "memory");
+    __asm__ __volatile__("vmaddz.x vf16, vf12, vf23z" : : : "memory");
+    __asm__ __volatile__("vdiv Q, vf0w, vf18x" : : : "memory");
+    __asm__ __volatile__("vsub.x vf16, vf17, vf16" : : : "memory");
+    __asm__ __volatile__("vwaitq" : : : "memory");
+    __asm__ __volatile__("vmulq.x vf16, vf16, Q" : : : "memory");
+    __asm__ __volatile__("vmulx.xyz vf15, vf19, vf16x" : : : "memory");
+    __asm__ __volatile__("vsub.xyz vf15, vf21, vf15" : : : "memory");
+    __asm__ __volatile__("sqc2 vf15, 0(%0)" : : "r"(hitPoint) : "memory");
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", _CheckLine);
 
@@ -77,32 +109,148 @@ INCLUDE_ASM("asm/main/nonmatchings/face_point", check_occlusion);
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", xglCullingCheck);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C3B8);
+extern s32 gCullingSettings[];
+
+s32 xglCullingGetSetting(void) {
+    return gCullingSettings[0];
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C3C8);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C420);
+extern s32 gCullingEnabled;
+
+typedef struct CullingMapRecord {
+    unsigned char unmodeled_00[0x8];
+    s32 volumeFlags;
+    unsigned char unmodeled_0C[0x4];
+    unsigned char query[0x160 - 0x10];  /* +0x10: the query block func_0030E68C reads */
+} CullingMapRecord;
+
+typedef struct CullingMap {
+    unsigned char unmodeled_00[0x20];
+    unsigned char volumeRecords[0xDE0 - 0x20];
+    s32 volumeCount;
+    s32 unmodeled_DE4;
+} CullingMap;
+
+extern CullingMap gCullingVolumeTable[];
+
+void xglCullingMapClear(void)
+{
+    CullingMap *map = gCullingVolumeTable;
+
+    gCullingEnabled = 0;
+    map->volumeCount = 0;
+    map->unmodeled_00[0] = 0;
+    map->unmodeled_DE4 = 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", check_culling_map);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C4F8);
+void xglCullingMapClear(void);
+s32 func_0030E68C(void *, void *);
+
+s32 xglCullingRecordQuery(CullingMapRecord *volumeRecord) {
+    s32 queryResult;
+
+    queryResult = volumeRecord->volumeFlags & 0x81;
+    if (queryResult != 0) {
+        queryResult = func_0030E68C(gCullingVolumeTable, volumeRecord->query);
+        if (queryResult == 0) {
+            /* xglCullingMapClear returns void; the call through this type is what the original emits. */
+            queryResult = ((s32 (*)()) xglCullingMapClear)();
+        }
+    }
+    return queryResult;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C538);
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", xglCullingMapCreate);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", xglCullingMapDisp);
+void xglCullingVolumeDisplay(void *volumeRecord);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C7E0);
+void xglCullingMapDisp(void)
+{
+    CullingMap *map = gCullingVolumeTable;
+    unsigned char *volumeRecord;
+    s32 remaining;
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C7F0);
+    if (map->volumeCount > 0) {
+        volumeRecord = map->volumeRecords;
+        for (remaining = map->volumeCount; remaining != 0; remaining--) {
+            xglCullingVolumeDisplay(volumeRecord);
+            volumeRecord += 0x160;
+        }
+    }
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C7F8);
+void xglCullingEnable(void) {
+    gCullingEnabled = 1;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C800);
+void xglCullingDisable(void) {
+    gCullingEnabled = 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", _ApplyMatrix33);
+void xglCullingIdleHook(void) {
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C850);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", _ApplyMatrix2Mat);
+s32 xglCullingCheck();
+
+void xglCullingPollCheck(void)
+{
+    s32 new_var;
+
+    xglCullingCheck();
+    new_var = 0;
+    if (new_var) {
+    }
+}
+
+void _ApplyMatrix33(void *rotatedVector, void *matrix, void *vector) {
+    __asm__ __volatile__("lqc2 vf31, 0(%0)" : : "r"(vector) : "memory");
+    __asm__ __volatile__("lqc2 vf27, 0(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("lqc2 vf28, 16(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("lqc2 vf29, 32(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("lqc2 vf30, 48(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("vmulax.xyz ACC, vf27, vf31x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyz ACC, vf28, vf31y" : : : "memory");
+    __asm__ __volatile__("vmaddz.xyz vf31, vf29, vf31z" : : : "memory");
+    __asm__ __volatile__("sqc2 vf31, 0(%0)" : : "r"(rotatedVector) : "memory");
+}
+
+void applyMatrixPoint(void *transformedPoint, void *matrix, void *vector) {
+    __asm__ __volatile__("lqc2 vf31, 0(%0)" : : "r"(vector) : "memory");
+    __asm__ __volatile__("lqc2 vf27, 0(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("lqc2 vf28, 16(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("lqc2 vf29, 32(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("lqc2 vf30, 48(%0)" : : "r"(matrix) : "memory");
+    __asm__ __volatile__("vmulax.xyz ACC, vf27, vf31x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyz ACC, vf28, vf31y" : : : "memory");
+    __asm__ __volatile__("vmaddaz.xyz ACC, vf29, vf31z" : : : "memory");
+    __asm__ __volatile__("vmaddw.xyz vf31, vf30, vf0w" : : : "memory");
+    __asm__ __volatile__("sqc2 vf31, 0(%0)" : : "r"(transformedPoint) : "memory");
+}
+
+void _ApplyMatrix2Mat(void *transformedPoint, void *firstMatrix, void *secondMatrix, void *vector) {
+    __asm__ __volatile__("lqc2 vf31, 0(%0)" : : "r"(vector) : "memory");
+    __asm__ __volatile__("lqc2 vf27, 0(%0)" : : "r"(firstMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf28, 16(%0)" : : "r"(firstMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf29, 32(%0)" : : "r"(firstMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf30, 48(%0)" : : "r"(firstMatrix) : "memory");
+    __asm__ __volatile__("vmulax.xyz ACC, vf27, vf31x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyz ACC, vf28, vf31y" : : : "memory");
+    __asm__ __volatile__("vmaddaz.xyz ACC, vf29, vf31z" : : : "memory");
+    __asm__ __volatile__("vmaddw.xyz vf31, vf30, vf0w" : : : "memory");
+    __asm__ __volatile__("lqc2 vf27, 0(%0)" : : "r"(secondMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf28, 16(%0)" : : "r"(secondMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf29, 32(%0)" : : "r"(secondMatrix) : "memory");
+    __asm__ __volatile__("lqc2 vf30, 48(%0)" : : "r"(secondMatrix) : "memory");
+    __asm__ __volatile__("vmulax.xyz ACC, vf27, vf31x" : : : "memory");
+    __asm__ __volatile__("vmadday.xyz ACC, vf28, vf31y" : : : "memory");
+    __asm__ __volatile__("vmaddaz.xyz ACC, vf29, vf31z" : : : "memory");
+    __asm__ __volatile__("vmaddw.xyz vf31, vf30, vf0w" : : : "memory");
+    __asm__ __volatile__("sqc2 vf31, 0(%0)" : : "r"(transformedPoint) : "memory");
+}

@@ -27,21 +27,21 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_profile_037", func_0019C8D0);
 void pxyProfileBegin(const char *name)
 {
     int i;
-    int found;
+    int profileSlot;
 
-    found = -1;
+    profileSlot = -1;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
             if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
-                found = i;
+                profileSlot = i;
                 break;
             }
         }
     }
-    if (found < 0) {
+    if (profileSlot < 0) {
         for (i = 0; i < PXY_ENTRY_COUNT; i++) {
             if (pxyProfileEntries[i].inUse == 0) {
-                found = i;
+                profileSlot = i;
                 strcpy(pxyProfileEntries[i].name, name);
                 pxyProfileEntries[i].startTicks = 0;
                 pxyProfileEntries[i].totalTicks = 0;
@@ -51,35 +51,35 @@ void pxyProfileBegin(const char *name)
             }
         }
     }
-    if (found >= 0 && found < PXY_ENTRY_COUNT) {
-        pxyProfileEntries[found].startTicks = *T1_COUNT;
+    if (profileSlot >= 0 && profileSlot < PXY_ENTRY_COUNT) {
+        pxyProfileEntries[profileSlot].startTicks = *T1_COUNT;
     }
 }
 
 float pxyProfileEnd(const char *name)
 {
     int i;
-    int found;
-    float result;
+    int profileSlot;
+    float elapsedMs;
     float msPerTick;
 
-    found = -1;
-    result = 0.0f;
+    profileSlot = -1;
+    elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
             if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
-                found = i;
+                profileSlot = i;
                 break;
             }
         }
     }
-    if (found >= 0) {
+    if (profileSlot >= 0) {
         msPerTick = 0.0052173799f;
-        pxyProfileEntries[found].totalTicks = pxyProfileEntries[found].totalTicks + (*T1_COUNT - pxyProfileEntries[found].startTicks);
-        result = (float) pxyProfileEntries[found].totalTicks * msPerTick;
-        GameMpeg2Play(pxyProfileEntries[found].text, "%s  %3.2f", pxyProfileEntries[found].name, (double) result);
+        pxyProfileEntries[profileSlot].totalTicks = pxyProfileEntries[profileSlot].totalTicks + (*T1_COUNT - pxyProfileEntries[profileSlot].startTicks);
+        elapsedMs = pxyProfileEntries[profileSlot].totalTicks * msPerTick;
+        GameMpeg2Play(pxyProfileEntries[profileSlot].text, "%s  %3.2f", pxyProfileEntries[profileSlot].name, elapsedMs);
     }
-    return result;
+    return elapsedMs;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_profile_037", func_0019CBB0);

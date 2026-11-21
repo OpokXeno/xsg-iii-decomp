@@ -74,8 +74,8 @@ extern int gifStateOriginY;
 
 /* One quadword of gifStatePacket: a data/address pair (A+D) or four raw words (the tag). */
 typedef union GifStateQword {
-    u64 pair[2];                /* A+D: the data, then the register address */
-    u32 word[4];
+    u64 adPair[2];                /* A+D: the data, then the register address */
+    u32 rawBits[4];
 } GifStateQword;
 
 /* The setup packet: 15 quadwords (60 words) sent as one transfer; its qwords 6 and 7 get the frame and the
@@ -123,14 +123,14 @@ extern u32 gifFadeQuadTag[4];
  * gifStatePacket; entry 0 is the GIF tag word, the pairs follow in packed mode (A+D).
  * The assert text "numPacket < (STATEPACKET_MAX - 1)" names both.
  */
-extern int gifStateNumPacket;
+extern unsigned int gifStateNumPacket;
 extern GifStateQword gifStatePacket[128];
 
 #define GIF_TAG_NREG_1 0x10000000
 
 /* The assert text and the file name of the packet queue asserts (no config name: splat names). */
-extern const char D_00539B68[40];
-extern const char D_00539B90[24];
+extern const char gifStatePacketAssert[40];
+extern const char gifStateSourceFile[24];
 
 /* The queue size the assert names: numPacket < (STATEPACKET_MAX - 1); the compare is against 63 in this build. */
 #define STATEPACKET_MAX 0x40
@@ -143,16 +143,16 @@ extern u16 D_004C8390[];
  * context registers: clamp, frame, the alpha blend picked by the effect state, texture, test and z buffer. */
 void gifStateSetupContext(XglPacket *packet, signed char alphaFix)
 {
-    gifStateSetupPacket[6].pair[0] = GS_SET_FRAME(D_004C8390[7], 8, GS_PSMCT32, 0);
+    gifStateSetupPacket[6].adPair[0] = GS_SET_FRAME(D_004C8390[7], 8, GS_PSMCT32, 0);
     switch (gifStatus.fbp) {
     case 0:
-        gifStateSetupPacket[7].pair[0] = GS_SET_TEX0(D_004C8390[11] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
+        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[11] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
         break;
     case 1:
-        gifStateSetupPacket[7].pair[0] = GS_SET_TEX0(D_004C8390[12] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
+        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[12] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
         break;
     default:
-        gifStateSetupPacket[7].pair[0] = GS_SET_TEX0(D_004C8390[11] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
+        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[11] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
         break;
     }
     sceVif1PkCnt(packet, 0);
@@ -211,7 +211,7 @@ void gifStateDrawRing(XglPacket *packet)
 {
     int trailAlpha;
     int ringAlpha;
-    float step;
+    float angleStep;
     float angle = 0.0f;
     float cosine;
     float sine;
@@ -219,19 +219,19 @@ void gifStateDrawRing(XglPacket *packet)
     u32 *ring;
     u32 *gifTag;
     unsigned int i;
-    int count;
-    int innerCount;
-    int sub3;
-    int sub2;
-    int sub1;
-    int x;
-    int y;
-    int x2;
-    int y2;
-    int u;
-    int v;
+    int outerVertexCount;
+    int innerVertexCount;
+    int innerSpan;
+    int trailSpan;
+    int outerRadius;
+    int outerX;
+    int outerY;
+    int trailX;
+    int trailY;
+    int blurX;
+    int blurY;
 
-    step = 6.2831855f / gifStateRingCount;
+    angleStep = 6.2831855f / gifStateRingCount;
     if (gifStatus.ratio == 0.0f) {
         return;
     }
@@ -243,40 +243,40 @@ void gifStateDrawRing(XglPacket *packet)
         trailAlpha = 0;
     }
     gifStatus.ratio -= gifStatus.ratioStep;
-    sub1 = gifStatus.subWindow[1];
-    sub2 = gifStatus.subWindow[2];
-    sub3 = gifStatus.subWindow[3];
+    outerRadius = gifStatus.subWindow[1];
+    trailSpan = gifStatus.subWindow[2];
+    innerSpan = gifStatus.subWindow[3];
     if (gifStatus.ratio < 0.0f) {
         gifStatus.ratio = 0.0f;
     }
     gifStateSetupContext(packet, 0);
 
-    /* The outer ring: per step one point at the radius sub1 and one at sub1 + sub2 pulled in by the blur. */
-    count = 0;
-    cursor = (void *) (GIF_SCRATCHPAD + 0x10);
+    /* The outer ring: per angleStep one point at the radius outerRadius and one at outerRadius + trailSpan pulled in by the blur. */
+    outerVertexCount = 0;
+    cursor = GIF_PACKET->vertex[0].uv;
     angle = 0.0f;
     for (i = 0; i < 2 * gifStateRingCount; i += 2) {
         cosine = cosf(angle);
         sine = sinf(angle);
-        x = cosine * sub1 + gifStatus.centerX;
-        y = sine * sub1 + gifStatus.centerY;
-        x2 = cosine * (sub1 + sub2) + gifStatus.centerX;
-        y2 = sine * (sub1 + sub2) + gifStatus.centerY;
-        angle += step;
-        x = x < 0 ? 0 : x;
-        y = y < 0 ? 0 : y;
-        x = x >= GIF_STATE_WIDTH ? GIF_STATE_WIDTH - 1 : x;
-        y = y >= GIF_STATE_HEIGHT ? GIF_STATE_HEIGHT - 1 : y;
+        outerX = cosine * outerRadius + gifStatus.centerX;
+        outerY = sine * outerRadius + gifStatus.centerY;
+        trailX = cosine * (outerRadius + trailSpan) + gifStatus.centerX;
+        trailY = sine * (outerRadius + trailSpan) + gifStatus.centerY;
+        angle += angleStep;
+        outerX = outerX < 0 ? 0 : outerX;
+        outerY = outerY < 0 ? 0 : outerY;
+        outerX = outerX >= GIF_STATE_WIDTH ? GIF_STATE_WIDTH - 1 : outerX;
+        outerY = outerY >= GIF_STATE_HEIGHT ? GIF_STATE_HEIGHT - 1 : outerY;
         cursor[0] = 0x80;
         cursor[1] = 0x80;
         cursor[2] = 0x80;
         cursor[3] = ringAlpha;
         cursor[6] = 0;
         cursor[7] = 0;
-        cursor[4] = x << 4;
-        cursor[5] = y << 4;
-        cursor[8] = GIF_X(x);
-        cursor[9] = GIF_Y(y);
+        cursor[4] = outerX << 4;
+        cursor[5] = outerY << 4;
+        cursor[8] = GIF_X(outerX);
+        cursor[9] = GIF_Y(outerY);
         cursor[10] = gifStatus.depth;
         cursor[11] = 0;
         cursor += 12;
@@ -286,28 +286,28 @@ void gifStateDrawRing(XglPacket *packet)
         cursor[2] = 0x80;
         cursor[3] = trailAlpha;
         cosine *= gifStatus.blur;
-        u = x2 - (int) cosine;
-        v = y2 - (int) (sine * gifStatus.blur);
-        v = v < 0 ? 0 : v;
-        u = u < 0 ? 0 : u;
-        v = v >= GIF_STATE_HEIGHT ? GIF_STATE_HEIGHT - 1 : v;
-        u = u >= GIF_STATE_WIDTH ? GIF_STATE_WIDTH - 1 : u;
+        blurX = trailX - (int) cosine;
+        blurY = trailY - (int) (sine * gifStatus.blur);
+        blurY = blurY < 0 ? 0 : blurY;
+        blurX = blurX < 0 ? 0 : blurX;
+        blurY = blurY >= GIF_STATE_HEIGHT ? GIF_STATE_HEIGHT - 1 : blurY;
+        blurX = blurX >= GIF_STATE_WIDTH ? GIF_STATE_WIDTH - 1 : blurX;
         cursor[6] = 0;
         cursor[7] = 0;
-        cursor[5] = v << 4;
-        cursor[4] = u << 4;
-        cursor[8] = GIF_X(x2);
-        cursor[9] = GIF_Y(y2);
+        cursor[5] = blurY << 4;
+        cursor[4] = blurX << 4;
+        cursor[8] = GIF_X(trailX);
+        cursor[9] = GIF_Y(trailY);
         cursor[10] = gifStatus.depth;
         cursor[11] = 0;
         cursor += 12;
-        count += 2;
+        outerVertexCount += 2;
     }
-    count += 2;
+    outerVertexCount += 2;
     i = 0;
-    innerCount = 0;
-    gifTag = (void *) GIF_SCRATCHPAD;
-    gifTag[0] = gifRingGifTag[0] | count;
+    innerVertexCount = 0;
+    gifTag = GIF_PACKET->tag;
+    gifTag[0] = gifRingGifTag[0] | outerVertexCount;
     gifTag[1] = gifRingGifTag[1];
     gifTag[2] = gifRingGifTag[2];
     gifTag[3] = gifRingGifTag[3];
@@ -341,10 +341,10 @@ void gifStateDrawRing(XglPacket *packet)
     cursor[11] = gifTag[11];
     sceVif1PkCnt(packet, 0);
     sceVif1PkOpenDirectHLCode(packet, 0);
-    sceVif1PkAddDirectDataN(packet, (void *) GIF_SCRATCHPAD, count * 3 + 1);
+    sceVif1PkAddDirectDataN(packet, GIF_PACKET, outerVertexCount * 3 + 1);
     sceVif1PkCloseDirectHLCode(packet);
 
-    ring = (void *) (GIF_SCRATCHPAD + 0x10);
+    ring = GIF_PACKET->vertex[0].uv;
     /* Move each outer point onto its inner neighbour. */
     for (; i < 2 * gifStateRingCount + 2; i += 2) {
         ring[0] = ring[12];
@@ -362,9 +362,9 @@ void gifStateDrawRing(XglPacket *packet)
         ring += 24;
     }
 
-    /* The inner ring: the outer points again at the radius sub1 + sub3, from the ratio-scaled start angle. */
-    angle = step * gifStatus.ratio;
-    ring = (void *) (GIF_SCRATCHPAD + 0x10);
+    /* The inner ring: the outer points again at the radius outerRadius + innerSpan, from the ratio-scaled start angle. */
+    angle = angleStep * gifStatus.ratio;
+    ring = GIF_PACKET->vertex[0].uv;
     for (i = 0; i < 2 * gifStateRingCount; i += 2) {
         int innerX;
         int innerY;
@@ -372,11 +372,11 @@ void gifStateDrawRing(XglPacket *packet)
         ring += 12;
         cosine = cosf(angle);
         sine = sinf(angle);
-        cosine *= sub1 + sub3;
+        cosine *= outerRadius + innerSpan;
         cosine += gifStatus.centerX;
-        innerY = sine * (sub1 + sub3) + gifStatus.centerY;
+        innerY = sine * (outerRadius + innerSpan) + gifStatus.centerY;
         innerX = cosine;
-        angle += step;
+        angle += angleStep;
         innerY = innerY < 0 ? 0 : innerY;
         innerX = innerX < 0 ? 0 : innerX;
         innerX = innerX >= GIF_STATE_WIDTH ? GIF_STATE_WIDTH - 1 : innerX;
@@ -388,11 +388,11 @@ void gifStateDrawRing(XglPacket *packet)
         ring[9] = GIF_Y(innerY);
         ring[10] = gifStatus.depth;
         ring += 12;
-        innerCount += 2;
+        innerVertexCount += 2;
     }
-    innerCount += 2;
-    gifTag = (void *) GIF_SCRATCHPAD;
-    gifTag[0] = gifRingGifTag[0] | innerCount;
+    innerVertexCount += 2;
+    gifTag = GIF_PACKET->tag;
+    gifTag[0] = gifRingGifTag[0] | innerVertexCount;
     gifTag[1] = gifRingGifTag[1];
     gifTag[2] = gifRingGifTag[2];
     gifTag[3] = gifRingGifTag[3];
@@ -425,7 +425,7 @@ void gifStateDrawRing(XglPacket *packet)
     ring[11] = gifTag[11];
     sceVif1PkCnt(packet, 0);
     sceVif1PkOpenDirectHLCode(packet, 0);
-    sceVif1PkAddDirectDataN(packet, (void *) GIF_SCRATCHPAD, innerCount * 3 + 1);
+    sceVif1PkAddDirectDataN(packet, GIF_PACKET, innerVertexCount * 3 + 1);
     sceVif1PkCloseDirectHLCode(packet);
 }
 
@@ -443,14 +443,14 @@ void xglVectorMulMat(Vector4 *destination, Matrix4 matrix, const Vector4 *vector
 /* The GIF tag template of the camera quad (the vertex count is or-ed in). */
 extern u32 gifCameraQuadTag[4];
 /* Gp-relative float cell the radial blur keeps its minimum scale in. */
-extern float D_00550CF0;
+extern float gifBlurMinScale;
 /* The scaffold float cells the radial blur reads: 0.9 and 0.01. */
-extern const float D_0054F6E4;
-extern const float D_0054F6E8;
+extern const float gifBlurScaleFloor;
+extern const float gifBlurScaleStep;
 /* The per-edge scales of the radial blur (512 floats; the splat label ends before the table does). */
-extern float D_005A6C60[];
+extern float gifBlurScales[];
 /* The GIF tag template of the radial blur fan (the vertex count is or-ed in). */
-extern u32 D_003EB740[4];
+extern u32 gifBlurFanTag[4];
 
 /* The fan's edge points are this far apart at least. */
 #define GIF_BLUR_MIN_STEP 4
@@ -462,27 +462,27 @@ extern u32 D_003EB740[4];
 void gifStateDrawRadialBlur(XglPacket *packet)
 {
     u32 *cursor;
-    u32 *tag = 0;
-    int k;
-    int count;
-    int step;
-    int pos;
-    float scale = 0.0f;
+    u32 *fanTag = 0;
+    int scaleIndex;
+    int fanVertexCount;
+    int edgeSpacing;
+    int edgePos;
+    float edgeScale = 0.0f;
 
-    if (gifStatus.ratio == scale) {
+    if (gifStatus.ratio == edgeScale) {
         return;
     }
-    D_00550CF0 = gifStatus.ratio * D_0054F6E4;
-    for (pos = 0; pos < 512; pos++) {
-        D_005A6C60[pos] = (xglSRand() % 10U) * D_0054F6E8 + D_00550CF0;
+    gifBlurMinScale = gifStatus.ratio * gifBlurScaleFloor;
+    for (edgePos = 0; edgePos < 512; edgePos++) {
+        gifBlurScales[edgePos] = (xglSRand() % 10U) * gifBlurScaleStep + gifBlurMinScale;
     }
-    k = 0;
-    count = 1;
-    pos = 0;
+    scaleIndex = 0;
+    fanVertexCount = 1;
+    edgePos = 0;
     gifStateSetupContext(packet, gifStatus.effectAlpha * gifStatus.ratio);
-    step = gifStatus.subWindow[0];
-    if (step < GIF_BLUR_MIN_STEP) {
-        step = GIF_BLUR_MIN_STEP;
+    edgeSpacing = gifStatus.subWindow[0];
+    if (edgeSpacing < GIF_BLUR_MIN_STEP) {
+        edgeSpacing = GIF_BLUR_MIN_STEP;
     }
     cursor = GIF_PACKET->vertex[0].uv;
     cursor[0] = gifStatus.centerX << 4;
@@ -495,78 +495,78 @@ void gifStateDrawRadialBlur(XglPacket *packet)
     cursor[7] = 0;
     cursor = GIF_PACKET->vertex[1].uv;
     do {
-        scale = D_005A6C60[k++];
-        cursor[0] = (gifStatus.centerX + (pos - gifStatus.centerX) * scale) * 16.0f;
-        cursor[1] = (gifStatus.centerY + (0 - gifStatus.centerY) * scale) * 16.0f;
+        edgeScale = gifBlurScales[scaleIndex++];
+        cursor[0] = (gifStatus.centerX + (edgePos - gifStatus.centerX) * edgeScale) * 16.0f;
+        cursor[1] = (gifStatus.centerY + (0 - gifStatus.centerY) * edgeScale) * 16.0f;
         cursor[2] = 0;
         cursor[3] = 0;
-        count++;
-        cursor[4] = ((gifStateOriginX + pos) << 4) - 8;
-        pos += step;
+        fanVertexCount++;
+        cursor[4] = ((gifStateOriginX + edgePos) << 4) - 8;
+        edgePos += edgeSpacing;
         cursor[5] = ((gifStateOriginY + 0) << 4) - 9;
         cursor[6] = gifStatus.depth;
         cursor[7] = 0;
         cursor += 8;
-    } while (pos < GIF_STATE_WIDTH);
-    for (pos = 0; pos < GIF_STATE_HEIGHT; pos += step) {
-        scale = D_005A6C60[k++];
-        cursor[0] = (gifStatus.centerX + ((GIF_STATE_WIDTH - 1) - gifStatus.centerX) * scale) * 16.0f;
-        cursor[1] = (gifStatus.centerY + (pos - gifStatus.centerY) * scale) * 16.0f;
+    } while (edgePos < GIF_STATE_WIDTH);
+    for (edgePos = 0; edgePos < GIF_STATE_HEIGHT; edgePos += edgeSpacing) {
+        edgeScale = gifBlurScales[scaleIndex++];
+        cursor[0] = (gifStatus.centerX + ((GIF_STATE_WIDTH - 1) - gifStatus.centerX) * edgeScale) * 16.0f;
+        cursor[1] = (gifStatus.centerY + (edgePos - gifStatus.centerY) * edgeScale) * 16.0f;
         cursor[2] = 0;
         cursor[3] = 0;
-        count++;
+        fanVertexCount++;
         cursor[4] = ((gifStateOriginX + (GIF_STATE_WIDTH - 1)) << 4) - 8;
-        cursor[5] = ((gifStateOriginY + pos) << 4) - 9;
+        cursor[5] = ((gifStateOriginY + edgePos) << 4) - 9;
         cursor[6] = gifStatus.depth;
         cursor[7] = 0;
         cursor += 8;
     }
-    for (pos = GIF_STATE_WIDTH - 1; pos >= 0; pos -= step) {
-        scale = D_005A6C60[k++];
-        cursor[0] = (gifStatus.centerX + (pos - gifStatus.centerX) * scale) * 16.0f;
-        cursor[1] = (gifStatus.centerY + ((GIF_STATE_HEIGHT - 1) - gifStatus.centerY) * scale) * 16.0f;
+    for (edgePos = GIF_STATE_WIDTH - 1; edgePos >= 0; edgePos -= edgeSpacing) {
+        edgeScale = gifBlurScales[scaleIndex++];
+        cursor[0] = (gifStatus.centerX + (edgePos - gifStatus.centerX) * edgeScale) * 16.0f;
+        cursor[1] = (gifStatus.centerY + ((GIF_STATE_HEIGHT - 1) - gifStatus.centerY) * edgeScale) * 16.0f;
         cursor[2] = 0;
         cursor[3] = 0;
-        count++;
-        cursor[4] = ((gifStateOriginX + pos) << 4) - 8;
+        fanVertexCount++;
+        cursor[4] = ((gifStateOriginX + edgePos) << 4) - 8;
         cursor[5] = ((gifStateOriginY + (GIF_STATE_HEIGHT - 1)) << 4) - 9;
         cursor[6] = gifStatus.depth;
         cursor[7] = 0;
         cursor += 8;
     }
-    for (pos = GIF_STATE_HEIGHT - 1; pos >= 0; pos -= step) {
-        scale = D_005A6C60[k++];
-        cursor[0] = (gifStatus.centerX + (0 - gifStatus.centerX) * scale) * 16.0f;
-        cursor[1] = (gifStatus.centerY + (pos - gifStatus.centerY) * scale) * 16.0f;
+    for (edgePos = GIF_STATE_HEIGHT - 1; edgePos >= 0; edgePos -= edgeSpacing) {
+        edgeScale = gifBlurScales[scaleIndex++];
+        cursor[0] = (gifStatus.centerX + (0 - gifStatus.centerX) * edgeScale) * 16.0f;
+        cursor[1] = (gifStatus.centerY + (edgePos - gifStatus.centerY) * edgeScale) * 16.0f;
         cursor[2] = 0;
         cursor[3] = 0;
-        count++;
+        fanVertexCount++;
         cursor[4] = ((gifStateOriginX + 0) << 4) - 8;
-        cursor[5] = ((gifStateOriginY + pos) << 4) - 9;
+        cursor[5] = ((gifStateOriginY + edgePos) << 4) - 9;
         cursor[6] = gifStatus.depth;
         cursor[7] = 0;
         cursor += 8;
     }
-    count++;
-    tag = GIF_PACKET->tag;
-    tag[0] = D_003EB740[0] | count;
-    tag[1] = D_003EB740[1];
-    tag[2] = D_003EB740[2];
-    tag[3] = D_003EB740[3];
+    fanVertexCount++;
+    fanTag = GIF_PACKET->tag;
+    fanTag[0] = gifBlurFanTag[0] | fanVertexCount;
+    fanTag[1] = gifBlurFanTag[1];
+    fanTag[2] = gifBlurFanTag[2];
+    fanTag[3] = gifBlurFanTag[3];
     /* The fan closes on its first edge point: past the tag come vertex 0 (the centre) and vertex 1, whose
      * eight words go once more to the end. */
-    tag += 4;
-    cursor[0] = tag[8];
-    cursor[1] = tag[9];
-    cursor[2] = tag[10];
-    cursor[3] = tag[11];
-    cursor[4] = tag[12];
-    cursor[5] = tag[13];
-    cursor[6] = tag[14];
-    cursor[7] = tag[15];
+    fanTag += 4;
+    cursor[0] = fanTag[8];
+    cursor[1] = fanTag[9];
+    cursor[2] = fanTag[10];
+    cursor[3] = fanTag[11];
+    cursor[4] = fanTag[12];
+    cursor[5] = fanTag[13];
+    cursor[6] = fanTag[14];
+    cursor[7] = fanTag[15];
     sceVif1PkCnt(packet, 0);
     sceVif1PkOpenDirectHLCode(packet, 0);
-    sceVif1PkAddDirectDataN(packet, GIF_PACKET, count * 2 + 1);
+    sceVif1PkAddDirectDataN(packet, GIF_PACKET, fanVertexCount * 2 + 1);
     sceVif1PkCloseDirectHLCode(packet);
     gifStatus.ratio -= gifStatus.ratioStep;
     if (gifStatus.ratio < 0.0f) {
@@ -579,15 +579,15 @@ void gifStateDrawRadialBlur(XglPacket *packet)
  * lowers the ratio by its step unless the decrease gate is set. Nothing is drawn once the ratio is down to 0. */
 void gifStateDrawCameraQuad(XglPacket *packet)
 {
-    Vector4 scaled;
-    Vector4 offset;
+    Vector4 blurVector;
+    Vector4 blurOffset;
     Matrix matrix;
     int corners[4][2];
     XglCamera *camera = xglStudioSelectGetActiveCamera(0);
     u32 *cursor;
     u32 *gifTag = 0;
-    int x;
-    int y;
+    int shiftX;
+    int shiftY;
 
     if (gifStatus.ratio <= 0.0f) {
         return;
@@ -598,18 +598,18 @@ void gifStateDrawCameraQuad(XglPacket *packet)
     xglCurMulRotateZ(camera->travel.rotation.z);
     xglCurMatrixGet(matrix.rows);
     xglMatrixInverse(&matrix, &matrix);
-    xglVectorScale(&scaled, &gifStatus.mulColor, gifStatus.blur);
-    xglVectorMulMat(&offset, matrix.rows, &scaled);
-    x = -offset.x;
-    y = offset.y;
-    corners[0][0] = x;
-    corners[0][1] = y;
-    corners[1][0] = x;
-    corners[1][1] = y;
-    corners[2][0] = x;
-    corners[2][1] = y;
-    corners[3][0] = x;
-    corners[3][1] = y;
+    xglVectorScale(&blurVector, &gifStatus.mulColor, gifStatus.blur);
+    xglVectorMulMat(&blurOffset, matrix.rows, &blurVector);
+    shiftX = -blurOffset.x;
+    shiftY = blurOffset.y;
+    corners[0][0] = shiftX;
+    corners[0][1] = shiftY;
+    corners[1][0] = shiftX;
+    corners[1][1] = shiftY;
+    corners[2][0] = shiftX;
+    corners[2][1] = shiftY;
+    corners[3][0] = shiftX;
+    corners[3][1] = shiftY;
     gifStateSetupContext(packet, gifStatus.ratio * gifStatus.effectAlpha);
     cursor = GIF_PACKET->vertex[0].uv;
     cursor[0] = 0;
@@ -670,72 +670,72 @@ void gifStateDrawCameraQuad(XglPacket *packet)
 void gifStateDrawJitterGrid(XglPacket *packet)
 {
     u32 *cursor;
-    int x;
-    int y;
-    int count = 0;
+    int gridX;
+    int gridY;
+    int stripVertexCount = 0;
     int jitter;
     int leftColumn;
     u32 *tag = 0;
     u32 *rowTag = 0;
 
     if (gifStatus.ratio != 0.0f) {
-        y = 0;
-        x = y;
-        count = x;
+        gridY = 0;
+        gridX = gridY;
+        stripVertexCount = gridX;
         cursor = GIF_PACKET->vertex[0].uv;
         gifStateSetupContext(packet, gifStatus.effectAlpha * gifStatus.ratio);
         if (gifStatus.blur == 0) {
             gifStatus.blur = 1;
         }
         do {
-            if (x == 0) {
+            if (gridX == 0) {
                 jitter = 0;
             } else {
                 jitter = (int) ((float) (xglSRand() % gifStatus.blur) * gifStatus.ratio);
             }
-            cursor[0] = (x + jitter) << 4;
-            cursor[1] = y << 4;
+            cursor[0] = (gridX + jitter) << 4;
+            cursor[1] = gridY << 4;
             cursor[2] = 0;
             cursor[3] = 0;
-            cursor[4] = ((gifStateOriginX + x) << 4) - 8;
-            cursor[5] = ((gifStateOriginY + y) << 4) - 9;
+            cursor[4] = ((gifStateOriginX + gridX) << 4) - 8;
+            cursor[5] = ((gifStateOriginY + gridY) << 4) - 9;
             cursor[6] = gifStatus.depth;
             cursor[7] = 0;
-            count++;
+            stripVertexCount++;
             cursor += 8;
-            y += gifStateGridStep;
-            leftColumn = x == 0;
+            gridY += gifStateGridStep;
+            leftColumn = gridX == 0;
             if (leftColumn) {
-                jitter = x;
+                jitter = gridX;
             } else {
                 jitter = (int) ((float) (xglSRand() % gifStatus.blur) * gifStatus.ratio);
             }
-            cursor[0] = (x + jitter) << 4;
-            cursor[1] = y << 4;
+            cursor[0] = (gridX + jitter) << 4;
+            cursor[1] = gridY << 4;
             cursor[2] = 0;
             cursor[3] = 0;
-            cursor[4] = ((gifStateOriginX + x) << 4) - 8;
-            cursor[5] = ((gifStateOriginY + y) << 4) - 9;
+            cursor[4] = ((gifStateOriginX + gridX) << 4) - 8;
+            cursor[5] = ((gifStateOriginY + gridY) << 4) - 9;
             cursor[6] = gifStatus.depth;
             cursor[7] = 0;
-            count++;
+            stripVertexCount++;
             cursor += 8;
-            y -= gifStateGridStep;
-            x += gifStateGridStep;
-        } while (x < GIF_STATE_WIDTH);
+            gridY -= gifStateGridStep;
+            gridX += gifStateGridStep;
+        } while (gridX < GIF_STATE_WIDTH);
         tag = GIF_PACKET->tag;
-        tag[0] = gifGridFirstRowTag[0] | count;
+        tag[0] = gifGridFirstRowTag[0] | stripVertexCount;
         tag[1] = gifGridFirstRowTag[1];
         tag[2] = gifGridFirstRowTag[2];
         tag[3] = gifGridFirstRowTag[3];
         sceVif1PkCnt(packet, 0);
         sceVif1PkOpenDirectHLCode(packet, 0);
-        sceVif1PkAddDirectDataN(packet, GIF_PACKET, count * 2 + 1);
+        sceVif1PkAddDirectDataN(packet, GIF_PACKET, stripVertexCount * 2 + 1);
         sceVif1PkCloseDirectHLCode(packet);
 
-        for (y += gifStateGridStep; y < GIF_STATE_HEIGHT; y += gifStateGridStep) {
-            x = 0;
-            count = 0;
+        for (gridY += gifStateGridStep; gridY < GIF_STATE_HEIGHT; gridY += gifStateGridStep) {
+            gridX = 0;
+            stripVertexCount = 0;
             cursor = GIF_PACKET->vertex[0].uv;
             do {
                 cursor[0] = cursor[8];
@@ -746,40 +746,40 @@ void gifStateDrawJitterGrid(XglPacket *packet)
                 cursor[5] = cursor[13];
                 cursor[6] = cursor[14];
                 cursor[7] = cursor[15];
-                count++;
+                stripVertexCount++;
                 cursor += 8;
-                y += gifStateGridStep;
-                if (x == 0) {
+                gridY += gifStateGridStep;
+                if (gridX == 0) {
                     jitter = 0;
                 } else {
                     jitter = (int) ((float) (xglSRand() % gifStatus.blur) * gifStatus.ratio);
                 }
-                cursor[0] = (x + jitter) << 4;
-                if (y == 0) {
+                cursor[0] = (gridX + jitter) << 4;
+                if (gridY == 0) {
                     jitter = 0;
                 } else {
                     jitter = (int) ((float) (xglSRand() % gifStatus.blur) * gifStatus.ratio);
                 }
-                cursor[1] = (y + jitter) << 4;
+                cursor[1] = (gridY + jitter) << 4;
                 cursor[2] = 0;
                 cursor[3] = 0;
-                cursor[4] = ((gifStateOriginX + x) << 4) - 8;
-                cursor[5] = ((gifStateOriginY + y) << 4) - 9;
+                cursor[4] = ((gifStateOriginX + gridX) << 4) - 8;
+                cursor[5] = ((gifStateOriginY + gridY) << 4) - 9;
                 cursor[6] = gifStatus.depth;
                 cursor[7] = 0;
-                count++;
+                stripVertexCount++;
                 cursor += 8;
-                x += gifStateGridStep;
-                y -= gifStateGridStep;
-            } while (x < GIF_STATE_WIDTH);
+                gridX += gifStateGridStep;
+                gridY -= gifStateGridStep;
+            } while (gridX < GIF_STATE_WIDTH);
             rowTag = GIF_PACKET->tag;
-            rowTag[0] = gifGridRowTag[0] | count;
+            rowTag[0] = gifGridRowTag[0] | stripVertexCount;
             rowTag[1] = gifGridRowTag[1];
             rowTag[2] = gifGridRowTag[2];
             rowTag[3] = gifGridRowTag[3];
             sceVif1PkCnt(packet, 0);
             sceVif1PkOpenDirectHLCode(packet, 0);
-            sceVif1PkAddDirectDataN(packet, GIF_PACKET, count * 2 + 1);
+            sceVif1PkAddDirectDataN(packet, GIF_PACKET, stripVertexCount * 2 + 1);
             sceVif1PkCloseDirectHLCode(packet);
         }
         gifStatus.ratio -= gifStatus.ratioStep;
@@ -796,14 +796,14 @@ void gifStateDrawFadeQuad(XglPacket *packet)
 {
     u32 *cursor;
     u32 *gifTag = 0;
-    int count;
+    int vertexCount;
 
     if (gifStatus.ratio <= 0.0f) {
         return;
     }
     gifStateSetupContext(packet, gifStatus.ratio * gifStatus.effectAlpha);
     cursor = GIF_PACKET->vertex[0].uv;
-    count = 0;
+    vertexCount = 0;
     cursor[0] = 0;
     cursor[1] = 0;
     cursor[2] = 0;
@@ -813,7 +813,7 @@ void gifStateDrawFadeQuad(XglPacket *packet)
     cursor[6] = gifStatus.depth;
     cursor[7] = 0;
     cursor += 8;
-    count++;
+    vertexCount++;
     cursor[0] = (GIF_STATE_WIDTH - 1) << 4;
     cursor[1] = 0;
     cursor[2] = 0;
@@ -823,7 +823,7 @@ void gifStateDrawFadeQuad(XglPacket *packet)
     cursor[6] = gifStatus.depth;
     cursor[7] = 0;
     cursor += 8;
-    count++;
+    vertexCount++;
     cursor[0] = 0;
     cursor[1] = (GIF_STATE_HEIGHT - 1) << 4;
     cursor[2] = 0;
@@ -833,7 +833,7 @@ void gifStateDrawFadeQuad(XglPacket *packet)
     cursor[6] = gifStatus.depth;
     cursor[7] = 0;
     cursor += 8;
-    count++;
+    vertexCount++;
     cursor[0] = (GIF_STATE_WIDTH - 1) << 4;
     cursor[1] = (GIF_STATE_HEIGHT - 1) << 4;
     cursor[2] = 0;
@@ -842,15 +842,15 @@ void gifStateDrawFadeQuad(XglPacket *packet)
     cursor[5] = (gifStateOriginY + (GIF_STATE_HEIGHT - 1) + gifStatus.subWindow[3] * gifStatus.ratio) * 16.0f - 9.0f;
     cursor[6] = gifStatus.depth;
     cursor[7] = 0;
-    count++;
+    vertexCount++;
     gifTag = GIF_PACKET->tag;
-    gifTag[0] = gifFadeQuadTag[0] | count;
+    gifTag[0] = gifFadeQuadTag[0] | vertexCount;
     gifTag[1] = gifFadeQuadTag[1];
     gifTag[2] = gifFadeQuadTag[2];
     gifTag[3] = gifFadeQuadTag[3];
     sceVif1PkCnt(packet, 0);
     sceVif1PkOpenDirectHLCode(packet, 0);
-    sceVif1PkAddDirectDataN(packet, gifTag, count * 2 + 1);
+    sceVif1PkAddDirectDataN(packet, gifTag, vertexCount * 2 + 1);
     sceVif1PkCloseDirectHLCode(packet);
     gifStatus.ratio -= gifStatus.ratioStep;
 }
@@ -863,14 +863,14 @@ extern int D_00550CFC;
 extern int D_00550D00;
 extern int D_00550D04;
 
-void func_00254920(void)
+void gifStateResetTimings(void)
 {
     D_00550D00 = 90;
     D_00550D04 = 6;
     D_00550CFC = 0;
 }
 
-void func_00254938(int first, int second, int third)
+void gifStateSetTimings(int first, int second, int third)
 {
     D_00550CFC = first;
     D_00550D00 = second;
@@ -922,51 +922,51 @@ INCLUDE_ASM("asm/main/nonmatchings/gifState", func_002580A0);
 /* Empties the queue and writes the tag header: one register per loop, A+D descriptor. */
 void gifStateReset(void) {
     gifStateNumPacket = 0;
-    gifStatePacket[0].word[0] = GIF_TAG_EOP;
-    gifStatePacket[0].word[1] = GIF_TAG_NREG_1;
-    gifStatePacket[0].word[2] = GIF_AD;
-    gifStatePacket[0].word[3] = 0;
+    gifStatePacket[0].rawBits[0] = GIF_TAG_EOP;
+    gifStatePacket[0].rawBits[1] = GIF_TAG_NREG_1;
+    gifStatePacket[0].rawBits[2] = GIF_AD;
+    gifStatePacket[0].rawBits[3] = 0;
 }
 
 /* Queues the A+D pair (gifAddress, gifData) as the next quadword of gifStatePacket (asserts while the
  * packet is not full). */
 void gifStateAddReg(int gifAddress, u64 gifData)
 {
-    if ((unsigned int) gifStateNumPacket >= STATEPACKET_MAX - 1) {
-        assertFailed(D_00539B68, D_00539B90, 37);
+    if (gifStateNumPacket >= STATEPACKET_MAX - 1) {
+        assertFailed(gifStatePacketAssert, gifStateSourceFile, 37);
     }
     gifStateNumPacket++;
-    gifStatePacket[gifStateNumPacket].pair[0] = gifData;
-    gifStatePacket[gifStateNumPacket].pair[1] = gifAddress;
+    gifStatePacket[gifStateNumPacket].adPair[0] = gifData;
+    gifStatePacket[gifStateNumPacket].adPair[1] = gifAddress;
 }
 
 /* Queues four raw words as one quadword of gifStatePacket (asserts while the packet is not full). */
-void gifStateAddRawQword(u32 word0, u32 word1, u32 word2, u32 word3)
+void gifStateAddRawQword(u32 qwordLowBits, u32 qwordLowMidBits, u32 qwordHighMidBits, u32 qwordHighBits)
 {
-    if ((unsigned int) gifStateNumPacket >= STATEPACKET_MAX - 1) {
-        assertFailed(D_00539B68, D_00539B90, 50);
+    if (gifStateNumPacket >= STATEPACKET_MAX - 1) {
+        assertFailed(gifStatePacketAssert, gifStateSourceFile, 50);
     }
     gifStateNumPacket++;
-    gifStatePacket[gifStateNumPacket].word[0] = word0;
-    gifStatePacket[gifStateNumPacket].word[1] = word1;
-    gifStatePacket[gifStateNumPacket].word[2] = word2;
-    gifStatePacket[gifStateNumPacket].word[3] = word3;
+    gifStatePacket[gifStateNumPacket].rawBits[0] = qwordLowBits;
+    gifStatePacket[gifStateNumPacket].rawBits[1] = qwordLowMidBits;
+    gifStatePacket[gifStateNumPacket].rawBits[2] = qwordHighMidBits;
+    gifStatePacket[gifStateNumPacket].rawBits[3] = qwordHighBits;
 }
 
 /* Sends the queued pairs as one direct VIF transfer of count+1 quadwords (tag + pairs). */
 void gifStateFlush(void) {
     XglPacket *packet;
-    int count;
-    int tag;
-    unsigned int byteCount;
+    int queuedPairs;
+    int tagWord;
+    unsigned int transferBytes;
 
     packet = xglPacketGetCurrent();
-    count = gifStateNumPacket;
-    tag = count | GIF_TAG_EOP;
-    byteCount = (count * 0x10) + 0x10;
-    if (count != 0) {
-        gifStatePacket[0].word[0] = tag;
-        sceVif1PkAddDirectDataN(packet, gifStatePacket, byteCount >> 4);
+    queuedPairs = gifStateNumPacket;
+    tagWord = queuedPairs | GIF_TAG_EOP;
+    transferBytes = (queuedPairs * 0x10) + 0x10;
+    if (queuedPairs != 0) {
+        gifStatePacket[0].rawBits[0] = tagWord;
+        sceVif1PkAddDirectDataN(packet, gifStatePacket, transferBytes >> 4);
         gifStateNumPacket = 0;
     }
 }
@@ -992,6 +992,10 @@ void gifStateSetZBufFormat(void) {
     gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 0));
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00258698);
+extern int D_00550E30;
+
+void gifStateEnableFlag(void) {
+    D_00550E30 = 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/gifState", func_002586A8);

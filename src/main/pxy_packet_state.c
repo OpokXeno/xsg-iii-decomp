@@ -27,17 +27,17 @@
  * then the header words, are written through the word view). */
 typedef union XglDirectQueueEntry {
     struct {
-        u64 data;
+        u64 registerValue;
         u64 address;
     };
-    u32 word[4];
+    u32 tagAndHeaderWords[4];
 } XglDirectQueueEntry;
 
 
 
 
 
-struct PxyPartRange;
+struct PxyDrawPartRange;
 union Matrix;
 struct PxyShadow;
 struct PxyHideMask;
@@ -83,7 +83,7 @@ typedef int s32;
 /* The reflection matrix and the words packed into its last column and row. */
 typedef union PxyReflectMatrix {
     Matrix4 rows;
-    s32 words[4][4];
+    s32 intRows[4][4];
 } PxyReflectMatrix;
 
 /* Static block of the reflection state (.bss 0x9899F0-0x989A50): the colour vector, the reflection matrix,
@@ -144,56 +144,114 @@ extern const u8 vuStateHeaderQuad[16];
 
 /* One 16-byte A+D entry of the register list: two data words, then the register and its high word. */
 typedef struct GsRegEntry {
-    u32 data[2];
+    u32 dataDoubleword[2];
     u32 reg;
     u32 regHigh;
 } GsRegEntry;
 
 /* One 16-byte record of the five-record VU1 parameter block uploaded to 994: a count, an address, a float and a spare word. */
-typedef struct PxyVu1ParamRecord {
-    u32 count;
+typedef struct PxyVu1ParamBlockEntry {
+    u32 qwordCount;
     u32 address;
-    float value;
+    float floatValue;
     u32 spare;
-} PxyVu1ParamRecord;
+} PxyVu1ParamBlockEntry;
 
 /* One quadword of a GIF packet, as four words (the tag) or as two register-data pairs. */
 typedef union GifQword {
-    u32 word[4];
+    u32 tagWords[4];
     u64 reg[2];
-    float value[4];
+    float floats[4];
 } GifQword;
 
 u8 *xglPacketMicrocodeEntry(int mode);
 void nmlPacketAddWaitMicrocode(void);
 
+/* The packet state pxyPacketSelectMode reads: the flag word at +0x00 (bit 0x8000 clear picks the mode group that tests
+ * the record), then the record at +0x14, whose flag word at +0x08 (bit 0x1 clear picks mode 4 or the mode 3/0 group). */
+typedef struct PxyModeGate {
+    u8 unk00[8];
+    s32 gateFlags; /* +0x08 */
+} PxyModeGate;
+
+typedef struct PxyPacketModeState {
+    s32 selectFlags; /* +0x00 */
+    u8 unk04[0x10];
+    PxyModeGate *gateRecord; /* +0x14 */
+} PxyPacketModeState;
+
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AA9D0);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AAA00);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AAC98);
+extern s32 pxyPendingValue;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AACA0);
+void pxyPacketSetPendingValue(s32 pendingValue) {
+    pxyPendingValue = pendingValue;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AACA8);
+extern s32 pxyPendingIndex;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AACB8);
+void pxyPacketSetPendingIndex(s32 pendingIndex) {
+    pxyPendingIndex = pendingIndex;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AACC0);
+extern s32 pxyPendingEnabled;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AACC8);
+void pxyPacketEnablePending(void) {
+    pxyPendingEnabled = 1;
+}
+
+void pxyPacketDisablePending(void) {
+    pxyPendingEnabled = 0;
+}
+
+extern s32 pxyModeThreeEnabled;
+
+/* Zero selects mode 0 instead of 3 inside pxyPacketSelectMode's branch where the flag at 0x551290 is zero. */
+void pxyPacketSetModeFlagThree(s32 modeThreeEnabled) {
+    pxyModeThreeEnabled = modeThreeEnabled;
+}
+
+extern s32 pxyModeFourEnabled;
+
+/* Zero makes pxyPacketSelectMode choose the mode 3/0 group instead of mode 4. */
+void pxyPacketSetModeFlagFour(s32 modeFourEnabled) {
+    pxyModeFourEnabled = modeFourEnabled;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AACD0);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AAD00);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AADA0);
+extern s32 pxyLastArgWasZero;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AADB8);
+void pxyPacketSetFlagIfZero(s32 testedValue) {
+    if (testedValue != 0) {
+        pxyLastArgWasZero = 0;
+        return;
+    }
+    pxyLastArgWasZero = 1;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AADE0);
+extern s32 pxyCachedCameraArg;
+extern s32 pxyCachedCamera;
+s32 xglStudioSelectGetActiveCamera();
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AADE8);
+void pxyPacketCacheCamera(s32 cameraArg) {
+    pxyCachedCameraArg = cameraArg;
+    pxyCachedCamera = xglStudioSelectGetActiveCamera();
+}
+
+extern s32 pxyCacheValue;
+
+void pxyPacketSetCacheValue(s32 cacheValue) {
+    pxyCacheValue = cacheValue;
+}
+
+s32 pxyPacketGetCacheValue(void) {
+    return pxyCacheValue;
+}
 
 void nmlPacketClrTextureCache(void)
 {
@@ -201,7 +259,11 @@ void nmlPacketClrTextureCache(void)
     pxyTextureChannelCache = -1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", nmlPacketClrMatrixCache);
+extern s32 pxyMatrixCache;
+
+void nmlPacketClrMatrixCache(void) {
+    pxyMatrixCache = 0;
+}
 
 void xglPacketModeReset(void)
 {
@@ -213,12 +275,20 @@ void nmlPacketClrModelCache(void)
     pxyUploadedPacket = 0;
 }
 
-void xglPacketInitVuStateArg(int value)
+void xglPacketInitVuStateArg(int passIndex)
 {
     xglPacketInitVuState();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AAE38);
+void nmlPacketClrMatrixCache();
+
+void nmlPacketClrAll(void) {
+    xglPacketModeReset();
+    nmlPacketClrTextureCache();
+    nmlPacketClrModelCache();
+    nmlPacketClrMatrixCache();
+    xglPacketInitVuState();
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AAE70);
 
@@ -232,15 +302,95 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ABD60);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AC0D0);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AC478);
+void pxyPacketUploadUnpack(void *unpackData, u32 quadwordCount, s32 address) {
+    XglPacket *packet;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AC4F8);
+    packet = xglPacketGetCurrent();
+    sceVif1PkCnt(packet, 0U);
+    sceVif1PkOpenUpkCode(packet, address & 0xFFFF, 0x6CU, 1U, 1U);
+    sceVif1PkAddUpkData128N(packet, unpackData, quadwordCount);
+    sceVif1PkCloseUpkCode(packet);
+}
+
+extern unsigned char pxyLightColorTableMain[];
+extern unsigned char pxyLightColorTableAlternate[];
+extern unsigned char pxyLightParamTableMain[];
+extern unsigned char pxyLightParamTableAlternate[];
+extern unsigned char pxyLightExtraTable[];
+
+void pxyPacketUploadLightTables(s32 alternate) {
+    XglPacket *packet;
+    u8 *lightColorTable;
+    u8 *lightParamTable;
+
+    packet = xglPacketGetCurrent();
+    lightColorTable = pxyLightColorTableMain;
+    lightParamTable = pxyLightParamTableMain;
+    if (alternate != 0) {
+        lightColorTable = pxyLightColorTableAlternate;
+        lightParamTable = pxyLightParamTableAlternate;
+    }
+    sceVif1PkOpenUpkCode(packet, 0x35CU, 0x6CU, 1U, 1U);
+    sceVif1PkAddUpkData128N(packet, lightColorTable, 0x10U);
+    sceVif1PkCloseUpkCode(packet);
+    sceVif1PkOpenUpkCode(packet, 0x3BAU, 0x6CU, 1U, 1U);
+    sceVif1PkAddUpkData128N(packet, lightParamTable, 2U);
+    sceVif1PkCloseUpkCode(packet);
+    sceVif1PkOpenUpkCode(packet, 0x33CU, 0x6CU, 1U, 1U);
+    sceVif1PkAddUpkData128N(packet, pxyLightExtraTable, 1U);
+    sceVif1PkCloseUpkCode(packet);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", xglPacketInitVuState);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AC9F8);
+extern s32 pxyModeZeroPending;
+s32 func_001AAA00(s32 index);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ACA88);
+void pxyPacketEnterPlainMode(void) {
+    XglPacket *packet;
+    void *programData;
+    s32 programQwordCount;
+    s32 mscalTag;
+
+    packet = xglPacketGetCurrent();
+    xglPacketMode = 0;
+    programData = (void *) func_001AAA00(0);
+    programQwordCount = func_001AAA00(1);
+    sceVif1PkRef(packet, programData, programQwordCount, 0U, 0U, 0U);
+    sceVif1PkCnt(packet, 0U);
+    mscalTag = func_001AAA00(3);
+    sceVif1PkAddCode(packet, mscalTag | 0x14000000);
+    pxyModeZeroPending = 0;
+}
+
+void pxyPacketSelectMode(PxyPacketModeState *modeSelector) {
+    XglPacket *packet;
+    s32 packetMode;
+    void *programData;
+    s32 programQwordCount;
+
+    packet = xglPacketGetCurrent();
+    packetMode = 2;
+    if (!(modeSelector->selectFlags & 0x8000)) {
+        packetMode = 1;
+        if (!(modeSelector->gateRecord->gateFlags & 1)) {
+            packetMode = 4;
+            if (pxyModeFourEnabled == 0) {
+                packetMode = 3;
+                if (pxyModeThreeEnabled == 0) {
+                    packetMode = 0;
+                }
+            }
+        }
+    }
+    if (xglPacketMode != packetMode) {
+        xglPacketMode = packetMode;
+        programData = (void *) func_001AAA00(0);
+        programQwordCount = func_001AAA00(1);
+        sceVif1PkRef(packet, programData, programQwordCount, 0U, 0U, 0U);
+        sceVif1PkCnt(packet, 0U);
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ACB50);
 
@@ -262,13 +412,33 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD5A0);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD628);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD6B8);
+void xglPacketAddVifFlushIrq(void) {
+    XglPacket *packet;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD6F8);
+    packet = xglPacketGetCurrent();
+    sceVif1PkCnt(packet, 0U);
+    sceVif1PkAddCode(packet, 0x91000000U);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD738);
+void xglPacketAddVifFlush(void) {
+    XglPacket *packet;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD790);
+    packet = xglPacketGetCurrent();
+    sceVif1PkCnt(packet, 0U);
+    sceVif1PkAddCode(packet, 0x11000000U);
+}
+
+void xglPacketAddRefFlagged(void *refAddress, u32 qwc, u32 refControlBits) {
+    XglPacket *packet;
+    packet = xglPacketGetCurrent();
+    sceVif1PkRef(packet, refAddress, qwc, 0U, refControlBits, 0U);
+}
+
+void xglPacketAddRef(void *refAddress, u32 qwc) {
+    XglPacket *packet;
+    packet = xglPacketGetCurrent();
+    sceVif1PkRef(packet, refAddress, qwc, 0U, 0U, 0U);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD7D8);
 
@@ -286,44 +456,150 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE680);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE748);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE810);
+void *memcpy(void *dest, const void *src, s32 size);
+
+u8 *xglPacketCopyBytes(const void *sourceAddress, s32 byteLength) {
+    XglPacket *packet;
+    u8 *newCursor;
+
+    packet = xglPacketGetCurrent();
+    memcpy(packet->cursor, sourceAddress, byteLength);
+    newCursor = &packet->cursor[byteLength];
+    packet->cursor = newCursor;
+    return newCursor - byteLength;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE870);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE8C8);
+void xglMemCopy64(u8 *dest, const void *src, s32 count);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE928);
+u8 *xglPacketCopy64(const void *sourceAddress, s32 sixtyFourByteBlockCount) {
+    XglPacket *packet;
+    s32 copiedBytes;
+    u8 *newCursor;
+
+    packet = xglPacketGetCurrent();
+    copiedBytes = sixtyFourByteBlockCount << 6;
+    xglMemCopy64(packet->cursor, sourceAddress, sixtyFourByteBlockCount);
+    newCursor = packet->cursor + copiedBytes;
+    packet->cursor = newCursor;
+    return newCursor - copiedBytes;
+}
+
+void xglMemCopy16(u8 *dest, const void *src, s32 count);
+
+u8 *xglPacketCopy16(const void *sourceAddress, s32 quadwordCount) {
+    XglPacket *packet;
+    s32 copiedBytes;
+    u8 *newCursor;
+
+    packet = xglPacketGetCurrent();
+    copiedBytes = quadwordCount * 0x10;
+    xglMemCopy16(packet->cursor, sourceAddress, quadwordCount);
+    newCursor = packet->cursor + copiedBytes;
+    packet->cursor = newCursor;
+    return newCursor - copiedBytes;
+}
 
 /* Reserves count quadwords plus one in the current packet and returns the old write cursor, or 0 when the
  * reservation would run past the packet's top region. */
-u8 *func_001AE988(int count)
+u8 *xglPacketReserve(int quadwordCount)
 {
     XglPacket *packet;
     u8 *cursor;
     u8 *newCursor;
-    u32 size;
-    u8 *bufferEnd;
+    u32 reservedBytes;
+    u32 packetTop;
     u32 limit;
-    const XglPacket *view;
+    const XglPacket *constPacket;
 
     packet = xglPacketGetCurrent();
-    view = packet;
-    limit = view->limit;
-    bufferEnd = (u8 *) view->buffer + view->bufferSize;
-    packet->bufferSize = packet->bufferSize;
+    constPacket = packet;
+    limit = constPacket->limit;
+    packetTop = constPacket->buffer + constPacket->bufferSize;
     cursor = packet->cursor;
-    if (bufferEnd - limit - 0x8010 - (count << 4) <= (u32) cursor - limit) {
+    if (packetTop - limit - 0x8010 - (quadwordCount << 4) <= (u32) cursor - limit) {
         return 0;
     }
-    size = (count << 4) + 16;
-    newCursor = cursor + size;
-    *(u8 **) &packet->cursor = newCursor;
+    reservedBytes = (quadwordCount << 4) + 16;
+    newCursor = cursor + reservedBytes;
+    packet->cursor = newCursor;
     return cursor;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEA00);
+s32 xglPacketRoundUpToPowerOfTwo(s32 requestedCount) {
+    if (!(requestedCount >= 3)) {
+        return 2;
+    }
+    if (!(requestedCount >= 5)) {
+        return 4;
+    }
+    if (!(requestedCount >= 9)) {
+        return 8;
+    }
+    if (!(requestedCount >= 0x11)) {
+        return 0x10;
+    }
+    if (!(requestedCount >= 0x21)) {
+        return 0x20;
+    }
+    if (!(requestedCount >= 0x41)) {
+        return 0x40;
+    }
+    if (!(requestedCount >= 0x81)) {
+        return 0x80;
+    }
+    if (!(requestedCount >= 0x101)) {
+        return 0x100;
+    }
+    if (!(requestedCount >= 0x201)) {
+        return 0x200;
+    }
+    if (!(requestedCount >= 0x401)) {
+        return 0x400;
+    }
+    if (!(requestedCount >= 0x801)) {
+        return 0x800;
+    }
+    return 1;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEA90);
+s32 xglPacketCeilLogTwo(s32 requestedCount) {
+    if (!(requestedCount >= 3)) {
+        return 1;
+    }
+    if (!(requestedCount >= 5)) {
+        return 2;
+    }
+    if (!(requestedCount >= 9)) {
+        return 3;
+    }
+    if (!(requestedCount >= 0x11)) {
+        return 4;
+    }
+    if (!(requestedCount >= 0x21)) {
+        return 5;
+    }
+    if (!(requestedCount >= 0x41)) {
+        return 6;
+    }
+    if (!(requestedCount >= 0x81)) {
+        return 7;
+    }
+    if (!(requestedCount >= 0x101)) {
+        return 8;
+    }
+    if (!(requestedCount >= 0x201)) {
+        return 9;
+    }
+    if (!(requestedCount >= 0x401)) {
+        return 0xA;
+    }
+    if (!(requestedCount >= 0x801)) {
+        return 0xB;
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEB20);
 
@@ -337,13 +613,23 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AECF8);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AED28);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEDB8);
+extern s32 D_0055127C;
+
+void pxyPacketSetSecondCount(s32 secondaryCount) {
+    D_0055127C = secondaryCount;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEDC0);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEE40);
+extern s32 pxyPacketCount;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEE48);
+void pxyPacketResetCount(void) {
+    pxyPacketCount = 0;
+}
+
+s32 pxyPacketGetCount(void) {
+    return pxyPacketCount;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEE50);
 

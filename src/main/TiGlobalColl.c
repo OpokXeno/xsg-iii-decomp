@@ -32,7 +32,7 @@ typedef struct TiTransformCell {
     Matrix4 inverse;            /* +0x50 */
 } TiTransformCell;
 
-void func_0029BEE0(TiSampleBlock *block, int *param, int mode, int count);
+void func_0029BEE0(TiSampleBlock *sampledBlock, int *sampleCursor, int sampleMode, int count);
 void xglCurSetTranslate(f32 *translate);
 void xglCurMulRotateX(f32 angle);
 void xglCurMulRotateY(f32 angle);
@@ -49,28 +49,28 @@ void tiVu0LoadIdentityMatrix(void);
 /* Below this threshold the node slots are indexed by key; otherwise the keyed entries are searched. */
 #define TI_NODE_INDEXED_THRESHOLD 1.1f
 
-/* Builds the current matrix of the node entry for key: the entry's global matrix when apply is set (else the
- * identity), then its translate and its rotations Z, Y and X, stored into dst. Below the threshold the slots are
+/* Builds the current matrix of the node entry for key: the entry's global matrix when useGlobalMatrix is set (else the
+ * identity), then its translate and its rotations Z, Y and X, stored into nodeMatrix. Below the threshold the slots are
  * indexed by key; otherwise the first keyed entry with that id is used. */
-int tiMRPackageGetNodeMatrix(TiMRPackage *pMRPack, u32 key, Matrix4 dst, int apply) {
-    struct TiNodeTable *pStatus;
+int tiMRPackageGetNodeMatrix(TiMRPackage *pMRPack, u32 key, Matrix4 nodeMatrix, int useGlobalMatrix) {
+    struct TiNodeTable *nodePointTable;
     TiNodeSlot *indexedEntries;
     TiNodeKey *keyedEntries;
     TiNodeKey *found;
-    u32 entryIndex;
-    int result;
+    u32 keyedNodeIndex;
+    int isNodeFound;
 
-    result = 0;
-    pStatus = pMRPack->nodeTable;
-    if (pStatus == 0) {
-        return result;
+    isNodeFound = 0;
+    nodePointTable = pMRPack->nodeTable;
+    if (nodePointTable == 0) {
+        return isNodeFound;
     }
-    if (pStatus->threshold < TI_NODE_INDEXED_THRESHOLD) {
-        indexedEntries = pStatus->slots;
-        if (key >= pStatus->count) {
-            return result;
+    if (nodePointTable->threshold < TI_NODE_INDEXED_THRESHOLD) {
+        indexedEntries = nodePointTable->slots;
+        if (key >= nodePointTable->count) {
+            return isNodeFound;
         }
-        if (apply != 0) {
+        if (useGlobalMatrix != 0) {
             xglCurMatrixSet(pMRPack->globalMat[indexedEntries[key].matrixIndex]);
         } else {
             tiVu0LoadIdentityMatrix();
@@ -87,21 +87,21 @@ int tiMRPackageGetNodeMatrix(TiMRPackage *pMRPack, u32 key, Matrix4 dst, int app
         if (indexedEntries[key].rotation[0] != 0.0f) {
             xglCurMulRotateX(indexedEntries[key].rotation[0]);
         }
-        xglCurMatrixGet(dst);
-        result = 1;
+        xglCurMatrixGet(nodeMatrix);
+        isNodeFound = 1;
     } else {
-        keyedEntries = (TiNodeKey *) pStatus->slots;
+        keyedEntries = (TiNodeKey *) nodePointTable->slots;
         found = 0;
-        for (entryIndex = 0; entryIndex < pMRPack->nodeTable->count; entryIndex++) {
-            if (keyedEntries[entryIndex].id == key) {
-                found = &keyedEntries[entryIndex];
+        for (keyedNodeIndex = 0; keyedNodeIndex < pMRPack->nodeTable->count; keyedNodeIndex++) {
+            if (keyedEntries[keyedNodeIndex].id == key) {
+                found = &keyedEntries[keyedNodeIndex];
                 break;
             }
         }
         if (found == 0) {
-            return result;
+            return isNodeFound;
         }
-        if (apply != 0) {
+        if (useGlobalMatrix != 0) {
             xglCurMatrixSet(pMRPack->globalMat[found->matrixIndex]);
         } else {
             tiVu0LoadIdentityMatrix();
@@ -118,66 +118,64 @@ int tiMRPackageGetNodeMatrix(TiMRPackage *pMRPack, u32 key, Matrix4 dst, int app
         if (found->rotation[0] != 0.0f) {
             xglCurMulRotateX(found->rotation[0]);
         }
-        xglCurMatrixGet(dst);
-        result = 1;
+        xglCurMatrixGet(nodeMatrix);
+        isNodeFound = 1;
     }
-    return result;
+    return isNodeFound;
 }
 
-/* Writes the position of the node entry for key into dst with w = 1. Below the threshold the slots are indexed by
- * key; otherwise the first keyed entry with that id is used. With apply set, dst is then transformed by the
+/* Writes the position of the node entry for key into nodePoint with w = 1. Below the threshold the slots are indexed by
+ * key; otherwise the first keyed entry with that id is used. With useGlobalMatrix set, nodePoint is then transformed by the
  * global matrix that the entry names. */
-int tiMRPackageGetNodePoint(TiMRPackage *pMRPack, u32 key, Vector4 *dst, int apply) {
-    struct TiNodeTable *pStatus;
+int tiMRPackageGetNodePoint(TiMRPackage *pMRPack, u32 key, Vector4 *nodePoint, int useGlobalMatrix) {
+    struct TiNodeTable *nodePointTable;
     TiNodeSlot *indexedEntries;
     TiNodeKey *keyedEntries;
     TiNodeKey *found;
-    u32 entryIndex;
+    u32 keyedNodeIndex;
 
-    pStatus = pMRPack->nodeTable;
-    if (pStatus == 0) {
+    nodePointTable = pMRPack->nodeTable;
+    if (nodePointTable == 0) {
         return 0;
     }
-    if (pStatus->threshold < TI_NODE_INDEXED_THRESHOLD) {
-        indexedEntries = pStatus->slots;
-        if (key >= pStatus->count) {
+    if (nodePointTable->threshold < TI_NODE_INDEXED_THRESHOLD) {
+        indexedEntries = nodePointTable->slots;
+        if (key >= nodePointTable->count) {
             return 0;
         }
-        dst->x = indexedEntries[key].offset[0];
-        dst->y = indexedEntries[key].offset[1];
-        dst->z = indexedEntries[key].offset[2];
-        dst->w = 1.0f;
-        if (apply != 0) {
+        nodePoint->x = indexedEntries[key].offset[0];
+        nodePoint->y = indexedEntries[key].offset[1];
+        nodePoint->z = indexedEntries[key].offset[2];
+        nodePoint->w = 1.0f;
+        if (useGlobalMatrix != 0) {
             xglCurMatrixSet(pMRPack->globalMat[indexedEntries[key].matrixIndex]);
-            xglCurApplyVector(dst, dst);
+            xglCurApplyVector(nodePoint, nodePoint);
             return 1;
         }
         return 1;
     } else {
-        keyedEntries = (TiNodeKey *) pStatus->slots;
+        keyedEntries = (TiNodeKey *) nodePointTable->slots;
         found = 0;
-        for (entryIndex = 0; entryIndex < pMRPack->nodeTable->count; entryIndex++) {
-            if (keyedEntries[entryIndex].id == key) {
-                found = &keyedEntries[entryIndex];
+        for (keyedNodeIndex = 0; keyedNodeIndex < pMRPack->nodeTable->count; keyedNodeIndex++) {
+            if (keyedEntries[keyedNodeIndex].id == key) {
+                found = &keyedEntries[keyedNodeIndex];
                 break;
             }
         }
         if (found == 0) {
             return 0;
         }
-        dst->x = found->offset[0];
-        dst->y = found->offset[1];
-        dst->z = found->offset[2];
-        dst->w = 1.0f;
-        if (apply != 0) {
+        nodePoint->x = found->offset[0];
+        nodePoint->y = found->offset[1];
+        nodePoint->z = found->offset[2];
+        nodePoint->w = 1.0f;
+        if (useGlobalMatrix != 0) {
             xglCurMatrixSet(pMRPack->globalMat[found->matrixIndex]);
-            xglCurApplyVector(dst, dst);
+            xglCurApplyVector(nodePoint, nodePoint);
         }
         return 1;
     }
 }
-
-INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_002969A8);
 
 /* Sphere entry of a global collision set (0x20 bytes): the radius at +0x00 and the centre at +0x10. */
 typedef struct TiGlobalCollSphere {
@@ -185,30 +183,38 @@ typedef struct TiGlobalCollSphere {
     unsigned char unmodeled_04[12];
     Vector4 centre;             /* +0x10 */
 } TiGlobalCollSphere;
+typedef int s32;
+extern s32 D_004C9A00[];
+
+void tiGlobalCollClearCounters(void) {
+    D_004C9A00[0] = 0;
+    D_004C9A00[1] = 0;
+    D_004C9A00[2] = 0;
+}
 
 void assertFailed(const char *message, const char *file, int line);
 TiGlobalCollSet *tiGlobalCollGetHandle(void);
-extern const char D_005427F8[];
-extern const char D_00542800[];
-void func_00296B80(TiGlobalCollSet *handle, TiHrcDynamics *pNode, TiSolverState *body);
-void func_00296D28(TiGlobalCollSet *handle, TiHrcDynamics *pNode, TiSolverState *body);
-void func_00296F48(TiGlobalCollSet *handle, TiHrcDynamics *pNode, TiSolverState *body);
+extern const char tiGlobalCollAssertMessage[];
+extern const char tiGlobalCollAssertFile[];
+void func_00296B80(TiGlobalCollSet *collisionSet, TiHrcDynamics *dynamicsNode, TiSolverState *solverBody);
+void func_00296D28(TiGlobalCollSet *collisionSet, TiHrcDynamics *dynamicsNode, TiSolverState *solverBody);
+void func_00296F48(TiGlobalCollSet *collisionSet, TiHrcDynamics *dynamicsNode, TiSolverState *solverBody);
 
 /* Pushes the body out of one sphere: inside the sphere the body moves to its surface along the unit direction
  * from the centre, and its accumulator gains the push scaled by the penetration depth. */
-void tiGlobalCollPushOutSphere(TiGlobalCollSphere *sphere, void *unused1, TiSolverState *body) {
-    Vector4 offset;
+void tiGlobalCollPushOutSphere(TiGlobalCollSphere *sphere, void *unused1, TiSolverState *solverBody) {
+    Vector4 centreToBody;
     float lengthSquared;
     float distance;
     float depth;
 
-    offset.x = body->position.vector.x - sphere->centre.x;
-    offset.y = body->position.vector.y - sphere->centre.y;
-    offset.z = body->position.vector.z - sphere->centre.z;
-    if (__builtin_fabsf(offset.x) < sphere->radius) {
-        if (__builtin_fabsf(offset.y) < sphere->radius) {
-            if (__builtin_fabsf(offset.z) < sphere->radius) {
-                lengthSquared = offset.x * offset.x + offset.y * offset.y + offset.z * offset.z;
+    centreToBody.x = solverBody->position.vector.x - sphere->centre.x;
+    centreToBody.y = solverBody->position.vector.y - sphere->centre.y;
+    centreToBody.z = solverBody->position.vector.z - sphere->centre.z;
+    if (__builtin_fabsf(centreToBody.x) < sphere->radius) {
+        if (__builtin_fabsf(centreToBody.y) < sphere->radius) {
+            if (__builtin_fabsf(centreToBody.z) < sphere->radius) {
+                lengthSquared = centreToBody.x * centreToBody.x + centreToBody.y * centreToBody.y + centreToBody.z * centreToBody.z;
                 distance = __builtin_sqrtf(lengthSquared);
                 if (distance == 0.0f) {
                     distance = 0.000001f;
@@ -216,15 +222,15 @@ void tiGlobalCollPushOutSphere(TiGlobalCollSphere *sphere, void *unused1, TiSolv
                 if (distance < sphere->radius) {
                     depth = sphere->radius - distance;
                     distance = 1.0f / distance;
-                    offset.x = offset.x * distance;
-                    offset.y = offset.y * distance;
-                    offset.z = offset.z * distance;
-                    body->accumulator.vector.x = body->accumulator.vector.x + offset.x * sphere->radius * depth;
-                    body->accumulator.vector.y = body->accumulator.vector.y + offset.y * sphere->radius * depth;
-                    body->accumulator.vector.z = body->accumulator.vector.z + offset.z * sphere->radius * depth;
-                    body->position.vector.x = offset.x * sphere->radius + sphere->centre.x;
-                    body->position.vector.y = offset.y * sphere->radius + sphere->centre.y;
-                    body->position.vector.z = offset.z * sphere->radius + sphere->centre.z;
+                    centreToBody.x = centreToBody.x * distance;
+                    centreToBody.y = centreToBody.y * distance;
+                    centreToBody.z = centreToBody.z * distance;
+                    solverBody->accumulator.vector.x = solverBody->accumulator.vector.x + centreToBody.x * sphere->radius * depth;
+                    solverBody->accumulator.vector.y = solverBody->accumulator.vector.y + centreToBody.y * sphere->radius * depth;
+                    solverBody->accumulator.vector.z = solverBody->accumulator.vector.z + centreToBody.z * sphere->radius * depth;
+                    solverBody->position.vector.x = centreToBody.x * sphere->radius + sphere->centre.x;
+                    solverBody->position.vector.y = centreToBody.y * sphere->radius + sphere->centre.y;
+                    solverBody->position.vector.z = centreToBody.z * sphere->radius + sphere->centre.z;
                 }
             }
         }
@@ -240,13 +246,13 @@ INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_00296D28);
 /* Pushes the body out of one cylinder: its position is taken into the cylinder space with toLocal; inside the half
  * height and the radius, the horizontal distance is pulled back to the radius and the point is mapped back with
  * toWorld. */
-void tiGlobalCollPushOutCylinder(TiGlobalCollCylinder *cylinder, void *unused1, TiSolverState *body) {
+void tiGlobalCollPushOutCylinder(TiGlobalCollCylinder *cylinder, void *unused1, TiSolverState *solverBody) {
     Vector4 localPoint;
     float radialDistance;
 
-    localPoint.x = body->position.vector.x;
-    localPoint.y = body->position.vector.y;
-    localPoint.z = body->position.vector.z;
+    localPoint.x = solverBody->position.vector.x;
+    localPoint.y = solverBody->position.vector.y;
+    localPoint.z = solverBody->position.vector.z;
     localPoint.w = 1.0f;
     xglVectorMulMat(&localPoint, cylinder->toLocal, &localPoint);
     if (__builtin_fabsf(localPoint.y) < cylinder->halfHeight) {
@@ -262,9 +268,9 @@ void tiGlobalCollPushOutCylinder(TiGlobalCollCylinder *cylinder, void *unused1, 
             localPoint.x = localPoint.x * radialDistance * cylinder->radius;
             localPoint.z = localPoint.z * radialDistance * cylinder->radius;
             xglVectorMulMat(&localPoint, cylinder->toWorld, &localPoint);
-            body->position.vector.x = localPoint.x;
-            body->position.vector.y = localPoint.y;
-            body->position.vector.z = localPoint.z;
+            solverBody->position.vector.x = localPoint.x;
+            solverBody->position.vector.y = localPoint.y;
+            solverBody->position.vector.z = localPoint.z;
         }
     }
 }
@@ -273,16 +279,16 @@ INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_00296F48);
 
 /* Solves one body against the shapes of the current collision set: the three solver passes take the handle, the
  * node and the body in turn. */
-void tiGlobalCollSolveBody(TiHrcDynamics *pNode, TiSolverState *body) {
-    TiGlobalCollSet *handle;
+void tiGlobalCollSolveBody(TiHrcDynamics *dynamicsNode, TiSolverState *solverBody) {
+    TiGlobalCollSet *collisionSet;
 
-    handle = tiGlobalCollGetHandle();
-    if (pNode == 0) {
-        assertFailed(D_005427F8, D_00542800, 197);
+    collisionSet = tiGlobalCollGetHandle();
+    if (dynamicsNode == 0) {
+        assertFailed(tiGlobalCollAssertMessage, tiGlobalCollAssertFile, 197);
     }
-    func_00296B80(handle, pNode, body);
-    func_00296D28(handle, pNode, body);
-    func_00296F48(handle, pNode, body);
+    func_00296B80(collisionSet, dynamicsNode, solverBody);
+    func_00296D28(collisionSet, dynamicsNode, solverBody);
+    func_00296F48(collisionSet, dynamicsNode, solverBody);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_002970A8);
@@ -290,28 +296,28 @@ INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_002970A8);
 INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_00297100);
 
 /* Builds the cell's current matrix from the sampled translate, rotation and scale, then its inverse. */
-void tiTransformCellBuild(void *unused0, int mode, void *unused2, int param, TiTransformCell *cell) {
-    TiSampleBlock block;
+void tiTransformCellBuild(void *unused0, int sampleMode, void *unused2, int sampleCursor, TiTransformCell *cell) {
+    TiSampleBlock sampledBlock;
     TiScaleVector scale;
     TiScaleVector sample;
     int sampleParam;
 
-    sampleParam = param;
-    func_0029BEE0(&block, &sampleParam, mode, 9);
-    xglCurSetTranslate(&block.translate.x);
-    xglCurMulRotateZ(block.rotate.z);
-    xglCurMulRotateY(block.rotate.y);
-    xglCurMulRotateX(block.rotate.x);
-    sample.x = block.scaleX;
+    sampleParam = sampleCursor;
+    func_0029BEE0(&sampledBlock, &sampleParam, sampleMode, 9);
+    xglCurSetTranslate(&sampledBlock.translate.x);
+    xglCurMulRotateZ(sampledBlock.rotate.z);
+    xglCurMulRotateY(sampledBlock.rotate.y);
+    xglCurMulRotateX(sampledBlock.rotate.x);
+    sample.x = sampledBlock.scaleX;
     sample.y = 1.0f;
-    sample.z = block.scaleZ;
+    sample.z = sampledBlock.scaleZ;
     scale = sample;
     xglCurMulScaleXYZ(&scale.x);
     xglCurMatrixGet(cell->matrix);
     xglMatrixInverse(cell->inverse, cell->matrix);
     cell->unitWeight = 1.0f;
     cell->zero = 0.0f;
-    cell->blend = block.blend;
+    cell->blend = sampledBlock.blend;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/TiGlobalColl", func_00297240);

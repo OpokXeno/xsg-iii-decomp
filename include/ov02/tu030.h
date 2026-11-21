@@ -6,7 +6,7 @@
 
 #include "shared.h"
 
-/* A step of the battle step chain: ov01StepSetNext and ov01StackPush take one, and the chain driver calls it with its stack. */
+/* A step of the battle step chain: battleStackSetSuccessorStep and battleStackPush take one, and the chain driver calls it with its stack. */
 typedef void (*SaveStackStep)(struct SaveStack *context);
 
 /* Save stack of SAVE_STACK_LEVELS levels. `top` is the live value and `count` the depth. Level L has SAVE_STACK_LEVEL_CELLS
@@ -15,7 +15,7 @@ struct SaveStack {
     int unmodeled_00;
     union {
         int top;
-        SaveStackStep step;   /* the successor step ov01StepSetNext stores, and ov01StackPush pushes; the same word as top */
+        SaveStackStep step;   /* the successor step battleStackSetSuccessorStep stores, and battleStackPush pushes; the same word as top */
     };
     int unmodeled_08;
     int unmodeled_0c;

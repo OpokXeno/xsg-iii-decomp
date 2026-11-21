@@ -10,44 +10,93 @@
 typedef struct MapFixupEntryWords {
     unsigned char unmodeled_00[2];
     unsigned short keepId;              /* +0x02 */
-    unsigned int pointer04;             /* +0x04 */
-    unsigned int pointer08;             /* +0x08 */
-    unsigned int pointer0C;             /* +0x0C */
+    unsigned int vertexArrayAddress;             /* +0x04 */
+    unsigned int planeArrayAddress;             /* +0x08 */
+    unsigned int kindTableAddress;             /* +0x0C */
 } MapFixupEntryWords;
 
 /* Group of entries: type word at +0x00, entry count at +0x02, relocation flag at +0x03. */
 typedef struct MapFixupGroup {
-    unsigned short typeWord;            /* +0x00 */
-    unsigned char entryCount;           /* +0x02 */
+    unsigned short groupType;            /* +0x00 */
+    unsigned char blockRelativeOffsetCount;           /* +0x02 */
     unsigned char relocated;            /* +0x03 */
-    unsigned int firstEntry;            /* +0x04, entry array of block-relative offsets */
+    unsigned int blockRelativeOffsets;            /* +0x04, entry array of block-relative offsets */
 } MapFixupGroup;
 
 #include "main/tu352.h"
 
 MapFixupEntry *UnduDataGetHeader(int groupType, int keepId);
-MapRecordSet *mapSetupCollisionObject(Vector4 *position, const int *delta, MapCollisionObject *object);
-void mapBindAndSnapObject(Vector4 *position, MapCollisionObject *object);
+MapRecordSet *mapSetupCollisionObject(Vector4 *position, const int *delta, MapCollisionObject *collisionObject);
+void mapBindAndSnapObject(Vector4 *position, MapCollisionObject *collisionObject);
 extern void *mapCurrentBlock;
 extern int elvKeepOffFlags[];
 int printf(const char *format, ...);
 void UnduInit(MapFixupBlock *block);
-void mapSnapToNearestTriangle(Vector4 *position, MapCollisionObject *object);
-f32 func_002AA490(Vector4 *position, const Vector4 *delta, MapCollisionObject *object);
+void mapSnapToNearestTriangle(Vector4 *position, MapCollisionObject *collisionObject);
+f32 func_002AA490(Vector4 *position, const Vector4 *delta, MapCollisionObject *collisionObject);
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A68E0);
+typedef int s32;
+extern MapCollisionObject mapStaticCollisionObject;
+extern unsigned char mapStaticProbeStorage[];
+/* The probe word stored at mapStaticProbeStorage by mapStaticStoreProbe. */
+#define mapStaticProbeWord (*(MapRecordGroup **) mapStaticProbeStorage)
+extern unsigned char gUndulateActiveFlags[];
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A6928);
+/* View of MapRecordSet with its record count at +0x5C, which tu352.h leaves unmodeled. */
+typedef struct MapRecordSetCounted {
+    unsigned char unmodeled_00[0x5C];
+    int triangleCount;                    /* +0x5C */
+} MapRecordSetCounted;
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A6950);
+void mapInitStaticCollisionObject(void);
+MapRecordGroup *func_002A6FA8();
+void func_002A70E8(MapCollisionObject *collisionObject);
+
+void mapInitStaticCollisionObject(void) {
+    func_002A70E8(&mapStaticCollisionObject);
+    mapStaticCollisionObject.bits = 0x4800;
+    mapStaticCollisionObject.block = func_002A6FA8(0x700, -1);
+}
+
+void mapStaticStoreProbe(s32 probeIndex) {
+    MapRecordGroup *probeGroup;
+
+    probeGroup = func_002A6FA8(0x700, probeIndex);
+    mapStaticProbeWord = probeGroup;
+}
+
+s32 mapStaticObjectProbe(Vector4 *position, f32 *outDistance)
+{
+  f32 distance;
+  u8 hitKind;
+  if (mapStaticCollisionObject.block != 0)
+  {
+    distance = func_002AA490(position, 0, &mapStaticCollisionObject);
+    if (distance != (-1000.0f))
+    {
+      hitKind = mapStaticCollisionObject.kind;
+      *outDistance = distance;
+      return hitKind + 1;
+    }
+  }
+  return -1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A69D0);
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A69F0);
+u8 undulateFlagQuery(s32 flagNumber) {
+    return gUndulateActiveFlags[flagNumber];
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A6A08);
+s32 undulateFlagActive(s32 flagNumber) {
+    return gUndulateActiveFlags[flagNumber] & 1;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A6A20);
+extern s32 D_00551598;
+
+s32 undulateMaskTestBit(s32 bitIndex) {
+    return D_00551598 & (1 << bitIndex);
+}
 
 void mapTriangleEdgePlanes(void) {
     __asm__ __volatile__(
@@ -104,7 +153,7 @@ int mapPointOutsideTriangle(const Vector4 *point)
 
 /* Distance from the point origin to the plane through point with normal normal. */
 f32 mapPlaneDistance(const Vector4 *origin, const Vector4 *point, const Vector4 *normal) {
-    f32 result;
+    f32 planeDistance;
 
     __asm__ __volatile__("lqc2 vf2, 0(%0)" : : "r"(origin) : "memory");
     __asm__ __volatile__("lqc2 vf3, 0(%0)" : : "r"(point) : "memory");
@@ -113,33 +162,33 @@ f32 mapPlaneDistance(const Vector4 *origin, const Vector4 *point, const Vector4 
     __asm__ __volatile__("vmul.xz vf5, vf1, vf4" : : : "memory");
     __asm__ __volatile__("vaddz.x vf1, vf5, vf5z" : : : "memory");
     __asm__ __volatile__("vaddy.x vf5, vf1, vf3y" : : : "memory");
-    __asm__ __volatile__("qmfc2.ni %0, vf5" : "=r"(result) : : "memory");
-    return result;
+    __asm__ __volatile__("qmfc2.ni %0, vf5" : "=r"(planeDistance) : : "memory");
+    return planeDistance;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A6B18);
 
-void func_002A68E0(void);
+void mapInitStaticCollisionObject(void);
 void func_002A6B18(void);
-void func_002A4DA0(void);
-void func_002A4E60(void);
-void func_002A5238(void);
-void func_002A4E00(void);
-void func_002A62A0(void);
+void undulateSetAllFlags(void);
+void undulateResetVectors(void);
+void mapFlagTableReset(void);
+void undulateSetAllBits(void);
+void mapProbeInitDefault(void);
 
-void func_002A6F60(void) {
+void mapCollisionInit(void) {
     func_002A6B18();
-    func_002A4DA0();
-    func_002A4E60();
-    func_002A5238();
-    func_002A4E00();
-    func_002A62A0();
-    func_002A68E0();
+    undulateSetAllFlags();
+    undulateResetVectors();
+    mapFlagTableReset();
+    undulateSetAllBits();
+    mapProbeInitDefault();
+    mapInitStaticCollisionObject();
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A6FA8);
 
-void func_002A70E8(MapCollisionObject *object);
+void func_002A70E8(MapCollisionObject *collisionObject);
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A70E8);
 
@@ -158,16 +207,16 @@ INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A7AF8);
 #define MAP_HEIGHT_NONE -1000.0f
 
 /* Plane distance of the probe origin to a record, or MAP_HEIGHT_NONE when the origin is outside the triangle. */
-f32 mapRecordPlaneDistance(const MapRecordSet *set, const MapRecord *record)
+f32 mapRecordPlaneDistance(const MapRecordSet *triangleSet, const MapRecord *candidateTriangle)
 {
-    const Vector4 *origin = set->origin;
-    const Vector4 *vertices = set->vertices;
-    const Vector4 *vertex0 = vertices + record->vertexIndex[0];
-    const Vector4 *vertex1 = vertices + record->vertexIndex[1];
-    const Vector4 *vertex2 = vertices + record->vertexIndex[2];
-    __asm__ __volatile__("lqc2 vf16, 0(%0)" : : "r"(vertex0) : "memory");
-    __asm__ __volatile__("lqc2 vf17, 0(%0)" : : "r"(vertex1) : "memory");
-    __asm__ __volatile__("lqc2 vf18, 0(%0)" : : "r"(vertex2) : "memory");
+    const Vector4 *origin = triangleSet->origin;
+    const Vector4 *vertices = triangleSet->vertices;
+    const Vector4 *firstCorner = vertices + candidateTriangle->vertexIndex[0];
+    const Vector4 *secondCorner = vertices + candidateTriangle->vertexIndex[1];
+    const Vector4 *thirdCorner = vertices + candidateTriangle->vertexIndex[2];
+    __asm__ __volatile__("lqc2 vf16, 0(%0)" : : "r"(firstCorner) : "memory");
+    __asm__ __volatile__("lqc2 vf17, 0(%0)" : : "r"(secondCorner) : "memory");
+    __asm__ __volatile__("lqc2 vf18, 0(%0)" : : "r"(thirdCorner) : "memory");
     __asm__ __volatile__("vmr32.xyzw vf1, vf16" : : : "memory");
     __asm__ __volatile__("vmr32.xyzw vf2, vf17" : : : "memory");
     __asm__ __volatile__("vmr32.xyzw vf3, vf18" : : : "memory");
@@ -175,7 +224,7 @@ f32 mapRecordPlaneDistance(const MapRecordSet *set, const MapRecord *record)
     __asm__ __volatile__("vmr32.xyzw vf21, vf2" : : : "memory");
     __asm__ __volatile__("vmr32.xyzw vf22, vf3" : : : "memory");
     if (mapPointOutsideTriangle(origin) == 0) {
-        return mapPlaneDistance(origin, vertex0, set->planes + record->planeIndex);
+        return mapPlaneDistance(origin, firstCorner, triangleSet->planes + candidateTriangle->planeIndex);
     }
     return MAP_HEIGHT_NONE;
 }
@@ -189,21 +238,21 @@ INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A7E98);
 #define MAP_HIT_NEARER 1
 #define MAP_HIT_FIRST 2
 
-int mapCheckSubHeightCheck(MapRecordSet *set, MapRecord *record, float height)
+int mapCheckSubHeightCheck(MapRecordSet *triangleSet, MapRecord *candidateTriangle, float height)
 {
     int hitStatus;
     float hitGap;
     float collisionGap;
 
     hitStatus = MAP_HIT_NONE;
-    if (set->collisionHeight == MAP_HEIGHT_NONE) {
+    if (triangleSet->collisionHeight == MAP_HEIGHT_NONE) {
         hitStatus = MAP_HIT_FIRST;
     } else {
-        hitGap = set->origin->y - height;
+        hitGap = triangleSet->origin->y - height;
         if (hitGap < 0.0f) {
             hitGap = -hitGap;
         }
-        collisionGap = set->origin->y - set->collisionHeight;
+        collisionGap = triangleSet->origin->y - triangleSet->collisionHeight;
         if (collisionGap < 0.0f) {
             collisionGap = -collisionGap;
         }
@@ -213,12 +262,12 @@ int mapCheckSubHeightCheck(MapRecordSet *set, MapRecord *record, float height)
     }
     switch (hitStatus) {
     case MAP_HIT_NEARER:
-        if (set->origin->y + set->heightTolerance < height) {
+        if (triangleSet->origin->y + triangleSet->heightTolerance < height) {
             break;
         }
     case MAP_HIT_FIRST:
-        set->collisionHeight = height;
-        set->collisionRecord = record;
+        triangleSet->collisionHeight = height;
+        triangleSet->collisionRecord = candidateTriangle;
         break;
     default:
         break;
@@ -226,40 +275,79 @@ int mapCheckSubHeightCheck(MapRecordSet *set, MapRecord *record, float height)
     return hitStatus;
 }
 
-extern int D_005512FC;
-/* Plane distance of the probe origin to a record, or MAP_HEIGHT_NONE when the origin is outside the triangle. */ f32 mapRecordPlaneDistance(const MapRecordSet *set, const MapRecord *record);
-int func_002AA8B0(MapRecordSet *set, int flag);
-int mapCheckSubHeightCheck(MapRecordSet *set, MapRecord *record, float height);
+extern int mapCheckFilterEnabled;
+f32 mapRecordPlaneDistance(const MapRecordSet *triangleSet, const MapRecord *candidateTriangle);
+int func_002AA8B0(MapRecordSet *triangleSet, int flag);
+int mapCheckSubHeightCheck(MapRecordSet *triangleSet, MapRecord *candidateTriangle, float height);
 
 /* Walks the record set and passes each hit record to mapCheckSubHeightCheck unless its kind is 4. */
 void mapCheckAll(MapRecordSet *owner)
 {
-    MapRecord *record;
-    int recordIndex;
-    int kind;
-    f32 value;
-    MapRecordSet *set = owner;
+    MapRecord *candidateTriangle;
+    int triangleIndex;
+    int triangleKind;
+    f32 planeDistance;
+    MapRecordSet *triangleSet = owner;
 
-    record = set->records;
-    if (D_005512FC != 0 && func_002AA8B0(set, 0) != 0) {
+    candidateTriangle = triangleSet->records;
+    if (mapCheckFilterEnabled != 0 && func_002AA8B0(triangleSet, 0) != 0) {
         return;
     }
-    for (recordIndex = 0; recordIndex < (*(int *)&set->unmodeled_00[0x5C]); recordIndex++) {
-        value = mapRecordPlaneDistance(set, record);
-        if (value != MAP_HEIGHT_NONE) {
-            kind = record->kind;
-            if (set->kindTable != 0) {
-                kind = set->kindTable[kind].kindCode;
+    for (triangleIndex = 0; triangleIndex < ((MapRecordSetCounted *) triangleSet)->triangleCount; triangleIndex++) {
+        planeDistance = mapRecordPlaneDistance(triangleSet, candidateTriangle);
+        if (planeDistance != MAP_HEIGHT_NONE) {
+            triangleKind = candidateTriangle->kind;
+            if (triangleSet->kindTable != 0) {
+                triangleKind = triangleSet->kindTable[triangleKind].kindCode;
             }
-            if (kind != 4) {
-                mapCheckSubHeightCheck(set, record, value);
+            if (triangleKind != 4) {
+                mapCheckSubHeightCheck(triangleSet, candidateTriangle, planeDistance);
             }
         }
-        record++;
+        candidateTriangle++;
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A81D0);
+f32 func_002A7E98(MapRecordSet *, MapRecord *);
+
+void mapCheckAllByProbeDistance(MapRecordSet *triangleSet)
+{
+  MapRecord *candidateTriangle;
+  MapRecordKind *recordKinds;
+  MapRecordSet *owner;
+  f32 distance;
+  s32 triangleIndex;
+  s32 triangleKind;
+  owner = triangleSet;
+  candidateTriangle = owner->records;
+  if ((mapCheckFilterEnabled == 0) || (func_002AA8B0(triangleSet, 1) == 0))
+  {
+    triangleIndex = 0;
+    if (((MapRecordSetCounted *) owner)->triangleCount > 0)
+    {
+      do
+      {
+        distance = func_002A7E98(owner, candidateTriangle);
+        if (distance != MAP_HEIGHT_NONE)
+        {
+          recordKinds = owner->kindTable;
+          triangleKind = candidateTriangle->kind;
+          if (recordKinds != 0)
+          {
+            triangleKind = recordKinds[triangleKind].kindCode;
+          }
+          if (triangleKind != 4)
+          {
+            mapCheckSubHeightCheck(owner, candidateTriangle, distance);
+          }
+        }
+        triangleIndex += 1;
+        candidateTriangle += 1;
+      }
+      while (triangleIndex < ((MapRecordSetCounted *) owner)->triangleCount);
+    }
+  }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A82A8);
 
@@ -281,9 +369,9 @@ INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A9F70);
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002A9FD0);
 
-void mapBindAndSnapObject(Vector4 *position, MapCollisionObject *object) {
-    if (mapSetupCollisionObject(position, 0, object) != 0) {
-        mapSnapToNearestTriangle(position, object);
+void mapBindAndSnapObject(Vector4 *position, MapCollisionObject *collisionObject) {
+    if (mapSetupCollisionObject(position, 0, collisionObject) != 0) {
+        mapSnapToNearestTriangle(position, collisionObject);
     }
 }
 
@@ -298,8 +386,12 @@ f32 mapProbeScratchMove(Vector4 *position) {
     return func_002AA490(position, 0, probe);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002AA8A0);
+void mapHookNoop(void) {
 
-INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002AA8A8);
+}
+
+s32 mapHookReturnZero(void) {
+    return 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/undulate", func_002AA8B0);

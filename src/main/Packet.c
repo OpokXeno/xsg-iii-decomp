@@ -14,42 +14,53 @@ XglPacket *xglPacketGetCurrent(void)
     return pCurrentPacket;
 }
 
-void func_002F4878(XglPacket *packet, u32 buffer);
+void func_002F4878(XglPacket *packet, u32 packetBase);
 extern XglPacket D_008BC260[2];
-extern XglPacket *D_00551588;
+extern XglPacket *pSendPacket;
 
-void func_001998E0(u32 buffer, u32 size, float rate)
+void xglPacketInitDoubleBuffer(u32 packetBase, u32 packetHalfSize, float reservePercent)
 {
-    int reserve;
+    int reserveSize;
     XglPacket **currentPacket = &pCurrentPacket;
-    XglPacket **sendPacket = &D_00551588;
+    XglPacket **sendPacket = &pSendPacket;
 
-    if (rate < 1.0f) {
-        rate = 1.0f;
+    if (reservePercent < 1.0f) {
+        reservePercent = 1.0f;
     }
-    if (rate > 99.0f) {
-        rate = 99.0f;
+    if (reservePercent > 99.0f) {
+        reservePercent = 99.0f;
     }
-    reserve = size * rate / 100.0f;
-    if (reserve & 0xF) {
-        reserve = reserve - (reserve & 0xF) + 0x10;
+    reserveSize = packetHalfSize * reservePercent / 100.0f;
+    if (reserveSize & 0xF) {
+        reserveSize = reserveSize - (reserveSize & 0xF) + 0x10;
     }
-    func_002F4878(&D_008BC260[0], buffer);
-    func_002F4878(&D_008BC260[1], buffer + size);
-    D_008BC260[0].bufferSize = size;
-    D_008BC260[1].bufferSize = size;
-    D_008BC260[0].buffer = buffer;
-    D_008BC260[1].buffer = buffer + size;
+    func_002F4878(&D_008BC260[0], packetBase);
+    func_002F4878(&D_008BC260[1], packetBase + packetHalfSize);
+    D_008BC260[0].bufferSize = packetHalfSize;
+    D_008BC260[1].bufferSize = packetHalfSize;
+    D_008BC260[0].buffer = packetBase;
+    D_008BC260[1].buffer = packetBase + packetHalfSize;
     *sendPacket = 0;
-    D_008BC260[0].limit = buffer + size - reserve;
+    D_008BC260[0].limit = packetBase + packetHalfSize - reserveSize;
     D_008BC260[0].cursor = (u8 *) D_008BC260[0].limit;
-    D_008BC260[1].limit = buffer + size + size - reserve;
+    D_008BC260[1].limit = packetBase + packetHalfSize + packetHalfSize - reserveSize;
     D_008BC260[1].cursor = (u8 *) D_008BC260[1].limit;
     *currentPacket = &D_008BC260[0];
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/Packet", func_00199A20);
 
-INCLUDE_ASM("asm/main/nonmatchings/Packet", xglPacketSend);
+typedef int s32;
+void xglDmaDirectSrcChain(u32 channel, u32 address);
 
-INCLUDE_ASM("asm/main/nonmatchings/Packet", func_00199B88);
+void xglPacketSend(void) {
+    if (pSendPacket != 0) {
+        xglDmaDirectSrcChain(1, pSendPacket->start);
+    }
+}
+
+extern s32 xglPacketSendMode;
+
+void xglPacketSetSendMode(s32 sendMode) {
+    xglPacketSendMode = sendMode;
+}

@@ -1,10 +1,11 @@
 #include "common.h"
 #include "shared.h"
 
+struct XenoActor;
+
 void sefCreateEffect(void *object);
 int sefGetEntryFlags(struct XenoActor *actor);
 int sefIsHitActor(struct XenoActor *actor);
-struct XenoActor;
 
 #include "main/res_get_path.h"
 #include "main/tu352.h"
@@ -14,7 +15,7 @@ struct XenoActor;
 #include "ov02/tu060.h"
 #include "ov02/tu062.h"
 
-/* Indices of XenoActor.rsrc: the model pack (.pxy, xenoActor.c reads it as PxyHeader *), the texture (.txy), the
+/* Indices of XenoActor.rsrc: the model pack (.pxy, xenoActor.c reads it as PxyModelHeader *), the texture (.txy), the
  * hierarchy (.xhr, XenoActorAllocMatrices builds the matrices from it), the motion tables (.xap: slot n is
  * XAct_Rsrc_XAP + n, slots 0..5 = indices 4..9) and a few entries xenoActor.c reads as pointers. The names of the
  * first seven are those of the original's asserts; no assert names the rest. */
@@ -54,9 +55,9 @@ struct TecRecord {
     signed char secondRollThreshold;        /* +0x05: a second roll below this returns 0 */
     signed char type;                       /* +0x06: compared with 2 by calcHitDmg */
     union {
-        signed char kind;                   /* kind byte, mapped by calcHit and calcHitItem */
+        signed char hitKind;                   /* kind byte, mapped by calcHit and calcHitItem */
         unsigned char effectFlags;          /* the same byte as flags 0x1 to 0x40, read by calcUseItem */
-        signed char slot;                   /* the slot cmdTechniqueAttackQueue (cmd_exec.c) accepts below 8 */
+        signed char commandSlot;                   /* the slot cmdTechniqueAttackQueue (cmd_exec.c) accepts below 8 */
     } kindBits;                             /* +0x07 */
     unsigned short hitFlags;                /* +0x08: bits 0x4, 0x8, 0x10 and 0x20 are tested; 0x100 sets object
                                              * flag 0x2000 (unitCmdSetPhase) */
@@ -72,7 +73,7 @@ struct TecRecord {
     signed char rowGate[4];
     signed char inflictRate;                /* +0x16: chance the value of calcStatResist is taken from */
     signed char row;                        /* +0x17 */
-    unsigned short bits;                    /* +0x18: one bit per status of the row */
+    unsigned short rowStatusBits;                    /* +0x18: one bit per status of the row */
     short extent;                           /* +0x1A: the extent attackEffectsFinished (cmd_exec.c) passes to
                                              * unitEffectKeyFree */
     /* +0x1C: zero lets calcHitRowGate walk its row gates; unitSlotsClear tests 5, unitAttachRequest 1 */
@@ -86,7 +87,7 @@ TecRecord *tecRecordGet(int index);
 /* A unit has three child units (and three slot flags, one per child); the command table has 40 handlers. */
 #define UNIT_CHILD_COUNT 3
 
-/* Command-table indices (unitCommandTable in src/ov01/unit_cmd.c) that the unit move and mode handlers store as step status. */
+/* Command-table indices (unitCommandTable in X2 src/ov01/unit_cmd.c) that the unit move and mode handlers store as step status. */
 enum {
     UNIT_CMD_MODE_DISPATCH = 0x0A,
     UNIT_CMD_JUMP_EFFECT = 0x0B,    /* unitCmdEva: issues UNIT_CMD_MOVE_CHA_JUMP and effect 0xB */
@@ -124,14 +125,14 @@ struct FadeTask;
 #define UNIT_FLAG_HIT_PANELS 0x40000
 
 int unitEffectKeyFree(BattleUnit *unit, int keyHigh, int keyLow);
-void unitCmdSet(BattleUnit *object, Ov01Command *command);
+void unitCmdSet(BattleUnit *object, BattleUnitCommand *command);
 
 /*
  * Hit record of one target: calcHitRate rolls for it and calcHitDmg fills it; the status
  * steps (calcCrit, calcHitStateStep, calcHitRowGate, calcFollowKind) read it.
  */
 struct HitRecord {
-    struct BattleUnit *target;                      /* +0x00 */
+    struct BattleUnit *targetUnit;                      /* +0x00 */
     int reaction;                           /* +0x04: the UNIT_CMD_* the target answers with (unitJobTypeAtk) */
     int damage;                             /* +0x08: calcDmg result (calcDmgItem for type 2) */
     int followResult;                       /* +0x0c: calcFollowKind result, stored by calcDmg */
@@ -140,8 +141,8 @@ struct HitRecord {
     int stepState;                          /* +0x14: 1 to 3, written by calcHitRowGate and calcHitStateStep */
     union {
         /* calcHit result (calcHitItem for type 2): bit 8 set once taken, bit 9 blocks it */
-        int word;
-        unsigned char kind;                 /* its low byte: the hit kind calcStatAtk tests */
+        int hitResult;
+        unsigned char hitKind;                 /* its low byte: the hit kind calcStatAtk tests */
     } hitMode;                              /* +0x18 */
     int inflictRow;                         /* +0x1c: row calcStatAtk inflicts */
     int inflictMask;                        /* +0x20: bits calcStatAtk inflicts */
@@ -155,7 +156,7 @@ struct HitRecord {
  */
 struct AttackCommand {
     struct BattleUnit *attacker;                    /* +0x00 */
-    int kind;                               /* +0x04: 4 selects the base chance 200 in calcStatInflictRate */
+    int inflictKind;                               /* +0x04: 4 selects the base chance 200 in calcStatInflictRate */
     int actionIdx;                          /* +0x08: index tecRecordGet takes */
     int id;                                 /* +0x0C: the lookup key (the third argument of calcUseItem) */
 };
@@ -169,7 +170,7 @@ struct ActStepCounter {
     int hold;                               /* +0x04 */
     int multiplier;                         /* +0x08: 2, 4 or 10; monsGainSet's rate at phase 2 */
     union {
-        int cleared0C;                      /* +0x0C: cleared by actStepCounterSet */
+        int sharedWord;                      /* +0x0C: cleared by actStepCounterSet */
         int levelGranted;                   /* same word: set once calcDmg granted the attacker a level */
         int statPanelState;                 /* same word: menuUnitPanelOpen creates the stat panel while it is 1, then sets 2 */
     };
@@ -185,12 +186,12 @@ typedef struct CmdListBody {
     int command;                        /* +0x00 */
     unsigned char unmodeled_04[0x4];
     int code;                           /* +0x08: the key-row entry, technique or argument thinkDispatch passes */
-    /* +0x0C: the target unit of the think commands as a word, like CmdListEntry.unit (think command 14 stores 1
+    /* +0x0C: the target unit of the think commands as a word, like CmdListEntry.motionActor (think command 14 stores 1
      * here). One int member, not a union of a pointer and an int: a store through a union conflicts with every
      * load, and cmdExecute's original loads unit->stats before its arg.target store reaches memory. */
     struct {
-        int target;
-    } arg;
+        int thinkTargetUnit;
+    } commandTarget;
     int pairIndex;                      /* +0x10: the pair record unitPairPartnerFind reads; the battle lookup of
                                          * think command 3 */
     int attackKind;                     /* +0x14: copied into AttackCommand.kind by cmdFindFirstTarget */
@@ -211,7 +212,7 @@ enum {
     CMD_KIND_REFRESH = 8,               /* unitCmdRefreshPhase */
     CMD_KIND_THINK_END = 9,             /* unitCmdUnbind: the end of a unit's think step (thinkSendEnd) */
     CMD_KIND_CODE_WAIT = 14,            /* unitCmdMot: sets phase `code`, then waits for unitIsDone when the
-                                         * wait flag (arg.target) is set */
+                                         * wait flag (commandTarget) is set */
     CMD_KIND_REMOVE = 37                /* unitCmdRemove: unitRemove */
 };
 
@@ -219,7 +220,7 @@ enum {
 typedef struct EventQueueArgs {
     union {
         int actions;                    /* kind 3: the kind-4 records of the attack */
-        BattleUnit *unit;               /* the commanding unit (cmdExecute); kind 19 compares it with its own unit */
+        BattleUnit *commandingUnit;               /* the commanding unit (cmdExecute); kind 19 compares it with its own unit */
         int countdown;                  /* kind 20: the steps eventWaitCountdown has left */
     };                                  /* +0x00 */
     union {
@@ -227,22 +228,22 @@ typedef struct EventQueueArgs {
         int hits;                       /* kind 3: the kind-5 records (targets) of the attack */
     };                                  /* +0x04 */
     int pairIndex;                      /* +0x08: the command's pair record (CmdListBody.pairIndex, pairLinkGet) */
-    BattleUnit *target;                 /* +0x0C: the partner / stocked unit of events 0x10 and 0x12 */
+    BattleUnit *partnerUnit;                 /* +0x0C: the partner / stocked unit of events 0x10 and 0x12 */
 } EventQueueArgs;
 
 /* One 0x30-byte record of eventQueueTable (eventQueueTable); kind is its first word,
  * the payload layout depends on the appender. */
 typedef struct EventQueueEntry {
-    int kind;
+    int eventKind;
     union {
-        EventQueueArgs args;          /* eventQueueAdd */
+        EventQueueArgs addArgs;          /* eventQueueAdd */
         struct AttackCommand attack;  /* eventQueueAddAttackAction: the attack (unitJobTypeAtk) */
         struct {
-            BattleUnit *object;
-            CmdListBody args;
-        } kind1;                      /* eventQueueAddUnitCommand */
-        struct HitRecord kind5;       /* eventQueueAddAttackHit: the hit record of one target */
-    } data;
+            BattleUnit *commandUnit;
+            CmdListBody commandRecord;
+        } unitCommandEvent;                      /* eventQueueAddUnitCommand */
+        struct HitRecord attackHitEvent;       /* eventQueueAddAttackHit: the hit record of one target */
+    } eventPayload;
 } EventQueueEntry;
 
 void unitEffectStart(struct BattleUnit *object, int keyHigh, int keyLow);
@@ -250,18 +251,18 @@ void unitEffectStart(struct BattleUnit *object, int keyHigh, int keyLow);
 /* Effect request block sent to the main-side effect queue (sefCreateEffect /
  * sefStartEffectWithValue); the senders clear it first. */
 struct EffectRequest {
-    struct XenoActor *head;            /* +0x00: the actor of the owner unit (BattleUnit.unit) */
+    struct XenoActor *ownerActor;            /* +0x00: the actor of the owner unit (BattleUnit.motionActor) */
     struct XenoActor *partner;         /* +0x04: the other unit's actor of a pair technique (attackEffectsStart) */
-    struct XenoActor *target;          /* +0x08: the same actor again (cmd_exec.c senders); the hit target's actor */
-    struct XenoActor *parts[4];        /* +0x0C: the child actors of the unit (two each for a pair technique) */
+    struct XenoActor *targetActor;          /* +0x08: the same actor again (cmd_exec.c senders); the hit target's actor */
+    struct XenoActor *childActors[4];        /* +0x0C: the child actors of the unit (two each for a pair technique) */
     int key;                           /* +0x1C: (high << 12) | low, see createEffect */
     unsigned char unmodeled_20[0x24 - 0x20];
     short hitMode;                     /* +0x24: the hit record's hitMode (attackEffectsStart) */
     unsigned short hitCode;            /* +0x26: the actionBits byte and the target's row bits (attackEffectsStart) */
     unsigned char unmodeled_28[0x2C - 0x28];
-    short mode;                        /* +0x2C: 2 or 3 (unitEffectStartMode); the attacker's state
+    short effectMode;                        /* +0x2C: 2 or 3 (unitEffectStartMode); the attacker's state
                                         * (attackEffectsStart) */
-    short targetState;                 /* +0x2E: the target's state (attackEffectsStart) */
+    short targetUnitState;                 /* +0x2E: the target's state (attackEffectsStart) */
     unsigned char unmodeled_30[0x38 - 0x30];
 };
 
@@ -325,7 +326,7 @@ int attackHitsShow(EventQueueEntry *entry, struct AttackCommand *command);
 #define HIT_EFFECT_STEP2 0x14
 #define HIT_EFFECT_STEP3 0x13
 
-int attackHitsShowAndWait(EventQueueEntry *entry, struct AttackCommand *owner);
+int attackHitsShowAndWait(EventQueueEntry *eventEntry, struct AttackCommand *owner);
 
 /* Effect key ranges of the unit's own sequence: keys 700..733 move up by 100 for a technique of extent below 8. */
 #define TEC_EFFECT_SEQUENCE_FIRST 700
@@ -344,12 +345,71 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", attackHitsShow);
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", attackEffectsFinished);
 
-int attackHitsShowAndWait(EventQueueEntry *entry, struct AttackCommand *owner) {
-    attackHitsShow(entry, owner);
+int attackHitsShowAndWait(EventQueueEntry *eventEntry, struct AttackCommand *owner) {
+    attackHitsShow(eventEntry, owner);
     return attackEffectsFinished(owner);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230668);
+typedef int s32;
+/* One 0x18-byte record of the list: two flag bytes (cleared by saveScreenClearRecords). */
+struct McFileEntry {
+    unsigned char unmodeled_00[0x11];
+    signed char flagD;                      /* +0x11 */
+    signed char flagE;                      /* +0x12 */
+    unsigned char unmodeled_13[0x18 - 0x13];
+};
+struct McFileList {
+    unsigned char unmodeled_00[0x1C];
+    short cursor;                           /* +0x1C */
+    short previousCursor;                   /* +0x1E */
+    unsigned char unmodeled_20[0x0C];
+    unsigned short portResult[2];           /* +0x2C, indexed by port */
+    unsigned char unmodeled_30[0x34 - 0x30];
+    struct McFileEntry fileEntries[50];            /* +0x34 */
+    unsigned char unmodeled_4E4[0x4E8 - 0x4E4];
+    unsigned short fadeBase;                 /* screen +0x5BB04 */
+    unsigned char unmodeled_4EA[0x4FB - 0x4EA];
+    unsigned char fileStatusBytes[5];               /* screen +0x5BB17..+0x5BB1B, cleared by saveScreenClearStatusBytes */
+    unsigned char unmodeled_500[0x502 - 0x500];
+    short fadeLevel;                          /* screen +0x5BB1E: the level value saveScreenBeginLevelFade sets */
+};
+struct McScreen {
+    unsigned char unmodeled_000[0x150B0];
+    unsigned char scanBuffer[0x5B61C - 0x150B0];   /* +0x150B0: buffer xglMcRequest fills */
+    struct McFileList fileList;                             /* +0x5B61C */
+    unsigned char port;                             /* +0x5BB20 */
+    unsigned char levelIndex[0x5BB23 - 0x5BB21];
+    unsigned char uiState;                          /* +0x5BB23 */
+    unsigned char requestBits[1];
+    signed char flagA;                              /* +0x5BB25 */
+    signed char cardBusy;                           /* +0x5BB26 */
+    signed char fadeStage;                              /* +0x5BB27 */
+    unsigned char fadeProgress[1];
+    signed char flagC;                              /* +0x5BB29 */
+    unsigned char unmodeled_5BB2A[0x5BB2C - 0x5BB2A];
+    signed char pending;                            /* +0x5BB2C */
+    unsigned char unmodeled_5BB2D[0x5BB2E - 0x5BB2D];
+    signed char displayState;                          /* +0x5BB2E: set to 2 by saveScreenResetDisplayState */
+    unsigned char unmodeled_5BB2F[0x5BB40 - 0x5BB2F];
+};
+struct McCardRequest {
+    unsigned char unmodeled_00[4];
+    void *screen;
+    unsigned char unmodeled_08[4];
+    void (*callback)(void);
+};
+typedef signed char s8;
+/* A byte cell whose flag sits 7 bytes in: the screen's flag bytes are addressed from here. */
+typedef struct McStatusCell {
+    unsigned char unmodeled_00[7];
+    s8 statusFlag;
+} McStatusCell;
+s32 sheetSetIndex(s32);
+
+void saveScreenSetMessage(s32 sheetIndex) {
+    sheetSetIndex(0);
+    sheetSetIndex(sheetIndex);
+}
 
 /*
  * Script command ";mpeg2" (name and handler of its resCommandTable entry; proposed resCmdMpeg2).
@@ -377,19 +437,60 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002309C8);
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230A58);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230B60);
+extern struct McScreen *gSaveScreen;
+s32 counterEntryAdvancePhase();
+void saveScreenHandleError(struct McScreen *screen, unsigned short cardResult);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230BA8);
+void saveScreenHandleError(struct McScreen *screen, unsigned short cardResult) {
+    gSaveScreen->requestBits[0] &= 0xFE;
+    counterEntryAdvancePhase(&gSaveScreen->scanBuffer[0x46560]);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230BE8);
+void saveScreenSetRequestFlag(void) {
+    gSaveScreen->scanBuffer[0x4656B] = 0x80;
+    gSaveScreen->requestBits[0] |= 2;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230C50);
+void saveScreenBeginLevelFade(void) {
+    gSaveScreen->fadeStage = 1;
+    gSaveScreen->fadeProgress[0] = 0x80;
+    gSaveScreen->fileList.fadeLevel = (gSaveScreen->levelIndex[0] * 0x670) - gSaveScreen->fileList.fadeBase;
+}
+
+void saveScreenStepFlagB(void) {
+    if (((s8) gSaveScreen->fadeProgress[0] >= 0) && (gSaveScreen->fadeStage == 1)) {
+        gSaveScreen->fadeStage = 2;
+        return;
+    }
+    gSaveScreen->fadeStage = 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230CA8);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230D68);
+void saveScreenClearStatusBytes(void) {
+    s32 statusCellOffset;
+    s32 statusCellIndex;
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230DA0);
+    statusCellIndex = 0;
+    do {
+        statusCellOffset = statusCellIndex + 0x5BB10;
+        statusCellIndex += 1;
+        /* byte store at the screen's absolute address 0x5BB17 + index: this spelling keeps the codegen */
+        ((McStatusCell *) &gSaveScreen->unmodeled_000[statusCellOffset])->statusFlag = 0;
+    } while (statusCellIndex < 5);
+}
+
+void saveScreenClearStatusBytes();
+
+void saveScreenClearRecords(void) {
+    s32 fileEntryIndex;
+
+    for (fileEntryIndex = 0; fileEntryIndex < 50; fileEntryIndex++) {
+        gSaveScreen->fileList.fileEntries[fileEntryIndex].flagD = 0;
+        gSaveScreen->fileList.fileEntries[fileEntryIndex].flagE = 0;
+    }
+    saveScreenClearStatusBytes();
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00230DE8);
 
@@ -402,9 +503,9 @@ int xglJpegEncode(JpegEncodeRequest *request);
 extern XglRenderState sRender;
 extern unsigned long long D_003E6F80[24];
 
-int saveThumbnailEncode(int quality, unsigned char *output_buffer)
+int saveThumbnailEncode(int quality, unsigned char *jpegBuffer)
 {
-    JpegEncodeRequest params;
+    JpegEncodeRequest encodeRequest;
     unsigned long long bitbltWord;
 
     bitbltWord = 0x24020000 | (sRender.vram.draw_base << 5);
@@ -415,29 +516,37 @@ int saveThumbnailEncode(int quality, unsigned char *output_buffer)
     xglDmaDirectNormal(2, (unsigned int) D_003E6F80, 12);
     sceGsSyncPath(0, 0);
 
-    memset(&params, 0, sizeof(params));
-    params.outputBuffer = output_buffer;
-    params.frameBufferBase = 0x3800;
-    params.frameBufferWidth = 8;
-    params.width = 128;
-    params.height = 112;
-    params.originX = 0;
-    params.originY = 0;
+    memset(&encodeRequest, 0, sizeof(encodeRequest));
+    encodeRequest.outputBuffer = jpegBuffer;
+    encodeRequest.frameBufferBase = 0x3800;
+    encodeRequest.frameBufferWidth = 8;
+    encodeRequest.width = 128;
+    encodeRequest.height = 112;
+    encodeRequest.originX = 0;
+    encodeRequest.originY = 0;
     if (quality <= 0) {
-        params.luminanceQuality = 10;
-        params.chrominanceQuality = 10;
+        encodeRequest.luminanceQuality = 10;
+        encodeRequest.chrominanceQuality = 10;
     } else {
-        params.luminanceQuality = quality;
-        params.chrominanceQuality = quality;
+        encodeRequest.luminanceQuality = quality;
+        encodeRequest.chrominanceQuality = quality;
     }
-    params.samplingMode = 0;
-    xglJpegEncode(&params);
-    return params.outputSize;
+    encodeRequest.samplingMode = 0;
+    xglJpegEncode(&encodeRequest);
+    return encodeRequest.outputSize;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00231090);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002312E8);
+s32 xglJpegDecode();
+void saveThumbnailDecode(s32 encodedJpeg, s32 thumbnail) {
+    s32 decodeRequest[8];
+
+    memset(&decodeRequest[0], 0, 0x20U);
+    decodeRequest[0] = thumbnail + 0x58;
+    decodeRequest[1] = encodedJpeg;
+    xglJpegDecode(&decodeRequest[0]);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00231338);
 
@@ -465,7 +574,16 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00232D80);
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00233440);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002336E8);
+s32 func_00232D80();
+
+void saveScreenDrawLevel(void) {
+    s32 scaled;
+    s32 level;
+
+    scaled = (gSaveScreen->fileList.fadeLevel - 0x3F0) * gSaveScreen->fadeProgress[0];
+    level = (scaled >> 7) + 0x3F0;
+    func_00232D80(gSaveScreen->levelIndex[0], level >> 4, 0x80);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00233740);
 
@@ -475,7 +593,22 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00233DB8);
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00234118);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00234468);
+struct McScreen * memPoolAlloc();
+s32 bufferPointersRewind();
+s32 func_00213C18();
+s32 pagedTablePoolInit();
+
+s32 saveScreenCreate(void) {
+    struct McScreen *screen;
+
+    func_00213C18();
+    pagedTablePoolInit();
+    screen = memPoolAlloc(0x5BB40);
+    gSaveScreen = screen;
+    memset(screen, 0, 0x5BB40U);
+    bufferPointersRewind();
+    return 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002344C0);
 
@@ -495,7 +628,12 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00234F38);
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00235060);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002351F8);
+extern s32 D_004B4F8C[];
+
+void saveScreenResetDisplayState(void) {
+    D_004B4F8C[0] = 0;
+    gSaveScreen->displayState = 2;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00235220);
 
@@ -503,7 +641,13 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00235480);
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00235498);
 
-INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002357C0);
+s32 xglFontSetAlphaScale();
+s32 func_0021E390();
+
+void saveScreenDrawLabel(s32 alpha) {
+    xglFontSetAlphaScale(alpha & 0xFF);
+    func_0021E390(0x30, 0x78, &gSaveScreen->scanBuffer[0x46524], 0);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002357F8);
 
@@ -512,114 +656,114 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_002358D0);
 INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00235A40);
 
 /* The list object of the memory-card screen block (its cursor, per-port results). */
-struct McList {
-    unsigned char unmodeled_00[0x1C];
-    short cursor;                           /* +0x1C */
-    short previousCursor;                   /* +0x1E */
-    unsigned char unmodeled_20[0x0C];
-    unsigned short portResult[2];           /* +0x2C, indexed by port */
-    unsigned char unmodeled_30[0x504 - 0x30];
-};
 
-/* The screen block D_00550BC0 points to, at its absolute offsets. */
-struct McScreen {
-    unsigned char unmodeled_000[0x150B0];
-    unsigned char scanBuffer[0x5B61C - 0x150B0];   /* +0x150B0: buffer xglMcRequest fills */
-    struct McList list;                             /* +0x5B61C */
-    unsigned char port;                             /* +0x5BB20 */
-    unsigned char unmodeled_5BB21[0x5BB23 - 0x5BB21];
-    unsigned char uiState;                          /* +0x5BB23 */
-    unsigned char unmodeled_5BB24[1];
-    signed char flagA;                              /* +0x5BB25 */
-    signed char cardBusy;                           /* +0x5BB26 */
-    signed char flagB;                              /* +0x5BB27 */
-    unsigned char unmodeled_5BB28[1];
-    signed char flagC;                              /* +0x5BB29 */
-    unsigned char unmodeled_5BB2A[0x5BB2C - 0x5BB2A];
-    signed char pending;                            /* +0x5BB2C */
-};
+
+
+
+
+
+
+
+
+/* The screen block gSaveScreen points to, at its absolute offsets. */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /* The request block of xglMcRequest (data at +4, callback at +12). */
-struct McRequest {
-    unsigned char unmodeled_00[4];
-    void *data;
-    unsigned char unmodeled_08[4];
-    void (*callback)(void);
-};
 
-extern struct McScreen *D_00550BC0;
-extern unsigned char func_002357F8[];
-extern unsigned char func_002358D0[];
+
+
+
+
+
+
+extern struct McScreen *gSaveScreen;
+extern EventQueueEntry func_002357F8[];
+extern struct AttackCommand func_002358D0[];
 extern unsigned char func_00235220[];
 extern unsigned char func_00235480[];
 void func_00235A40(void);
 void func_00221A88(void *obj, int a, int b);
-void func_00221AF8(void *obj, short value);
+void addClampedCounter(void *obj, short value);
 void func_00221B40(void *obj, int value);
-void func_00221280(int a, int b);
-void seVoiceStartDefault(int value);
-void func_00230B60(struct McScreen *screen, unsigned short result);
+void mcStateSetupRequest(int a, int b);
+void seVoiceStartDefault(unsigned int handle);
+void saveScreenHandleError(struct McScreen *screen, unsigned short cardResult);
 int func_00213700(int id);
 int func_002306C0(int a, int b, int c);
-void func_00230668(int value);
+void saveScreenSetMessage(int sheetIndex);
 void func_00230818(int a, int b, void *c, void *d);
-int xglMcRequest(int port, int command, struct McRequest *request, void *buffer);
+int xglMcRequest(int port, int command, struct McCardRequest *cardRequest, void *buffer);
 void xglMcReset(void);
 
-void saveSlotListUpdate(int init)
+void saveSlotListUpdate(int listLoadRequested)
 {
-    struct McRequest request;
+    struct McCardRequest cardRequest;
 
-    if (init != 0) {
-        D_00550BC0->uiState = 0;
-        func_00230668(func_002306C0(func_00213700(0x291), D_00550BC0->port + 1, 0));
-        func_00221280(0, 0);
-        D_00550BC0->cardBusy = 1;
-        func_00221A88(&D_00550BC0->list, 198, 8);
-        func_00221AF8(&D_00550BC0->list, D_00550BC0->list.cursor);
-        D_00550BC0->pending = 0;
-        if (D_00550BC0->list.portResult[D_00550BC0->port] == 2) {
-            D_00550BC0->uiState = 1;
+    if (listLoadRequested != 0) {
+        gSaveScreen->uiState = 0;
+        saveScreenSetMessage(func_002306C0(func_00213700(0x291), gSaveScreen->port + 1, 0));
+        mcStateSetupRequest(0, 0);
+        gSaveScreen->cardBusy = 1;
+        func_00221A88(&gSaveScreen->fileList, 198, 8);
+        addClampedCounter(&gSaveScreen->fileList, gSaveScreen->fileList.cursor);
+        gSaveScreen->pending = 0;
+        if (gSaveScreen->fileList.portResult[gSaveScreen->port] == 2) {
+            gSaveScreen->uiState = 1;
             return;
         }
-        request.data = D_00550BC0;
-        request.callback = func_00235A40;
-        xglMcRequest(D_00550BC0->port, 8, &request, D_00550BC0->scanBuffer);
+        cardRequest.screen = gSaveScreen;
+        cardRequest.callback = func_00235A40;
+        xglMcRequest(gSaveScreen->port, 8, &cardRequest, gSaveScreen->scanBuffer);
         return;
     }
-    switch (D_00550BC0->uiState) {
+    switch (gSaveScreen->uiState) {
     case 0: {
-        struct McScreen *screen = D_00550BC0;
-        unsigned short result = screen->list.portResult[screen->port];
+        struct McScreen *screen = gSaveScreen;
+        unsigned short cardResult = screen->fileList.portResult[screen->port];
 
-        if ((unsigned short) (result - 1) >= 2 && result != 0xFF) {
+        if ((unsigned short) (cardResult - 1) >= 2 && cardResult != 0xFF) {
             screen->flagA = 0;
-            D_00550BC0->cardBusy = 0;
-            D_00550BC0->flagB = 0;
-            func_00230B60(screen, result);
-            D_00550BC0->flagC = 0;
+            gSaveScreen->cardBusy = 0;
+            gSaveScreen->fadeStage = 0;
+            saveScreenHandleError(screen, cardResult);
+            gSaveScreen->flagC = 0;
             xglMcReset();
-            func_00230818(func_002306C0(func_00213700(0x28C), D_00550BC0->port + 1, 0), 1,
+            func_00230818(func_002306C0(func_00213700(0x28C), gSaveScreen->port + 1, 0), 1,
                           func_00235220, func_00235480);
         }
         break;
     }
     case 1:
-        if (D_00550BC0->list.cursor == D_00550BC0->list.previousCursor) {
-            D_00550BC0->cardBusy = 0;
-            if (D_00550BC0->pending != 0) {
+        if (gSaveScreen->fileList.cursor == gSaveScreen->fileList.previousCursor) {
+            gSaveScreen->cardBusy = 0;
+            if (gSaveScreen->pending != 0) {
                 seVoiceStartDefault(9);
-                attackHitsShowAndWait((EventQueueEntry *) func_002357F8, (struct AttackCommand *) func_002358D0);
+                attackHitsShowAndWait(func_002357F8, func_002358D0);
             } else {
                 func_00230818(func_00213700(0x33C), 1, func_00235220, func_00235480);
             }
         }
         break;
     case 2:
-        D_00550BC0->cardBusy = 0;
-        func_00230818(func_002306C0(func_00213700(0x28C), D_00550BC0->port + 1, 0), 1,
+        gSaveScreen->cardBusy = 0;
+        func_00230818(func_002306C0(func_00213700(0x28C), gSaveScreen->port + 1, 0), 1,
                       func_00235220, func_00235480);
         break;
     }
-    func_00221B40(&D_00550BC0->list, 1);
+    func_00221B40(&gSaveScreen->fileList, 1);
 }

@@ -1,15 +1,20 @@
 #include "common.h"
 #include "shared.h"
 
-int scGetImmAdrImmIdx2(int base, unsigned short *table, int index);
-short scGetImmNumIdx(short *table, int index);
-int scOfsToAdr(int offset);
+int scGetImmAdrImmIdx2(int scriptBase, unsigned short *immediateTable, int immediateIndex);
+short scGetImmNumIdx(short *immediateTable, int immediateIndex);
+int scOfsToAdr(int encodedOffset);
 
 #define SCRIPT_ADDRESS_NONE 0xFFFF    /* absent table entry or address */
 
 INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ECA60);
 
-INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ECE70);
+typedef int s32;
+s32 func_001CF9C0(s32, s32, s32, s32);
+
+void scQueueDefaultRequest(void) {
+    func_001CF9C0(0, -3, 0, 0);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ECE98);
 
@@ -23,42 +28,42 @@ INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ECFF0);
 
 INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ED068);
 
-extern int D_00551034;
+extern int gSefExecSteps;
 void func_002022F0(int arg);
 
-void func_001ED2E8(void)
+void sefAdvanceStepCounter(void)
 {
-    D_00551034 += 1;
+    gSefExecSteps += 1;
     func_002022F0(0);
 }
 
-int scGetImmAdrImmIdx2(int base, unsigned short *table, int index)
+int scGetImmAdrImmIdx2(int scriptBase, unsigned short *immediateTable, int immediateIndex)
 {
-    int offset;
+    int halfwordOffset;
     int address;
 
-    offset = table[index];
-    if (offset == SCRIPT_ADDRESS_NONE ||offset == -1) {
-        offset = 0;
+    halfwordOffset = immediateTable[immediateIndex];
+    if (halfwordOffset == SCRIPT_ADDRESS_NONE || halfwordOffset == -1) {
+        halfwordOffset = 0;
     }
     address = 0;
-    if (offset != 0) {
-        address = base + offset * 2;
+    if (halfwordOffset != 0) {
+        address = scriptBase + halfwordOffset * 2;
     }
     return address;
 }
 
-short scGetImmNumIdx(short *table, int index)
+short scGetImmNumIdx(short *immediateTable, int immediateIndex)
 {
-    return table[index];
+    return immediateTable[immediateIndex];
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ED360);
 
-int scOfsToAdr(int offset)
+int scOfsToAdr(int encodedOffset)
 {
-    if (offset == SCRIPT_ADDRESS_NONE ||offset == -1) {
-        offset = 0;
+    if (encodedOffset == SCRIPT_ADDRESS_NONE || encodedOffset == -1) {
+        encodedOffset = 0;
     }
-    return offset;
+    return encodedOffset;
 }

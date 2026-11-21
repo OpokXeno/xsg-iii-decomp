@@ -10,18 +10,14 @@ The Sony SDK and public libraries do not need to be recovered.
 
 ## Progress
 
-Recovery has not started: the four files rebuild byte for byte from disassembly, and no
-function is C yet. The build system, tools and compile contracts come from the
-[Xenosaga Episode II](https://bytematch.dev/OpokXeno/xsg-ii-decomp) project.
-
-Recovered 1,135 of 7,286 in-scope game function(s) (15.578%).
+Recovered 3,888 of 7,286 in-scope game function(s) (53.363%).
 
 | Version | Target | Functions | Progress |
 | --- | --- | ---: | ---: |
-| NTSC-U | `SLUS_213.89` | 1,014 / 5,594 | 18.127% |
-| NTSC-U | `OV01.OVL` | 7 / 21 | 33.333% |
-| NTSC-U | `OV02.OVL` | 91 / 1,364 | 6.672% |
-| NTSC-U | `OV04.OVL` | 23 / 307 | 7.492% |
+| NTSC-U | `SLUS_213.89` | 3,033 / 5,594 | 54.219% |
+| NTSC-U | `OV01.OVL` | 13 / 21 | 61.905% |
+| NTSC-U | `OV02.OVL` | 756 / 1,364 | 55.425% |
+| NTSC-U | `OV04.OVL` | 86 / 307 | 28.013% |
 
 ## Building
 

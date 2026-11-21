@@ -3,9 +3,9 @@
 
 /* Row-major 4x4 float matrix. */
 
-int MMathMatrixBetweenVectors(Matrix4 *destination, const Vector4 *from, const Vector4 *to);
+int MMathMatrixBetweenVectors(Matrix4 *rotation, const Vector4 *fromDirection, const Vector4 *toDirection);
 
-/* Builds in destination the rotation that turns the unit vector from onto
+/* Builds in rotation the rotation that turns the unit vector from onto
  * the unit vector to: the half-angle quaternion (cross(from, to) / s, s / 2)
  * with s = sqrt(2 * (1 + dot(from, to))), expanded to a 4x4 matrix. When s is
  * below 0.01 (opposite vectors) it uses the half turn about y instead and
@@ -13,10 +13,10 @@ int MMathMatrixBetweenVectors(Matrix4 *destination, const Vector4 *from, const V
  * 0.01 threshold is the assembler's li.s literal. The original keeps an
  * untouched 16-byte frame: without the unused scratch quadword gcc drops the
  * addiu $sp pair (fd.sh: 57 insns for 59). */
-int MMathMatrixBetweenVectors(Matrix4 *destination, const Vector4 *from, const Vector4 *to)
+int MMathMatrixBetweenVectors(Matrix4 *rotation, const Vector4 *fromDirection, const Vector4 *toDirection)
 {
-    int rotated;
-    Vector4 scratch;
+    int isRotatedHalfTurn;
+    Vector4 frameScratch;
 
     __asm__ __volatile__(
         ".set noreorder\n"
@@ -78,10 +78,10 @@ int MMathMatrixBetweenVectors(Matrix4 *destination, const Vector4 *from, const V
         "sqc2 vf7, 0x10(%1)\n"
         "sqc2 vf6, 0(%1)\n"
         ".set reorder\n"
-        : "=r"(rotated)
-        : "r"(destination), "r"(from), "r"(to)
+        : "=r"(isRotatedHalfTurn)
+        : "r"(rotation), "r"(fromDirection), "r"(toDirection)
         : "$8", "$f8", "$f9", "memory");
-    return rotated;
+    return isRotatedHalfTurn;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/m_se_obj", func_0025BA50);
