@@ -55,6 +55,8 @@
    "0x004add40": "gameSynopsisPanelRectPacket",
    "0x004b1d50": "actShadowBeginQuads",
    "0x004b1df0": "Tail_10",
+   "0x004b1e90": "fontColorPatternA",
+   "0x004b2690": "fontColorPatternB",
    "0x004b2e50": "asciiEucTable",
    "0x004b3058": "fontNibbleMasks",
    "0x004b30a0": "fontPlaneUploadSetup",

@@ -2,6 +2,7 @@
 #include "shared.h"
 
 #include "main/Packet.h"
+#include "main/xgl_render.h"
 
 
 XglPacket *xglPacketGetCurrent(void);
@@ -29,12 +30,8 @@ typedef struct XglTextureTransSet {
 #define TEXTURE_TRANS_REGION_AD 10 /* +0x50: TRXREG data */
 extern u64 D_004C7DC0[TEXTURE_TRANS_SETUP_WORDS / 2];
 
-/* The render state as this TU reads it: the texture buffer base page at +0x12. */
-typedef struct XglRenderTextureBaseView {
-    u8 unmodeled_00[0x12];
-    u16 textureBase; /* +0x12 */
-} XglRenderTextureBaseView;
-extern XglRenderTextureBaseView D_004C8390;
+/* The render state; the texture transfer reads its texture buffer base page. */
+extern XglRenderStateBlock D_004C8390;
 
 void sceVif1PkCnt(XglPacket *packet, u32 flag);
 void sceVif1PkAddDataN(XglPacket *packet, void *data, u32 count);
@@ -56,7 +53,7 @@ void func_001997D0(XglTextureTransSet *set)
         } else {
             blockWidth = entry->size >> 16;
         }
-        D_004C7DC0[TEXTURE_TRANS_BITBLT_AD] = ((u64) (((D_004C8390.textureBase << 11) + entry->vramOffset) >> 6) << 32)
+        D_004C7DC0[TEXTURE_TRANS_BITBLT_AD] = ((u64) (((D_004C8390.texture_base << 11) + entry->vramOffset) >> 6) << 32)
             | ((u64) blockWidth << 48);
         D_004C7DC0[TEXTURE_TRANS_REGION_AD] = width | ((u64) entry->height << 32);
         sceVif1PkCnt(pCurrentPacket, 0);

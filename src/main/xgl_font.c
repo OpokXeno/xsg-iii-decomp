@@ -1479,14 +1479,11 @@ void xglFontSetFlags(int fontFlags)
     xglFontStateFlags[0] = fontFlags & (0xFFFF & ~FONT_STATE_DEBUG_PRINT);
 }
 
-/* Four 16x16 colour patterns, each the left or right half of 32-word rows: two images of
- * 16 rows x 32 words, the first at D_004B1E90 (left) / D_004B1ED0 (right), the second at
- * D_004B2690 / D_004B26D0. */
+/* Four 16x16 colour patterns: the left and right halves of two images of 16 rows x 32 words
+ * (the splat labels D_004B1ED0 / D_004B26D0 mark the right halves). */
 #define FONT_PATTERN_SIZE 16
-extern unsigned int D_004B1E90[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
-extern unsigned int D_004B1ED0[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
-extern unsigned int D_004B2690[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
-extern unsigned int D_004B26D0[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
+extern unsigned int fontColorPatternA[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
+extern unsigned int fontColorPatternB[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
 
 /* Fills the four patterns from the four colours: the colour index runs along the row (x & 3),
  * in 4x2 cells ((x >> 2) & 1, (y & 1) << 1), in 8x2-row cells ((x >> 3) & 1, y & 2), and down
@@ -1497,28 +1494,28 @@ void func_00185B68(const unsigned int *colors)
     int x;
     int y;
 
-    pixel = D_004B1E90[0];
+    pixel = &fontColorPatternA[0][0];
     for (y = 0; y < FONT_PATTERN_SIZE; y++) {
         for (x = 0; x < FONT_PATTERN_SIZE; x++) {
             *pixel++ = colors[x & 3];
         }
         pixel += FONT_PATTERN_SIZE;
     }
-    pixel = D_004B1ED0[0];
+    pixel = &fontColorPatternA[0][FONT_PATTERN_SIZE];
     for (y = 0; y < FONT_PATTERN_SIZE; y++) {
         for (x = 0; x < FONT_PATTERN_SIZE; x++) {
             *pixel++ = colors[((x >> 2) & 1) | ((y << 1) & 2)];
         }
         pixel += FONT_PATTERN_SIZE;
     }
-    pixel = D_004B2690[0];
+    pixel = &fontColorPatternB[0][0];
     for (y = 0; y < FONT_PATTERN_SIZE; y++) {
         for (x = 0; x < FONT_PATTERN_SIZE; x++) {
             *pixel++ = colors[((x >> 3) & 1) | (y & 2)];
         }
         pixel += FONT_PATTERN_SIZE;
     }
-    pixel = D_004B26D0[0];
+    pixel = &fontColorPatternB[0][FONT_PATTERN_SIZE];
     for (y = 0; y < FONT_PATTERN_SIZE; y++) {
         for (x = 0; x < FONT_PATTERN_SIZE; x++) {
             *pixel++ = colors[(y >> 2) & 3];
