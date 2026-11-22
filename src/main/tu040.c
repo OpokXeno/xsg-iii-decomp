@@ -1,25 +1,41 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu040", func_0019E148);
-
 typedef int s32;
 typedef signed char s8;
 typedef unsigned char u8;
-s32 func_0019E148();
-
-void pxyFinishInit(void) {
-    func_0019E148();
-}
 
 extern unsigned char gPxyModelRenderStateStorage[];
+
+/* The 16-byte tail of a batch table. As in X2's PxyBatchTableTail the record is doubleword aligned: with a
+ * word-aligned record GCC folds the field offset into the loop pointer, the original keeps it as the store offset. */
+typedef union PxyBatchTableTail {
+    struct {
+        s32 unk2000;
+        s32 unk2004;
+        s32 count;                  /* +0x2008 */
+        s32 unk200C;
+    };
+    unsigned long long doublewords[2];
+} PxyBatchTableTail;
+
+/* One 0x2010-byte batch table (nml_model_set_045.c's PxyBatchTable, batches left opaque here). */
+typedef struct PxyBatchTable {
+    u8 batches[0x2000];
+    PxyBatchTableTail tail;         /* +0x2000 */
+} PxyBatchTable;
 
 /* Module globals at gPxyModelRenderStateStorage (pxy); offsets as used by the functions below, gaps are unknown. */
 struct PxyModelRenderState {
     u8 unk000[0x180];
     float lightSlotTable[24][4];    /* +0x180: X2 pxyLightSlotTable; x of the first seven rows set to 1 */
-    u8 unk300[0x680 - 0x300];
+    u8 unk300[0x670 - 0x300];
+    s32 overlayBatchCount;          /* +0x670 (nml_model_set_045.c's name) */
+    s32 unk674;
+    s32 unk678;
+    s32 unk67C;
     s32 packetSlotWriteCursor;
-    u8 unk684[0x8];
+    void *firstBatch;               /* +0x684 (nml_model_set_045.c's name) */
+    u8 unk688[0x4];
     s32 unk68C;
     s32 unk690;
     s32 unk694;                     /* +0x694: cleared with the entry table */
@@ -37,14 +53,44 @@ struct PxyModelRenderState {
     s32 translucentEntryCursor;
     float opaqueEntryUsagePercent;  /* +0x6E0 */
     float translucentEntryUsagePercent; /* +0x6E4 */
-    u8 unk6E8[0xC];
+    u8 unk6E8[0x8];
+    s32 unk6F0;
     s32 unk6F4;
     u8 unk6F8[0x8];
     void (*drawCallbacks[16])(int); /* +0x700 */
+    u8 unk740[0xA70 - 0x740];
+    PxyBatchTable batchTables[2];   /* +0xA70: one per draw pass */
 };
 
 /* Typed view of gPxyModelRenderStateStorage as the module globals. */
 #define gPxyModelRenderState (*(struct PxyModelRenderState *) gPxyModelRenderStateStorage)
+
+void *memset(void *destination, int value, unsigned int size);
+
+/* Empties both batch tables and the batch list words (X2 pxyResetBatchTables). */
+void func_0019E148(void)
+{
+    int i;
+
+    for (i = 0; i < 2; i++) {
+        gPxyModelRenderState.batchTables[i].tail.count = 0;
+        gPxyModelRenderState.batchTables[i].tail.unk2000 = 0;
+        gPxyModelRenderState.batchTables[i].tail.unk2004 = 0;
+        memset(gPxyModelRenderState.batchTables[i].batches, 0, sizeof(gPxyModelRenderState.batchTables[i].batches));
+    }
+    gPxyModelRenderState.unk678 = 0;
+    gPxyModelRenderState.overlayBatchCount = 0;
+    gPxyModelRenderState.unk674 = 0;
+    gPxyModelRenderState.firstBatch = 0;
+    gPxyModelRenderState.unk6F0 = 0;
+    gPxyModelRenderState.unk67C = 0;
+}
+
+void func_0019E148(void);
+
+void pxyFinishInit(void) {
+    func_0019E148();
+}
 
 void pxyClearPacketSlots(void) {
     s32 packetSlotNumber;
