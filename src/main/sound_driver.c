@@ -48,16 +48,26 @@ typedef union SoundControl {
     /* The head has a slot's layout too; soundSlotReopen indexes the slots as soundSlotRecords[index + 1]. */
     SoundSlot soundSlotRecords[3];
 } SoundControl;
+/* One sound channel's state word: state in the second byte, a counter in the first. */
+typedef union SoundChannelState {
+    int word;
+    unsigned short half;   /* counter | state << 8 */
+    struct {
+        unsigned char counter;
+        unsigned char state;
+    } bytes;
+} SoundChannelState;
+
 typedef struct SoundRecordBlock {
     unsigned char master_volume; /* +0x00: scales the level of slot 0 */
     unsigned char volumeLevels[3];
     int current_song;            /* +0x04 */
     int driver_work;             /* +0x08 */
-    unsigned char unmodeled_0C[4];
+    VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as D_004C7044) */
     int reset_word;              /* +0x10 */
     int lookupTable[279];        /* +0x14 */
     unsigned char unmodeled_470[0x534 - 0x470];
-    int table_b[63];             /* +0x534 */
+    SoundChannelState table_b[63]; /* +0x534: channels 1..63, see soundApplySettings */
     SoundSlot soundSlotRecords[4]; /* +0x630 */
 } SoundRecordBlock;
 typedef signed char s8;
@@ -493,7 +503,67 @@ void soundDriverSetStreamMode(s32 streamEnable) {
     func_00180978(0, 0xA0000900, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", soundApplySettings);
+/* SoundChannelState.state values, per soundApplySettings. */
+#define SOUND_CHANNEL_STARTING 0 /* next pass: playing */
+#define SOUND_CHANNEL_PLAYING 1  /* cleared when the counter is 0 or func_0017ECA8 reports it done */
+#define SOUND_CHANNEL_STOPPING 2 /* func_0017E970 stops it, then playing with counter 0 */
+#define SOUND_CHANNEL_COUNT 64
+#define SOUND_CHANNEL_PLAYING_IDLE (SOUND_CHANNEL_PLAYING << 8)
+
+int seVolumeRampStep(VolumeRamp *ramp);
+void soundOutputVolumeWrite(s32 outputVolume);
+void func_0017F210(void);
+void func_00160200(void);
+int func_0017ECA8(unsigned char channel);
+void func_0017E970(unsigned char channel);
+
+/* Per frame: steps the ramps of the open sound slots and the output volume ramp, runs the driver
+ * services and advances every channel's state. */
+void soundApplySettings(void)
+{
+    SoundSlot *soundSlot;
+    SoundChannelState *channel;
+    int i;
+    int level;
+
+    soundSlot = gSoundRecordBlock.soundSlotRecords;
+    for (i = 0; i < 4; i++) {
+        if (soundSlot->voiceWork.voiceWorkBuffer != 0) {
+            if (seVolumeRampStep(&soundSlot->ramp) >= 0) {
+                soundSlotApply(soundSlot);
+            }
+        }
+        soundSlot++;
+    }
+    level = seVolumeRampStep(&gSoundRecordBlock.master_ramp);
+    if (level >= 0) {
+        soundOutputVolumeWrite(level * 0x102);
+    }
+    func_0017F210();
+    func_00160200();
+    channel = gSoundRecordBlock.table_b;
+    for (i = 1; i < SOUND_CHANNEL_COUNT; i++) {
+        if (channel->half != 0) {
+            switch (channel->half >> 8) {
+            case SOUND_CHANNEL_STARTING:
+                channel->bytes.state++;
+                break;
+            case SOUND_CHANNEL_PLAYING:
+                if (channel->half == SOUND_CHANNEL_PLAYING_IDLE) {
+                    channel->word = 0;
+                } else if (func_0017ECA8(i) == 0) {
+                    channel->word = 0;
+                }
+                break;
+            case SOUND_CHANNEL_STOPPING:
+                func_0017E970(i);
+                channel->word = SOUND_CHANNEL_PLAYING_IDLE;
+                break;
+            }
+        }
+        channel++;
+    }
+}
 
 void soundSetFullVolume(void) {
     gSoundRecordBlock.master_volume = 0x7F;
