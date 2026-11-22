@@ -1106,6 +1106,8 @@
    "0x004c7c60": "gCameraDefaultClipRange",
    "0x004c7c70": "gCameraDefaultPortEffect",
    "0x004c7c80": "gCameraDefaultRotation",
+   "0x004c7d00": "gCameraResetAngleDelta",
+   "0x004c7d10": "gCameraResetPlaceDelta",
    "0x004c7c90": "gCameraDefaultAngleVelocity",
    "0x004c7ca0": "gCameraDefaultAngleDelta",
    "0x004c7cb0": "gCameraDefaultPosition",

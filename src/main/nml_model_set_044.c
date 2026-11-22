@@ -163,7 +163,15 @@ void pxySetLightPtr(XglLightSet *light)
     pxyCurrentLight = light;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F308);
+#include "quadword.h"
+
+/* The matrix func_0019F308 stores (nml_model_set .bss). */
+extern Matrix4 D_008C2CA0;
+
+void func_0019F308(Matrix4 matrix)
+{
+    QuadwordCopyMatrix(D_008C2CA0, matrix);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F338);
 

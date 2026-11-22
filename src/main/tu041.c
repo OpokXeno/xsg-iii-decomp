@@ -41,7 +41,25 @@ void pxyStateSetDirty(void) {
     gPxyDirtyFlag = 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu041", func_0019E7F0);
+typedef struct PxyModelRenderState {
+    unsigned char unmodeled_000[0x300];
+    unsigned int renderStatus; /* +0x300 */
+    unsigned char unmodeled_304[0x3E4 - 0x304];
+    int stateFlags3E4; /* +0x3E4: bit 0 set by func_0019E7F0 */
+} PxyModelRenderState;
+
+extern PxyModelRenderState gPxyModelRenderStateStorage;
+
+/* Episode I calls this nmlModelSetTexProreal. */
+#define PXY_STATE_PROREAL 0x1
+
+int func_0019E7F0(void)
+{
+    int stateFlags = gPxyModelRenderStateStorage.stateFlags3E4 | PXY_STATE_PROREAL;
+
+    gPxyModelRenderStateStorage.stateFlags3E4 = stateFlags;
+    return stateFlags;
+}
 
 extern unsigned int D_008C2C90[];
 
@@ -49,13 +67,6 @@ void pxyStateSetWord0(unsigned int word0)
 {
     D_008C2C90[0] = word0;
 }
-
-typedef struct PxyModelRenderState {
-    unsigned char unmodeled_000[0x300];
-    unsigned int renderStatus; /* +0x300 */
-} PxyModelRenderState;
-
-extern PxyModelRenderState gPxyModelRenderStateStorage;
 
 void pxyRenderStatusSetBit10(void)
 {

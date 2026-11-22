@@ -69,7 +69,16 @@ void xglCameraTravelDefaultInit(XglCamera *camera) {
     QuadwordCopy(&travel->chase_position, &gCameraDefaultChasePosition);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193A40);
+extern Vector4 gCameraResetAngleDelta;
+extern Vector4 gCameraResetPlaceDelta;
+
+/* Clears the travel scale and resets the angle and place deltas. */
+void func_00193A40(XglCamera *camera)
+{
+    camera->travel.scale = 0.0f;
+    QuadwordCopy(&camera->travel.angle_delta, &gCameraResetAngleDelta);
+    QuadwordCopy(&camera->travel.place_delta, &gCameraResetPlaceDelta);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193A78);
 
