@@ -612,13 +612,14 @@
     {
      "range": [
       "0x0054ff2c",
-      "0x0054ff70"
+      "0x0054ff74"
      ],
      "generated": [
       "0x0054ff2c",
-      "0x0054ff70"
+      "0x0054ff74"
      ],
      "generated_by": [
+      "func_00197128",
       "xglAtan2",
       "xglEulerFromRotation"
      ],
@@ -639,7 +640,8 @@
       "D_0054FF60",
       "D_0054FF64",
       "D_0054FF68",
-      "D_0054FF6C"
+      "D_0054FF6C",
+      "D_0054FF70"
      ],
      "also_referenced_by_c": [],
      "basis": {

@@ -1306,7 +1306,23 @@ void xglSRandInit(void) {
     gXglRandomSeed[0] = 0x12345678;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197128);
+void xglDmaDirectSrcChain(u32 channel, u32 address);
+extern char xglVu0ResidentMicroprogram[];
+
+/* Geometry start-up: seeds the VU0 random generator and xglRand, then sends the VU0 resident microprogram. */
+void func_00197128(void)
+{
+    float randomSeed = 0.1f;
+
+    __asm__ __volatile__(
+        "qmtc2.ni %0, vf1\n\t"
+        "vrinit R, vf1x"
+        :
+        : "r"(randomSeed)
+        : "memory");
+    gXglRandomSeed[0] = 0x12345678;
+    xglDmaDirectSrcChain(0, (u32)xglVu0ResidentMicroprogram);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197168);
 

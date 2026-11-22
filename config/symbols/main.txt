@@ -10244,6 +10244,7 @@ gIoRpcReplyBlock = 0x008BBF70;
 gCameraDefaultNearClip = 0x0054FF24;
 gCameraDefaultFarClip = 0x0054FF28;
 gXglRandomSeed = 0x008BBFC0;
+xglVu0ResidentMicroprogram = 0x00516B20;
 xglLightSlotTable = 0x008BBFD0;
 xglLightConeEdgeTemplate = 0x005412E0;
 xglLightBankValid = 0x005511F4;
