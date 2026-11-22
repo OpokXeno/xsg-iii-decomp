@@ -404,6 +404,9 @@ void xglRenderMove(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 
+/* Callbacks func_0019AE90 runs on the frame packet. */
+#define RENDER_FINAL_CALLBACK_COUNT 21
+
 typedef struct XglRenderStateBlock {
     unsigned char unmodeled_00[2];
     short psm;                          /* +0x02 */
@@ -411,7 +414,9 @@ typedef struct XglRenderStateBlock {
     unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
-    unsigned char unmodeled_0e[0x67];   /* +0x0E..+0x74 */
+    unsigned char unmodeled_0e[0x0e];   /* +0x0E..+0x1B */
+    XglRenderFadeCallback finalPacketCallbacks[RENDER_FINAL_CALLBACK_COUNT]; /* +0x1C: run by func_0019AE90 */
+    unsigned char unmodeled_70[0x05];   /* +0x70..+0x74 */
     unsigned char frame_delta;          /* +0x75 */
     unsigned char unmodeled_76[0x0e];   /* +0x76..+0x83 */
     unsigned char syncBacklogFull;              /* +0x84 */
@@ -669,7 +674,21 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019ADD8);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AE90);
+/* Calls every registered final-packet callback with the current packet. */
+void func_0019AE90(void)
+{
+    XglPacket *packet;
+    XglRenderFadeCallback function;
+    int i;
+
+    packet = xglPacketGetCurrent();
+    for (i = 0; i < RENDER_FINAL_CALLBACK_COUNT; i++) {
+        function = D_004C8390.finalPacketCallbacks[i];
+        if (function != 0) {
+            function(packet);
+        }
+    }
+}
 
 extern s32 D_004C8400[];
 extern s32 xglRenderGlobalFadeValue;

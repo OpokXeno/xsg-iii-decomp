@@ -511,7 +511,55 @@ void xglCameraMoveOffset(XglCamera *camera, Vector4 *cameraShift) {
     xglCameraViewVolume(camera, cameraShift);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00195050);
+/* Sets the camera window to the rectangle (left, top) - (right, bottom): corners sorted, then clamped to the frame. */
+void func_00195050(XglCamera *camera, int left, int top, int right, int bottom)
+{
+    int swapCoordinate;
+    XglCameraScreen *screen;
+
+    if (camera == 0) {
+        return;
+    }
+    screen = &camera->screen;
+    if (right < left) {
+        swapCoordinate = right;
+        right = left;
+        left = swapCoordinate;
+    }
+    if (bottom < top) {
+        swapCoordinate = bottom;
+        bottom = top;
+        top = swapCoordinate;
+    }
+    if (left < 0) {
+        left = 0;
+    }
+    if (right < 0) {
+        right = 0;
+    }
+    if (top < 0) {
+        top = 0;
+    }
+    if (bottom < 0) {
+        bottom = 0;
+    }
+    if (left >= D_004C8390.reso.frame_width) {
+        left = D_004C8390.reso.frame_width;
+    }
+    if (right >= D_004C8390.reso.frame_width) {
+        right = D_004C8390.reso.frame_width;
+    }
+    if (top >= D_004C8390.reso.frame_height) {
+        top = D_004C8390.reso.frame_height;
+    }
+    if (bottom >= D_004C8390.reso.frame_height) {
+        bottom = D_004C8390.reso.frame_height;
+    }
+    screen->window.vector.x = left;
+    screen->window.vector.y = top;
+    screen->window.vector.z = right;
+    screen->window.vector.w = bottom;
+}
 
 extern f32 gCameraDefaultNearClip;
 extern f32 gCameraDefaultFarClip;
