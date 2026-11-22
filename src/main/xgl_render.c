@@ -737,7 +737,32 @@ void xglRenderGlobalFadeSet(float red, float green, float blue, float alpha)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B020);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B3C0);
+#include "gs.h"
+
+#define VIF_CODE_FLUSH 0x11000000
+void sceVif1PkAddCode(XglPacket *packet, unsigned int code);
+void func_002F4BF8(XglPacket *packet);
+/* The packet template func_0019B3C0 sends: four quadwords, the TEX0 slot, then seven more from +0x60. */
+extern u64 D_004C7EA0[][2];
+extern u16 movieFramebufferBasePage[];
+
+/* Sends the D_004C7EA0 packet with a TEX0 register that points at the movie frame buffer page. */
+void func_0019B3C0(void)
+{
+    XglPacket *packet = xglPacketGetCurrent();
+    u64 *scratch;
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkAddCode(packet, VIF_CODE_FLUSH);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    sceVif1PkAddDirectDataN(packet, D_004C7EA0, 4);
+    scratch = (u64 *)SCRATCHPAD_BASE;
+    scratch[0] = 0x24020000 | (movieFramebufferBasePage[0] << 5) | ((u64)0xc800 << 19);
+    scratch[1] = GS_TEX0_1;
+    sceVif1PkAddDirectDataN(packet, (void *)SCRATCHPAD_BASE, 1);
+    sceVif1PkAddDirectDataN(packet, D_004C7EA0[6], 7);
+    func_002F4BF8(packet);
+}
 
 extern s32 xglRenderFadeGifWord[];
 extern unsigned char gXglRenderFadeDisabled[];
