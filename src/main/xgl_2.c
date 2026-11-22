@@ -1324,9 +1324,29 @@ void func_00197128(void)
     xglDmaDirectSrcChain(0, (u32)xglVu0ResidentMicroprogram);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197168);
+/* Wraps an angle into [-pi, pi). */
+float func_00197168(float angle)
+{
+    while (angle < -3.1415927f) {
+        angle += 6.2831855f;
+    }
+    while (angle >= 3.1415927f) {
+        angle -= 6.2831855f;
+    }
+    return angle;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_001971E8);
+/* Wraps an angle into [0, 2 pi). */
+float func_001971E8(float angle)
+{
+    while (angle < 0.0f) {
+        angle += 6.2831855f;
+    }
+    while (angle >= 6.2831855f) {
+        angle -= 6.2831855f;
+    }
+    return angle;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197268);
 
