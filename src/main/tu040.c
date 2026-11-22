@@ -133,18 +133,18 @@ void pxyInitModelCounters(void) {
     pxyInitGlobals();
 }
 
-/* The global colour scale (r, g, b, a) nml_model_set_044.c's func_0019F1C0 sets. */
-extern float D_004C8B10[4];
+/* The global colour scale nml_model_set_044.c's func_0019F1C0 sets (X2 pxyGlobalColor). */
+extern Vector4 D_004C8B10;
 
 /* X2 pxyClearEntryTable. */
 void func_0019E410(void)
 {
     int i;
 
-    D_004C8B10[0] = 1.0f;
-    D_004C8B10[1] = 1.0f;
-    D_004C8B10[2] = 1.0f;
-    D_004C8B10[3] = 1.0f;
+    D_004C8B10.x = 1.0f;
+    D_004C8B10.y = 1.0f;
+    D_004C8B10.z = 1.0f;
+    D_004C8B10.w = 1.0f;
     gPxyModelRenderState.entryCount = 0;
     gPxyModelRenderState.entryGroupMask = 0;
     gPxyModelRenderState.unk694 = 0;

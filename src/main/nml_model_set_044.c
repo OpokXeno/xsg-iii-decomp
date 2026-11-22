@@ -251,22 +251,22 @@ void nmlModelSetStencil(int stencil) {
     }
 }
 
-extern int nmlModelStoredFlag;
+/* The light set copy func_0019F488 keeps (X2 pxySetLightCopy); the old setter still passes an int. */
+extern XglLightSet *nmlModelStoredFlag;
 
 void nmlModelSetStoredFlag(int storedFlag) {
-    nmlModelStoredFlag = storedFlag;
+    nmlModelStoredFlag = (XglLightSet *) storedFlag;
 }
 
 void *xglPacketReserve(int count);
 
-/* Copies the light set into the packet and keeps the copy's address (X2 pxySetLightCopy). In this build the
- * address goes to the word nmlModelSetStoredFlag also writes. */
+/* Copies the light set into the packet and keeps the copy's address (X2 pxySetLightCopy). */
 void func_0019F488(XglLightSet *light)
 {
     XglLightSet *copy;
 
     copy = xglPacketReserve(0x19);
-    nmlModelStoredFlag = (int)copy;
+    nmlModelStoredFlag = copy;
     *copy = *light;
 }
 
