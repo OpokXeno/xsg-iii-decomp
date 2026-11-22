@@ -227,7 +227,8 @@ typedef struct CdDriverState {
     u8 dual_layer_disc;                          /* +0x33 */
     u8 power_off_pending;                        /* +0x34 */
     u8 archive_init_active;                      /* +0x35: 1 while xglCdArcInit rebuilds the archive slots */
-    u8 unmodeled_036[0x8];                       /* +0x36..0x3d */
+    signed char queuedReadDelay;                 /* +0x36: frames until the queued read starts (xglCdControlThread) */
+    u8 unmodeled_037[0x7];                       /* +0x37..0x3d */
     u8 queue_cursor;                             /* +0x3e */
     u8 queue_tail;                               /* +0x3f */
     CdRequestPartial readQueue[CD_QUEUE_SIZE];    /* +0x40..0x103f */
@@ -482,9 +483,9 @@ void xglCdControlThread(void)
     if (xglClockRefreshCountdown > 0) {
         xglClockRefreshCountdown--;
     }
-    if ((s8) LW.unmodeled_036[0] > 0) {
-        LW.unmodeled_036[0] = (s8) LW.unmodeled_036[0] - 1;
-        if ((s8) LW.unmodeled_036[0] <= 0) {
+    if (LW.queuedReadDelay > 0) {
+        LW.queuedReadDelay--;
+        if (LW.queuedReadDelay <= 0) {
             xglCdStartQueuedRead();
         }
     }
@@ -1081,8 +1082,8 @@ signed char xglCdGetServicePending(void)
 }
 
 void xglCdRaiseMaxByte(s32 candidate) {
-    if ((s8) LW.unmodeled_036[0] < candidate) {
-        LW.unmodeled_036[0] = candidate;
+    if (LW.queuedReadDelay < candidate) {
+        LW.queuedReadDelay = candidate;
     }
 }
 
@@ -1361,7 +1362,7 @@ void xglCdInitial(void)
     LW.search_layer = 0;
     LW.dual_layer_disc = 0;
     LW.power_off_pending = 0;
-    LW.unmodeled_036[0] = 0;
+    LW.queuedReadDelay = 0;
     LW.disk_state = 0;
     LW.disk_flags = 0;
     func_002F7718(0);
