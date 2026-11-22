@@ -91,7 +91,18 @@ XglCamera *xglStudioGetActiveCamera(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_studio", xglStudioSelectGetActiveCamera);
+XglCamera *xglStudioSelectGetActiveCamera(int studio_index)
+{
+    XglCamera *camera;
+    int camera_index;
+
+    for (camera_index = 0; camera_index < 2; camera_index++) {
+        camera = &((Studio *)&gStudioRecords[studio_index])->cameras[camera_index];
+        if (camera->active != 0)
+            return camera;
+    }
+    return 0;
+}
 
 XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
 void xglCameraInit(XglCamera *camera);

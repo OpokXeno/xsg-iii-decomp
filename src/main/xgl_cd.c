@@ -471,7 +471,36 @@ void xglCdOpenDevice(void)
     xglCdDeviceHandle = ADXF_Open(xglCdDeviceName, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cd", xglCdControlThread);
+/* Small-data flag: a positive value means the clock was read already; the first
+ * read stores 10 when the console reports 1. xglCdControlThread counts it down once per tick. */
+extern signed char xglClockRefreshCountdown;
+
+/* One tick of the CD service: counts the clock refresh down, starts the next queued read when its
+ * delay runs out, serves an asynchronous read, and resets an unknown state to idle. */
+void xglCdControlThread(void)
+{
+    if (xglClockRefreshCountdown > 0) {
+        xglClockRefreshCountdown--;
+    }
+    if ((s8) LW.unmodeled_036[0] > 0) {
+        LW.unmodeled_036[0] = (s8) LW.unmodeled_036[0] - 1;
+        if ((s8) LW.unmodeled_036[0] <= 0) {
+            xglCdStartQueuedRead();
+        }
+    }
+    switch (LW.threadActivity) {
+    case CD_STATE_IDLE:
+    case CD_STATE_SYNC_READ:
+        break;
+    case CD_STATE_ASYNC_READ:
+        xglCdServiceRead();
+        break;
+    default:
+        LW.threadActivity = CD_STATE_IDLE;
+        break;
+    }
+    xglCdServiceActive = 0;
+}
 
 /* One BCD byte: high nibble tens, low nibble units. */
 int BCD2INT(unsigned char bcd)
@@ -481,9 +510,6 @@ int BCD2INT(unsigned char bcd)
 
 /* The console's clock record: xglCdClockRecord holds the BCD fields read below. */
 extern unsigned char xglCdClockRecord[];
-/* Small-data flag: a positive value means the clock was read already; the first
- * read stores 10 when the console reports 1. */
-extern signed char xglClockRefreshCountdown;
 int func_002F8588(unsigned char *clock_record);
 
 int xglClockReadBcd(XglClock *clock_time)
@@ -508,7 +534,21 @@ int xglClockReadBcd(XglClock *clock_time)
     return clockReadResult;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cd", xglClockRead);
+#define CLOCK_READ_ATTEMPTS 20
+void func_002F38F0(int);
+
+/* Reads the clock, retrying up to CLOCK_READ_ATTEMPTS times while xglClockReadBcd fails. */
+void xglClockRead(XglClock *clock_time)
+{
+    int attempt;
+
+    for (attempt = 0; attempt < CLOCK_READ_ATTEMPTS; attempt++) {
+        if (xglClockReadBcd(clock_time) == 0) {
+            break;
+        }
+        func_002F38F0(0);
+    }
+}
 
 /*
  * Converts a calendar record to the number of seconds elapsed since
