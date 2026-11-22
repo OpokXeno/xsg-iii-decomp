@@ -101,13 +101,17 @@ int makeGstransChain(unsigned int chainAddress, unsigned int image, const MovieF
     return (((unsigned int) packet - chainAddress) & 0x00ffffffU) >> 4;
 }
 
-/* The movie player record: the handle, the DMA packet address, the frame stamp, and the
- * extra-sound flag and volume. */
+/* The movie player record: the handle, the DMA packet address, the frame stamp, the size of the
+ * current frame, the frame-held flag, and the extra-sound flag and volume. From +0x0C on it has
+ * the layout of MovieFrame: the frame step passes the record itself to makeGstransChain. */
 typedef struct MoviePlayerRecord {
     int playerHandle;
     unsigned int dma_address;
     int frame_stamp;
-    unsigned char unmodeled_0c[9];
+    unsigned char unmodeled_0c[4];
+    short frame_width;
+    short frame_height;
+    unsigned char frame_held;
     unsigned char extra_enabled;
     unsigned char volume;
 } MoviePlayerRecord;
@@ -178,8 +182,6 @@ int moviePlayerStartFile(MoviePlayerRecord *player, const char *name)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/movie_player_015", func_0018BB08);
-
 extern unsigned char gMovieFrameWidth[];
 
 void func_00132E10(int playerHandle, int value);
@@ -187,6 +189,60 @@ void func_00132E10(int playerHandle, int value);
 void func_002F49F8(int packet, int dma_address, int flags);
 
 int xglPacketGetCurrent(void);
+
+/* The frame record func_00130B50 fills: a null image means no new frame. */
+typedef struct MovieCurrentFrame {
+    unsigned int image;
+    unsigned char unmodeled_04[8];
+    int width;
+    int height;
+    unsigned char unmodeled_14[0x10];
+    int stamp;
+    unsigned char unmodeled_28[0x68];
+} MovieCurrentFrame;
+
+/* Player statuses func_00133F08 returns that the frame step tells apart. */
+#define MOVIE_STATUS_PLAY_END 3
+#define MOVIE_STATUS_ERROR 4
+
+void func_00131470(int playerHandle);
+void func_00130B50(int playerHandle, MovieCurrentFrame *frame);
+int func_00133F08(int playerHandle);
+
+/* XS2 moviePlayerUpdate: releases the frame taken last time, takes the next one and, when there
+ * is one, builds its upload chain (with the width from gMovieFrameWidth as BITBLTBUF destination)
+ * and queues it. Returns 1 at the end of the movie, -1 on a playback error, 0 otherwise. */
+int func_0018BB08(MoviePlayerRecord *player)
+{
+    MovieCurrentFrame frame;
+    int packet;
+    u64 *dma_words;
+
+    packet = xglPacketGetCurrent();
+    if (player->frame_held != 0) {
+        func_00131470(player->playerHandle);
+    }
+    func_00130B50(player->playerHandle, &frame);
+    player->frame_held = 0;
+    if (frame.image != 0) {
+        player->frame_stamp = frame.stamp;
+        player->frame_width = frame.width;
+        player->frame_height = frame.height;
+        makeGstransChain(player->dma_address, frame.image, (const MovieFrame *) player);
+        dma_words = (u64 *) ((player->dma_address & 0x0FFFFFFF) | 0x20000000);
+        dma_words[4] = ((u64) *(u16 *)gMovieFrameWidth << 37) | (0x8000ULL << 36);
+        func_002F49F8(packet, player->dma_address, 0);
+        player->frame_held = 1;
+    }
+    switch (func_00133F08(player->playerHandle)) {
+    case MOVIE_STATUS_PLAY_END:
+        return 1;
+    case MOVIE_STATUS_ERROR:
+        return -1;
+    default:
+        return 0;
+    }
+}
 
 /* Forwards `value` to func_00132E10 for the player's handle. When `value` is 0 and the player
  * has a frame, it stores the BITBLTBUF word (the width from gMovieFrameWidth in the DBW field) at
