@@ -268,7 +268,52 @@ int xglFontIsTextureGlyphCode(unsigned char eucRow, unsigned char eucColumn)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00181FA0);
+struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07[5]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; unsigned char unmodeled_10; unsigned char unmodeled_11[3]; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; unsigned char unmodeled_20[6]; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { unsigned char compact_width; unsigned char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
+
+extern struct FontStateQueue xglFontState;
+void sceVif1PkRef();
+
+/* The 1-bit glyph plane behind the font texture: 0x800 bytes at texture_buffer + 0x78400, eight pixels
+ * per byte, expanded through fontNibbleMasks (four pixels per nibble, 0xFF per set bit) into
+ * fontExpandedPlane and sent to the GS after the setup packet fontPlaneUploadSetup. */
+#define FONT_PLANE_OFFSET 0x78400
+#define FONT_PLANE_BYTES 0x800
+#define FONT_PLANE_QUADWORDS 0x400
+#define FONT_PLANE_SETUP_QUADWORDS 7
+#define VIF_DIRECT_FONT_PLANE 0x51000400 /* VIF DIRECT, 0x400 quadwords */
+
+extern u32 fontNibbleMasks[16];
+extern u32 fontExpandedPlane[FONT_PLANE_BYTES * 2];
+extern unsigned char fontPlaneUploadSetup[];
+XglPacket *xglPacketGetCurrent(void);
+
+void func_00181FA0(void)
+{
+    unsigned char *source;
+    u32 *plane;
+    u32 *destination;
+    int i;
+    XglPacket *packet;
+
+    source = xglFontState.texture_buffer + FONT_PLANE_OFFSET;
+    plane = fontExpandedPlane;
+    destination = plane;
+    for (i = 0; i < FONT_PLANE_BYTES; i++) {
+        unsigned char bits;
+        u32 high;
+        u32 low;
+
+        bits = *source++;
+        high = fontNibbleMasks[bits >> 4];
+        low = fontNibbleMasks[bits & 0xF];
+        destination[0] = high;
+        destination[1] = low;
+        destination += 2;
+    }
+    packet = xglPacketGetCurrent();
+    sceVif1PkRef(packet, fontPlaneUploadSetup, FONT_PLANE_SETUP_QUADWORDS, 0, 0, 0);
+    sceVif1PkRef(packet, plane, FONT_PLANE_QUADWORDS, 0, VIF_DIRECT_FONT_PLANE, 0);
+}
 
 /*
  * Reserves count A+D writes in the cursor's packet and writes their GIF tag: NLOOP = count with
@@ -291,10 +336,6 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_001820D0);
 /* The two texture-filter packets: 1:1 glyphs and scaled glyphs. */
 extern unsigned int D_004B3110[8];
 extern unsigned int D_004B3130[8];
-
-struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07[5]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; unsigned char unmodeled_10; unsigned char unmodeled_11[3]; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; unsigned char unmodeled_20[6]; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { unsigned char compact_width; unsigned char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
-
-extern struct FontStateQueue xglFontState;
 
 void xglFontSetTextureFilter(FontDrawCursor *cursor, int useCursorScale)
 {
@@ -1289,12 +1330,10 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185770);
 extern unsigned char D_004B1E20[];
 extern unsigned char D_004B3320[];
 extern unsigned char D_004B33A0[];
-void func_00181FA0();
 void func_001820D0();
 void sceVif1PkCloseDirectHLCode();
 void sceVif1PkCnt();
 void sceVif1PkOpenDirectHLCode();
-void sceVif1PkRef();
 
 void xglFontBuildPacket(XglPacket **packet_slot)
 {
