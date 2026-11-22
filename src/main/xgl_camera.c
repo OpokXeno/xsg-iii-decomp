@@ -86,20 +86,9 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193BD0);
 
 #include "vu0_macro.h"
 #include "main/tu007.h"
-
-typedef struct CameraPadOverride {
-    unsigned short held;
-    unsigned short pressed;
-    unsigned char unmodeled_04[4];
-    signed char rightX;
-    signed char rightY;
-    signed char leftX;
-    signed char leftY;
-    unsigned int active;
-} CameraPadOverride;
+#include "main/sdv.h"
 
 extern PadRecord PadData[2];
-extern CameraPadOverride sdvSpecialBuf;
 void func_00193A40(XglCamera *camera);
 void func_00193A78(XglCamera *camera);
 void func_00193BD0(XglCamera *camera);

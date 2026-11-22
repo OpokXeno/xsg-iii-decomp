@@ -1,10 +1,9 @@
 #include "common.h"
 #include "shared.h"
+#include "main/sdv.h"
 
 void sdvInitSpecialWork(void);
 void *memset(void *destination, int value, unsigned int count);
-
-extern unsigned char sdvSpecialBuf[];
 
 typedef int s32;
 extern s32 D_005511EC;
@@ -15,26 +14,19 @@ void sdvStoreValue(s32 storedValue) {
 
 void sdvInitSpecialWork(void)
 {
-    memset(&sdvSpecialBuf, 0, 0x10);
+    memset(&sdvSpecialBuf, 0, sizeof(sdvSpecialBuf));
 }
 
-/* The 16-byte special work at sdvSpecialBuf as func_00193850 fills it (sdvInitSpecialWork clears it). */
-typedef struct SdvSpecialWork {
-    short values[3];          /* +0x00 */
-    unsigned char unmodeled_06[2];
-    unsigned char bytes[4];   /* +0x08 */
-    int active;               /* +0x0C: set to 1 */
-} SdvSpecialWork;
-
-#define sdvSpecialWork (*(SdvSpecialWork *)sdvSpecialBuf)
-void func_00193850(int value0, int value1, int value2, int byte0, int byte1, int byte2, int byte3)
+/* Sets the camera pad override: the buttons and the four stick axes the camera pad updates read
+ * instead of the pads; active is stored last. */
+void func_00193850(int held, int pressed, int repeated, int rightX, int rightY, int leftX, int leftY)
 {
-    sdvSpecialWork.values[0] = value0;
-    sdvSpecialWork.values[1] = value1;
-    sdvSpecialWork.values[2] = value2;
-    sdvSpecialWork.bytes[0] = byte0;
-    sdvSpecialWork.bytes[1] = byte1;
-    sdvSpecialWork.bytes[2] = byte2;
-    sdvSpecialWork.bytes[3] = byte3;
-    sdvSpecialWork.active = 1;
+    sdvSpecialBuf.held = held;
+    sdvSpecialBuf.pressed = pressed;
+    sdvSpecialBuf.repeated = repeated;
+    sdvSpecialBuf.rightX = rightX;
+    sdvSpecialBuf.rightY = rightY;
+    sdvSpecialBuf.leftX = leftX;
+    sdvSpecialBuf.leftY = leftY;
+    sdvSpecialBuf.active = 1;
 }
