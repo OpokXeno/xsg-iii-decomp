@@ -99,7 +99,19 @@ int cfeModelFindPart(PxyPackView *pack, const char *partName) {
     return -1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EA60);
+/* Geometry entry index (112 bytes each) of a "pxy" pack, 0 when the pack is not one or index is out of range
+ * (X2 pxyGetEntry). */
+unsigned char *func_0019EA60(PxyPackView *pack, int index) {
+    unsigned char *geometryEntry;
+
+    if (pack != 0 && (pack->signature & 0xFFFFFF) == 0x797870) {
+        geometryEntry = (unsigned char *)pack + pack->header.geometryOffset;
+        if (pack->header.geometryCount > index) {
+            return geometryEntry + index * 112;
+        }
+    }
+    return 0;
+}
 
 void pxySetShadowOffset(f32 offsetX, f32 offsetY)
 {

@@ -250,7 +250,7 @@ typedef struct CullingMap {
     unsigned char unmodeled_00[0x20];
     CullingVolume volumes[10];
     s32 volumeCount;
-    s32 unmodeled_DE4;
+    s32 *unmodeled_DE4;          /* +0xDE4: a list of up to 12 indices ended by a negative one (func_0019C3C8) */
 } CullingMap;
 
 extern CullingMap gCullingVolumeTable[];
@@ -281,7 +281,19 @@ s32 xglCullingGetSetting(void) {
     return gCullingSettings[0];
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C3C8);
+/* Walks the index list at +0xDE4 up to its first negative entry (at most 12); the loop has no effect. */
+void func_0019C3C8(void)
+{
+    s32 index;
+
+    if (gCullingVolumeTable->unmodeled_DE4 != 0) {
+        for (index = 0; index < 12; index++) {
+            if (gCullingVolumeTable->unmodeled_DE4[index] < 0) {
+                break;
+            }
+        }
+    }
+}
 
 void xglCullingMapClear(void)
 {

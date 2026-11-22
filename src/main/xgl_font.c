@@ -546,7 +546,39 @@ void xglFontPrintDirect(const char *text)
     xglFontPrintDirectCore(text);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00182720);
+/* A FONT_OP_CALLBACK command: a 24-bit function address and a 32-bit argument, big-endian, then the
+ * terminator byte that closes the queue (X2 FontExtRecord). */
+struct FontCallbackRecord {
+    unsigned char opcode;
+    unsigned char function_high;
+    unsigned char function_middle;
+    unsigned char function_low;
+    unsigned char argument_high;
+    unsigned char argument_mid_high;
+    unsigned char argument_mid_low;
+    unsigned char argument_low;
+    unsigned char terminator;
+};
+
+/* Queues a call of function(argument) (X2 xglFontPrintExtFunc; this build ignores the OT argument). */
+void func_00182720(int ot, void *function, void *argument)
+{
+    struct FontCallbackRecord *record;
+    unsigned int function_address = (unsigned int)function;
+    unsigned int argument_word = (unsigned int)argument;
+
+    record = (struct FontCallbackRecord *)xglFontState.queue_cursor;
+    record->opcode = FONT_OP_CALLBACK;
+    record->function_high = function_address >> 16;
+    record->function_middle = function_address >> 8;
+    record->function_low = function_address;
+    record->argument_high = argument_word >> 24;
+    record->argument_mid_high = argument_word >> 16;
+    record->argument_mid_low = argument_word >> 8;
+    record->argument_low = argument_word;
+    record->terminator = 0;
+    xglFontState.queue_cursor += sizeof(*record);
+}
 
 void xglFontDebugPrefixSet(int stored_value)
 {
