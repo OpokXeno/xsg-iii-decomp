@@ -43726,18 +43726,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00196200",
+     "name": "xglMatrixUnit",
      "size": 48,
-     "splat_name": "func_00196200",
+     "splat_name": "xglMatrixUnit",
      "va": "0x00196200",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00196230",
+     "name": "xglMatrixUnit4s",
      "size": 48,
-     "splat_name": "func_00196230",
+     "splat_name": "xglMatrixUnit4s",
      "va": "0x00196230",
      "name_basis": "address",
      "provenance": "estimated"

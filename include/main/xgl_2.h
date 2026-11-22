@@ -106,7 +106,7 @@ struct XglCamera {
 };
 
 void xglRotTransPersN(ScreenVector4 *destination, Matrix4 matrix, const Vector4 *source, int count, int cameraId);
-void func_00196200(Matrix4 destination);
+void xglMatrixUnit(Matrix4 destination);
 struct XglCamera *xglStudioGetCamera2(int camera_index);
 
 #endif

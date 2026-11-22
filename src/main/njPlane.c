@@ -5,7 +5,7 @@ typedef int s32;
 typedef float f32;
 typedef signed char s8;
 
-/* Plane record: the 0x80-byte block this TU initialises; func_00196200 takes the sub-record at +0x80. */
+/* Plane record: the 0x80-byte block this TU initialises; xglMatrixUnit takes the sub-record at +0x80. */
 typedef struct NjPlane {
     f32 offset_x;           /* 0x00 */
     f32 offset_y;           /* 0x04 */
@@ -29,7 +29,7 @@ extern unsigned char gNjPlaneAssertCondition[];
 extern unsigned char gNjPlaneSourceFileName[];
 extern unsigned char gNjPlaneInitAssertMessage[];
 s32 func_001936A8();
-s32 func_00196200(void *planeMatrix);
+s32 xglMatrixUnit(void *planeMatrix);
 void njPlaneSetOffset(NjPlane *plane, f32 x, f32 y);
 void njPlaneSetColor(NjPlane *plane, s32 color);
 void njPlaneSetOrigin(NjPlane *plane, f32 x, f32 y);
@@ -47,7 +47,7 @@ void njPlaneInit(NjPlane *plane) {
     njPlaneSetTint(plane, 128.0f, 128.0f, 128.0f);
     njPlaneSetLevel(plane, 128.0f);
     njPlaneSetMode(plane, 0);
-    func_00196200(plane + 1);
+    xglMatrixUnit(plane + 1);
 }
 
 extern unsigned char gNjPlaneOffsetColorAssertMessage[];

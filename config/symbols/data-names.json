@@ -75,6 +75,8 @@
    "0x004c7b18": "xglIntcRecords",
    "0x004c7bd8": "xglDmaRecords",
    "0x004c7d20": "aaiVertexIndex",
+   "0x004c7d40": "xglIdentityMatrix",
+   "0x004c7d80": "xglUnit4sMatrix",
    "0x004c8250": "ClearEnv",
    "0x004c8386": "sRender",
    "0x004c8b40": "heapWindowAllocTitle",

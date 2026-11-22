@@ -340,7 +340,6 @@ float pxyCalcFadeMetric(int cameraIndex, const Vector4 *point, float scale) {
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_045", func_001A12A0);
 
 extern int pxyCameraEnabled[4];
-void func_00196200(Matrix4 destination);
 void _ModelCalcClipInitMat1(float (*planeSet)[4], Matrix4 matrix);
 int _ModelCalcClipMat1(Vector4 *point);
 int xglCullingPollCheck(XglCamera *camera, Vector4 *sphere);
@@ -358,7 +357,7 @@ void pxyCalcCameraVisibility(void)
     anyVisible = 0;
     modelHeader = gPxyModelRenderStateStorage.modelHeader;
     forceMask = (gPxyModelRenderStateStorage.renderStatus & 0x200000) | (gPxyModelRenderStateStorage.drawFlags & 0x1000);
-    func_00196200(clipMatrix);
+    xglMatrixUnit(clipMatrix);
     for (i = 0; i < 4; i++) {
         camera = xglStudioSelectGetActiveCamera(i);
         if (pxyCameraEnabled[i] != 0 && camera != 0) {

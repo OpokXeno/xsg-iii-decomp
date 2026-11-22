@@ -3,7 +3,7 @@
 typedef float f32;
 
 void *memset(void *destination, int value, unsigned int size);
-void func_00196200(f32 *matrix);
+void xglMatrixUnit(f32 *matrix);
 void xglMatrixRotX(f32 *matrix, f32 *source, f32 angle);
 void xglMatrixRotY(f32 *matrix, f32 *source, f32 angle);
 void xglVectorMulMat(f32 *destination, f32 *matrix, f32 *vector);
@@ -16,7 +16,7 @@ void xglPointAddRotatedOffset(void *resultPoint, void *basePoint, f32 *angles, f
 
     memset(&unrotatedOffset[0], 0, 0x10);
     unrotatedOffset[2] = offsetZ;
-    func_00196200(&rotation[0]);
+    xglMatrixUnit(&rotation[0]);
     xglMatrixRotY(&rotationY[0], &rotation[0], angles[1]);
     xglMatrixRotX(&rotation[0], &rotationY[0], angles[0]);
     xglVectorMulMat(&rotatedOffset[0], &rotation[0], &unrotatedOffset[0]);

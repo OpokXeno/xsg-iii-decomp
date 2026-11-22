@@ -76,6 +76,8 @@
    "0x00195a18": "xglVectorScaleXYZ",
    "0x00195cc8": "xglVectorOuter",
    "0x00195e20": "xglVectorNormal",
+   "0x00196200": "xglMatrixUnit",
+   "0x00196230": "xglMatrixUnit4s",
    "0x00196a48": "xglMatrixStackUnit",
    "0x00196aa0": "xglMatrixStackReverse",
    "0x00196ac8": "xglMatrixStackInverse",

@@ -56,9 +56,9 @@ extern char gXglMicroMatrixStackPush[];
 extern char gXglMicroMatrixStackPop[];
 extern char gXglMicroMatrixStackMulVector[];
 extern char gXglMicroMatrixStackRTPS[];
-/* Identity matrix and the unit matrix with w = 1 in every row, copied by func_00196200 / func_00196230. */
-extern Matrix4 D_004C7D40;
-extern Matrix4 D_004C7D80;
+/* Identity matrix and the unit matrix with w = 1 in every row, copied by xglMatrixUnit / xglMatrixUnit4s. */
+extern Matrix4 xglIdentityMatrix;
+extern Matrix4 xglUnit4sMatrix;
 /* VU0 resident microprogram entries of sine (D_20) and cosine (D_E8), as xglSin / xglCos call them. */
 extern char D_20[];
 extern char D_E8[];
@@ -731,14 +731,14 @@ void xglRotTransPersN(ScreenVector4 *screenPoints, Matrix4 matrix, const Vector4
     xglMatrixStackPop(1);
 }
 
-void func_00196200(Matrix4 destination)
+void xglMatrixUnit(Matrix4 destination)
 {
-    QuadwordCopyMatrix(destination, D_004C7D40);
+    QuadwordCopyMatrix(destination, xglIdentityMatrix);
 }
 
-void func_00196230(Matrix4 destination)
+void xglMatrixUnit4s(Matrix4 destination)
 {
-    QuadwordCopyMatrix(destination, D_004C7D80);
+    QuadwordCopyMatrix(destination, xglUnit4sMatrix);
 }
 
 void xglMatrixMul(Matrix4 productMatrix, Matrix4 left, Matrix4 right)

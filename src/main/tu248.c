@@ -4,7 +4,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu248", func_002607B8);
 
 typedef int s32;
 typedef float f32;
-s32 func_00196200();
+s32 xglMatrixUnit();
 f32 func_00260F70(f32, f32, f32);
 f32 xglAtan2(f32, f32);
 s32 xglMatrixRotY(f32 *, f32 *, f32);
@@ -31,7 +31,7 @@ void xglVectorToAngles(f32 *angles, void *targetPoint, void *basePoint, f32 *pit
     angles[1] = yaw;
     clampedYaw = func_00260F70(yaw, yawLimits[0], yawLimits[1]);
     angles[1] = clampedYaw;
-    func_00196200(&baseMatrix[0]);
+    xglMatrixUnit(&baseMatrix[0]);
     xglMatrixRotY(&yawMatrix[0], &baseMatrix[0], -angles[1]);
     xglVectorMulMat(&yawLocalDirection[0], &yawMatrix[0], &worldDirection[0]);
     pitch = xglAtan2(yawLocalDirection[1], -yawLocalDirection[2]);

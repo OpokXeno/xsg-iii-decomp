@@ -1,7 +1,7 @@
 #ifndef INCLUDE_MAIN_NJPLANE_H
 #define INCLUDE_MAIN_NJPLANE_H
 
-/* Plane record: the 0x80-byte block this TU initialises; func_00196200 takes the sub-record at +0x80. */
+/* Plane record: the 0x80-byte block this TU initialises; xglMatrixUnit takes the sub-record at +0x80. */
 typedef struct NjPlane {
     f32 offset_x;           /* 0x00 */
     f32 offset_y;           /* 0x04 */
