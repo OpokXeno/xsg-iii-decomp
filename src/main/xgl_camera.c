@@ -1,5 +1,7 @@
 #include "common.h"
 #include "main/xgl_2.h"
+#include "main/xgl_render.h"
+#include "quadword.h"
 
 typedef int s32;
 
@@ -12,9 +14,30 @@ void xglCameraResetState(XglCamera *camera)
   camera->active = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", xglCameraScreenInit);
 
-#include "quadword.h"
+extern Vector4 gCameraDefaultClipRange;
+extern Vector4 gCameraDefaultPortEffect;
+/* The xgl_render.c render state (XglRenderState); the camera screen takes its frame size. */
+extern XglRenderState D_004C8390;
+
+/* Fills the XglCameraScreen block at camera+0x10 with the default screen and the frame size. */
+void xglCameraScreenInit(XglCamera *camera)
+{
+    XglCameraScreen *screen = &camera->screen;
+
+    screen->depthMax = 0x00FFFFFF;
+    screen->depthMin = 0;
+    QuadwordCopy(&screen->clipRange.vector, &gCameraDefaultClipRange);
+    QuadwordCopy(&screen->portEffect, &gCameraDefaultPortEffect);
+    screen->resolution.vector.x = D_004C8390.reso.frame_width;
+    screen->resolution.vector.y = D_004C8390.reso.frame_height;
+    screen->resolution.vector.z = D_004C8390.reso.frame_width;
+    screen->resolution.vector.w = D_004C8390.reso.frame_height;
+    screen->window.vector.x = 0.0f;
+    screen->window.vector.y = 0.0f;
+    screen->window.vector.z = D_004C8390.reso.frame_width;
+    screen->window.vector.w = D_004C8390.reso.frame_height;
+}
 
 extern Vector4 gCameraDefaultRotation;
 extern Vector4 gCameraDefaultAngleVelocity;
@@ -342,14 +365,116 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001947F0);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001948E0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", xglCameraViewTravel);
+float tanf(float angle);
+void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
+void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
+void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b, const Vector4 *c);
+void xglMatrixStackMul(Matrix4 matrix);
+void xglMatrixStackInverse(void);
+void xglMatrixStackTrans(const Vector4 *vector);
+void xglMatrixStackRotX(float angle);
+void xglMatrixStackRotZ(float angle);
+void xglMatrixStackFrustum(float left, float right, float bottom, float top, float nearPlane, float farPlane);
+extern signed char aaiVertexIndex[6][3];
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", xglCameraViewVolume);
+/* Builds the frustum corners and the view/inverse transforms from the screen and travel state, then saves them into
+ * the camera. */
+void xglCameraViewTravel(XglCamera *camera, Vector4 *offset)
+{
+    XglCameraScreen *screen = &camera->screen;
+    CameraTravel *travel = &camera->travel;
+    AlignedVector4 scale;
+    AlignedVector4 aspect;
+    AlignedVector4 position;
+
+    scale.x = tanf(travel->fov * 0.5f);
+    scale.y = scale.x;
+    scale.z = scale.x * (screen->clipRange.vector.w / screen->projection.y);
+    scale.w = scale.z;
+    aspect.x = screen->projection.x / screen->projection.y;
+    aspect.y = aspect.x;
+    aspect.z = screen->clipRange.vector.z / screen->clipRange.vector.w;
+    aspect.w = aspect.z;
+    travel->frustum.corner[3].x = screen->clipRange.vector.x;
+    travel->frustum.corner[3].y = screen->clipRange.vector.y;
+    travel->frustum.corner[3].z = travel->frustum.corner[3].x;
+    travel->frustum.corner[3].w = travel->frustum.corner[3].y;
+    Vu0MulVector(&travel->frustum.corner[3], &travel->frustum.corner[3], &scale);
+    xglVectorScale(&travel->frustum.corner[2], &travel->frustum.corner[3], -1.0f);
+    Vu0MulVector(&travel->frustum.corner[1], &travel->frustum.corner[3], &aspect);
+    xglVectorScale(&travel->frustum.corner[0], &travel->frustum.corner[1], -1.0f);
+    xglMatrixStackUnit();
+    Vu0SubVectorXYZ(&position, &travel->position, offset);
+    xglMatrixStackTrans(&position);
+    xglMatrixStackRotY(travel->rotation.y);
+    xglMatrixStackRotX(travel->rotation.x);
+    xglMatrixStackRotZ(travel->rotation.z);
+    xglMatrixStackSave(travel->transform);
+    xglMatrixStackInverse();
+    xglMatrixStackSave(travel->inverseTransform);
+}
+
+/* Copies the travel frustum into the camera volume, saves the view matrix and builds the volume vertices,
+ * planes and plane sets. */
+void xglCameraViewVolume(XglCamera *camera, Vector4 *offset) {
+    XglCameraScreen *screen;
+    CameraTravel *travel;
+    CameraVolume *volume;
+    AlignedVector4 corner;
+    int x;
+    int b;
+    int y;
+    int i;
+    int j;
+    int k;
+
+    screen = &camera->screen;
+    travel = &camera->travel;
+    for (i = 0; i <= 0; i++) {
+        volume = &camera->volume[i];
+        QuadwordCopyMatrix(volume->frustum, travel->frustum.matrix);
+        xglMatrixStackUnit();
+        xglMatrixStackFrustum(volume->frustum[0][2], volume->frustum[1][2], volume->frustum[2][2],
+                      volume->frustum[3][2], screen->clipRange.vector.x, screen->clipRange.vector.y);
+        xglMatrixStackMul(travel->inverseTransform);
+        xglMatrixStackSave(volume->viewMatrix);
+        for (j = 0; j < 2; j++) {
+            for (k = 0; k < 8; k++) {
+                x = k & 1;
+                b = ((k & 2) >> 1) | 2;
+                y = ((k & 4) >> 2) | ((j & 1) << 1);
+                corner.x = volume->frustum[x][y];
+                corner.y = volume->frustum[b][y];
+                corner.z = -screen->clipRange.component[y & 1];
+                corner.w = 1.0f;
+                xglVectorMulMat(&volume->vertex[j * 8 + k].vector, travel->transform, &corner);
+            }
+            {
+            for (k = 0; k < 6; k++) {
+                xglPlaneParameter(&(volume->plane + j * 6)[k].vector,
+                                  &(volume->vertex + j * 8)[aaiVertexIndex[k][0]].vector,
+                                  &(volume->vertex + j * 8)[aaiVertexIndex[k][1]].vector,
+                                  &(volume->vertex + j * 8)[aaiVertexIndex[k][2]].vector);
+            }
+            }
+        }
+        {
+        for (j = 0; j < 4; j++) {
+            for (k = 0; k < 3; k++) {
+                volume->planeSet[0][j][k] = volume->plane[k].component[j];
+                volume->planeSet[1][j][k] = volume->plane[k + 3].component[j];
+                volume->planeSet[2][j][k] = volume->plane[k + 6].component[j];
+                volume->planeSet[3][j][k] = volume->plane[k + 9].component[j];
+            }
+        }
+        }
+    }
+}
 
 void xglCameraResetState(XglCamera *camera);
 /* Fills the CameraTravel block at camera+0x90 with the default travel view. */
 void xglCameraTravelDefaultInit(XglCamera *camera);
-s32 xglCameraScreenInit(void *);
+void xglCameraScreenInit(XglCamera *camera);
 
 void func_001948E0();
 void xglCameraViewTravel(XglCamera *camera, Vector4 *cameraShift);

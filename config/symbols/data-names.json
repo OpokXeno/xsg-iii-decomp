@@ -1103,6 +1103,8 @@
    "0x00550f48": "gNjStringDefaultScale",
    "0x0053dd88": "gNjStringWidthCode",
    "0x0053dcb0": "gNjStringHighlightRgb",
+   "0x004c7c60": "gCameraDefaultClipRange",
+   "0x004c7c70": "gCameraDefaultPortEffect",
    "0x004c7c80": "gCameraDefaultRotation",
    "0x004c7c90": "gCameraDefaultAngleVelocity",
    "0x004c7ca0": "gCameraDefaultAngleDelta",
