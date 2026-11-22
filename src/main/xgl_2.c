@@ -1348,9 +1348,36 @@ float func_001971E8(float angle)
     return angle;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197268);
+/* The rotation that turns the z axis from from towards to (see func_00197328). */
+void func_00197268(Vector4 *rotation, const Vector4 *from, const Vector4 *to)
+{
+    float dx;
+    float dz;
+    float dy;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197328);
+    dz = to->z - from->z;
+    dx = to->x - from->x;
+    dy = to->y - from->y;
+    rotation->y = xglAtan2(dx, dz);
+    rotation->x = -xglAtan2(dy, __builtin_sqrtf(dx * dx + dz * dz));
+    rotation->w = 1.0f;
+}
+
+
+/* The rotation that turns the z axis towards direction: y angle around, x angle up (negated), w = 1. */
+void func_00197328(Vector4 *rotation, const Vector4 *direction)
+{
+    float x;
+    float z;
+    float y;
+
+    x = direction->x;
+    z = direction->z;
+    y = direction->y;
+    rotation->y = xglAtan2(x, z);
+    rotation->x = -xglAtan2(y, __builtin_sqrtf(x * x + z * z));
+    rotation->w = 1.0f;
+}
 
 int func_001973D0(float a, float b, float tolerance)
 {
