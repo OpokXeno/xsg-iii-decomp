@@ -268,7 +268,7 @@ int xglFontIsTextureGlyphCode(unsigned char eucRow, unsigned char eucColumn)
     return 0;
 }
 
-struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07[5]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; unsigned char unmodeled_10; unsigned char unmodeled_11[3]; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; unsigned char unmodeled_20[6]; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { unsigned char compact_width; unsigned char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
+struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07; unsigned short unmodeled_08; unsigned char unmodeled_0a[2]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; unsigned char unmodeled_10; unsigned char unmodeled_11[3]; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; unsigned char unmodeled_20[6]; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { unsigned char compact_width; unsigned char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
 
 extern struct FontStateQueue xglFontState;
 void sceVif1PkRef();
@@ -1335,7 +1335,8 @@ void sceVif1PkCloseDirectHLCode();
 void sceVif1PkCnt();
 void sceVif1PkOpenDirectHLCode();
 
-void xglFontBuildPacket(XglPacket **packet_slot)
+/* reloadMode: the flush passes 0; this build does not read it. */
+void xglFontBuildPacket(XglPacket **packet_slot, int reloadMode)
 {
     XglPacket *packet;
     u32 *direct_state;
@@ -1372,9 +1373,56 @@ void xglFontBuildPacket(XglPacket **packet_slot)
     func_001820D0(packet_slot);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185A20);
+#define SCRATCHPAD_BASE 0x70000000
+#define FONT_SCREEN_ORIGIN_X 0x700
+#define FONT_SCREEN_ORIGIN_Y 0x720
+#define FONT_COLOR_INITIAL 127
+#define FONT_ALPHA_SOURCE_BLEND 0x44
+#define GS_ALPHA_OPAQUE 0x80
 
-int func_00185A20();
+/* Draws one queued text from text and returns the address of its terminating zero. */
+unsigned char *func_00184B30(FontDrawCursor *cursor, unsigned char *text);
+/* The two quadwords that end the font packet (X2 test_15). */
+extern unsigned char D_004B3410[];
+
+/* XS2 xglFontFlush: sets up the drawing cursor at the base of the scratchpad, starts the font packet,
+ * draws every text queued behind xglFontState (zero-separated, ended by an empty one), closes the packet
+ * and empties the queue. */
+void func_00185A20(void)
+{
+    FontDrawCursor *cursor = (FontDrawCursor *) SCRATCHPAD_BASE;
+    unsigned char *text;
+
+    *xglFontState.queue_cursor = 0;
+    cursor->depth = -1;
+    cursor->blue = FONT_COLOR_INITIAL;
+    cursor->green = FONT_COLOR_INITIAL;
+    cursor->red = FONT_COLOR_INITIAL;
+    cursor->offset_x = FONT_SCREEN_ORIGIN_X;
+    cursor->offset_y = FONT_SCREEN_ORIGIN_Y;
+    cursor->drawFlags = 0;
+    cursor->effect_y = cursor->effect_x = cursor->effect = 1;
+    cursor->effect_red = 0;
+    cursor->scale_x = FONT_SCALE_ONE;
+    cursor->effect_green = 0;
+    cursor->alpha_abcd = FONT_ALPHA_SOURCE_BLEND;
+    cursor->alpha = GS_ALPHA_OPAQUE;
+    cursor->effect_blue = 0;
+    cursor->effect_alpha = 0;
+    cursor->alpha_fix = 0;
+    cursor->scale_y = FONT_SCALE_ONE;
+    cursor->packet = xglPacketGetCurrent();
+    xglFontBuildPacket(&cursor->packet, 0);
+    xglFontState.unmodeled_08 = 0;
+    text = (unsigned char *) (&xglFontState + 1);
+    while (*text != 0) {
+        text = func_00184B30(cursor, text) + 1;
+    }
+    sceVif1PkAddDirectDataN(cursor->packet, D_004B3410, 2);
+    sceVif1PkCloseDirectHLCode(cursor->packet);
+    xglFontBufferReset();
+}
+
 
 void xglFontUpdateState(void)
 {
