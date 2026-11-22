@@ -3,6 +3,7 @@
 /* A vector kept as a plain float[4] (like sceVu0FVECTOR); its w is element 3. Vector4 here changes the
  * address arithmetic of the w stores, so the casts to Vector4 * at the calls stay. */
 #include "main/tu141.h"
+#include "main/xgl_2.h"
 
 /* The .bss object at 0x008C28B0 (splat name gPxyModelRenderStateStorage). Only the fields this TU touches are named;
  * the flag word at +0x300 is or-ed with the nmlModelSet* bits below. */
@@ -19,7 +20,8 @@ typedef struct PxyModelRenderState {
     Vector4 position; /* +0x4C0 */
     unsigned char pad_4D0[0x698 - 0x4D0];
     unsigned int drawFlags; /* +0x698, or-ed with 0x20 in nmlModelSetFogFarDist */
-    unsigned char pad_69C[0x760 - 0x69C];
+    unsigned char pad_69C[0x750 - 0x69C];
+    Vector4Elements globalFogColor; /* +0x750: set by func_0019F178 (X2 nmlModelSetGlobalFogCol) */
     unsigned char fog_far[0x10]; /* +0x760: the fog parameters of nmlModelSetFogFarDist (gNmlModelFogFarParams) */
 } PxyModelRenderState;
 
@@ -66,7 +68,6 @@ void nmlModelSetFogDist(f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
 }
 
 #include "main/tu045.h"
-#include "main/xgl_2.h"
 
 XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
 void _CurMatrixSet(Matrix4 *matrix);
@@ -103,7 +104,11 @@ void nmlModelSetFogFarDist(f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
     modelSet->drawFlags |= 0x20;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F178);
+void func_0019F178(Vector4 *color)
+{
+    gPxyModelRenderStateStorage.globalFogColor.vector = *color;
+    gPxyModelRenderStateStorage.drawFlags |= 0x20;
+}
 
 extern f32 gNmlModelSortOffset;
 
@@ -111,7 +116,13 @@ void nmlModelSetSortOffset(f32 sortOffset) {
     gNmlModelSortOffset = sortOffset;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F1C0);
+/* The global colour scale (X2 pxySetColorScale writes pxyGlobalColor). */
+extern Vector4 D_004C8B10;
+
+void func_0019F1C0(Vector4 *color)
+{
+    D_004C8B10 = *color;
+}
 
 void nmlModelSetCurrentPtr(void *modelSetCurrent)
 {

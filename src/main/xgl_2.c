@@ -1332,9 +1332,15 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197268);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197328);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_001973D0);
+int func_001973D0(float a, float b, float tolerance)
+{
+    return __builtin_fabsf(a - b) < __builtin_fabsf(tolerance);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_001973F8);
+int func_001973F8(float radius, Vector4 *from, Vector4 *to)
+{
+    return xglPointLength(from, to) < __builtin_fabsf(radius);
+}
 
 unsigned long long func_00307E48(unsigned long long multiplicand, unsigned long long multiplier);
 

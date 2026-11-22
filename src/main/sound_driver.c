@@ -372,7 +372,15 @@ void soundSlotClearLoopFlag(int soundSlotNumber)
     func_00169688(soundSlot->driver_id, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F7E8);
+/* A buffer size for count entries (at least 2): count * 0xD511 + 0xDD11 rounded down to
+ * a 0x800 multiple, plus 0x8200. */
+unsigned int func_0018F7E8(unsigned int count)
+{
+    if (count < 2) {
+        count = 2;
+    }
+    return (count * 0xD511 + 0xDD11) / 0x800 * 0x800 + 0x8200;
+}
 
 typedef struct SoundWork {
     s32 voiceHandle;              /* +0x00: the voice handle, 0 when none */
