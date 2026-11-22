@@ -805,7 +805,47 @@ void func_0019AC80(s32 active)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019ADD8);
+void func_0019A6F0(int resolution);
+void xglRenderGlobalFadeReset(void);
+void func_001AA968(void);
+u8 stateExchangeOff(void);
+
+#define RENDER_FADE_NEUTRAL 0x80
+#define RENDER_DEFAULT_VSYNCS_PER_FRAME 2
+
+/* The render reset (cf. X2 xglRenderInit): neutral fade, scan line setup, the fixed display geometry
+ * (func_0019A6F0; the resolution argument is 0), cleared counters and per-frame state, no final-packet
+ * callbacks, fade and state exchange reset, VSync interrupt on, unlocked and not held. */
+void func_0019ADD8(void)
+{
+    int i;
+
+    D_004C8390_FADE.fade_gain = RENDER_FADE_NEUTRAL;
+    D_004C8390_FADE.fade_level = RENDER_FADE_NEUTRAL;
+    D_004C8390.palMode = 0;
+    D_004C8390.progressiveMode = 0;
+    D_004C8390.unmodeled_83 = 0;
+    xglRenderScanLineInit();
+    func_0019A6F0(0);
+    xglRenderMoveCount = 0;
+    LoopCount = 0;
+    gVsyncsPerFrame = RENDER_DEFAULT_VSYNCS_PER_FRAME;
+    D_004C8390.render_status = 0;
+    D_004C8390.frame_count = 0;
+    D_004C8390.frame_delta = 0;
+    D_004C8390.path_busy_flag = 0;
+    D_004C8390.vsync_tick_count = 0;
+    D_004C8390.skipped_frame_count = 0;
+    for (i = 0; i < RENDER_FINAL_CALLBACK_COUNT; i++) {
+        D_004C8390.finalPacketCallbacks[i] = 0;
+    }
+    xglRenderGlobalFadeReset();
+    func_001AA968();
+    stateExchangeOff();
+    xglIntcEnable(5);
+    xglRenderLocked = 0;
+    xglRenderHoldClear();
+}
 
 /* Calls every registered final-packet callback with the current packet. */
 void xglRenderFinalPacket(void)
@@ -931,8 +971,6 @@ void func_0019AC98(void);
 void pxyResetAndDisablePending(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
-
-s32 func_0019ADD8();
 
 s32 moviePlayerInit();
 

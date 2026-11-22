@@ -76,7 +76,8 @@ typedef struct XglRenderStateBlock {
     unsigned char unmodeled_70[4];      /* +0x70..+0x73 */
     unsigned char render_status;        /* +0x74: cleared by the base swap (X2 xglRenderStatus) */
     unsigned char frame_delta;          /* +0x75 */
-    unsigned char unmodeled_76[2];      /* +0x76..+0x77 */
+    unsigned char path_busy_flag;       /* +0x76: cleared by the render reset (X2 xglRenderPathBusyFlag) */
+    unsigned char unmodeled_77;         /* +0x77 */
     unsigned short frame_count;         /* +0x78: advanced by frame_delta on every base swap */
     unsigned short vsync_tick_count;    /* +0x7A: VSyncs since the last render move (X2 xglRenderVSyncTickCount) */
     short skipped_frame_count;          /* +0x7C: half the ticks minus one, at least 0 (X2 xglRenderSkippedFrameCount) */
