@@ -5,20 +5,6 @@
 unsigned int xglClockDayTime2UInt(XglClock *clock_time);
 void xglClockUInt2DayTime(XglClock *clock_time, unsigned int elapsed);
 
-/* xglCdGetFilePos and xglCdGetFileData fill a 0x30-byte file-position record;
- * only its leading lbn word is evidenced by the callers in xgl_cd.c. */
-typedef struct CdFilePosition {
-    unsigned int lbn;
-    int stored_bytes;
-    unsigned char unmodeled_08[0x1c];
-    unsigned char readMedium;
-    unsigned char unmodeled_25;
-    unsigned char packed;
-    unsigned char unmodeled_27;
-    int fileDescriptor;
-    int file_size;
-} CdFilePosition;
-
 /* Where a file is read from (CdFilePosition.readMedium, CdStreamParam.readMedium). */
 #define CD_SOURCE_DISC 0
 #define CD_SOURCE_HOST 1

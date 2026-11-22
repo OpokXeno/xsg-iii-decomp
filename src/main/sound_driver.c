@@ -374,7 +374,25 @@ int soundSlotStatus(int soundSlotNumber)
     return func_00167CB8(soundSlot->driver_id);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F6E0);
+/* The play position of a voice as a sample count and the samples per second (shaped like CRI ADXT_GetTime). */
+void func_00168038(int adxt, unsigned int *sampleCount, unsigned int *sampleRate);
+
+#define SOUND_FRAMES_PER_SECOND 30.0f
+
+/* The play position of slot soundSlotNumber's voice in frames, or -1 when the slot is not open. */
+int func_0018F6E0(int soundSlotNumber)
+{
+    SoundSlot *soundSlot;
+    unsigned int sampleCount;
+    unsigned int sampleRate;
+
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot == 0) {
+        return -1;
+    }
+    func_00168038(soundSlot->driver_id, &sampleCount, &sampleRate);
+    return (float) sampleCount / (float) sampleRate * SOUND_FRAMES_PER_SECOND;
+}
 
 /* Calls the driver on slot index's voice with value 0; a slot that is not open returns 0. */
 /* Clears the loop flag of the driver voice of the sound slot index (the reset half of soundSlotStartFile). */

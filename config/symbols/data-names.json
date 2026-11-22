@@ -127,6 +127,7 @@
    "0x00540210": "$L13",
    "0x00540238": "xglMcBasePath",
    "0x00540390": "$L499",
+   "0x00540408": "soundCdLocationFormat",
    "0x00540620": "exitProgramBanner",
    "0x00540660": "errorBanner",
    "0x00541de0": "cfeForwardVector",

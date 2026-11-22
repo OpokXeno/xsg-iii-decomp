@@ -10243,6 +10243,7 @@ gSoundVolumeCurve = 0x005491A8;
 gSoundRecordBlock = 0x004C7038;
 gSoundVoices = 0x004C7668;
 gSoundSlotDefaultLevel = 0x004C703B;
+soundCdLocationFormat = 0x00540408;
 gSeMasterBankPath = 0x005404E0;
 gSeBankFileExt = 0x005404D8;
 gSeAdxFileExt = 0x005404F8;
