@@ -63,7 +63,7 @@ typedef struct SoundRecordBlock {
     unsigned char volumeLevels[3];
     int current_song;            /* +0x04 */
     int driver_work;             /* +0x08 */
-    VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as D_004C7044) */
+    VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
     int reset_word;              /* +0x10 */
     int lookupTable[279];        /* +0x14 */
     unsigned char unmodeled_470[0x534 - 0x470];

@@ -78,7 +78,9 @@ typedef struct XglRenderStateBlock {
     unsigned char frame_delta;          /* +0x75 */
     unsigned char unmodeled_76[2];      /* +0x76..+0x77 */
     unsigned short frame_count;         /* +0x78: advanced by frame_delta on every base swap */
-    unsigned char unmodeled_7a[6];      /* +0x7A..+0x7F */
+    unsigned short vsync_tick_count;    /* +0x7A: VSyncs since the last render move (X2 xglRenderVSyncTickCount) */
+    short skipped_frame_count;          /* +0x7C: half the ticks minus one, at least 0 (X2 xglRenderSkippedFrameCount) */
+    unsigned char unmodeled_7e[2];      /* +0x7E..+0x7F */
     /* +0x80 / +0x81: the video mode xglRenderScanLineInit resets the GS with (PAL, else 480p when
      * progressiveMode is set, else NTSC interlaced); xglRenderStart sets +0x81 (xglRenderStartFlag). */
     unsigned char palMode;              /* +0x80 */
@@ -88,11 +90,15 @@ typedef struct XglRenderStateBlock {
     unsigned char syncBacklogFull;      /* +0x84 */
 } XglRenderStateBlock;
 
-/* The clear packet at gEnvFlags (0x004C8240, 0x150 bytes): one quadword, then the GIF packet that
- * xglRenderMove sends from +0x10 (the ClearEnv label). Its A+D writes include the TEST value that
- * xglRenderClearDepth / xglRenderClearFrame select (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
+/* The clear packet at gEnvFlags (0x004C8240, 0x150 = 0x15 quadwords, sent whole by the base swap in movie
+ * mode): one quadword, then the GIF packet of 0x14 quadwords that xglRenderMove sends by DMA from +0x10 (the
+ * ClearEnv label). Its A+D writes include the TEST value that xglRenderClearDepth / xglRenderClearFrame select
+ * (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
+#define RENDER_CLEAR_PACKET_QUADWORDS 0x14
+
 typedef struct XglClearPacket {
-    unsigned char unmodeled_00[0x20];
+    unsigned char unmodeled_00[0x10];
+    u64 gifTag[2];                      /* +0x10: the GIF tag, start of the packet xglRenderMove sends */
     u64 test;                           /* +0x20: GS TEST_1 value of the clear */
     unsigned char unmodeled_28[0x18];
     struct {

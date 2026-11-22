@@ -143,9 +143,7 @@ extern GsDispEnv DispEnv;
 extern signed char pxyTickScaleDouble;
 
 extern signed char xglRenderVSyncInterval;
-
-extern int LoopCount;
-
+extern int LoopCount; /* frames rendered (X2 name) */
 extern int ScanLineInterpolate;
 
 /* Glyph digit strokes of the pxy debug draw (.data after the hooks). */
@@ -414,8 +412,7 @@ extern void sceGsPutDrawEnv(GsDrawEnv *env);
 extern int xglRenderGlobalFadeColor;
 
 /* 0 by xglRenderCpUDispOff, 1 by xglRenderCpUDispOn */
-extern int xglRenderClearSkip;
-
+extern unsigned char xglRenderClearSkip; /* set: the next render move sends neither the clear nor the packet */
 extern int xglRenderMoveCount;
 
 /* The GS VSync interrupt callback increments this counter while
@@ -786,7 +783,7 @@ void xglRenderLockClear(void) {
     xglRenderLocked = 0;
 }
 
-extern s8 xglRenderHeld;
+extern unsigned char xglRenderHeld;
 
 void xglRenderHoldClear(void) {
     xglRenderHeld = 0;
@@ -920,6 +917,18 @@ void xglRenderGlobalFadeSend(void) {
         sceVif1PkRef(packet, &xglRenderFadeGifWord[-0x11], 0x15, 0, 0, 0);
     }
 }
+
+void pxyVif1EmptyPacketStart(void);
+void sefDrawEffectRecords3D(void);
+void func_001AA580(void);
+void func_002586A8(void);
+void pxyStateConsumeDirty(void);
+void xglFontUpdateState(void);
+void func_0019B020(void);
+void pxyVif1EmptyPacketRestart(void);
+void func_00199A20(void);
+void func_0019AC98(void);
+void pxyResetAndDisablePending(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 
