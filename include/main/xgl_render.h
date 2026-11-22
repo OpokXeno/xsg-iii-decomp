@@ -68,7 +68,10 @@ typedef struct XglRenderStateBlock {
     unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
-    unsigned char unmodeled_0e[8];      /* +0x0E..+0x15 */
+    unsigned short work_buffer_base;    /* +0x0E: the third full-screen page (X2 work_buffer_base; label movieBackdropBasePage) */
+    unsigned short aux_page;            /* +0x10: a VRAM page func_0019A6F0 sets; no reader in this build */
+    unsigned short texture_base;        /* +0x12: the texture buffer page (Packet.c's texture transfer) */
+    unsigned short aux_page2;           /* +0x14: a VRAM page func_0019A6F0 sets; no reader in this build */
     unsigned short display_buffer_base; /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame */
     unsigned short flip_base;           /* +0x18: the next display page (X2 sRenderFlipBase) */
     unsigned char unmodeled_1a[2];      /* +0x1A..+0x1B */

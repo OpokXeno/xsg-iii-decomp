@@ -703,7 +703,50 @@ void xglRenderStart(s32 renderStartMode) {
     xglRenderDispEnvFlagSet();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A6F0);
+void func_00199FE8(void);
+void func_0019A558(void);
+void xglStudioReset(void);
+void xglStudioMainCameraInit(void);
+
+/* The fixed display geometry of this build: a 512x448 frame, 32-bit colour, 24-bit depth, in 2048-word
+ * GS pages (one frame is 0x70 pages). */
+#define RENDER_DEPTH_PSM 0x31 /* PSMZ24 */
+#define RENDER_FRAME_PSM 0    /* PSMCT32 */
+#define RENDER_FRAME_WIDTH 512
+#define RENDER_FRAME_HEIGHT 448
+#define RENDER_FRAME_PAGES 0x70
+#define RENDER_PAGE_WORK (RENDER_FRAME_PAGES * 3)
+#define RENDER_PAGE_AUX 0xC0
+#define RENDER_PAGE_TEXTURE 0x1C0
+#define RENDER_PAGE_AUX2 0x1E0
+
+/* The XS3 xglRenderSetReso: one fixed geometry (resolution is not read); the display page is the second
+ * frame in movie mode (movieMode), else the first. Then the environments and the studio cameras. */
+void func_0019A6F0(int resolution)
+{
+    D_004C8390.depth_psm = RENDER_DEPTH_PSM;
+    D_004C8390.psm = RENDER_FRAME_PSM;
+    D_004C8390.frame_width = RENDER_FRAME_WIDTH;
+    D_004C8390.frame_height = RENDER_FRAME_HEIGHT;
+    D_004C8390.zbuf_base = 0;
+    D_004C8390.dispfb_base = RENDER_FRAME_PAGES;
+    D_004C8390.prev_dispfb_base = RENDER_FRAME_PAGES * 2;
+    D_004C8390.work_buffer_base = RENDER_PAGE_WORK;
+    D_004C8390.aux_page = RENDER_PAGE_AUX;
+    D_004C8390.texture_base = RENDER_PAGE_TEXTURE;
+    D_004C8390.aux_page2 = RENDER_PAGE_AUX2;
+    if (D_004C8390.movieMode != 0) {
+        D_004C8390.display_buffer_base = RENDER_FRAME_PAGES * 2;
+    } else {
+        D_004C8390.display_buffer_base = RENDER_FRAME_PAGES;
+    }
+    D_004C8390.flip_base = D_004C8390.prev_dispfb_base;
+    func_00199FE8();
+    func_0019A280();
+    func_0019A558();
+    xglStudioReset();
+    xglStudioMainCameraInit();
+}
 
 /* The fade bytes sit just past XglRenderStateBlock, which must keep its 0x86-byte size (the object records it). */
 typedef struct XglRenderFadeView {
@@ -805,7 +848,6 @@ void func_0019AC80(s32 active)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
-void func_0019A6F0(int resolution);
 void xglRenderGlobalFadeReset(void);
 void func_001AA968(void);
 u8 stateExchangeOff(void);
