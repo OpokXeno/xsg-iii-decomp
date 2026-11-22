@@ -63,16 +63,47 @@ extern Matrix4 xglUnit4sMatrix;
 extern char D_20[];
 extern char D_E8[];
 
-/* xglSin / xglCos inlined: result = the micro entry evaluated on the angle bits in vf4. The rotation
- * functions move the angle to a GPR once and share it between both calls. */
-#define XglMicroSinCos(result, micro, angleBits) \
-    __asm__ __volatile__( \
-        "ctc2.i %1, $vi27\n\t" \
-        "vnop\n\t" \
-        "qmtc2.ni %2, $vf4\n\t" \
-        "vcallmsr $vi27\n\t" \
-        "qmfc2.i %0, $vf1" \
-        : "=r"(result) : "r"((u32)(micro) >> 3), "r"(angleBits))
+/* xglSin / xglCos (xgl_light_030.c) as inline functions: the micro entry evaluated on the angle
+ * bits in vf4. Inlined twice, the two mfc1 of the angle are merged by CSE. */
+static inline float xglSinInline(float angle)
+{
+    u32 angleBits;
+    float result;
+
+    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
+    __asm__ __volatile__(
+        "ctc2.i %1, $vi27
+	"
+        "vnop
+	"
+        "qmtc2.ni %2, $vf4
+	"
+        "vcallmsr $vi27
+	"
+        "qmfc2.i %0, $vf1"
+        : "=r"(result) : "r"((u32)D_20 >> 3), "r"(angleBits));
+    return result;
+}
+
+static inline float xglCosInline(float angle)
+{
+    u32 angleBits;
+    float result;
+
+    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
+    __asm__ __volatile__(
+        "ctc2.i %1, $vi27
+	"
+        "vnop
+	"
+        "qmtc2.ni %2, $vf4
+	"
+        "vcallmsr $vi27
+	"
+        "qmfc2.i %0, $vf1"
+        : "=r"(result) : "r"((u32)D_E8 >> 3), "r"(angleBits));
+    return result;
+}
 
 void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation)
 {
@@ -872,16 +903,10 @@ void xglMatrixRotX(Matrix4 destination, Matrix4 source, float angle)
 {
     AlignedVector4 sincos;
     AlignedVector4 *pSincos;
-    u32 angleBits;
-    float sine;
-    float cosine;
 
-    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
     pSincos = &sincos;
-    XglMicroSinCos(sine, D_20, angleBits);
-    sincos.y = sine;
-    XglMicroSinCos(cosine, D_E8, angleBits);
-    sincos.x = cosine;
+    sincos.y = xglSinInline(angle);
+    sincos.x = xglCosInline(angle);
     __asm__ __volatile__(
         "lq $2, 0(%1)\n"
         "lqc2 vf28, 16(%1)\n"
@@ -905,16 +930,10 @@ void xglMatrixRotY(Matrix4 destination, Matrix4 source, float angle)
 {
     AlignedVector4 sincos;
     AlignedVector4 *pSincos;
-    u32 angleBits;
-    float sine;
-    float cosine;
 
-    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
     pSincos = &sincos;
-    XglMicroSinCos(sine, D_20, angleBits);
-    sincos.y = sine;
-    XglMicroSinCos(cosine, D_E8, angleBits);
-    sincos.x = cosine;
+    sincos.y = xglSinInline(angle);
+    sincos.x = xglCosInline(angle);
     __asm__ __volatile__(
         "lq $2, 16(%1)\n"
         "lqc2 vf27, 0(%1)\n"
@@ -938,16 +957,10 @@ void xglMatrixRotZ(Matrix4 destination, Matrix4 source, float angle)
 {
     AlignedVector4 sincos;
     AlignedVector4 *pSincos;
-    u32 angleBits;
-    float sine;
-    float cosine;
 
-    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
     pSincos = &sincos;
-    XglMicroSinCos(sine, D_20, angleBits);
-    sincos.y = sine;
-    XglMicroSinCos(cosine, D_E8, angleBits);
-    sincos.x = cosine;
+    sincos.y = xglSinInline(angle);
+    sincos.x = xglCosInline(angle);
     __asm__ __volatile__(
         "lq $2, 32(%1)\n"
         "lqc2 vf27, 0(%1)\n"
