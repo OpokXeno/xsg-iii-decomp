@@ -17,8 +17,8 @@ void xglCameraResetState(XglCamera *camera)
 
 extern Vector4 gCameraDefaultClipRange;
 extern Vector4 gCameraDefaultPortEffect;
-/* The xgl_render.c render state (XglRenderState); the camera screen takes its frame size. */
-extern XglRenderState D_004C8390;
+/* The render state; the camera screen takes its frame size. */
+extern XglRenderStateBlock D_004C8390;
 
 /* Fills the XglCameraScreen block at camera+0x10 with the default screen and the frame size. */
 void xglCameraScreenInit(XglCamera *camera)
@@ -29,14 +29,14 @@ void xglCameraScreenInit(XglCamera *camera)
     screen->depthMin = 0;
     QuadwordCopy(&screen->clipRange.vector, &gCameraDefaultClipRange);
     QuadwordCopy(&screen->portEffect, &gCameraDefaultPortEffect);
-    screen->resolution.vector.x = D_004C8390.reso.frame_width;
-    screen->resolution.vector.y = D_004C8390.reso.frame_height;
-    screen->resolution.vector.z = D_004C8390.reso.frame_width;
-    screen->resolution.vector.w = D_004C8390.reso.frame_height;
+    screen->resolution.vector.x = D_004C8390.frame_width;
+    screen->resolution.vector.y = D_004C8390.frame_height;
+    screen->resolution.vector.z = D_004C8390.frame_width;
+    screen->resolution.vector.w = D_004C8390.frame_height;
     screen->window.vector.x = 0.0f;
     screen->window.vector.y = 0.0f;
-    screen->window.vector.z = D_004C8390.reso.frame_width;
-    screen->window.vector.w = D_004C8390.reso.frame_height;
+    screen->window.vector.z = D_004C8390.frame_width;
+    screen->window.vector.w = D_004C8390.frame_height;
 }
 
 extern Vector4 gCameraDefaultRotation;
@@ -532,17 +532,17 @@ void func_00195050(XglCamera *camera, int left, int top, int right, int bottom)
     if (bottom < 0) {
         bottom = 0;
     }
-    if (left >= D_004C8390.reso.frame_width) {
-        left = D_004C8390.reso.frame_width;
+    if (left >= D_004C8390.frame_width) {
+        left = D_004C8390.frame_width;
     }
-    if (right >= D_004C8390.reso.frame_width) {
-        right = D_004C8390.reso.frame_width;
+    if (right >= D_004C8390.frame_width) {
+        right = D_004C8390.frame_width;
     }
-    if (top >= D_004C8390.reso.frame_height) {
-        top = D_004C8390.reso.frame_height;
+    if (top >= D_004C8390.frame_height) {
+        top = D_004C8390.frame_height;
     }
-    if (bottom >= D_004C8390.reso.frame_height) {
-        bottom = D_004C8390.reso.frame_height;
+    if (bottom >= D_004C8390.frame_height) {
+        bottom = D_004C8390.frame_height;
     }
     screen->window.vector.x = left;
     screen->window.vector.y = top;

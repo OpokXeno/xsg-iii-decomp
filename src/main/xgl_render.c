@@ -404,23 +404,6 @@ void xglRenderMove(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 
-/* Callbacks func_0019AE90 runs on the frame packet. */
-#define RENDER_FINAL_CALLBACK_COUNT 21
-
-typedef struct XglRenderStateBlock {
-    unsigned char unmodeled_00[2];
-    short psm;                          /* +0x02 */
-    unsigned char unmodeled_04[4];
-    unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
-    unsigned short dispfb_base;         /* +0x0A */
-    unsigned short prev_dispfb_base;    /* +0x0C */
-    unsigned char unmodeled_0e[0x0e];   /* +0x0E..+0x1B */
-    XglRenderFadeCallback finalPacketCallbacks[RENDER_FINAL_CALLBACK_COUNT]; /* +0x1C: run by func_0019AE90 */
-    unsigned char unmodeled_70[0x05];   /* +0x70..+0x74 */
-    unsigned char frame_delta;          /* +0x75 */
-    unsigned char unmodeled_76[0x0e];   /* +0x76..+0x83 */
-    unsigned char syncBacklogFull;              /* +0x84 */
-} XglRenderStateBlock;
 
 typedef int s32;
 
@@ -603,9 +586,9 @@ void xglRenderScanLineInit(void)
   *((volatile s32 *) 0x10003C20) = 0;
   ScanLineInterpolate = 1;
   func_002F38F0(0);
-  if (D_004C8390.unmodeled_76[0xA] == 0)
+  if (D_004C8390.palMode == 0)
   {
-    if (!(D_004C8390.unmodeled_76[0xB] != 0))
+    if (!(D_004C8390.progressiveMode != 0))
     {
       func_002F3118(0, 1, 2, 0);
     }
@@ -685,13 +668,12 @@ void xglRenderHoldSet(void) {
     xglRenderHeld = 1;
 }
 
-/* The halfword at 0x4C8410: its high byte is xglRenderStartFlag (0x4C8411); func_0019AC80 tests both bytes at once. */
-extern u16 D_004C8410[];
 extern s8 xglRenderMovieActive;
 
 void func_0019AC80(s32 active)
 {
-    if (D_004C8410[0] != 0) {
+    /* GCC merges the two byte tests into one lhu of +0x80 */
+    if (D_004C8390.palMode != 0 || D_004C8390.progressiveMode != 0) {
         active = 1;
     }
     xglRenderMovieActive = active;

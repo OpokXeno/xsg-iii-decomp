@@ -259,12 +259,7 @@ extern GifAdQuad Tail_10[3];
 extern GifAdQuad gDropShadowSetupQuads[5];
 extern GifAdQuad gDropShadowRestoreQuads[3];
 
-/* The table at 0x004C8390; the shadow packets read its display buffer base at +0x16 (lhu 22(base)). */
-typedef struct {
-    u8 unmodeled_00[0x16];
-    unsigned short display_buffer_base;
-} XglRenderStateBlock;
-
+/* The render state; the shadow packets read its display buffer base. */
 extern XglRenderStateBlock D_004C8390;
 
 /* Steps *decrementedValue down by decrementAmount and clamps the result into [lowerBound, upperBound];
