@@ -99,8 +99,8 @@ int cfeModelFindPart(PxyPackView *pack, const char *partName) {
     return -1;
 }
 
-/* Geometry entry index (112 bytes each) of a "pxy" pack, 0 when the pack is not one or index is out of range
- * (X2 pxyGetEntry). */
+/* The address of geometry entry `index` (112 bytes each) of a "pxy" pack, 0 when the pack is not one or the
+ * index is out of range (X2 pxyGetEntry). */
 unsigned char *func_0019EA60(PxyPackView *pack, int index) {
     unsigned char *geometryEntry;
 

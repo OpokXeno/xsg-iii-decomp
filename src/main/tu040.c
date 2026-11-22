@@ -86,8 +86,6 @@ void func_0019E148(void)
     gPxyModelRenderState.unk67C = 0;
 }
 
-void func_0019E148(void);
-
 void pxyFinishInit(void) {
     func_0019E148();
 }
@@ -158,7 +156,6 @@ void func_0019E410(void)
 
 extern int pxyCameraEnabled[4];
 void func_001975C8(void *light);
-void *memset(void *destination, int value, unsigned int size);
 
 /* X2 pxyInitTables: camera 0 on, the default light at the start of the block, the light slot table cleared with
  * unit x in its first seven rows, the usage percentages cleared, then the entry table. */
