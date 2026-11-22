@@ -28992,6 +28992,32 @@
      }
     }
    ]
+  },
+  "main/tu032": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffd0",
+      "0x0054ffd4"
+     ],
+     "generated": [
+      "0x0054ffd0",
+      "0x0054ffd4"
+     ],
+     "generated_by": [
+      "func_00199A20"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFD0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/Packet.o"
+     }
+    }
+   ]
   }
  }
 }
