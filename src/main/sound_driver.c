@@ -243,7 +243,55 @@ void soundSlotStartNumbered(s32 soundSlotNumber, s32 fileNumber) {
     soundSlotStartFile(soundSlotNumber, fileKey);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F2D0);
+/* The EE va_start spelling (as in the other variadic definitions of this tree); every
+ * variadic argument takes one 8-byte slot. */
+typedef char *va_list;
+#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
+#define VA_SLOT_SIZE 8
+
+/* The pool the playlist's file keys are written to, one after another (the driver keeps
+ * the pointers). */
+extern char D_004C76A8[];
+/* The seamless playlist calls of the driver voice (shaped like CRI ADXT_ResetEntry,
+ * ADXT_EntryFname, ADXT_SetSeamlessLp and ADXT_StartSeamless). */
+void func_0015E8C0(int id);
+void func_0015E240(int id, const char *key);
+void func_0015E568(int id, int loop);
+void func_0015E488(int id);
+
+/* Plays the null-terminated list of file names on the sound slot as one seamless playlist:
+ * each name's file key goes to the pool and into the list; a name starting with '<' ends
+ * the list and loops it. A null slot (the lookup failed) does nothing. */
+void func_0018F2D0(int soundSlotNumber, const char *fileName, ...)
+{
+    extern void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
+    SoundSlot *soundSlot;
+    char *key;
+    va_list args;
+    va_list slot;
+
+    key = D_004C76A8;
+    soundSlot = func_0018E490(soundSlotNumber);
+    if (soundSlot != 0) {
+        func_0015E8C0(soundSlot->driver_id);
+        va_start(args, fileName);
+        while (fileName != 0) {
+            if (fileName[0] == '<') {
+                func_0015E568(soundSlot->driver_id, 1);
+                break;
+            }
+            func_0018E4C0(key, gSeAdxDirName, fileName, gSeAdxFileExt);
+            func_0015E240(soundSlot->driver_id, key);
+            while (*key++ != 0) {
+            }
+            /* the next argument's slot is kept before the step, as the original does */
+            slot = args;
+            args += VA_SLOT_SIZE;
+            fileName = *(const char **) slot;
+        }
+        func_0015E488(soundSlot->driver_id);
+    }
+}
 
 s32 func_0016A968(s32, s32);
 
