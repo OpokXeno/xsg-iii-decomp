@@ -15,7 +15,11 @@ typedef struct PxyModelRenderState {
     unsigned char pad_358[0x380 - 0x358];
     long long stencil_alpha; /* +0x380 */
     long long stencil_mode; /* +0x388, set to 0x42 */
-    unsigned char pad_390[0x4B0 - 0x390];
+    unsigned char pad_390[0x398 - 0x390];
+    f32 modelScaleMax; /* +0x398: the largest of modelScale x, y, z */
+    unsigned char pad_39C[0x470 - 0x39C];
+    Vector4 modelScale; /* +0x470 */
+    unsigned char pad_480[0x4B0 - 0x480];
     unsigned char fog_near[0x10]; /* +0x4B0: the fog parameters of nmlModelSetFogDist (gNmlModelFogNearParams) */
     Vector4 position; /* +0x4C0 */
     unsigned char pad_4D0[0x698 - 0x4D0];
@@ -184,7 +188,18 @@ void func_0019F308(Matrix4 matrix)
     QuadwordCopyMatrix(D_008C2CA0, matrix);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F338);
+/* X2 nmlModelSetScale: keeps the scale and its largest component. */
+void func_0019F338(const Vector4 *scale)
+{
+    gPxyModelRenderStateStorage.modelScale = *scale;
+    gPxyModelRenderStateStorage.modelScaleMax = scale->x;
+    if (gPxyModelRenderStateStorage.modelScaleMax < scale->y) {
+        gPxyModelRenderStateStorage.modelScaleMax = scale->y;
+    }
+    if (gPxyModelRenderStateStorage.modelScaleMax < scale->z) {
+        gPxyModelRenderStateStorage.modelScaleMax = scale->z;
+    }
+}
 
 void nmlModelSetZwrite(int zwrite) {
     if (zwrite != 0) {
@@ -242,7 +257,18 @@ void nmlModelSetStoredFlag(int storedFlag) {
     nmlModelStoredFlag = storedFlag;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F488);
+void *xglPacketReserve(int count);
+
+/* Copies the light set into the packet and keeps the copy's address (X2 pxySetLightCopy). In this build the
+ * address goes to the word nmlModelSetStoredFlag also writes. */
+void func_0019F488(XglLightSet *light)
+{
+    XglLightSet *copy;
+
+    copy = xglPacketReserve(0x19);
+    nmlModelStoredFlag = (int)copy;
+    *copy = *light;
+}
 
 void nmlModelSetFlagBit40(void) {
     gPxyModelRenderStateStorage.renderStatus |= 0x40;

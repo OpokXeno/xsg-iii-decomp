@@ -1350,4 +1350,13 @@ unsigned short xglSRand(void)
     return (gXglRandomSeed[0] >> 16) & 0x7fff;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00197480);
+/* Two steps of the gXglRandomSeed generator; returns the first step shifted left 16 plus the second state shifted
+ * right 16 (X2 xglLRand). */
+unsigned int func_00197480(void)
+{
+    unsigned int first;
+
+    first = (unsigned int)(func_00307E48(gXglRandomSeed[0], 1103515245ULL) + 12345ULL);
+    gXglRandomSeed[0] = first * 1103515245U + 12345U;
+    return (first << 16) + (unsigned int)(gXglRandomSeed[0] >> 16);
+}
