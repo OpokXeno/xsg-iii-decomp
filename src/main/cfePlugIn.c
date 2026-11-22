@@ -77,13 +77,19 @@ void cfeDirectionFromAngles(float *direction, const float *angles)
 int func_0030E68C(unsigned char *geometryEntry, const char *name);
 
 /* Index of the first geometry geometryEntry (112 bytes each) of a "pxy" pack whose name matches partName; -1 when none does. */
-int cfeModelFindPart(PxyModelHeader *pack, const char *partName) {
+/* A "pxy" pack as cfeModelFindPart reads it: the first doubleword holds the "pxy" magic in its low three bytes. */
+typedef union PxyPackView {
+    u64 signature;
+    PxyModelHeader header;
+} PxyPackView;
+
+int cfeModelFindPart(PxyPackView *pack, const char *partName) {
     unsigned char *geometryEntry;
     int i;
 
-    if (partName != 0 && pack != 0 && (*(u64 *)pack & 0xFFFFFF) == 0x797870) {
-        geometryEntry = (unsigned char *)pack + pack->geometryOffset;
-        for (i = 0; i < pack->geometryCount; i++) {
+    if (partName != 0 && pack != 0 && (pack->signature & 0xFFFFFF) == 0x797870) {
+        geometryEntry = (unsigned char *)pack + pack->header.geometryOffset;
+        for (i = 0; i < pack->header.geometryCount; i++) {
             if (func_0030E68C(geometryEntry, partName) == 0) {
                 return i;
             }
