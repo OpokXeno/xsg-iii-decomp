@@ -438,8 +438,8 @@ void sceGsSetDefLoadImage(void *image, s16 fbp, s16 fbw, s16 psm, s16 x, s16 y, 
 void nmlModelDirectSend(s32 slot, void *data, s32 quadwordCount);
 s32 xglPsmBufferWidth(s32 width, s32 psm);
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int count);
-void func_002F4BA0(XglPacket *packet, unsigned int mode);
-void func_002F4BF8(XglPacket *packet);
+void sceVif1PkOpenDirectCode(XglPacket *packet, unsigned int mode);
+void sceVif1PkCloseDirectCode(XglPacket *packet);
 
 /* Uploads a texture set's records to the packet, last record first: each record is a GS load-image block sent as
  * a direct-mode GIF packet, followed by the record's data. */
@@ -463,9 +463,9 @@ void nmlPacketTextureTrans(TxyBlock *txyBlock, s32 textureSetSlot, s32 originX) 
             sceGsSetDefLoadImage(loadImage, ((u16) originX + textureRecord->destX), xglPsmBufferWidth(512, 0), 0, 0, 0,
                                  textureRecord->width, textureRecord->height);
             loadImage[0] &= ~0x8000;
-            func_002F4BA0(packet, 0);
+            sceVif1PkOpenDirectCode(packet, 0);
             sceVif1PkAddDirectDataN(packet, loadImage, 5);
-            func_002F4BF8(packet);
+            sceVif1PkCloseDirectCode(packet);
             sceVif1PkRef(packet, (u8 *) txyBlock + textureRecord->dataOffset, textureRecord->dataQuadwordCount, 0, 0, 0);
             recordIndex--;
         }

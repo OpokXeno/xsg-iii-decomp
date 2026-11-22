@@ -21,7 +21,7 @@ void nmlModelSetStoreValue(s32 storedValue) {
     D_008C2C14 = storedValue;
 }
 
-void func_0019EF08(Vector4 *color)
+void nmlModelSetFogCol(Vector4 *color)
 {
     gPxyModelRenderStateStorage.fogColor.vector = *color;
     gPxyModelRenderStateStorage.renderStatus |= 1;

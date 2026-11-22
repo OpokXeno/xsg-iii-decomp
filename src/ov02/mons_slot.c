@@ -106,10 +106,10 @@ void monsColorStore(s64 *color) {
     gMonsColor[1] = color[1];
 }
 
-s32 func_0019F1C0(void *);
+s32 pxySetColorScale(void *);
 
 void monsColorApply(void) {
-    func_0019F1C0(gMonsColor);
+    pxySetColorScale(gMonsColor);
 }
 
 /*

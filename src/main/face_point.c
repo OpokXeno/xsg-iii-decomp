@@ -250,7 +250,7 @@ typedef struct CullingMap {
     unsigned char unmodeled_00[0x20];
     CullingVolume volumes[10];
     s32 volumeCount;
-    s32 *unmodeled_DE4;          /* +0xDE4: a list of up to 12 indices ended by a negative one (func_0019C3C8) */
+    s32 *volumeIndexList;          /* +0xDE4: a list of up to 12 indices ended by a negative one (func_0019C3C8) */
 } CullingMap;
 
 extern CullingMap gCullingVolumeTable[];
@@ -286,9 +286,9 @@ void func_0019C3C8(void)
 {
     s32 index;
 
-    if (gCullingVolumeTable->unmodeled_DE4 != 0) {
+    if (gCullingVolumeTable->volumeIndexList != 0) {
         for (index = 0; index < 12; index++) {
-            if (gCullingVolumeTable->unmodeled_DE4[index] < 0) {
+            if (gCullingVolumeTable->volumeIndexList[index] < 0) {
                 break;
             }
         }
@@ -302,7 +302,7 @@ void xglCullingMapClear(void)
     gCullingEnabled = 0;
     map->volumeCount = 0;
     map->unmodeled_00[0] = 0;
-    map->unmodeled_DE4 = 0;
+    map->volumeIndexList = 0;
 }
 
 typedef struct CullingMapEntry {

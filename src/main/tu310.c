@@ -76,7 +76,7 @@ s32 cycleStepARange255();
 s32 cycleStepBRange255();
 s32 cycleStepARange512();
 s32 cycleStepBRange512();
-s32 func_00195050();
+s32 xglCameraSetWindow();
 s32 xglStudioSelectGetActiveCamera();
 s32 fptodp(f32);
 s32 func_00287848();
@@ -164,7 +164,7 @@ void envApplyActiveCameraParams(void)
 
   activeCamera = xglStudioSelectGetActiveCamera(0);
   channelParams = gEnvCameraParams;
-  func_00195050(activeCamera, channelParams[0].channelSetting, channelParams[1].channelSetting, channelParams[2].channelSetting, channelParams[3].channelSetting);
+  xglCameraSetWindow(activeCamera, channelParams[0].channelSetting, channelParams[1].channelSetting, channelParams[2].channelSetting, channelParams[3].channelSetting);
 }
 
 void envCameraRefreshA(void) {

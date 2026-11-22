@@ -389,7 +389,7 @@ extern signed char gVsyncsPerFrame;
 void func_001337B8(void);
 void func_002F32B8(void);
 void func_002F3118(int, int, int, int);
-void func_002F38F0(int);
+void sceGsSyncV(int);
 int sceGsSyncPath(int, int);
 
 void xglRenderSyncWait(void)
@@ -454,7 +454,7 @@ void xglRenderSyncWait(void)
         FlushCache(0);
         xglDmaDirectNormal(2, (unsigned int) packet, 7);
         sceGsSyncPath(0, 0);
-        func_002F38F0(0);
+        sceGsSyncV(0);
     }
 
     gVsyncsSinceFlip = 0;
@@ -521,7 +521,7 @@ void xglRenderClearFrame(void)
     gEnvFlags.test = GS_TEST_CLEAR_FRAME;
 }
 
-void func_0019A530(u32 color)
+void xglRenderClearColor(u32 color)
 {
     gEnvFlags.color.red = color;
     gEnvFlags.color.green = color >> 8;
@@ -538,7 +538,7 @@ void xglRenderScanLineInit(void)
   *((volatile s32 *) 0x10003820) = 0;
   *((volatile s32 *) 0x10003C20) = 0;
   ScanLineInterpolate = 1;
-  func_002F38F0(0);
+  sceGsSyncV(0);
   if (D_004C8390.palMode == 0)
   {
     if (!(D_004C8390.progressiveMode != 0))
@@ -637,7 +637,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019ADD8);
 
 /* Calls every registered final-packet callback with the current packet. */
-void func_0019AE90(void)
+void xglRenderFinalPacket(void)
 {
     XglPacket *packet;
     XglRenderFadeCallback function;
@@ -703,12 +703,12 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B020);
 
 #define VIF_CODE_FLUSH 0x11000000
 void sceVif1PkAddCode(XglPacket *packet, unsigned int code);
-void func_002F4BF8(XglPacket *packet);
+void sceVif1PkCloseDirectCode(XglPacket *packet);
 /* The packet template func_0019B3C0 sends: four quadwords, the TEX0 slot, then seven more from +0x60. */
-extern u64 D_004C7EA0[][2];
+extern u64 xglRenderMovieTex0Packet[][2];
 extern u16 movieFramebufferBasePage[];
 
-/* Sends the D_004C7EA0 packet with a TEX0 register that points at the movie frame buffer page. */
+/* Sends the xglRenderMovieTex0Packet packet with a TEX0 register that points at the movie frame buffer page. */
 void func_0019B3C0(void)
 {
     XglPacket *packet = xglPacketGetCurrent();
@@ -717,13 +717,13 @@ void func_0019B3C0(void)
     sceVif1PkCnt(packet, 0);
     sceVif1PkAddCode(packet, VIF_CODE_FLUSH);
     sceVif1PkOpenDirectHLCode(packet, 0);
-    sceVif1PkAddDirectDataN(packet, D_004C7EA0, 4);
+    sceVif1PkAddDirectDataN(packet, xglRenderMovieTex0Packet, 4);
     scratch = (u64 *)SCRATCHPAD_BASE;
     scratch[0] = 0x24020000 | (movieFramebufferBasePage[0] << 5) | ((u64)0xc800 << 19);
     scratch[1] = GS_TEX0_1;
     sceVif1PkAddDirectDataN(packet, (void *)SCRATCHPAD_BASE, 1);
-    sceVif1PkAddDirectDataN(packet, D_004C7EA0[6], 7);
-    func_002F4BF8(packet);
+    sceVif1PkAddDirectDataN(packet, xglRenderMovieTex0Packet[6], 7);
+    sceVif1PkCloseDirectCode(packet);
 }
 
 extern s32 xglRenderFadeGifWord[];

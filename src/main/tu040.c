@@ -30,15 +30,15 @@ struct PxyModelRenderState {
     float lightSlotTable[24][4];    /* +0x180: X2 pxyLightSlotTable; x of the first seven rows set to 1 */
     u8 unk300[0x670 - 0x300];
     s32 overlayBatchCount;          /* +0x670 (nml_model_set_045.c's name) */
-    s32 unk674;
-    s32 unk678;
-    s32 unk67C;
+    s32 shadowBatchCount;           /* +0x674 (X2 pxyShadowBatchCount) */
+    s32 separateBatchCount;         /* +0x678 (X2 pxySeparateBatchCount) */
+    s32 extraBatchCount;            /* +0x67C (X2 pxyExtraBatchCount) */
     s32 packetSlotWriteCursor;
     void *firstBatch;               /* +0x684 (nml_model_set_045.c's name) */
     u8 unk688[0x4];
     s32 unk68C;
     s32 unk690;
-    s32 unk694;                     /* +0x694: cleared with the entry table */
+    s32 freezeAnimation;            /* +0x694: X2 pxyFreezeAnimation, cleared with the entry table */
     s32 drawFlags;                  /* +0x698 */
     s32 drawCallbackCount;          /* +0x69C: counted up by cfePlugIn.c's func_0019ED68 */
     u8 unk6A0[0x4];
@@ -54,7 +54,7 @@ struct PxyModelRenderState {
     float opaqueEntryUsagePercent;  /* +0x6E0 */
     float translucentEntryUsagePercent; /* +0x6E4 */
     u8 unk6E8[0x8];
-    s32 unk6F0;
+    void *lastBatch;                /* +0x6F0 (X2 pxyLastBatch) */
     s32 unk6F4;
     u8 unk6F8[0x8];
     void (*drawCallbacks[16])(int); /* +0x700 */
@@ -68,7 +68,7 @@ struct PxyModelRenderState {
 void *memset(void *destination, int value, unsigned int size);
 
 /* Empties both batch tables and the batch list words (X2 pxyResetBatchTables). */
-void func_0019E148(void)
+void pxyResetBatchTables(void)
 {
     int i;
 
@@ -78,16 +78,16 @@ void func_0019E148(void)
         gPxyModelRenderState.batchTables[i].tail.unk2004 = 0;
         memset(gPxyModelRenderState.batchTables[i].batches, 0, sizeof(gPxyModelRenderState.batchTables[i].batches));
     }
-    gPxyModelRenderState.unk678 = 0;
+    gPxyModelRenderState.separateBatchCount = 0;
     gPxyModelRenderState.overlayBatchCount = 0;
-    gPxyModelRenderState.unk674 = 0;
+    gPxyModelRenderState.shadowBatchCount = 0;
     gPxyModelRenderState.firstBatch = 0;
-    gPxyModelRenderState.unk6F0 = 0;
-    gPxyModelRenderState.unk67C = 0;
+    gPxyModelRenderState.lastBatch = 0;
+    gPxyModelRenderState.extraBatchCount = 0;
 }
 
 void pxyFinishInit(void) {
-    func_0019E148();
+    pxyResetBatchTables();
 }
 
 void pxyClearPacketSlots(void) {
@@ -131,21 +131,21 @@ void pxyInitModelCounters(void) {
     pxyInitGlobals();
 }
 
-/* The global colour scale nml_model_set_044.c's func_0019F1C0 sets (X2 pxyGlobalColor). */
-extern Vector4 D_004C8B10;
+/* The global colour scale nml_model_set_044.c's pxySetColorScale sets (X2 pxyGlobalColor). */
+extern Vector4 pxyGlobalColor;
 
 /* X2 pxyClearEntryTable. */
-void func_0019E410(void)
+void pxyClearEntryTable(void)
 {
     int i;
 
-    D_004C8B10.x = 1.0f;
-    D_004C8B10.y = 1.0f;
-    D_004C8B10.z = 1.0f;
-    D_004C8B10.w = 1.0f;
+    pxyGlobalColor.x = 1.0f;
+    pxyGlobalColor.y = 1.0f;
+    pxyGlobalColor.z = 1.0f;
+    pxyGlobalColor.w = 1.0f;
     gPxyModelRenderState.entryCount = 0;
     gPxyModelRenderState.entryGroupMask = 0;
-    gPxyModelRenderState.unk694 = 0;
+    gPxyModelRenderState.freezeAnimation = 0;
     for (i = 0; i < 16; i++) {
         gPxyModelRenderState.drawCallbacks[i] = 0;
     }
@@ -159,7 +159,7 @@ void func_001975C8(void *light);
 
 /* X2 pxyInitTables: camera 0 on, the default light at the start of the block, the light slot table cleared with
  * unit x in its first seven rows, the usage percentages cleared, then the entry table. */
-void func_0019E480(void)
+void pxyInitTables(void)
 {
     pxyCameraEnabled[0] = 1;
     pxyCameraEnabled[1] = 0;
@@ -176,5 +176,5 @@ void func_0019E480(void)
     gPxyModelRenderState.lightSlotTable[6][0] = 1.0f;
     gPxyModelRenderState.opaqueEntryUsagePercent = 0;
     gPxyModelRenderState.translucentEntryUsagePercent = 0;
-    func_0019E410();
+    pxyClearEntryTable();
 }

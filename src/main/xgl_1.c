@@ -295,7 +295,7 @@ int xglMovieIpuReset(void)
 }
 
 /* Sets the default packet addresses and transfer thresholds of a movie work record (X2 xglMovieInfoInit). */
-void func_0018B7E0(XglMovieWork *movie)
+void xglMovieInfoInit(XglMovieWork *movie)
 {
     movie->packetAddress[0] = (unsigned long *)MOVIE_PACKET_ADDRESS_0;
     movie->packetAddress[1] = (unsigned long *)MOVIE_PACKET_ADDRESS_1;

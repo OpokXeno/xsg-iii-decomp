@@ -501,7 +501,7 @@ void xglCameraMoveOffset(XglCamera *camera, Vector4 *cameraShift) {
 }
 
 /* Sets the camera window to the rectangle (left, top) - (right, bottom): corners sorted, then clamped to the frame. */
-void func_00195050(XglCamera *camera, int left, int top, int right, int bottom)
+void xglCameraSetWindow(XglCamera *camera, int left, int top, int right, int bottom)
 {
     int swapCoordinate;
     XglCameraScreen *screen;

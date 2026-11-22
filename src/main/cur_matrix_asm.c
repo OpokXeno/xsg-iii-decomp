@@ -21,8 +21,8 @@ void sceVif1PkCnt(XglPacket *packet, unsigned int count);
 void sceVif1PkAddCode(XglPacket *packet, unsigned int code);
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int qwc);
 void sceVif1PkRef(XglPacket *packet, const void *data, unsigned int qwc, unsigned int a, unsigned int b, unsigned int c);
-void func_002F4BA0(XglPacket *packet, unsigned int mode);
-void func_002F4BF8(XglPacket *packet);
+void sceVif1PkOpenDirectCode(XglPacket *packet, unsigned int mode);
+void sceVif1PkCloseDirectCode(XglPacket *packet);
 void sceGsSetDefLoadImage(u64 *image, short dbp, unsigned int dbw, unsigned int psm, unsigned int x, unsigned int y, unsigned int w, unsigned int h);
 extern u16 D_004C8390[];
 
@@ -37,16 +37,16 @@ void nmlPacketSendCircleTexture(const void *indices, void *palette)
     sceVif1PkAddCode(packet, 0x11000000);
     sceGsSetDefLoadImage(image, (D_004C8390[9] << 5), 1, 19, 0, 0, 64, 64);
     image[0] |= 0x8000;
-    func_002F4BA0(packet, 0);
+    sceVif1PkOpenDirectCode(packet, 0);
     sceVif1PkAddDirectDataN(packet, image, 5);
-    func_002F4BF8(packet);
+    sceVif1PkCloseDirectCode(packet);
     sceVif1PkRef(packet, indices, 258, 0, 0, 0);
     sceVif1PkCnt(packet, 0);
     sceGsSetDefLoadImage(image, ((D_004C8390[9] << 5) + 128), 1, 0, 0, 0, 16, 16);
     image[0] |= 0x8000;
-    func_002F4BA0(packet, 0);
+    sceVif1PkOpenDirectCode(packet, 0);
     sceVif1PkAddDirectDataN(packet, image, 5);
-    func_002F4BF8(packet);
+    sceVif1PkCloseDirectCode(packet);
     sceVif1PkRef(packet, xglPacketCopy16(palette, 66), 66, 0, 0, 0);
 }
 

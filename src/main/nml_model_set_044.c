@@ -85,7 +85,7 @@ void nmlModelSetFogFarDist(f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
     modelSet->drawFlags |= 0x20;
 }
 
-void func_0019F178(Vector4 *color)
+void nmlModelSetGlobalFogCol(Vector4 *color)
 {
     gPxyModelRenderStateStorage.globalFogColor.vector = *color;
     gPxyModelRenderStateStorage.drawFlags |= 0x20;
@@ -98,11 +98,11 @@ void nmlModelSetSortOffset(f32 sortOffset) {
 }
 
 /* The global colour scale (X2 pxySetColorScale writes pxyGlobalColor). */
-extern Vector4 D_004C8B10;
+extern Vector4 pxyGlobalColor;
 
-void func_0019F1C0(Vector4 *color)
+void pxySetColorScale(Vector4 *color)
 {
-    D_004C8B10 = *color;
+    pxyGlobalColor = *color;
 }
 
 void nmlModelSetCurrentPtr(void *modelSetCurrent)
@@ -157,16 +157,16 @@ void pxySetLightPtr(XglLightSet *light)
 
 #include "quadword.h"
 
-/* The matrix func_0019F308 stores (nml_model_set .bss). */
-extern Matrix4 D_008C2CA0;
+/* The matrix nmlModelSetDrawMatrix stores (nml_model_set .bss). */
+extern Matrix4 nmlModelDrawMatrix;
 
-void func_0019F308(Matrix4 matrix)
+void nmlModelSetDrawMatrix(Matrix4 matrix)
 {
-    QuadwordCopyMatrix(D_008C2CA0, matrix);
+    QuadwordCopyMatrix(nmlModelDrawMatrix, matrix);
 }
 
 /* X2 nmlModelSetScale: keeps the scale and its largest component. */
-void func_0019F338(const Vector4 *scale)
+void nmlModelSetScale(const Vector4 *scale)
 {
     gPxyModelRenderStateStorage.modelScale = *scale;
     gPxyModelRenderStateStorage.modelScaleMax = scale->x;
@@ -228,22 +228,22 @@ void nmlModelSetStencil(int stencil) {
     }
 }
 
-/* The light set copy func_0019F488 keeps (X2 pxySetLightCopy); the old setter still passes an int. */
-extern XglLightSet *nmlModelStoredFlag;
+/* The light set copy pxySetLightCopy keeps (X2 pxySetLightCopy); the old setter still passes an int. */
+extern XglLightSet *pxyLightCopy;
 
 void nmlModelSetStoredFlag(int storedFlag) {
-    nmlModelStoredFlag = (XglLightSet *) storedFlag;
+    pxyLightCopy = (XglLightSet *) storedFlag;
 }
 
 void *xglPacketReserve(int count);
 
 /* Copies the light set into the packet and keeps the copy's address (X2 pxySetLightCopy). */
-void func_0019F488(XglLightSet *light)
+void pxySetLightCopy(XglLightSet *light)
 {
     XglLightSet *copy;
 
     copy = xglPacketReserve(0x19);
-    nmlModelStoredFlag = copy;
+    pxyLightCopy = copy;
     *copy = *light;
 }
 

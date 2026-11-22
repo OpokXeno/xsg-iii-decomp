@@ -134,7 +134,7 @@ void xglLightSlotsClear(void) {
 
 /* Registers a light pack in the slot table: 2 when it was registered already (one more reference), 1 when a free
  * slot took it, 0 when it is no light pack or no slot is free (X2 xglLightPackRegister). */
-int func_001978B8(XglLightPack *pack)
+int xglLightPackRegister(XglLightPack *pack)
 {
     int i;
 
@@ -158,7 +158,7 @@ int func_001978B8(XglLightPack *pack)
 
 /* Drops one reference of a registered light pack and frees its slot at the last one: 1 when the slot was freed
  * (X2 xglLightPackRelease). */
-int func_00197970(XglLightPack *pack)
+int xglLightPackRelease(XglLightPack *pack)
 {
     int i;
 

@@ -48,7 +48,7 @@ void xglLightPackDebugEmpty(XglLightKey *key) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00198E48);
 
-void func_00199018(XglLightKey *key)
+void xglLightPackDebugMarker(XglLightKey *key)
 {
     int scaled[3];
     DoublewordAlignedVector4 copy;
@@ -59,7 +59,7 @@ void func_00199018(XglLightKey *key)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199030);
 
-void func_00199148(XglLightKey *key)
+void xglLightPackDebugPoint(XglLightKey *key)
 {
     int scaled[3];
     DoublewordAlignedVector4 copy;
@@ -99,10 +99,10 @@ extern XglLightPackSlot xglLightSlotTable[16];
 
 void func_001994F0(XglLightKey *key);
 void func_00199030(XglLightKey *key);
-void func_00199148(XglLightKey *key);
+void xglLightPackDebugPoint(XglLightKey *key);
 void func_00198E48(XglLightKey *key);
 void func_00199160(XglLightKey *key);
-void func_00199018(XglLightKey *key);
+void xglLightPackDebugMarker(XglLightKey *key);
 
 void xglLightPackDebugDrawAll(void)
 {
@@ -144,12 +144,12 @@ void xglLightPackDebugDrawAll(void)
                     break;
                 case 10:
                 case 18:
-                    func_00199018(key);
+                    xglLightPackDebugMarker(key);
                     break;
                 case 2:
                 case 19:
                 case 34:
-                    func_00199148(key);
+                    xglLightPackDebugPoint(key);
                     break;
                 }
                 key++;

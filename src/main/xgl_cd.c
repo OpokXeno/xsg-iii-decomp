@@ -536,7 +536,7 @@ int xglClockReadBcd(XglClock *clock_time)
 }
 
 #define CLOCK_READ_ATTEMPTS 20
-void func_002F38F0(int);
+void sceGsSyncV(int);
 
 /* Reads the clock, retrying up to CLOCK_READ_ATTEMPTS times while xglClockReadBcd fails. */
 void xglClockRead(XglClock *clock_time)
@@ -547,7 +547,7 @@ void xglClockRead(XglClock *clock_time)
         if (xglClockReadBcd(clock_time) == 0) {
             break;
         }
-        func_002F38F0(0);
+        sceGsSyncV(0);
     }
 }
 

@@ -32,11 +32,11 @@ typedef struct PadVibrationTimers {
 
 extern unsigned char gPadLatchBlocked[];
 extern PadVibrationTimers gPadLatchedValue;
-extern s16 D_0055156C; /* fade length in frames */
-extern u8 D_00551560; /* large motor value at the start of the fade */
-extern u8 D_00551561; /* large motor value at the end of the fade */
+extern s16 padVibrationFadeFrames; /* fade length in frames */
+extern u8 padVibrationFadeStart; /* large motor value at the start of the fade */
+extern u8 padVibrationFadeEnd; /* large motor value at the end of the fade */
 
-void func_00186FB8(void)
+void Vibration_Stop(void)
 {
     do {
         gPadLatchedValue.hold = 0;
@@ -54,17 +54,17 @@ void padSetLatchedValue(s32 latchedValue) {
     }
 }
 
-void func_00186FF0(u8 startValue, u8 endValue, s32 framesTotal)
+void Vibration_Set_Strong(u8 startValue, u8 endValue, s32 framesTotal)
 {
     if (gPadLatchBlocked[0] == 0) {
-        D_00551560 = startValue;
-        D_00551561 = endValue;
+        padVibrationFadeStart = startValue;
+        padVibrationFadeEnd = endValue;
         gPadLatchedValue.fadeFramesLeft = framesTotal;
-        D_0055156C = framesTotal;
+        padVibrationFadeFrames = framesTotal;
     }
 }
 
-void func_00187020(void)
+void VibrationEngine(void)
 {
     if (gPadLatchedValue.hold != 0) {
         PadData[0].actuator[PAD_VIBRATION_SMALL_MOTOR] = 1;
@@ -77,9 +77,9 @@ void func_00187020(void)
     if (gPadLatchedValue.fadeFramesLeft != 0) {
         int fadeStep;
 
-        fadeStep = (D_00551560 - D_00551561) * gPadLatchedValue.fadeFramesLeft / D_0055156C;
+        fadeStep = (padVibrationFadeStart - padVibrationFadeEnd) * gPadLatchedValue.fadeFramesLeft / padVibrationFadeFrames;
         gPadLatchedValue.fadeFramesLeft = gPadLatchedValue.fadeFramesLeft - 1;
-        PadData[0].actuator[PAD_VIBRATION_LARGE_MOTOR] = D_00551561 + fadeStep;
+        PadData[0].actuator[PAD_VIBRATION_LARGE_MOTOR] = padVibrationFadeEnd + fadeStep;
         if (gPadLatchedValue.fadeFramesLeft < 0) {
             gPadLatchedValue.fadeFramesLeft = 0;
         }

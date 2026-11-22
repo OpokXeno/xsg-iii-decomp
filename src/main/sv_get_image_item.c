@@ -1540,16 +1540,16 @@ extern int svModelDrawFlags;
 extern const f32 D_0054FD88;
 /* Callees of the other units, prototyped from their call sites. */
 void pxyAddRenderLevel(int level);
-void func_0019EF08(const Vector4 *color);
+void nmlModelSetFogCol(const Vector4 *color);
 void nmlModelSetFogDist(float d0, float d1, float d2, float d3);
 void nmlModelSetSortOffset(float offset);
 void nmlModelSetTexture(TxyBlock *txy);
-void func_0019F308(Matrix4 *matrix);
-void func_0019F338(const Vector4 *scale);
+void nmlModelSetDrawMatrix(Matrix4 *matrix);
+void nmlModelSetScale(const Vector4 *scale);
 void nmlModelSetZwrite(int zwrite);
 void nmlModelSetTransparency(float transparency);
 void nmlModelSetStencil(int stencil);
-void func_0019F488(void *lightSet);
+void pxySetLightCopy(void *lightSet);
 void pxySetAnimTime(float animTime);
 void func_001A1D18(PxyModelHeader *submit);
 SefFogOverride *sefGetFogOverrideBlock(void);
@@ -1607,10 +1607,10 @@ void svSetModelRenderState(SvRenderItem *renderItem, Matrix4 *matrix, int scale)
     if (renderItem->part->txyBlock != 0 && renderItem->part->submitBlock != 0) {
         modelDrawFlags = svModelDrawFlags;
         transparency = renderItem->transparency * 0.0078125f;
-        func_0019F488(svCurrentVertexViewBlock);
+        pxySetLightCopy(svCurrentVertexViewBlock);
         pxySetAnimTime(renderItem->animTime);
         nmlModelSetTexture(renderItem->part->txyBlock);
-        func_0019F308(matrix);
+        nmlModelSetDrawMatrix(matrix);
         if (D_00551520 != 0) {
             transparency *= D_00551520->w;
         }
@@ -1634,14 +1634,14 @@ void svSetModelRenderState(SvRenderItem *renderItem, Matrix4 *matrix, int scale)
         } else {
             fogOverride = sefGetFogOverrideBlock();
             if (fogOverride->enabled != 0) {
-                func_0019EF08(&fogOverride->fogColor);
+                nmlModelSetFogCol(&fogOverride->fogColor);
                 nmlModelSetFogDist(fogOverride->dist[0], fogOverride->dist[1], fogOverride->dist[2], fogOverride->dist[3]);
             }
         }
         if (scale > 0) {
             nmlModelSetSortOffset(scale * D_0054FD88);
         }
-        func_0019F338(&renderItem->scale);
+        nmlModelSetScale(&renderItem->scale);
         func_001A1D18(renderItem->part->submitBlock);
     }
 }

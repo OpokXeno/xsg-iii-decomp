@@ -22,13 +22,13 @@ typedef struct PxyModelRenderState {
     unsigned char pad_3E8[0x470 - 0x3E8];
     Vector4 modelScale; /* +0x470 */
     unsigned char pad_480[0x4A0 - 0x480];
-    Vector4Elements fogColor; /* +0x4A0: set by func_0019EF08 (X2 nmlModelSetFogCol) */
+    Vector4Elements fogColor; /* +0x4A0: set by nmlModelSetFogCol (X2 nmlModelSetFogCol) */
     unsigned char fog_near[0x10]; /* +0x4B0: the fog parameters of nmlModelSetFogDist (gNmlModelFogNearParams) */
     Vector4 position; /* +0x4C0 */
     unsigned char pad_4D0[0x698 - 0x4D0];
     unsigned int drawFlags; /* +0x698, or-ed with 0x20 in nmlModelSetFogFarDist */
     unsigned char pad_69C[0x750 - 0x69C];
-    Vector4Elements globalFogColor; /* +0x750: set by func_0019F178 (X2 nmlModelSetGlobalFogCol) */
+    Vector4Elements globalFogColor; /* +0x750: set by nmlModelSetGlobalFogCol (X2 nmlModelSetGlobalFogCol) */
     unsigned char fog_far[0x10]; /* +0x760: the fog parameters of nmlModelSetFogFarDist (gNmlModelFogFarParams) */
 } PxyModelRenderState;
 

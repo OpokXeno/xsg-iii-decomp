@@ -643,7 +643,7 @@
       "0x0054ff8c"
      ],
      "generated_by": [
-      "func_00197128",
+      "xglGeometryInit",
       "func_00197168",
       "func_001971E8",
       "xglAtan2",

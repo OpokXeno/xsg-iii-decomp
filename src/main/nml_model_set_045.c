@@ -1053,12 +1053,12 @@ void pxyStateConsumeDirty(void) {
 void pxyFinishInit();
 void pxyInitPacketSlots();
 void pxyInitGlobals();
-s32 func_0019E410();
+s32 pxyClearEntryTable();
 
 void pxyInitModuleState(void) {
     pxyInitPacketSlots();
     pxyInitGlobals();
-    func_0019E410();
+    pxyClearEntryTable();
     pxyFinishInit();
 }
 

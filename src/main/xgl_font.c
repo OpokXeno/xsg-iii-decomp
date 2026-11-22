@@ -561,7 +561,7 @@ struct FontCallbackRecord {
 };
 
 /* Queues a call of function(argument) (X2 xglFontPrintExtFunc; this build ignores the OT argument). */
-void func_00182720(int ot, void *function, void *argument)
+void xglFontPrintExtFunc(int ot, void *function, void *argument)
 {
     struct FontCallbackRecord *record;
     unsigned int function_address = (unsigned int)function;

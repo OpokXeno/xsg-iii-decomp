@@ -247,7 +247,7 @@ void xglMemCopy16b(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "lq $2, 0(%1)\n\t"
@@ -256,14 +256,14 @@ void xglMemCopy16b(u8 *destination, const u8 *source, int count)
         "addi %0, %0, -16\n\t"
         "addi %1, %1, -16\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglMemCopy8(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "ld $2, 0(%1)\n\t"
@@ -272,14 +272,14 @@ void xglMemCopy8(u8 *destination, const u8 *source, int count)
         "addi %0, %0, 8\n\t"
         "addi %1, %1, 8\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglMemCopy8b(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "ld $2, 0(%1)\n\t"
@@ -288,14 +288,14 @@ void xglMemCopy8b(u8 *destination, const u8 *source, int count)
         "addi %0, %0, -8\n\t"
         "addi %1, %1, -8\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglMemCopy4(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "lw $2, 0(%1)\n\t"
@@ -304,14 +304,14 @@ void xglMemCopy4(u8 *destination, const u8 *source, int count)
         "addi %0, %0, 4\n\t"
         "addi %1, %1, 4\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglMemCopy4b(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "lw $2, 0(%1)\n\t"
@@ -320,14 +320,14 @@ void xglMemCopy4b(u8 *destination, const u8 *source, int count)
         "addi %0, %0, -4\n\t"
         "addi %1, %1, -4\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglMemCopy2(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "lh $2, 0(%1)\n\t"
@@ -1323,7 +1323,7 @@ void xglDmaDirectSrcChain(u32 channel, u32 address);
 extern char xglVu0ResidentMicroprogram[];
 
 /* Geometry start-up: seeds the VU0 random generator and xglRand, then sends the VU0 resident microprogram. */
-void func_00197128(void)
+void xglGeometryInit(void)
 {
     float randomSeed = 0.1f;
 
@@ -1392,9 +1392,9 @@ void func_00197328(Vector4 *rotation, const Vector4 *direction)
     rotation->w = 1.0f;
 }
 
-int func_001973D0(float a, float b, float tolerance)
+int func_001973D0(float value, float reference, float tolerance)
 {
-    return __builtin_fabsf(a - b) < __builtin_fabsf(tolerance);
+    return __builtin_fabsf(value - reference) < __builtin_fabsf(tolerance);
 }
 
 int func_001973F8(float radius, Vector4 *from, Vector4 *to)
@@ -1412,7 +1412,7 @@ unsigned short xglSRand(void)
 
 /* Two steps of the gXglRandomSeed generator; returns the first step shifted left 16 plus the second state shifted
  * right 16 (X2 xglLRand). */
-unsigned int func_00197480(void)
+unsigned int xglLRand(void)
 {
     unsigned int first;
 
