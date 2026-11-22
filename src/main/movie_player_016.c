@@ -76,9 +76,6 @@ void moviePlayerSetDimensions(u16 width, u16 height) {
     moviePlayerHeight = height;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/movie_player_016", func_0018BD50);
-
-s32 func_0012FBB8();
 s32 makeGstransChain(s32 destination, s32 image, void *frame);
 
 /* Layout of the movie player object that moviePlayerSetupObject fills in (0x17 bytes used). */
@@ -94,6 +91,24 @@ typedef struct MoviePlayerObject {
     unsigned char unk_15;           /* +0x15, cleared */
     unsigned char unk_16;           /* +0x16, set to 0x7F */
 } MoviePlayerObject;
+
+/* The bytes moviePlayerSetupObject uses: the work area and the GS transfer chain, each rounded up to 64. */
+s32 func_0018BD50(void)
+{
+    MoviePlayerObject player;
+    MoviePlayerParams creationParams;
+    s32 workAreaBytes;
+    s32 alignMask;
+
+    alignMask = ~0x3F;
+    moviePlayerParamsInit(&creationParams);
+    player.maxWidth = creationParams.max_width;
+    player.maxHeight = creationParams.max_height;
+    workAreaBytes = (creationParams.movieWorkAreaSize + 0x3F) & alignMask;
+    return workAreaBytes + (((makeGstransChain(0, 0, &player) * 0x10) + 0x3F) & alignMask);
+}
+
+s32 func_0012FBB8();
 
 s32 moviePlayerSetupObject(MoviePlayerObject *player, s32 movieWorkAreaBase)
 {

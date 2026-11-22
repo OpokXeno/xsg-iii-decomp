@@ -20,7 +20,17 @@ int func_0030E68C(const char *, const char *);
 char *strcpy(char *, const char *);
 int GameMpeg2Play(char *destination, const char *format, ...);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_profile_037", func_0019C8D0);
+/* Frees every profile slot. */
+void func_0019C8D0(void)
+{
+    int slot;
+
+    slot = PXY_ENTRY_COUNT - 1;
+    do {
+        pxyProfileEntries[slot].inUse = 0;
+        slot--;
+    } while (slot >= 0);
+}
 
 void pxyProfileBegin(const char *name)
 {

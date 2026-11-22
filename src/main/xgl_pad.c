@@ -69,10 +69,19 @@ void xglPadSetRepeat(int port, unsigned short mask, int delay, int interval) {
     pad->unmodeled_4e = -delay;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_pad", func_00186358);
+/* Sets the repeat mask of the button group at +0x68 of a pad, or of both pads for port -1. */
+void func_00186358(int port, unsigned short mask)
+{
+    if (port == -1) {
+        func_00186358(0, mask);
+        func_00186358(1, mask);
+        return;
+    }
+    PadData[port].groupRepeatMask = mask;
+}
 
 typedef int s32;
-s32 func_00186358(s32 port, s32 mask);
+void func_00186358(int port, unsigned short mask);
 
 void xglPadSetDefaults(void) {
     xglPadSetRepeat(-1, 0xF000U, 5, 1);

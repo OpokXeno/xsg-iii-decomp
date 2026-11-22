@@ -84,9 +84,9 @@ struct XglCameraScreen {
     unsigned char unmodeled_08[8];
     Vector4Elements clipRange; /* x, y = near, far */
     Vector4 portEffect;
-    Vector4 resolution;
+    Vector4Elements resolution; /* union like clipRange: xglCameraScreenInit reloads the frame size after each store */
     Vector4 projection;
-    Vector4 window;
+    Vector4Elements window;
     Vector4 screenOffset;
     Vector4 screenScale;
 };
@@ -106,7 +106,7 @@ struct XglCamera {
 };
 
 void xglRotTransPersN(ScreenVector4 *destination, Matrix4 matrix, const Vector4 *source, int count, int cameraId);
-void func_00196200(Matrix4 destination);
+void xglMatrixUnit(Matrix4 destination);
 struct XglCamera *xglStudioGetCamera2(int camera_index);
 
 #endif

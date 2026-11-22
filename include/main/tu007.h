@@ -60,10 +60,12 @@ struct PadRecord {
     signed char repeatDelay;           /* +0x48 */
     signed char repeatInterval;        /* +0x49 */
     unsigned short repeatMask;         /* +0x4A */
-    signed char repeatWait;            /* +0x4C */
-    signed char repeatCount;           /* +0x4D */
+    unsigned short groupRepeatMask;    /* +0x4C: repeat mask of the button group at +0x68 (func_00186358,
+                                          xglPadRead reads it as a halfword) */
     signed char unmodeled_4e;          /* +0x4E: set to -repeatDelay by xglPadSetRepeat */
-    unsigned char unmodeled_4f[7];     /* +0x4F */
+    unsigned char unmodeled_4f;        /* +0x4F */
+    unsigned char actuator[2];         /* +0x50: the vibration motors (small, large) the pad vibration drives */
+    unsigned char unmodeled_52[4];     /* +0x52 */
     unsigned char horizontalDeadZone;  /* +0x56: initialised to 64 by xglPadInitial */
     unsigned char verticalDeadZone;    /* +0x57: initialised to 64 by xglPadInitial */
     unsigned char buttonMap[8];        /* +0x58 */

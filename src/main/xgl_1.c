@@ -294,4 +294,15 @@ int xglMovieIpuReset(void)
     return (func_002FAF50(0, IPU_SYNC_TIMEOUT) >= 0) ? 0 : -1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_1", func_0018B7E0);
+/* Sets the default packet addresses and transfer thresholds of a movie work record (X2 xglMovieInfoInit). */
+void xglMovieInfoInit(XglMovieWork *movie)
+{
+    movie->packetAddress[0] = (unsigned long *)MOVIE_PACKET_ADDRESS_0;
+    movie->packetAddress[1] = (unsigned long *)MOVIE_PACKET_ADDRESS_1;
+    /* -1: currentFrame -1, transMode 0xFF */
+    movie->transMode = movie->currentFrame = -1;
+    movie->loop = 0;
+    movie->ipuThresholdHigh = 0;
+    movie->ipuThresholdLow = 0;
+    movie->decodeBuffer = 0;
+}

@@ -22,11 +22,22 @@ void assertFailed(const char *message, const char *file, int line) {
     assertExit();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/assert_fail", func_001936A8);
+/* Assertion with a printf-style message (condition, file, line, format, ...): like assertFailed, the original only
+ * exits through assertExit. */
+void func_001936A8(const char *condition, const char *file, int line, const char *format, ...)
+{
+    assertExit();
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/assert_fail", func_001936F0);
+/* Debug log with a source position (file, line, format, ...); empty in the retail build. */
+void func_001936F0(const char *file, int line, const char *format, ...)
+{
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/assert_fail", func_00193730);
+/* Checked report with a printf-style message (condition, file, line, format, ...); empty in the retail build. */
+void func_00193730(const char *condition, const char *file, int line, const char *format, ...)
+{
+}
 
 /* Exit path shared by the assertion and error reporters: prints "> Exit Program", then traps (break). */
 void assertExit(void) {

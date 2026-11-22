@@ -98,7 +98,10 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001975C8);
 
 /* A light pack: the pack a light slot holds is its address. Only the fields the light readers use are named. */
 typedef struct XglLightPack {
-    u8 unmodeled_00[0x30];
+    union {
+        u64 signature;            /* 0x00: "lxy" in the low three bytes */
+        u8 unmodeled_00[0x30];
+    };
     s32 lightEntryCount;         /* 0x30 */
     u8 unmodeled_34[0x8];
     s32 keyOffset;          /* 0x3C */
@@ -127,9 +130,53 @@ void xglLightSlotsClear(void) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001978B8);
+#define XGL_LIGHT_PACK_SIGNATURE 0x79786C /* "lxy" */
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197970);
+/* Registers a light pack in the slot table: 2 when it was registered already (one more reference), 1 when a free
+ * slot took it, 0 when it is no light pack or no slot is free (X2 xglLightPackRegister). */
+int xglLightPackRegister(XglLightPack *pack)
+{
+    int i;
+
+    if (pack != 0 && (pack->signature & 0xFFFFFF) == XGL_LIGHT_PACK_SIGNATURE) {
+        for (i = 0; i < 16; i++) {
+            if (xglLightSlotTable[i].lightPack == pack) {
+                xglLightSlotTable[i].unk_04 = xglLightSlotTable[i].unk_04 + 1;
+                return 2;
+            }
+        }
+        for (i = 0; i < 16; i++) {
+            if (xglLightSlotTable[i].lightPack == 0) {
+                xglLightSlotTable[i].lightPack = pack;
+                xglLightSlotTable[i].unk_04 = 1;
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
+
+/* Drops one reference of a registered light pack and frees its slot at the last one: 1 when the slot was freed
+ * (X2 xglLightPackRelease). */
+int xglLightPackRelease(XglLightPack *pack)
+{
+    int i;
+
+    if (pack != 0 && (pack->signature & 0xFFFFFF) == XGL_LIGHT_PACK_SIGNATURE) {
+        for (i = 0; i < 16; i++) {
+            if (xglLightSlotTable[i].lightPack == pack) {
+                xglLightSlotTable[i].unk_04 = xglLightSlotTable[i].unk_04 - 1;
+                if (xglLightSlotTable[i].unk_04 <= 0) {
+                    xglLightSlotTable[i].lightPack = 0;
+                    xglLightSlotTable[i].unk_04 = 0;
+                    return 1;
+                }
+                return 0;
+            }
+        }
+    }
+    return 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197A00);
 

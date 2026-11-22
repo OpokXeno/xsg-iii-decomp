@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/tu007.h"
 
 typedef signed char s8;
 typedef unsigned char u8;
@@ -17,17 +18,70 @@ void padGetRightStick(PadRightStick *controllerPort, f32 *stickX, f32 *stickY) {
     *stickY = controllerPort->rightY * 0.0078125f;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu011", func_00186FB8);
+#define PAD_VIBRATION_SMALL_MOTOR 0
+#define PAD_VIBRATION_LARGE_MOTOR 1
+
+extern PadRecord PadData[2];
+
+/* The vibration timers (small data; the original loads their address with one gp-relative la): hold counts
+ * the frames the small motor keeps running, fadeFramesLeft the remaining steps of the large motor's fade. */
+typedef struct PadVibrationTimers {
+    s16 hold;
+    s16 fadeFramesLeft;
+} PadVibrationTimers;
 
 extern unsigned char gPadLatchBlocked[];
-extern s16 gPadLatchedValue;
+extern PadVibrationTimers gPadLatchedValue;
+extern s16 padVibrationFadeFrames; /* fade length in frames */
+extern u8 padVibrationFadeStart; /* large motor value at the start of the fade */
+extern u8 padVibrationFadeEnd; /* large motor value at the end of the fade */
+
+void Vibration_Stop(void)
+{
+    do {
+        gPadLatchedValue.hold = 0;
+        PadData[0].actuator[PAD_VIBRATION_LARGE_MOTOR] = 0;
+    } while (0);
+    do {
+        gPadLatchedValue.fadeFramesLeft = 0;
+        PadData[0].actuator[PAD_VIBRATION_SMALL_MOTOR] = 0;
+    } while (0);
+}
 
 void padSetLatchedValue(s32 latchedValue) {
     if (gPadLatchBlocked[0] == 0) {
-        gPadLatchedValue = latchedValue;
+        gPadLatchedValue.hold = latchedValue;
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu011", func_00186FF0);
+void Vibration_Set_Strong(u8 startValue, u8 endValue, s32 framesTotal)
+{
+    if (gPadLatchBlocked[0] == 0) {
+        padVibrationFadeStart = startValue;
+        padVibrationFadeEnd = endValue;
+        gPadLatchedValue.fadeFramesLeft = framesTotal;
+        padVibrationFadeFrames = framesTotal;
+    }
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu011", func_00187020);
+void VibrationEngine(void)
+{
+    if (gPadLatchedValue.hold != 0) {
+        PadData[0].actuator[PAD_VIBRATION_SMALL_MOTOR] = 1;
+        if ((s16)(gPadLatchedValue.hold - 1) < 0) {
+            gPadLatchedValue.hold = 0;
+        } else {
+            gPadLatchedValue.hold = gPadLatchedValue.hold - 1;
+        }
+    }
+    if (gPadLatchedValue.fadeFramesLeft != 0) {
+        int fadeStep;
+
+        fadeStep = (padVibrationFadeStart - padVibrationFadeEnd) * gPadLatchedValue.fadeFramesLeft / padVibrationFadeFrames;
+        gPadLatchedValue.fadeFramesLeft = gPadLatchedValue.fadeFramesLeft - 1;
+        PadData[0].actuator[PAD_VIBRATION_LARGE_MOTOR] = padVibrationFadeEnd + fadeStep;
+        if (gPadLatchedValue.fadeFramesLeft < 0) {
+            gPadLatchedValue.fadeFramesLeft = 0;
+        }
+    }
+}

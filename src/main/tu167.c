@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_render.h"
 
 typedef int s32;
 typedef signed char s8;
@@ -23,17 +24,6 @@ void steppedObjectLower(SteppedObject *steppedObject) {
     *xglStudioGetCamera2(1) = 0;
 }
 
-extern unsigned char gEnvFlags[];
-
-/* Three colour channel bytes at gEnvFlags + 0x40, 0x41 and 0x42. */
-typedef struct EnvColorChannels {
-    u8 unk_00[0x40];
-    s8 colorRed;
-    s8 colorGreen;
-    s8 colorBlue;
-} EnvColorChannels;
-
-#define gEnvColorChannels (*(EnvColorChannels *) gEnvFlags)
 s32 stepValueTowardTarget();
 
 void steppedObjectUpdateColors(SteppedObject *steppedObject)
@@ -41,11 +31,11 @@ void steppedObjectUpdateColors(SteppedObject *steppedObject)
   s32 scaled_17;
   s32 scaled_13;
   stepValueTowardTarget(&steppedObject->steppedValue);
-  gEnvColorChannels.colorRed = (steppedObject->steppedValue * 0x17) >> 6;
+  gEnvFlags.color.red = (steppedObject->steppedValue * 0x17) >> 6;
   scaled_17 = steppedObject->steppedValue * 0x17;
-  gEnvColorChannels.colorGreen = scaled_17 >> 6;
+  gEnvFlags.color.green = scaled_17 >> 6;
   scaled_13 = steppedObject->steppedValue * 0x13;
-  gEnvColorChannels.colorBlue = scaled_13 >> 6;
+  gEnvFlags.color.blue = scaled_13 >> 6;
 }
 
 s32 func_002184E0();

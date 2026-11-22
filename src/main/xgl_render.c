@@ -71,42 +71,6 @@ typedef union GsExtdataRegister {
 #include "main/xgl_render.h"
 
 /*
- * GS clear-environment block (ClearEnv, 0x006457C0, size 0x60). xglRenderClearDepth
- * and xglRenderClearFrame each write only the 8-byte tag at +0x10 (a
- * GS-register-shaped value selecting what a queued clear targets);
- * xglRenderClearColor splits a packed 0xAABBGGRR colour into the four
- * one-byte-per-word fields at +0x20..+0x2c. Bytes no claimed function
- * touches stay unmodeled.
- */
-typedef struct GsClearEnv {
-    u32 gif_tag_low;
-    u32 gif_tag_high;
-    u32 gif_registers_low;
-    u32 gif_registers_high;
-    u64 clearAlphaDepthTest;
-    u64 clearAlphaDepthTestAddress;
-    u32 color_r;
-    u32 color_g;
-    u32 color_b;
-    u32 color_a;
-    u32 left;
-    u32 top;
-    unsigned char unmodeled_38[0x08];
-    u32 right;
-    u32 bottom;
-    unsigned char unmodeled_48[0x08];
-    u64 restoreAlphaDepthTest;
-    u64 restoreAlphaDepthTestAddress;
-} GsClearEnv;
-
-typedef union GsClearPacket {
-    GsClearEnv env;
-    AlignedVector4 quadwords[6];
-} GsClearPacket;
-
-extern GsClearPacket ClearEnv;
-
-/*
  * GS display-environment block (0x004A9000, size 0x50). xglRenderDispOff/On
  * only touch the 8-byte flag word at +0x00 (bit 0x2 gates display output).
  */
@@ -404,18 +368,6 @@ void xglRenderMove(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 
-typedef struct XglRenderStateBlock {
-    unsigned char unmodeled_00[2];
-    short psm;                          /* +0x02 */
-    unsigned char unmodeled_04[4];
-    unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
-    unsigned short dispfb_base;         /* +0x0A */
-    unsigned short prev_dispfb_base;    /* +0x0C */
-    unsigned char unmodeled_0e[0x67];   /* +0x0E..+0x74 */
-    unsigned char frame_delta;          /* +0x75 */
-    unsigned char unmodeled_76[0x0e];   /* +0x76..+0x83 */
-    unsigned char syncBacklogFull;              /* +0x84 */
-} XglRenderStateBlock;
 
 typedef int s32;
 
@@ -437,7 +389,7 @@ extern signed char gVsyncsPerFrame;
 void func_001337B8(void);
 void func_002F32B8(void);
 void func_002F3118(int, int, int, int);
-void func_002F38F0(int);
+void sceGsSyncV(int);
 int sceGsSyncPath(int, int);
 
 void xglRenderSyncWait(void)
@@ -502,7 +454,7 @@ void xglRenderSyncWait(void)
         FlushCache(0);
         xglDmaDirectNormal(2, (unsigned int) packet, 7);
         sceGsSyncPath(0, 0);
-        func_002F38F0(0);
+        sceGsSyncV(0);
     }
 
     gVsyncsSinceFlip = 0;
@@ -561,15 +513,21 @@ void xglRenderDispEnvMove(void)
 
 void xglRenderClearDepth(void)
 {
-    ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_DEPTH;
+    gEnvFlags.test = GS_TEST_CLEAR_DEPTH;
 }
 
 void xglRenderClearFrame(void)
 {
-    ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_FRAME;
+    gEnvFlags.test = GS_TEST_CLEAR_FRAME;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A530);
+void xglRenderClearColor(u32 color)
+{
+    gEnvFlags.color.red = color;
+    gEnvFlags.color.green = color >> 8;
+    gEnvFlags.color.blue = color >> 16;
+    gEnvFlags.color.alpha = color >> 24;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A558);
 
@@ -580,10 +538,10 @@ void xglRenderScanLineInit(void)
   *((volatile s32 *) 0x10003820) = 0;
   *((volatile s32 *) 0x10003C20) = 0;
   ScanLineInterpolate = 1;
-  func_002F38F0(0);
-  if (D_004C8390.unmodeled_76[0xA] == 0)
+  sceGsSyncV(0);
+  if (D_004C8390.palMode == 0)
   {
-    if (!(D_004C8390.unmodeled_76[0xB] != 0))
+    if (!(D_004C8390.progressiveMode != 0))
     {
       func_002F3118(0, 1, 2, 0);
     }
@@ -663,13 +621,36 @@ void xglRenderHoldSet(void) {
     xglRenderHeld = 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC80);
+extern s8 xglRenderMovieActive;
+
+void func_0019AC80(s32 active)
+{
+    /* GCC merges the two byte tests into one lhu of +0x80 */
+    if (D_004C8390.palMode != 0 || D_004C8390.progressiveMode != 0) {
+        active = 1;
+    }
+    xglRenderMovieActive = active;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019ADD8);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AE90);
+/* Calls every registered final-packet callback with the current packet. */
+void xglRenderFinalPacket(void)
+{
+    XglPacket *packet;
+    XglRenderFadeCallback function;
+    int i;
+
+    packet = xglPacketGetCurrent();
+    for (i = 0; i < RENDER_FINAL_CALLBACK_COUNT; i++) {
+        function = D_004C8390.finalPacketCallbacks[i];
+        if (function != 0) {
+            function(packet);
+        }
+    }
+}
 
 extern s32 D_004C8400[];
 extern s32 xglRenderGlobalFadeValue;
@@ -718,7 +699,32 @@ void xglRenderGlobalFadeSet(float red, float green, float blue, float alpha)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B020);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B3C0);
+#include "gs.h"
+
+#define VIF_CODE_FLUSH 0x11000000
+void sceVif1PkAddCode(XglPacket *packet, unsigned int code);
+void sceVif1PkCloseDirectCode(XglPacket *packet);
+/* The packet template func_0019B3C0 sends: four quadwords, the TEX0 slot, then seven more from +0x60. */
+extern u64 xglRenderMovieTex0Packet[][2];
+
+/* Sends the xglRenderMovieTex0Packet packet with a TEX0 register that points at the display buffer page
+ * (the movie frame buffer). */
+void func_0019B3C0(void)
+{
+    XglPacket *packet = xglPacketGetCurrent();
+    u64 *scratch;
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkAddCode(packet, VIF_CODE_FLUSH);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    sceVif1PkAddDirectDataN(packet, xglRenderMovieTex0Packet, 4);
+    scratch = (u64 *)SCRATCHPAD_BASE;
+    scratch[0] = 0x24020000 | (D_004C8390.display_buffer_base << 5) | ((u64)0xc800 << 19);
+    scratch[1] = GS_TEX0_1;
+    sceVif1PkAddDirectDataN(packet, (void *)SCRATCHPAD_BASE, 1);
+    sceVif1PkAddDirectDataN(packet, xglRenderMovieTex0Packet[6], 7);
+    sceVif1PkCloseDirectCode(packet);
+}
 
 extern s32 xglRenderFadeGifWord[];
 extern unsigned char gXglRenderFadeDisabled[];
@@ -740,7 +746,6 @@ void xglRenderGlobalFadeSend(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 
-extern s8 xglRenderMovieActive;
 s32 func_0019ADD8();
 s32 moviePlayerInit();
 

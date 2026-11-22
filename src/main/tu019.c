@@ -37,4 +37,19 @@ s32 soundMasterVolumeSet(s32 requestedVolume) {
     return previousVolume;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu019", func_0018E698);
+/* The master volume ramp (its layout is in se_volume.c). */
+typedef struct VolumeRamp VolumeRamp;
+extern VolumeRamp seMasterVolumeRamp;
+int seVolumeRampSet(VolumeRamp *ramp, int level, int levelPerStep);
+
+/* Ramps the master volume towards level (a level above 0x7FFF goes through gSoundVolumeCurve) and writes it. */
+s32 func_0018E698(s32 level, s32 levelPerStep)
+{
+    if (level >= 0) {
+        if (level > 0x7FFF) {
+            level = gSoundVolumeCurve[level];
+        }
+        level = seVolumeRampSet(&seMasterVolumeRamp, level, levelPerStep);
+    }
+    return soundMasterVolumeSet(level * 0x102);
+}

@@ -227,7 +227,8 @@ typedef struct CdDriverState {
     u8 dual_layer_disc;                          /* +0x33 */
     u8 power_off_pending;                        /* +0x34 */
     u8 archive_init_active;                      /* +0x35: 1 while xglCdArcInit rebuilds the archive slots */
-    u8 unmodeled_036[0x8];                       /* +0x36..0x3d */
+    signed char queuedReadDelay;                 /* +0x36: frames until the queued read starts (xglCdControlThread) */
+    u8 unmodeled_037[0x7];                       /* +0x37..0x3d */
     u8 queue_cursor;                             /* +0x3e */
     u8 queue_tail;                               /* +0x3f */
     CdRequestPartial readQueue[CD_QUEUE_SIZE];    /* +0x40..0x103f */
@@ -471,7 +472,36 @@ void xglCdOpenDevice(void)
     xglCdDeviceHandle = ADXF_Open(xglCdDeviceName, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cd", xglCdControlThread);
+/* Small-data flag: a positive value means the clock was read already; the first
+ * read stores 10 when the console reports 1. xglCdControlThread counts it down once per tick. */
+extern signed char xglClockRefreshCountdown;
+
+/* One tick of the CD service: counts the clock refresh down, starts the next queued read when its
+ * delay runs out, serves an asynchronous read, and resets an unknown state to idle. */
+void xglCdControlThread(void)
+{
+    if (xglClockRefreshCountdown > 0) {
+        xglClockRefreshCountdown--;
+    }
+    if (LW.queuedReadDelay > 0) {
+        LW.queuedReadDelay--;
+        if (LW.queuedReadDelay <= 0) {
+            xglCdStartQueuedRead();
+        }
+    }
+    switch (LW.threadActivity) {
+    case CD_STATE_IDLE:
+    case CD_STATE_SYNC_READ:
+        break;
+    case CD_STATE_ASYNC_READ:
+        xglCdServiceRead();
+        break;
+    default:
+        LW.threadActivity = CD_STATE_IDLE;
+        break;
+    }
+    xglCdServiceActive = 0;
+}
 
 /* One BCD byte: high nibble tens, low nibble units. */
 int BCD2INT(unsigned char bcd)
@@ -481,9 +511,6 @@ int BCD2INT(unsigned char bcd)
 
 /* The console's clock record: xglCdClockRecord holds the BCD fields read below. */
 extern unsigned char xglCdClockRecord[];
-/* Small-data flag: a positive value means the clock was read already; the first
- * read stores 10 when the console reports 1. */
-extern signed char xglClockRefreshCountdown;
 int func_002F8588(unsigned char *clock_record);
 
 int xglClockReadBcd(XglClock *clock_time)
@@ -508,7 +535,21 @@ int xglClockReadBcd(XglClock *clock_time)
     return clockReadResult;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cd", xglClockRead);
+#define CLOCK_READ_ATTEMPTS 20
+void sceGsSyncV(int);
+
+/* Reads the clock, retrying up to CLOCK_READ_ATTEMPTS times while xglClockReadBcd fails. */
+void xglClockRead(XglClock *clock_time)
+{
+    int attempt;
+
+    for (attempt = 0; attempt < CLOCK_READ_ATTEMPTS; attempt++) {
+        if (xglClockReadBcd(clock_time) == 0) {
+            break;
+        }
+        sceGsSyncV(0);
+    }
+}
 
 /*
  * Converts a calendar record to the number of seconds elapsed since
@@ -1041,8 +1082,8 @@ signed char xglCdGetServicePending(void)
 }
 
 void xglCdRaiseMaxByte(s32 candidate) {
-    if ((s8) LW.unmodeled_036[0] < candidate) {
-        LW.unmodeled_036[0] = candidate;
+    if (LW.queuedReadDelay < candidate) {
+        LW.queuedReadDelay = candidate;
     }
 }
 
@@ -1321,7 +1362,7 @@ void xglCdInitial(void)
     LW.search_layer = 0;
     LW.dual_layer_disc = 0;
     LW.power_off_pending = 0;
-    LW.unmodeled_036[0] = 0;
+    LW.queuedReadDelay = 0;
     LW.disk_state = 0;
     LW.disk_flags = 0;
     func_002F7718(0);

@@ -68,7 +68,7 @@ void eventViewerReset(void) {
     gEventViewerReadItem = 0;
 }
 
-void func_00195050(s32, s32, s32, s32, s32);
+void xglCameraSetWindow(s32, s32, s32, s32, s32);
 void stateExchangeOff();
 void stateExchangeOn();
 void stateExchangeOverrideSet();
@@ -87,7 +87,7 @@ void eventViewerRender(void) {
     stateExchangeOverrideSet();
     camera = xglStudioSelectGetActiveCamera(0);
     windowTop = gEventViewerWindowTop;
-    func_00195050(camera, 0, windowTop, 0x200, windowTop + 0x140);
+    xglCameraSetWindow(camera, 0, windowTop, 0x200, windowTop + 0x140);
 }
 
 void eventViewerNoop(void) {

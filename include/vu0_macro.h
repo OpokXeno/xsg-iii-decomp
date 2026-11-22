@@ -19,6 +19,7 @@
  *   Vu0SubVectorXYZ(d, a, b)  d.xyz = a.xyz - b.xyz, d.w = a.w
  *   Vu0SubVector(d, a, b)     d = a - b
  *   Vu0AddVector(d, a, b)     d = a + b
+ *   Vu0MulVector(d, a, b)     d = a * b, per lane (xglVectorMul inlined)
  */
 
 #define Vu0AddVectorXYZ(destination, first, second) \
@@ -68,6 +69,16 @@
         "lqc2 vf20, 0(%1)\n" \
         "lqc2 vf21, 0(%2)\n" \
         "vadd.xyzw vf20, vf20, vf21\n" \
+        "sqc2 vf20, 0(%0)\n" \
+        : \
+        : "r" (destination), "r" (first), "r" (second) \
+        : "memory")
+
+#define Vu0MulVector(destination, first, second) \
+    __asm__ __volatile__( \
+        "lqc2 vf20, 0(%1)\n" \
+        "lqc2 vf21, 0(%2)\n" \
+        "vmul.xyzw vf20, vf20, vf21\n" \
         "sqc2 vf20, 0(%0)\n" \
         : \
         : "r" (destination), "r" (first), "r" (second) \

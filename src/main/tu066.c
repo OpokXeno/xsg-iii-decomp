@@ -64,7 +64,7 @@ extern unsigned char PadData[];
 #define gSbThreadBlock (*(SbThreadBlock *) gSbThreadBlockStorage)
 #define gPadData (*(PadRecord *) PadData)
 
-s32 func_00186FB8();
+s32 Vibration_Stop();
 s32 xglPacketSetSendMode();
 s32 soundStateReset();
 s32 func_001CE7B8();
@@ -93,7 +93,7 @@ void gameResetRuntimeState(void) {
     subsystemResetClearState();
     sefResetResourceTable();
     XenoActorPoolInitDefault();
-    func_00186FB8();
+    Vibration_Stop();
     xglPacketSetSendMode(0);
     xglRenderClearFrame();
     func_001CE7B8(0);
@@ -310,7 +310,7 @@ void gameActorSetupStep(void) {
     xenoActorSetAttrBit8(1);
     func_001EA6B0();
     func_001E8CB8(0);
-    func_00186FB8();
+    Vibration_Stop();
     gGameLoopRuntime.loopFlags &= ~0x100;
     sbNativeValueSlotSet(gameEnterPlayState, 1);
 }

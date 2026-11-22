@@ -3,25 +3,9 @@
 /* A vector kept as a plain float[4] (like sceVu0FVECTOR); its w is element 3. Vector4 here changes the
  * address arithmetic of the w stores, so the casts to Vector4 * at the calls stay. */
 #include "main/tu141.h"
+#include "main/xgl_2.h"
+#include "main/nml_model_set.h"
 
-/* The .bss object at 0x008C28B0 (splat name gPxyModelRenderStateStorage). Only the fields this TU touches are named;
- * the flag word at +0x300 is or-ed with the nmlModelSet* bits below. */
-typedef struct PxyModelRenderState {
-    unsigned char pad_000[0x300];
-    unsigned int renderStatus; /* +0x300 */
-    unsigned char pad_304[0x350 - 0x304];
-    f32 transparency[2]; /* +0x350 and +0x354, both set to the clamped transparency */
-    unsigned char pad_358[0x380 - 0x358];
-    long long stencil_alpha; /* +0x380 */
-    long long stencil_mode; /* +0x388, set to 0x42 */
-    unsigned char pad_390[0x4B0 - 0x390];
-    unsigned char fog_near[0x10]; /* +0x4B0: the fog parameters of nmlModelSetFogDist (gNmlModelFogNearParams) */
-    Vector4 position; /* +0x4C0 */
-    unsigned char pad_4D0[0x698 - 0x4D0];
-    unsigned int drawFlags; /* +0x698, or-ed with 0x20 in nmlModelSetFogFarDist */
-    unsigned char pad_69C[0x760 - 0x69C];
-    unsigned char fog_far[0x10]; /* +0x760: the fog parameters of nmlModelSetFogFarDist (gNmlModelFogFarParams) */
-} PxyModelRenderState;
 
 /* The block that contains the member `member` stored at `field` (the fog parameters are reached by their own symbols). */
 #define MEMBER_OFFSET(type, member) ((int) &((type *) 0)->member)
@@ -30,7 +14,6 @@ typedef struct PxyModelRenderState {
 void pxySetLightPtr(XglLightSet *light);
 extern XglLightSet *pxyCurrentLight;
 extern void *gNmlModelSetCurrent;
-extern PxyModelRenderState gPxyModelRenderStateStorage;
 extern Vector4 gNmlModelFogNearParams[];
 
 void nmlModelFogPara(Vector4 *out, f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
@@ -66,7 +49,6 @@ void nmlModelSetFogDist(f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
 }
 
 #include "main/tu045.h"
-#include "main/xgl_2.h"
 
 XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
 void _CurMatrixSet(Matrix4 *matrix);
@@ -103,7 +85,11 @@ void nmlModelSetFogFarDist(f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
     modelSet->drawFlags |= 0x20;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F178);
+void nmlModelSetGlobalFogCol(Vector4 *color)
+{
+    gPxyModelRenderStateStorage.globalFogColor.vector = *color;
+    gPxyModelRenderStateStorage.drawFlags |= 0x20;
+}
 
 extern f32 gNmlModelSortOffset;
 
@@ -111,7 +97,13 @@ void nmlModelSetSortOffset(f32 sortOffset) {
     gNmlModelSortOffset = sortOffset;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F1C0);
+/* The global colour scale (X2 pxySetColorScale writes pxyGlobalColor). */
+extern Vector4 pxyGlobalColor;
+
+void pxySetColorScale(Vector4 *color)
+{
+    pxyGlobalColor = *color;
+}
 
 void nmlModelSetCurrentPtr(void *modelSetCurrent)
 {
@@ -163,9 +155,28 @@ void pxySetLightPtr(XglLightSet *light)
     pxyCurrentLight = light;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F308);
+#include "quadword.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F338);
+/* The matrix nmlModelSetDrawMatrix stores (nml_model_set .bss). */
+extern Matrix4 nmlModelDrawMatrix;
+
+void nmlModelSetDrawMatrix(Matrix4 matrix)
+{
+    QuadwordCopyMatrix(nmlModelDrawMatrix, matrix);
+}
+
+/* X2 nmlModelSetScale: keeps the scale and its largest component. */
+void nmlModelSetScale(const Vector4 *scale)
+{
+    gPxyModelRenderStateStorage.modelScale = *scale;
+    gPxyModelRenderStateStorage.modelScaleMax = scale->x;
+    if (gPxyModelRenderStateStorage.modelScaleMax < scale->y) {
+        gPxyModelRenderStateStorage.modelScaleMax = scale->y;
+    }
+    if (gPxyModelRenderStateStorage.modelScaleMax < scale->z) {
+        gPxyModelRenderStateStorage.modelScaleMax = scale->z;
+    }
+}
 
 void nmlModelSetZwrite(int zwrite) {
     if (zwrite != 0) {
@@ -217,13 +228,24 @@ void nmlModelSetStencil(int stencil) {
     }
 }
 
-extern int nmlModelStoredFlag;
+/* The light set copy pxySetLightCopy keeps (X2 pxySetLightCopy); the old setter still passes an int. */
+extern XglLightSet *pxyLightCopy;
 
 void nmlModelSetStoredFlag(int storedFlag) {
-    nmlModelStoredFlag = storedFlag;
+    pxyLightCopy = (XglLightSet *) storedFlag;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set_044", func_0019F488);
+void *xglPacketReserve(int count);
+
+/* Copies the light set into the packet and keeps the copy's address (X2 pxySetLightCopy). */
+void pxySetLightCopy(XglLightSet *light)
+{
+    XglLightSet *copy;
+
+    copy = xglPacketReserve(0x19);
+    pxyLightCopy = copy;
+    *copy = *light;
+}
 
 void nmlModelSetFlagBit40(void) {
     gPxyModelRenderStateStorage.renderStatus |= 0x40;

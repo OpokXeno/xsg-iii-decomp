@@ -4,6 +4,7 @@
 /* Row-major 4x4 float matrix. */
 
 #include "main/xgl_2.h"
+#include "main/nml_model_set.h"
 
 
 extern Matrix *pxyMotionGlobalMatrices;
@@ -20,4 +21,8 @@ void nmlModelSetStoreValue(s32 storedValue) {
     D_008C2C14 = storedValue;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019EF08);
+void nmlModelSetFogCol(Vector4 *color)
+{
+    gPxyModelRenderStateStorage.fogColor.vector = *color;
+    gPxyModelRenderStateStorage.renderStatus |= 1;
+}

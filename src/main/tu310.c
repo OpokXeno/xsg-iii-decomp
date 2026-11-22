@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_render.h"
 
 typedef signed char s8;
 typedef int s32;
@@ -75,7 +76,7 @@ s32 cycleStepARange255();
 s32 cycleStepBRange255();
 s32 cycleStepARange512();
 s32 cycleStepBRange512();
-s32 func_00195050();
+s32 xglCameraSetWindow();
 s32 xglStudioSelectGetActiveCamera();
 s32 fptodp(f32);
 s32 func_00287848();
@@ -125,22 +126,13 @@ typedef struct EnvParams
   u8 unk144;
 } EnvParams;
 
-typedef struct EnvFlags
-{
-  u8 unk00[0x40];
-  s8 unk40;
-  s8 unk41;
-  s8 unk42;
-} EnvFlags;
-
-extern EnvFlags gEnvFlags[];
 extern EnvParams gEnvParams[];
 
 void envFlagsCopyFromParams(void)
 {
-  gEnvFlags[0].unk40 = gEnvParams[0].unk04;
-  gEnvFlags[0].unk41 = gEnvParams[0].unkA4;
-  gEnvFlags[0].unk42 = gEnvParams[0].unk144;
+  gEnvFlags.color.red = gEnvParams[0].unk04;
+  gEnvFlags.color.green = gEnvParams[0].unkA4;
+  gEnvFlags.color.blue = gEnvParams[0].unk144;
 }
 
 
@@ -172,7 +164,7 @@ void envApplyActiveCameraParams(void)
 
   activeCamera = xglStudioSelectGetActiveCamera(0);
   channelParams = gEnvCameraParams;
-  func_00195050(activeCamera, channelParams[0].channelSetting, channelParams[1].channelSetting, channelParams[2].channelSetting, channelParams[3].channelSetting);
+  xglCameraSetWindow(activeCamera, channelParams[0].channelSetting, channelParams[1].channelSetting, channelParams[2].channelSetting, channelParams[3].channelSetting);
 }
 
 void envCameraRefreshA(void) {
