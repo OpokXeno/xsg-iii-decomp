@@ -69,17 +69,22 @@ typedef struct XglRenderStateBlock {
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
     unsigned char unmodeled_0e[8];      /* +0x0E..+0x15 */
-    unsigned short display_buffer_base; /* +0x16: read by the drop-shadow packets of XenoActorUnpack.c */
-    unsigned char unmodeled_18[4];      /* +0x18..+0x1B */
+    unsigned short display_buffer_base; /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame */
+    unsigned short flip_base;           /* +0x18: the next display page (X2 sRenderFlipBase) */
+    unsigned char unmodeled_1a[2];      /* +0x1A..+0x1B */
     XglRenderFadeCallback finalPacketCallbacks[RENDER_FINAL_CALLBACK_COUNT]; /* +0x1C: run by xglRenderFinalPacket */
-    unsigned char unmodeled_70[0x05];   /* +0x70..+0x74 */
+    unsigned char unmodeled_70[4];      /* +0x70..+0x73 */
+    unsigned char render_status;        /* +0x74: cleared by the base swap (X2 xglRenderStatus) */
     unsigned char frame_delta;          /* +0x75 */
-    unsigned char unmodeled_76[0x0a];   /* +0x76..+0x7F */
+    unsigned char unmodeled_76[2];      /* +0x76..+0x77 */
+    unsigned short frame_count;         /* +0x78: advanced by frame_delta on every base swap */
+    unsigned char unmodeled_7a[6];      /* +0x7A..+0x7F */
     /* +0x80 / +0x81: the video mode xglRenderScanLineInit resets the GS with (PAL, else 480p when
      * progressiveMode is set, else NTSC interlaced); xglRenderStart sets +0x81 (xglRenderStartFlag). */
     unsigned char palMode;              /* +0x80 */
     unsigned char progressiveMode;      /* +0x81 */
-    unsigned char unmodeled_82[2];      /* +0x82..+0x83 */
+    unsigned char movieMode;            /* +0x82: the base swap sends the movie frame instead of swapping pages (label gXglRenderFadeDisabled) */
+    unsigned char unmodeled_83;         /* +0x83 */
     unsigned char syncBacklogFull;      /* +0x84 */
 } XglRenderStateBlock;
 

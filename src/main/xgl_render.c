@@ -726,7 +726,48 @@ s32 xglRenderFadeAlpha(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A7C0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AB00);
+extern unsigned char xglRenderLocked;
+extern unsigned char xglRenderMovieActive;
+
+/* Builds the movie frame's GS packet in the scratchpad and returns its quadword count. */
+int func_0019A7C0(void *scratch);
+
+/* XS2 xglRenderSwapBase: swaps the display and flip pages and makes the old draw page the previous one;
+ * in movie mode (movieMode set) the movie frame packet goes out instead, followed by the clear
+ * environment unless rendering is locked. Then clears the render status and advances the frame count. */
+void func_0019AB00(void)
+{
+    XglPacket *packet;
+    int quadwords;
+    unsigned short previousDisplayBase;
+
+    if (D_004C8390.movieMode != 0) {
+        if (xglRenderMovieActive != 0) {
+            packet = xglPacketGetCurrent();
+            quadwords = func_0019A7C0((void *) SCRATCHPAD_BASE);
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkOpenDirectHLCode(packet, 0);
+            sceVif1PkAddDirectDataN(packet, (void *) SCRATCHPAD_BASE, quadwords);
+            sceVif1PkCloseDirectHLCode(packet);
+            if (xglRenderLocked == 0) {
+                XglPacket *envPacket;
+
+                envPacket = xglPacketGetCurrent();
+                sceVif1PkOpenDirectHLCode(envPacket, 0);
+                sceVif1PkAddDirectDataN(envPacket, &gEnvFlags, 0x15);
+                sceVif1PkCloseDirectHLCode(envPacket);
+            }
+        }
+    } else {
+        D_004C8390.prev_dispfb_base = D_004C8390.dispfb_base;
+        previousDisplayBase = D_004C8390.display_buffer_base;
+        D_004C8390.dispfb_base = D_004C8390.flip_base;
+        D_004C8390.display_buffer_base = D_004C8390.flip_base;
+        D_004C8390.flip_base = previousDisplayBase;
+    }
+    D_004C8390.render_status = 0;
+    D_004C8390.frame_count += D_004C8390.frame_delta;
+}
 
 void xglRenderDispEnvFlagClear(void) {
     xglRenderDispEnvBlock.pmodeWord &= ~2;
@@ -736,7 +777,6 @@ void xglRenderDispEnvFlagSet(void) {
     xglRenderDispEnvBlock.pmodeWord |= 2;
 }
 
-extern s8 xglRenderLocked;
 
 void xglRenderLockSet(void) {
     xglRenderLocked = 1;
@@ -756,7 +796,6 @@ void xglRenderHoldSet(void) {
     xglRenderHeld = 1;
 }
 
-extern s8 xglRenderMovieActive;
 
 void func_0019AC80(s32 active)
 {
