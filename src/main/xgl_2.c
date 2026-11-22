@@ -336,14 +336,14 @@ void xglMemCopy2(u8 *destination, const u8 *source, int count)
         "addi %0, %0, 2\n\t"
         "addi %1, %1, 2\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglMemCopy2b(u8 *destination, const u8 *source, int count)
 {
     register u8 *dst = destination;
     register const u8 *src = source;
-    register int n = count;
+    register int remaining = count;
     __asm__ __volatile__(
         "1:\n\t"
         "lh $2, 0(%1)\n\t"
@@ -352,7 +352,7 @@ void xglMemCopy2b(u8 *destination, const u8 *source, int count)
         "addi %0, %0, -2\n\t"
         "addi %1, %1, -2\n\t"
         "bne $0, %2, 1b"
-        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+        : "+r"(dst), "+r"(src), "+r"(remaining) : : "$2", "memory");
 }
 
 void xglVectorDiv(Vector4 *quotientVector, const Vector4 *left, const Vector4 *right)

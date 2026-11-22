@@ -1,8 +1,8 @@
 #include "common.h"
+#include "shared.h"
 
 typedef int s32;
 typedef signed char s8;
-typedef unsigned char u8;
 
 extern unsigned char gPxyModelRenderStateStorage[];
 

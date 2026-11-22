@@ -1540,16 +1540,13 @@ extern int svModelDrawFlags;
 extern const f32 D_0054FD88;
 /* Callees of the other units, prototyped from their call sites. */
 void pxyAddRenderLevel(int level);
-void nmlModelSetFogCol(const Vector4 *color);
 void nmlModelSetFogDist(float d0, float d1, float d2, float d3);
 void nmlModelSetSortOffset(float offset);
 void nmlModelSetTexture(TxyBlock *txy);
-void nmlModelSetDrawMatrix(Matrix4 *matrix);
 void nmlModelSetScale(const Vector4 *scale);
 void nmlModelSetZwrite(int zwrite);
 void nmlModelSetTransparency(float transparency);
 void nmlModelSetStencil(int stencil);
-void pxySetLightCopy(void *lightSet);
 void pxySetAnimTime(float animTime);
 void func_001A1D18(PxyModelHeader *submit);
 SefFogOverride *sefGetFogOverrideBlock(void);
