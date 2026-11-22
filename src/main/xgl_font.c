@@ -23,6 +23,7 @@ const char *xglFontCopyTextUnit(char *textUnitBuffer, const char *text, int *len
 #define GIF_AD 0x0E
 #include "main/Packet.h"
 #include "main/xgl_font_codes.h"
+#include "gs.h"
 
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int qwc);
 void *sceVif1PkReserve(XglPacket *packet, unsigned int words);
@@ -331,7 +332,43 @@ void *xglFontAllocGifPacket(FontDrawCursor *cursor, int adWriteCount)
     return packet + 4;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_001820D0);
+#define GIF_TAG_NREG_1 0x1000000000000000ULL
+/* The font's Z test when xglFontState.unmodeled_14 (the depth-test flag) is set, else always. */
+#define FONT_ZTST_GEQUAL 2
+#define FONT_ZTST_ALWAYS 1
+/* The alpha test of the plain effects: pass where alpha is not equal to 0. */
+#define FONT_ATST_NOTEQUAL 6
+
+/* Queues the font's depth state as two A+D writes (ZBUF_1, TEST_1) from the 16-byte aligned
+ * start of the cursor's effect area: Z24 at page 0, written only without the depth test; the
+ * Z test from the depth-test flag, and the alpha test for effects 0 and 2..4. */
+void func_001820D0(FontDrawCursor *cursor)
+{
+    u64 *packet;
+    int ztst;
+
+    packet = (u64 *) (((unsigned int) cursor->effectArea.qwords + 0xF) & ~0xF);
+    ztst = xglFontState.unmodeled_14 != 0 ? FONT_ZTST_GEQUAL : FONT_ZTST_ALWAYS;
+    packet[0] = GIF_TAG_NREG_1 | GIF_TAG_EOP | 2;
+    packet[1] = GIF_AD;
+    packet[2] = GS_SET_ZBUF(0, GS_PSMZ24, xglFontState.unmodeled_14 ^ 1);
+    packet[3] = GS_ZBUF_1;
+    packet[5] = GS_TEST_1;
+    switch (cursor->effect) {
+    case 0:
+    case 2:
+    case 3:
+    case 4:
+        packet[4] = GS_SET_TEST(1, FONT_ATST_NOTEQUAL, 0, 0, 0, 0, 1, ztst);
+        break;
+    /* case 1 is its own test in the original's decision tree, with the default's code */
+    case 1:
+    default:
+        packet[4] = GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, ztst);
+        break;
+    }
+    sceVif1PkAddDirectDataN(cursor->packet, packet, 3);
+}
 
 /* The two texture-filter packets: 1:1 glyphs and scaled glyphs. */
 extern unsigned int D_004B3110[8];
@@ -625,8 +662,6 @@ void xglFontDebugPrefixSet(int stored_value)
 {
     fontStateFromWindow.stored_value = stored_value;
 }
-
-#include "gs.h"
 
 /* The EE va_start spelling of the variadic debug print (as in the other variadic definitions of this tree). */
 typedef char *va_list;
@@ -1330,7 +1365,6 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185770);
 extern unsigned char D_004B1E20[];
 extern unsigned char D_004B3320[];
 extern unsigned char D_004B33A0[];
-void func_001820D0();
 void sceVif1PkCloseDirectHLCode();
 void sceVif1PkCnt();
 void sceVif1PkOpenDirectHLCode();
@@ -1370,7 +1404,8 @@ void xglFontBuildPacket(XglPacket **packet_slot, int reloadMode)
     }
     sceVif1PkCnt(*packet_slot, 0);
     sceVif1PkOpenDirectHLCode(*packet_slot, 0);
-    func_001820D0(packet_slot);
+    /* packet_slot is the packet member at the start of the draw cursor */
+    func_001820D0((FontDrawCursor *) packet_slot);
 }
 
 #define SCRATCHPAD_BASE 0x70000000
