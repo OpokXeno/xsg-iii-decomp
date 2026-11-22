@@ -2,6 +2,8 @@
 #include "shared.h"
 #include "main/xgl_2.h"
 
+#include "quadword.h"
+
 /* Row-major 4x4 float matrix. */
 void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation);
 void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
@@ -54,6 +56,23 @@ extern char gXglMicroMatrixStackPush[];
 extern char gXglMicroMatrixStackPop[];
 extern char gXglMicroMatrixStackMulVector[];
 extern char gXglMicroMatrixStackRTPS[];
+/* Identity matrix and the unit matrix with w = 1 in every row, copied by func_00196200 / func_00196230. */
+extern Matrix4 D_004C7D40;
+extern Matrix4 D_004C7D80;
+/* VU0 resident microprogram entries of sine (D_20) and cosine (D_E8), as xglSin / xglCos call them. */
+extern char D_20[];
+extern char D_E8[];
+
+/* xglSin / xglCos inlined: result = the micro entry evaluated on the angle bits in vf4. The rotation
+ * functions move the angle to a GPR once and share it between both calls. */
+#define XglMicroSinCos(result, micro, angleBits) \
+    __asm__ __volatile__( \
+        "ctc2.i %1, $vi27\n\t" \
+        "vnop\n\t" \
+        "qmtc2.ni %2, $vf4\n\t" \
+        "vcallmsr $vi27\n\t" \
+        "qmfc2.i %0, $vf1" \
+        : "=r"(result) : "r"((u32)(micro) >> 3), "r"(angleBits))
 
 void xglEulerFromRotation(Vector4 *euler, Vector4 *rotation)
 {
@@ -154,7 +173,14 @@ float xglAtan2(float y, float x)
     return angle;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy64);
+void xglMemCopy64(void *destination, const void *source, int count)
+{
+    register void *dst = destination;
+    register const void *src = source;
+    register int remaining = count;
+
+    QuadwordCopyMatrixArray(dst, src, remaining);
+}
 
 void xglMemCopy64b(void *destination, const void *source, int count)
 {
@@ -177,21 +203,126 @@ void xglMemCopy64b(void *destination, const void *source, int count)
         : "$2", "memory");
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy16);
+void xglMemCopy16(void *destination, const void *source, int count)
+{
+    register void *dst = destination;
+    register const void *src = source;
+    register int remaining = count;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy16b);
+    QuadwordCopyArray(dst, src, remaining);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy8);
+void xglMemCopy16b(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "lq $2, 0(%1)\n\t"
+        "sq $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, -16\n\t"
+        "addi %1, %1, -16\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy8b);
+void xglMemCopy8(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "ld $2, 0(%1)\n\t"
+        "sd $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, 8\n\t"
+        "addi %1, %1, 8\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy4);
+void xglMemCopy8b(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "ld $2, 0(%1)\n\t"
+        "sd $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, -8\n\t"
+        "addi %1, %1, -8\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy4b);
+void xglMemCopy4(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "lw $2, 0(%1)\n\t"
+        "sw $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, 4\n\t"
+        "addi %1, %1, 4\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy2);
+void xglMemCopy4b(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "lw $2, 0(%1)\n\t"
+        "sw $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, -4\n\t"
+        "addi %1, %1, -4\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy2b);
+void xglMemCopy2(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "lh $2, 0(%1)\n\t"
+        "sh $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, 2\n\t"
+        "addi %1, %1, 2\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
+
+void xglMemCopy2b(u8 *destination, const u8 *source, int count)
+{
+    register u8 *dst = destination;
+    register const u8 *src = source;
+    register int n = count;
+    __asm__ __volatile__(
+        "1:\n\t"
+        "lh $2, 0(%1)\n\t"
+        "sh $2, 0(%0)\n\t"
+        "addi %2, %2, -1\n\t"
+        "addi %0, %0, -2\n\t"
+        "addi %1, %1, -2\n\t"
+        "bne $0, %2, 1b"
+        : "+r"(dst), "+r"(src), "+r"(n) : : "$2", "memory");
+}
 
 void xglVectorDiv(Vector4 *quotientVector, const Vector4 *left, const Vector4 *right)
 {
@@ -475,11 +606,46 @@ void xglVectorNormal(Vector4 *normalizedVector, const Vector4 *vector)
     );
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorClamp);
+/* Clamps each component of source to [minimum, maximum] into destination. */
+void xglVectorClamp(Vector4 *destination, const Vector4 *source,
+                    float minimum, float maximum)
+{
+    destination->x = source->x < minimum ? minimum
+                    : source->x > maximum ? maximum : source->x;
+    destination->y = source->y < minimum ? minimum
+                    : source->y > maximum ? maximum : source->y;
+    destination->z = source->z < minimum ? minimum
+                    : source->z > maximum ? maximum : source->z;
+    destination->w = source->w < minimum ? minimum
+                    : source->w > maximum ? maximum : source->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglVectorClampXYZ);
+/* Like xglVectorClamp, but copies the w component of source unchanged. */
+void xglVectorClampXYZ(Vector4 *destination, const Vector4 *source,
+                       float minimum, float maximum)
+{
+    destination->x = source->x < minimum ? minimum
+                    : source->x > maximum ? maximum : source->x;
+    destination->y = source->y < minimum ? minimum
+                    : source->y > maximum ? maximum : source->y;
+    destination->z = source->z < minimum ? minimum
+                    : source->z > maximum ? maximum : source->z;
+    destination->w = source->w;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglPlaneParameter);
+void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b,
+                       const Vector4 *c)
+{
+    Vector4 edge1;
+    Vector4 edge2;
+
+    Vu0SubVectorXYZ(&edge1, b, a);
+    Vu0SubVectorXYZ(&edge2, c, b);
+    xglVectorOuter(plane, &edge1, &edge2);
+    xglVectorNormal(plane, plane);
+    xglVectorInner(&plane->w, plane, a);
+    plane->w = -plane->w;
+}
 
 void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix,
                      const Vector4 *vector)
@@ -565,9 +731,15 @@ void xglRotTransPersN(ScreenVector4 *screenPoints, Matrix4 matrix, const Vector4
     xglMatrixStackPop(1);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00196200);
+void func_00196200(Matrix4 destination)
+{
+    QuadwordCopyMatrix(destination, D_004C7D40);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", func_00196230);
+void func_00196230(Matrix4 destination)
+{
+    QuadwordCopyMatrix(destination, D_004C7D80);
+}
 
 void xglMatrixMul(Matrix4 productMatrix, Matrix4 left, Matrix4 right)
 {
@@ -606,7 +778,20 @@ void xglMatrixMul(Matrix4 productMatrix, Matrix4 left, Matrix4 right)
     );
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixReverse);
+/* destination = the transpose of source. */
+void xglMatrixReverse(Matrix4 destination, const Matrix *source)
+{
+    int i;
+    int j;
+    Matrix4 work;
+
+    for (i = 0; i < 4; i++) {
+        for (j = 0; j < 4; j++) {
+            work[i][j] = source->rows[j][i];
+        }
+    }
+    QuadwordCopyMatrix(destination, work);
+}
 
 void xglMatrixInverse(Matrix *inverseMatrix, Matrix *matrix)
 {
@@ -683,11 +868,104 @@ void xglMatrixTrans(Matrix *translatedMatrix, Matrix *matrix, const Vector4 *tra
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixRotV);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixRotX);
+void xglMatrixRotX(Matrix4 destination, Matrix4 source, float angle)
+{
+    AlignedVector4 sincos;
+    AlignedVector4 *pSincos;
+    u32 angleBits;
+    float sine;
+    float cosine;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixRotY);
+    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
+    pSincos = &sincos;
+    XglMicroSinCos(sine, D_20, angleBits);
+    sincos.y = sine;
+    XglMicroSinCos(cosine, D_E8, angleBits);
+    sincos.x = cosine;
+    __asm__ __volatile__(
+        "lq $2, 0(%1)\n"
+        "lqc2 vf28, 16(%1)\n"
+        "lqc2 vf29, 32(%1)\n"
+        "lqc2 vf1, 0(%2)\n"
+        "sq $2, 0(%0)\n"
+        "lq $2, 48(%1)\n"
+        "sq $2, 48(%0)\n"
+        "vmulax.xyzw ACC, vf28, vf1x\n"
+        "vmaddy.xyzw vf27, vf29, vf1y\n"
+        "vmulax.xyzw ACC, vf29, vf1x\n"
+        "vmsuby.xyzw vf30, vf28, vf1y\n"
+        "sqc2 vf27, 16(%0)\n"
+        "sqc2 vf30, 32(%0)\n"
+        :
+        : "r" (destination), "r" (source), "r" (pSincos)
+        : "memory", "$2");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixRotZ);
+void xglMatrixRotY(Matrix4 destination, Matrix4 source, float angle)
+{
+    AlignedVector4 sincos;
+    AlignedVector4 *pSincos;
+    u32 angleBits;
+    float sine;
+    float cosine;
+
+    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
+    pSincos = &sincos;
+    XglMicroSinCos(sine, D_20, angleBits);
+    sincos.y = sine;
+    XglMicroSinCos(cosine, D_E8, angleBits);
+    sincos.x = cosine;
+    __asm__ __volatile__(
+        "lq $2, 16(%1)\n"
+        "lqc2 vf27, 0(%1)\n"
+        "lqc2 vf29, 32(%1)\n"
+        "lqc2 vf1, 0(%2)\n"
+        "sq $2, 16(%0)\n"
+        "lq $2, 48(%1)\n"
+        "sq $2, 48(%0)\n"
+        "vmulax.xyzw ACC, vf27, vf1x\n"
+        "vmsuby.xyzw vf28, vf29, vf1y\n"
+        "vmulax.xyzw ACC, vf29, vf1x\n"
+        "vmaddy.xyzw vf30, vf27, vf1y\n"
+        "sqc2 vf28, 0(%0)\n"
+        "sqc2 vf30, 32(%0)\n"
+        :
+        : "r" (destination), "r" (source), "r" (pSincos)
+        : "memory", "$2");
+}
+
+void xglMatrixRotZ(Matrix4 destination, Matrix4 source, float angle)
+{
+    AlignedVector4 sincos;
+    AlignedVector4 *pSincos;
+    u32 angleBits;
+    float sine;
+    float cosine;
+
+    __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
+    pSincos = &sincos;
+    XglMicroSinCos(sine, D_20, angleBits);
+    sincos.y = sine;
+    XglMicroSinCos(cosine, D_E8, angleBits);
+    sincos.x = cosine;
+    __asm__ __volatile__(
+        "lq $2, 32(%1)\n"
+        "lqc2 vf27, 0(%1)\n"
+        "lqc2 vf28, 16(%1)\n"
+        "lqc2 vf1, 0(%2)\n"
+        "sq $2, 32(%0)\n"
+        "lq $2, 48(%1)\n"
+        "sq $2, 48(%0)\n"
+        "vmulax.xyzw ACC, vf27, vf1x\n"
+        "vmaddy.xyzw vf29, vf28, vf1y\n"
+        "vmulax.xyzw ACC, vf28, vf1x\n"
+        "vmsuby.xyzw vf30, vf27, vf1y\n"
+        "sqc2 vf29, 0(%0)\n"
+        "sqc2 vf30, 16(%0)\n"
+        :
+        : "r" (destination), "r" (source), "r" (pSincos)
+        : "memory", "$2");
+}
 
 void xglMatrixFrustum(Matrix *destination, Matrix *source,
                       float left, float right, float bottom, float top,
@@ -973,7 +1251,54 @@ void xglQuaternion2Matrix(Matrix4 rotationMatrix, const Vector4 *quaternion)
     );
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglQuaternionInterpolateLinear);
+void xglQuaternionInterpolateLinear(Vector4 *destination, const Vector4 *first, const Vector4 *second,
+                                    float weightFirst, float weightSecond)
+{
+    __asm__ __volatile__(
+        "mfc1 $3, %3\n"
+        "mfc1 $7, %4\n"
+        "qmtc2.ni $3, vf10\n"
+        "qmtc2.ni $7, vf11\n"
+        "lqc2 vf20, 0(%1)\n"
+        "lqc2 vf21, 0(%2)\n"
+        "vmul.xyzw vf18, vf20, vf21\n"
+        ".set noat\n"
+        "addiu $1, $0, 0\n"
+        "mtc1 $1, $f0\n"
+        ".set at\n"
+        "vsubw.x vf1x, vf0x, vf0w\n"
+        "vaddy.x vf23x, vf0x, vf18y\n"
+        "vaddz.x vf24x, vf0x, vf18z\n"
+        "vaddw.x vf25x, vf0x, vf18w\n"
+        "vmulaw.x ACCx, vf18x, vf0w\n"
+        "vmaddaw.x ACCx, vf23x, vf0w\n"
+        "vmaddaw.x ACCx, vf24x, vf0w\n"
+        "vmaddw.x vf26x, vf25x, vf0w\n"
+        "qmfc2.ni $2, vf26\n"
+        "mtc1 $2, $f1\n"
+        "c.lt.s $f0, $f1\n"
+        "bc1t 1f\n"
+        "vmulx.xyzw vf21, vf21, vf1x\n"
+        "1:\n"
+        "vmulx.xyzw vf20, vf20, vf10x\n"
+        "vmulx.xyzw vf21, vf21, vf11x\n"
+        "vadd.xyzw vf22, vf20, vf21\n"
+        "vmul.xyzw vf19, vf22, vf22\n"
+        "vaddy.x vf23x, vf0x, vf19y\n"
+        "vaddz.x vf24x, vf0x, vf19z\n"
+        "vaddw.x vf25x, vf0x, vf19w\n"
+        "vmulaw.x ACCx, vf19x, vf0w\n"
+        "vmaddaw.x ACCx, vf23x, vf0w\n"
+        "vmaddaw.x ACCx, vf24x, vf0w\n"
+        "vmaddw.x vf26x, vf25x, vf0w\n"
+        "vrsqrt Q, vf0w, vf26x\n"
+        "vwaitq\n"
+        "vmulq.xyzw vf22, vf22, Q\n"
+        "sqc2 vf22, 0(%0)\n"
+        :
+        : "r" (destination), "r" (first), "r" (second), "f" (weightFirst), "f" (weightSecond)
+        : "memory", "$2", "$3", "$7", "$f0", "$f1");
+}
 
 extern unsigned long long gXglRandomSeed[];
 
