@@ -574,7 +574,24 @@ void xglRenderClearFrame(void)
     ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_FRAME;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A530);
+/* The clear colour bytes in this build: gEnvFlags + 0x40..0x43 (ClearEnv + 0x30, a packed RGBAQ). */
+typedef struct XglRenderClearColorBlock {
+    u8 unmodeled_00[0x40];
+    u8 red;   /* 0x40 */
+    u8 green; /* 0x41 */
+    u8 blue;  /* 0x42 */
+    u8 alpha; /* 0x43 */
+} XglRenderClearColorBlock;
+
+extern XglRenderClearColorBlock gEnvFlags;
+
+void func_0019A530(u32 color)
+{
+    gEnvFlags.red = color;
+    gEnvFlags.green = color >> 8;
+    gEnvFlags.blue = color >> 16;
+    gEnvFlags.alpha = color >> 24;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A558);
 
@@ -668,7 +685,17 @@ void xglRenderHoldSet(void) {
     xglRenderHeld = 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC80);
+/* The halfword at 0x4C8410: its high byte is xglRenderStartFlag (0x4C8411); func_0019AC80 tests both bytes at once. */
+extern u16 D_004C8410[];
+extern s8 xglRenderMovieActive;
+
+void func_0019AC80(s32 active)
+{
+    if (D_004C8410[0] != 0) {
+        active = 1;
+    }
+    xglRenderMovieActive = active;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
@@ -784,7 +811,6 @@ void xglRenderGlobalFadeSend(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 
-extern s8 xglRenderMovieActive;
 s32 func_0019ADD8();
 s32 moviePlayerInit();
 

@@ -48,11 +48,26 @@ void xglLightPackDebugEmpty(XglLightKey *key) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00198E48);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199018);
+void func_00199018(XglLightKey *key)
+{
+    int scaled[3];
+    DoublewordAlignedVector4 copy;
+
+    copy = key->position;
+    copy.w = 0.5f;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199030);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199148);
+void func_00199148(XglLightKey *key)
+{
+    int scaled[3];
+    DoublewordAlignedVector4 copy;
+
+    copy = key->position;
+    copy.w = key->extent.x;
+    copy.w = key->extent.y;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199160);
 
