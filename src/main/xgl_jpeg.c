@@ -1210,7 +1210,185 @@ void ConvertYUV2RGB(int width, int height)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_jpeg", StartOfScan);
+u8 *StartOfScan(u8 *segment, JpegDecodeControl *requestAddress)
+{
+    JpegDecodeControl *request = requestAddress;
+    int mcuWidth;
+    int mcuHeight;
+    int mcuX;
+    int mcuY;
+    int texelRow;
+    u8 *destCursor;
+    u8 *stagedRgba;
+
+    /* VU0 setup: the I register is loaded with 0.125f through $2 (hence the clobber),
+     * vf1-vf8 and vf27/vf28 are loaded, vf1-vf8 are scaled into vf11-vf18, then vf21-vf26 are loaded. */
+    __asm__ __volatile__(
+        "lui $2,0x3e00\n\t"
+        "ctc2 $2,$vi21\n\t"
+        "lqc2 vf1,0(%0)\n\t"
+        "lqc2 vf2,16(%0)\n\t"
+        "lqc2 vf3,32(%0)\n\t"
+        "lqc2 vf4,48(%0)\n\t"
+        "lqc2 vf5,64(%0)\n\t"
+        "lqc2 vf6,80(%0)\n\t"
+        "lqc2 vf7,96(%0)\n\t"
+        "lqc2 vf8,112(%0)\n\t"
+        "lqc2 vf27,128(%0)\n\t"
+        "lqc2 vf28,144(%0)\n\t"
+        "vmuli.xyzw vf11xyzw,vf1xyzw,I\n\t"
+        "vmuli.xyzw vf12xyzw,vf2xyzw,I\n\t"
+        "vmuli.xyzw vf13xyzw,vf3xyzw,I\n\t"
+        "vmuli.xyzw vf14xyzw,vf4xyzw,I\n\t"
+        "vmuli.xyzw vf15xyzw,vf5xyzw,I\n\t"
+        "vmuli.xyzw vf16xyzw,vf6xyzw,I\n\t"
+        "vmuli.xyzw vf17xyzw,vf7xyzw,I\n\t"
+        "vmuli.xyzw vf18xyzw,vf8xyzw,I\n\t"
+        :
+        : "r"(imm0_3)
+        : "$2", "memory");
+    __asm__ __volatile__(
+        "lqc2 vf21,0(%0)\n\t"
+        "lqc2 vf22,16(%0)\n\t"
+        "lqc2 vf23,32(%0)\n\t"
+        "lqc2 vf24,48(%0)\n\t"
+        "lqc2 vf25,64(%0)\n\t"
+        "lqc2 vf26,80(%0)\n\t"
+        :
+        : "r"(imm1_4)
+        : "memory");
+
+    /* Skip the scan header (length, component count, selectors, spectral range). */
+    segment += 12;
+    sw->bitstream = segment; /* cursor into the entropy-coded data */
+    sw->bitsRemaining = 0; /* bit reader starts byte-aligned */
+    sw->bufferedByte = 0; /* nothing buffered from the stream yet */
+    sw->dcPredictors[JPEG_COMPONENT_CR] = 0;
+    sw->dcPredictors[JPEG_COMPONENT_CB] = 0;
+    sw->dcPredictors[JPEG_COMPONENT_Y] = 0;
+
+    /* MCU size: 8x8 (mode 0), 16x8 (mode 1) or 16x16 (mode 2). */
+    switch (sw->samplingMode) {
+    case JPEG_SAMPLING_444:
+        mcuWidth = JPEG_BLOCK_DIM;
+        mcuHeight = JPEG_BLOCK_DIM;
+        break;
+    case JPEG_SAMPLING_422:
+        mcuWidth = JPEG_MCU_PIXELS;
+        mcuHeight = JPEG_BLOCK_DIM;
+        break;
+    case JPEG_SAMPLING_420:
+    default:
+        mcuWidth = JPEG_MCU_PIXELS;
+        mcuHeight = JPEG_MCU_PIXELS;
+        break;
+    }
+
+    /* Decode the image one MCU at a time, left to right, top to bottom. */
+    for (mcuY = 0; mcuY < sw->imageHeight; mcuY += mcuHeight) {
+        for (mcuX = 0; mcuX < sw->imageWidth; mcuX += mcuWidth) {
+            u32 restartPeriod = sw->restartInterval;
+            /* A restart interval resets the bit reader and the DC predictors. */
+            if (restartPeriod != 0 && --sw->restartIntervalPlusOne == 0) {
+                sw->restartIntervalPlusOne = restartPeriod; /* restart the interval countdown */
+                sw->bitstream += 2; /* step over the RSTn marker */
+                sw->bitsRemaining = 0; /* no bits left in the current byte */
+                sw->dcPredictors[JPEG_COMPONENT_CR] = 0;
+                sw->dcPredictors[JPEG_COMPONENT_CB] = 0;
+                sw->dcPredictors[JPEG_COMPONENT_Y] = 0;
+            }
+
+            /* Block order: component 0 (1, 2 or 4 blocks), then components 1 and 2. */
+            HuffmanDecode(sw->decodedMcuPlanes.planes, JPEG_COMPONENT_Y);
+            if (sw->samplingMode > 0) {
+                HuffmanDecode(sw->decodedMcuPlanes.planes + JPEG_BLOCK_COEFFS, JPEG_COMPONENT_Y);
+            }
+            if (sw->samplingMode == JPEG_SAMPLING_420) {
+                HuffmanDecode(sw->decodedMcuPlanes.planes + 2 * JPEG_BLOCK_COEFFS, JPEG_COMPONENT_Y);
+                HuffmanDecode(sw->decodedMcuPlanes.planes + 3 * JPEG_BLOCK_COEFFS, JPEG_COMPONENT_Y);
+            }
+            HuffmanDecode(sw->decodedMcuPlanes.planes + JPEG_BLOCK_CB * JPEG_BLOCK_COEFFS, JPEG_COMPONENT_CB);
+            HuffmanDecode(sw->decodedMcuPlanes.planes + JPEG_BLOCK_CR * JPEG_BLOCK_COEFFS, JPEG_COMPONENT_CR);
+
+            /* MCUs outside the requested crop window are decoded but not converted or stored. */
+            if (mcuX <= sw->maximumX && mcuY <= sw->maximumY) {
+                /* Inverse DCT of each decoded 8x8 block, in decode order. */
+                FFIDCT(sw->decodedMcuPlanes.planeBlocks[0]);
+                if (sw->samplingMode > 0) {
+                    FFIDCT(sw->decodedMcuPlanes.planeBlocks[1]);
+                }
+                if (sw->samplingMode == JPEG_SAMPLING_420) {
+                    FFIDCT(sw->decodedMcuPlanes.planeBlocks[2]);
+                    FFIDCT(sw->decodedMcuPlanes.planeBlocks[3]);
+                }
+                FFIDCT(sw->decodedMcuPlanes.planeBlocks[JPEG_BLOCK_CB]);
+                FFIDCT(sw->decodedMcuPlanes.planeBlocks[JPEG_BLOCK_CR]);
+                /* Gather the IDCT output into per-pixel YUV, then convert to RGBA at 0x70003000. */
+                ConvertMCU2YUV();
+                ConvertYUV2RGB(mcuWidth, mcuHeight);
+
+                /* No destination buffer: upload the MCU to the GS (frame buffer base and width come from the
+                 * request). */
+                if (request->decodedBuffer == 0) {
+                    /* The load-image packet lives in the work area; the MCU is read from 0x70003000. */
+                    sceGsSetDefLoadImage(sw, request->frameBufferBase, request->frameBufferWidth, GS_PSMCT32,
+                                         (short)(request->originX + mcuX), /* GS x */
+                                         (short)(request->originY + mcuY), /* GS y */
+                                         (short)mcuWidth, (short)mcuHeight); /* upload size: one MCU */
+                    sceGsExecLoadImage(sw, (void *)JPEG_STAGING_ADDRESS);
+                } else if (request->pixelFormat & JPEG_PIXEL_FORMAT_RGB555) {
+                    /* 16-bit RGB555 destination: pack each RGBA texel. */
+                    for (texelRow = 0; texelRow < mcuHeight; texelRow++) {
+                        int texelsLeft;
+
+                        stagedRgba = (u8 *)JPEG_STAGING_ADDRESS + texelRow * (mcuWidth * JPEG_RGBA_BYTES);
+                        /* destCursor stays a byte pointer shared with the 32-bit branch:
+                           the original keeps both cursors in $17, and a separate u16 *
+                           local moves this one to $7 and renumbers the loop registers.
+                           The fields are added, not or-ed: with | the pack is scheduled
+                           differently. */
+                        destCursor = request->decodedBuffer
+                                     + ((mcuY + texelRow) * sw->imageWidth + mcuX) * JPEG_RGB555_BYTES;
+                        texelsLeft = sw->imageWidth < mcuX + mcuWidth ? sw->imageWidth - mcuX : mcuWidth;
+                        for (; texelsLeft > 0; texelsLeft--) {
+                            int green555 = (stagedRgba[1] >> 3) << 5;
+                            int blue555 = (stagedRgba[2] >> 3) << 10;
+
+                            *(u16 *)destCursor = (u16)((stagedRgba[0] >> 3) + (blue555 + green555));
+                            destCursor += JPEG_RGB555_BYTES; /* advance one RGB555 pixel */
+                            stagedRgba += JPEG_RGBA_BYTES; /* advance one RGBA texel */
+                        }
+                    }
+                } else {
+                    /* 32-bit destination: copy each MCU row. */
+                    destCursor = request->decodedBuffer + (mcuY * sw->imageWidth + mcuX) * JPEG_RGBA_BYTES;
+                    stagedRgba = (u8 *)JPEG_STAGING_ADDRESS;
+
+                    for (texelRow = 0; texelRow < mcuHeight; texelRow++) {
+                        if (sw->imageWidth < mcuX + mcuWidth) {
+                            /* Clip the last MCU to the image width. */
+                            memcpy(destCursor, stagedRgba, (sw->imageWidth - mcuX) * JPEG_RGBA_BYTES);
+                        } else {
+                            memcpy(destCursor, stagedRgba, mcuWidth * JPEG_RGBA_BYTES);
+                        }
+                        destCursor += sw->imageWidth * JPEG_RGBA_BYTES; /* advance one destination row */
+                        stagedRgba += mcuWidth * JPEG_RGBA_BYTES; /* advance one staged row */
+                    }
+                }
+            }
+        }
+    }
+
+    /* Scan for the next marker: a 0xFF that is not a stuffed 0x00 byte. The
+     * returned pointer addresses that 0xFF. */
+    for (;;) {
+        while (*segment++ != JPEG_MARKER_PREFIX) {
+        }
+        if (*segment != 0) {
+            return segment - 1; /* return the address of the marker byte */
+        }
+    }
+}
 
 /* JPEG decode driver: sets the size limits and colour scales from the
    request, walks the marker segments of the request's buffer, dispatching
