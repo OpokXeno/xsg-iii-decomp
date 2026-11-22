@@ -10268,6 +10268,7 @@ gStudioEntrySkip = 0x00551220;
 gCullingEnabled = 0x0055122C;
 gCullingVolumeTable = 0x008BF8C0;
 gCullingSettings = 0x008C06A0;
+cullingBaseVolume = 0x00541D20;
 cullingForwardAxisVector = 0x00541D50;
 cullingCornerLowerLeftVector = 0x00541D60;
 cullingCornerLowerRightVector = 0x00541D70;

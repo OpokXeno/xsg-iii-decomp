@@ -1,10 +1,14 @@
 #include "common.h"
 #include "shared.h"
 #include "vu0_macro.h"
+#include "main/xgl_2.h"
+#include "quadword.h"
 
 /*
  * One culling volume: the position, rotation and scale culling_matrix reads,
- * the transform it builds from them, and the four corners it derives.
+ * the transform it builds from them, and the four corners it derives; then
+ * the five occlusion planes and the nearest corner depth setup_occlusion
+ * builds and check_occlusion reads (0x160 bytes, the map's volume stride).
  */
 typedef struct CullingVolume {
     Vector4 position;
@@ -14,6 +18,9 @@ typedef struct CullingVolume {
     Matrix4 transform;
     Matrix4 inverseTransform;
     Vector4 cullingCorners[4];
+    Vector4 occlusionPlanes[5];
+    float occlusionDepth;
+    unsigned char unmodeled_154[12];
 } CullingVolume;
 
 void xglMatrixStackUnit(void);
@@ -98,7 +105,32 @@ void _FacePoint(void *hitPoint, void *lineStart, void *lineEnd, void *planeNorma
     __asm__ __volatile__("sqc2 vf15, 0(%0)" : : "r"(hitPoint) : "memory");
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", _CheckLine);
+void xglVectorScaleXYZ(Vector4 *scaledVector, const Vector4 *vector, float scale);
+
+float _CheckLine(const Vector4 *offsetStart, const Vector4 *offsetEnd,
+                 const Vector4 *endpointStart, const Vector4 *endpointEnd,
+                 const Vector4 *planePoint, const Vector4 *planeNormal)
+{
+    Vector4 adjustedStart;
+    Vector4 adjustedEnd;
+    Vector4 endpointDelta;
+    Vector4 pointFromStart;
+    Vector4 normalOffset;
+
+    xglVectorScaleXYZ(&normalOffset, planeNormal,
+                      planeNormal->w * planePoint->w * 0.5f);
+    xglVectorScaleXYZ(&adjustedStart, offsetStart, planePoint->w * 0.5f);
+    xglVectorScaleXYZ(&adjustedEnd, offsetEnd, planePoint->w * 0.5f);
+    Vu0SubVectorXYZ(&adjustedStart, endpointStart, &adjustedStart);
+    Vu0SubVectorXYZ(&adjustedEnd, endpointEnd, &adjustedEnd);
+    Vu0AddVectorXYZ(&adjustedStart, &adjustedStart, &normalOffset);
+    Vu0AddVectorXYZ(&adjustedEnd, &adjustedEnd, &normalOffset);
+    Vu0SubVectorXYZ(&endpointDelta, &adjustedEnd, &adjustedStart);
+    Vu0SubVectorXYZ(&pointFromStart, planePoint, &adjustedStart);
+    return endpointDelta.x * pointFromStart.x +
+           endpointDelta.y * pointFromStart.y +
+           endpointDelta.z * pointFromStart.z;
+}
 
 void xglVectorOuter(Vector4 *destination, const Vector4 *left, const Vector4 *right);
 
@@ -123,19 +155,87 @@ void plane_from_points(const Vector4 *origin, const Vector4 *firstPoint,
     plane->w = -(normal.x * origin->x + normal.y * origin->y + normal.z * origin->z);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", setup_occlusion);
+/* Moves the volume corners into camera space, keeps the nearest depth and builds the five occlusion planes
+ * (front face, then the four sides through the eye), wound so the front plane faces the camera. */
+void setup_occlusion(CullingVolume *volume, XglCamera *camera)
+{
+    AlignedVector4 corner0;
+    AlignedVector4 corner1;
+    AlignedVector4 corner2;
+    AlignedVector4 corner3;
+    AlignedVector4 zero;
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", check_occlusion);
+    Vu0ApplyMatrixXYZ(&corner0, &camera->travel.inverseTransform, &volume->cullingCorners[0]);
+    Vu0ApplyMatrixXYZ(&corner1, &camera->travel.inverseTransform, &volume->cullingCorners[1]);
+    Vu0ApplyMatrixXYZ(&corner2, &camera->travel.inverseTransform, &volume->cullingCorners[2]);
+    Vu0ApplyMatrixXYZ(&corner3, &camera->travel.inverseTransform, &volume->cullingCorners[3]);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", xglCullingCheck);
+    corner0.z = corner0.z * -1.0f;
+    corner1.z = corner1.z * -1.0f;
+    corner2.z = corner2.z * -1.0f;
+    corner3.z = corner3.z * -1.0f;
 
-extern s32 gCullingSettings[];
+    volume->occlusionDepth = corner0.z;
+    if (corner1.z < volume->occlusionDepth) {
+        volume->occlusionDepth = corner1.z;
+    }
+    if (corner2.z < volume->occlusionDepth) {
+        volume->occlusionDepth = corner2.z;
+    }
+    if (corner3.z < volume->occlusionDepth) {
+        volume->occlusionDepth = corner3.z;
+    }
 
-s32 xglCullingGetSetting(void) {
-    return gCullingSettings[0];
+    QuadwordZero(&zero);
+    plane_from_points(&corner0, &corner1, &corner2, &volume->occlusionPlanes[0]);
+    if (0.0f < volume->occlusionPlanes[0].w) {
+        plane_from_points(&zero, &corner0, &corner1, &volume->occlusionPlanes[1]);
+        plane_from_points(&zero, &corner1, &corner2, &volume->occlusionPlanes[2]);
+        plane_from_points(&zero, &corner2, &corner3, &volume->occlusionPlanes[3]);
+        plane_from_points(&zero, &corner3, &corner0, &volume->occlusionPlanes[4]);
+    } else {
+        plane_from_points(&corner2, &corner1, &corner0, &volume->occlusionPlanes[0]);
+        plane_from_points(&zero, &corner1, &corner0, &volume->occlusionPlanes[1]);
+        plane_from_points(&zero, &corner2, &corner1, &volume->occlusionPlanes[2]);
+        plane_from_points(&zero, &corner3, &corner2, &volume->occlusionPlanes[3]);
+        plane_from_points(&zero, &corner0, &corner3, &volume->occlusionPlanes[4]);
+    }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C3C8);
+/* check_occlusion: tests a point against the volume's depth bound and its five occlusion planes. */
+s32 check_occlusion(CullingVolume *volume, XglCamera *camera, const Vector4 *point)
+{
+    float distance;
+    AlignedVector4 cameraPoint;
+
+    Vu0ApplyMatrixXYZ(&cameraPoint, &camera->travel.inverseTransform, point);
+    cameraPoint.z = cameraPoint.z * -1.0f;
+    distance = cameraPoint.z - cameraPoint.w;
+    if (volume->occlusionDepth > distance) {
+        return 0;
+    }
+    if (cameraPoint.x * volume->occlusionPlanes[0].x + cameraPoint.y * volume->occlusionPlanes[0].y
+                   + cameraPoint.z * volume->occlusionPlanes[0].z + volume->occlusionPlanes[0].w > -cameraPoint.w) {
+        return 0;
+    }
+    if (cameraPoint.x * volume->occlusionPlanes[1].x + cameraPoint.y * volume->occlusionPlanes[1].y
+                   + cameraPoint.z * volume->occlusionPlanes[1].z + volume->occlusionPlanes[1].w > -cameraPoint.w) {
+        return 0;
+    }
+    if (cameraPoint.x * volume->occlusionPlanes[2].x + cameraPoint.y * volume->occlusionPlanes[2].y
+                   + cameraPoint.z * volume->occlusionPlanes[2].z + volume->occlusionPlanes[2].w > -cameraPoint.w) {
+        return 0;
+    }
+    if (cameraPoint.x * volume->occlusionPlanes[3].x + cameraPoint.y * volume->occlusionPlanes[3].y
+                   + cameraPoint.z * volume->occlusionPlanes[3].z + volume->occlusionPlanes[3].w > -cameraPoint.w) {
+        return 0;
+    }
+    if (cameraPoint.x * volume->occlusionPlanes[4].x + cameraPoint.y * volume->occlusionPlanes[4].y
+                   + cameraPoint.z * volume->occlusionPlanes[4].z + volume->occlusionPlanes[4].w > -cameraPoint.w) {
+        return 0;
+    }
+    return 1;
+}
 
 extern s32 gCullingEnabled;
 
@@ -148,12 +248,40 @@ typedef struct CullingMapRecord {
 
 typedef struct CullingMap {
     unsigned char unmodeled_00[0x20];
-    unsigned char volumeRecords[0xDE0 - 0x20];
+    CullingVolume volumes[10];
     s32 volumeCount;
     s32 unmodeled_DE4;
 } CullingMap;
 
 extern CullingMap gCullingVolumeTable[];
+
+/* Nonzero when the point is hidden behind one of the map's culling volumes (0 while culling is disabled). */
+s32 xglCullingCheck(XglCamera *camera, const Vector4 *point)
+{
+    s32 index = 0;
+    s32 result = 0;
+
+    if (gCullingEnabled == 0) {
+        index = 0;
+        while (index < gCullingVolumeTable->volumeCount) {
+            setup_occlusion(&gCullingVolumeTable->volumes[index], camera);
+            result = check_occlusion(&gCullingVolumeTable->volumes[index], camera, point);
+            if (result != 0) {
+                break;
+            }
+            index++;
+        }
+    }
+    return result;
+}
+
+extern s32 gCullingSettings[];
+
+s32 xglCullingGetSetting(void) {
+    return gCullingSettings[0];
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C3C8);
 
 void xglCullingMapClear(void)
 {
@@ -215,7 +343,32 @@ s32 xglCullingRecordQuery(CullingMapRecord *volumeRecord) {
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C538);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", xglCullingMapCreate);
+extern const float cullingBaseVolume[9];
+
+/* Appends the base volume (cullingBaseVolume: position 0, rotation 0, scale 1) to the map while there is room. */
+void xglCullingMapCreate(void)
+{
+    CullingMap *map = gCullingVolumeTable;
+    const float *record = cullingBaseVolume;
+    CullingVolume *volumes = map->volumes;
+    CullingVolume *volume = &volumes[map->volumeCount];
+
+    if (map->volumeCount < 10) {
+        volume->position.x = record[0];
+        volume->position.y = record[1];
+        volume->position.z = record[2];
+        volume->position.w = 1.0f;
+        volume->rotation.x = record[3];
+        volume->rotation.y = record[4];
+        volume->rotation.z = record[5];
+        volume->scale.x = record[6];
+        volume->scale.y = record[7];
+        volume->scale.z = record[8];
+        volume->scale.w = 1.0f;
+        xglCullingVolumeSetup(volume);
+        map->volumeCount++;
+    }
+}
 
 void xglCullingMapDisp(void)
 {
@@ -224,7 +377,7 @@ void xglCullingMapDisp(void)
     s32 remaining;
 
     if (map->volumeCount > 0) {
-        volumeRecord = map->volumeRecords;
+        volumeRecord = (unsigned char *)map->volumes;
         for (remaining = map->volumeCount; remaining != 0; remaining--) {
             xglCullingVolumeDisplay(volumeRecord);
             volumeRecord += 0x160;
@@ -244,16 +397,16 @@ void xglCullingIdleHook(void) {
 
 }
 
-s32 xglCullingCheck();
-
-void xglCullingPollCheck(void)
+/* nml_model_set_045.c's visibility test: hidden behind a culling volume (see xglCullingCheck). The OR with a
+ * zero result keeps the call a jal with its own return, as the original has it (episode II's
+ * nmlModelCalcClipCulling); a plain return becomes a tail jump. */
+int xglCullingPollCheck(XglCamera *camera, Vector4 *sphere)
 {
-    s32 new_var;
+    int result;
 
-    xglCullingCheck();
-    new_var = 0;
-    if (new_var) {
-    }
+    result = 0;
+    result = result | xglCullingCheck(camera, sphere);
+    return result;
 }
 
 void _ApplyMatrix33(void *rotatedVector, void *matrix, void *vector) {

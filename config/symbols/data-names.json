@@ -341,6 +341,7 @@
    "0x0055122c": "gCullingEnabled",
    "0x008bf8c0": "gCullingVolumeTable",
    "0x008c06a0": "gCullingSettings",
+   "0x00541d20": "cullingBaseVolume",
    "0x00541d50": "cullingForwardAxisVector",
    "0x00541d60": "cullingCornerLowerLeftVector",
    "0x00541d70": "cullingCornerLowerRightVector",
