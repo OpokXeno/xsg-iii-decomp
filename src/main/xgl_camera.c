@@ -122,11 +122,63 @@ void func_00193A40(XglCamera *camera)
     QuadwordCopy(&camera->travel.place_delta, &gCameraResetPlaceDelta);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193A78);
+extern PadRecord PadData[2];
+
+/* The buttons of the focus and scale update (PS2 pad bits: R2, L1, R1, circle, square). */
+#define CAMERA_FOCUS_BTN_SCALE_DOWN 0x0002
+#define CAMERA_FOCUS_BTN_SHIFTS 0x000E
+#define CAMERA_FOCUS_BTN_SCALE_UP 0x0008
+#define CAMERA_FOCUS_BTN_IN 0x0020
+#define CAMERA_FOCUS_BTN_OUT 0x0080
+/* From 10 on the focus steps while the button is held, below it once per press. */
+#define CAMERA_FOCUS_HELD_MIN 10.0f
+#define CAMERA_FOCUS_MAX 99.0f
+#define CAMERA_FOCUS_MIN 1.0f
+#define CAMERA_FOCUS_STEP 1.0f
+/* The travel scale the scale buttons set (in radians per frame). */
+#define CAMERA_SCALE_STEP 0.0011170107f
+
+/* Pad update of the travel focus and scale: steps the focus between 1 and 99 (unless one
+ * of R2/L1/R1 is held or sdv holds the camera) and sets the scale from R1 or R2. With the
+ * sdv special work active its buttons replace the pads'. */
+void func_00193A78(XglCamera *camera)
+{
+    CameraTravel *travel = &camera->travel;
+    unsigned short held;
+    unsigned short pressed;
+
+    held = PadData[1].held | PadData[camera->padPort].held;
+    pressed = PadData[1].pressed | PadData[camera->padPort].pressed;
+    if (sdvSpecialBuf.active) {
+        held = sdvSpecialBuf.held;
+        pressed = sdvSpecialBuf.pressed;
+    }
+    if (!(held & CAMERA_FOCUS_BTN_SHIFTS) && D_005511EC == 0) {
+        if (travel->focus >= CAMERA_FOCUS_HELD_MIN) {
+            if ((held & CAMERA_FOCUS_BTN_IN) && travel->focus < CAMERA_FOCUS_MAX) {
+                travel->focus += CAMERA_FOCUS_STEP;
+            }
+            if ((held & CAMERA_FOCUS_BTN_OUT) && travel->focus > CAMERA_FOCUS_MIN) {
+                travel->focus -= CAMERA_FOCUS_STEP;
+            }
+        } else {
+            if ((pressed & CAMERA_FOCUS_BTN_IN) && travel->focus < CAMERA_FOCUS_MAX) {
+                travel->focus += CAMERA_FOCUS_STEP;
+            }
+            if ((pressed & CAMERA_FOCUS_BTN_OUT) && travel->focus > CAMERA_FOCUS_MIN) {
+                travel->focus -= CAMERA_FOCUS_STEP;
+            }
+        }
+    }
+    if (held & CAMERA_FOCUS_BTN_SCALE_UP) {
+        travel->scale = CAMERA_SCALE_STEP;
+    }
+    if (held & CAMERA_FOCUS_BTN_SCALE_DOWN) {
+        travel->scale = -CAMERA_SCALE_STEP;
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193BD0);
-
-extern PadRecord PadData[2];
 
 void func_00193A40(XglCamera *camera);
 

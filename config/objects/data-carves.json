@@ -1194,17 +1194,20 @@
     {
      "range": [
       "0x0054fea4",
-      "0x0054fea8"
+      "0x0054feb0"
      ],
      "generated": [
       "0x0054fea4",
-      "0x0054fea8"
+      "0x0054feb0"
      ],
      "generated_by": [
+      "func_00193A78",
       "xglCameraTravelDefaultInit"
      ],
      "c_owned_symbols": [
-      "D_0054FEA4"
+      "D_0054FEA4",
+      "D_0054FEA8",
+      "D_0054FEAC"
      ],
      "also_referenced_by_c": [],
      "basis": {
