@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/nml_model_set.h"
 
 extern int gPxyFadeRampIndexTable[];
 extern int gPxyFadeRampTable[];
@@ -41,23 +42,14 @@ void pxyStateSetDirty(void) {
     gPxyDirtyFlag = 1;
 }
 
-typedef struct PxyModelRenderState {
-    unsigned char unmodeled_000[0x300];
-    unsigned int renderStatus; /* +0x300 */
-    unsigned char unmodeled_304[0x3E4 - 0x304];
-    int stateFlags3E4; /* +0x3E4: bit 0 set by func_0019E7F0 */
-} PxyModelRenderState;
-
-extern PxyModelRenderState gPxyModelRenderStateStorage;
-
 /* Episode I calls this nmlModelSetTexProreal. */
-#define PXY_STATE_PROREAL 0x1
+#define PXY_TEX_PROREAL 0x1
 
 int func_0019E7F0(void)
 {
-    int stateFlags = gPxyModelRenderStateStorage.stateFlags3E4 | PXY_STATE_PROREAL;
+    int stateFlags = gPxyModelRenderStateStorage.texFlags | PXY_TEX_PROREAL;
 
-    gPxyModelRenderStateStorage.stateFlags3E4 = stateFlags;
+    gPxyModelRenderStateStorage.texFlags = stateFlags;
     return stateFlags;
 }
 
