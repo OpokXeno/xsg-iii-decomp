@@ -1559,56 +1559,6 @@
    ]
   },
   "main/tu037": {
-   ".lit4": [
-    {
-     "range": [
-      "0x0054ffd8",
-      "0x0054ffdc"
-     ],
-     "generated": [
-      "0x0054ffd8",
-      "0x0054ffdc"
-     ],
-     "generated_by": [
-      "pxyProfileEnd"
-     ],
-     "c_owned_symbols": [
-      "D_0054FFD8"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/pxy_profile_037.o"
-     }
-    },
-    {
-     "range": [
-      "0x0054ffe0",
-      "0x0054ffec"
-     ],
-     "generated": [
-      "0x0054ffe0",
-      "0x0054ffec"
-     ],
-     "generated_by": [
-      "pxyProfileGetMs",
-      "pxyProfileGetMsUnchecked",
-      "pxyProfileDrawEntries"
-     ],
-     "c_owned_symbols": [
-      "D_0054FFE0",
-      "D_0054FFE4",
-      "D_0054FFE8"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/pxy_profile_037.o"
-     }
-    }
-   ],
    ".rodata": [
     {
      "range": [
@@ -1624,6 +1574,38 @@
      ],
      "c_owned_symbols": [
       "D_00541DC8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/pxy_profile_037.o"
+     }
+    }
+   ],
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffd8",
+      "0x0054ffec"
+     ],
+     "generated": [
+      "0x0054ffd8",
+      "0x0054ffec"
+     ],
+     "generated_by": [
+      "func_0019CBB0",
+      "pxyProfileDrawEntries",
+      "pxyProfileEnd",
+      "pxyProfileGetMs",
+      "pxyProfileGetMsUnchecked"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFD8",
+      "D_0054FFDC",
+      "D_0054FFE0",
+      "D_0054FFE4",
+      "D_0054FFE8"
      ],
      "also_referenced_by_c": [],
      "basis": {

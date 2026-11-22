@@ -90,7 +90,33 @@ float pxyProfileEnd(const char *name)
     return elapsedMs;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_profile_037", func_0019CBB0);
+/* XS2 pxyProfileEndMs: adds the ticks since the slot's start to its total and returns the total in
+ * milliseconds, without formatting the text line; 0 when no slot has the name. */
+float func_0019CBB0(const char *name)
+{
+    int i;
+    int profileSlot;
+    float elapsedMs;
+    float msPerTick;
+
+    profileSlot = -1;
+    elapsedMs = 0.0f;
+    for (i = 0; i < PXY_ENTRY_COUNT; i++) {
+        if (pxyProfileEntries[i].inUse != 0) {
+            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+                profileSlot = i;
+                break;
+            }
+        }
+    }
+    if (profileSlot >= 0 && profileSlot < PXY_ENTRY_COUNT) {
+        msPerTick = 0.0052173799f;
+        pxyProfileEntries[profileSlot].totalTicks = pxyProfileEntries[profileSlot].totalTicks
+            + (*T1_COUNT - pxyProfileEntries[profileSlot].startTicks);
+        elapsedMs = pxyProfileEntries[profileSlot].totalTicks * msPerTick;
+    }
+    return elapsedMs;
+}
 
 float pxyProfileGetMs(const char *name)
 {
