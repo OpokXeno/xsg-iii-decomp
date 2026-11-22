@@ -134464,9 +134464,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002E6B20",
+     "name": "RemoveIntcHandler",
      "size": 16,
-     "splat_name": "func_002E6B20",
+     "splat_name": "RemoveIntcHandler",
      "va": "0x002e6b20",
      "name_basis": "address",
      "provenance": "estimated"
@@ -134491,9 +134491,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002E6B50",
+     "name": "RemoveDmacHandler",
      "size": 16,
-     "splat_name": "func_002E6B50",
+     "splat_name": "RemoveDmacHandler",
      "va": "0x002e6b50",
      "name_basis": "address",
      "provenance": "estimated"

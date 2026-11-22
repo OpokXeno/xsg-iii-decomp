@@ -204,7 +204,9 @@ extern int AddDmacHandler(int channel, int (*handler)(int channel), int next);
 
 void EnableIntc(unsigned int cause, int value);
 
-void DisableIntc(unsigned int cause, int value);
+/* Kernel service 0x15 returns the previous state. xglIntcDisable passes a second, cleared argument
+ * (the original sets $a1 = 0 there), func_00190688 only the cause, so the prototype is variadic. */
+int DisableIntc(unsigned int cause, ...);
 
 int EnableDmac(int channel);
 
@@ -401,4 +403,21 @@ void xglIntrInit(void)
     intrTimerAccum = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_intc", func_00190688);
+int RemoveIntcHandler(int cause, int handlerId);
+int RemoveDmacHandler(int channel, int handlerId);
+
+/* Removes every handler xglIntrInit registered (RemoveIntcHandler / RemoveDmacHandler, kernel services
+ * 0x11 and 0x13) and disables its INTC cause or DMAC channel. */
+void func_00190688(void)
+{
+    int i;
+
+    for (i = 0; xglIntcRecords[i].id >= 0; i++) {
+        RemoveIntcHandler(xglIntcRecords[i].id, xglIntcRecords[i].handle);
+        DisableIntc(xglIntcRecords[i].id);
+    }
+    for (i = 0; xglDmaRecords[i].id >= 0; i++) {
+        RemoveDmacHandler(xglDmaRecords[i].id, xglDmaRecords[i].handle);
+        DisableDmac(xglDmaRecords[i].id);
+    }
+}

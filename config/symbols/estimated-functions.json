@@ -63912,7 +63912,7 @@
      2
     ],
     [
-     "func_002E6B20",
+     "RemoveIntcHandler",
      3042080,
      16,
      2
@@ -63930,7 +63930,7 @@
      2
     ],
     [
-     "func_002E6B50",
+     "RemoveDmacHandler",
      3042128,
      16,
      2

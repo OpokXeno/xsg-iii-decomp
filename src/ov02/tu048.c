@@ -45,7 +45,7 @@ extern SoundSlotEntry gSoundVoiceSlots[];
 extern s32 gCurrentSoundId;
 extern s32 gSoundStartFlag;
 extern s32 gSoundAlternateToggle;
-void func_0018EC68(s32 soundId);
+int func_0018EC68(s32 soundId);
 
 void soundSlotTableClear(void) {
     extern void *memset(void *, int, unsigned int);

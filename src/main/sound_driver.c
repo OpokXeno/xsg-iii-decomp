@@ -67,7 +67,7 @@ extern SoundRecordBlock gSoundRecordBlock;
 extern s32 D_004C7040[];
 extern unsigned char gSeBankDirName[];
 void func_001801C0();
-void func_0018EC68();
+int func_0018EC68(int channel);
 
 void seBankLoadNumbered(s32 id, s32 number) {
     extern void func_0018E4C0();
@@ -95,7 +95,24 @@ void seLoadMasterBank(void)
     func_00180DD8(0xA4000000, 0x600);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EC68);
+int func_0017DAF0(int channel);
+
+/* Stops one channel (after func_00180978 command 0xA0001100), or for a negative id every channel
+ * from 4 (id -1) or 7 (any other negative id) up to 47. */
+int func_0018EC68(int channel)
+{
+    int i;
+
+    if (channel < 0) {
+        i = (channel == -1) ? 4 : 7;
+        for (; i < 48; i++) {
+            func_0017DAF0(i);
+        }
+        return 0;
+    }
+    func_00180978(channel, 0xA0001100, 0);
+    return func_0017DAF0(channel);
+}
 
 s32 func_001808E0();
 
