@@ -83,4 +83,22 @@ typedef struct XglRenderStateBlock {
     unsigned char syncBacklogFull;      /* +0x84 */
 } XglRenderStateBlock;
 
+/* The clear packet at gEnvFlags (0x004C8240, 0x150 bytes): one quadword, then the GIF packet that
+ * xglRenderMove sends from +0x10 (the ClearEnv label). Its A+D writes include the TEST value that
+ * xglRenderClearDepth / xglRenderClearFrame select (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
+typedef struct XglClearPacket {
+    unsigned char unmodeled_00[0x20];
+    u64 test;                           /* +0x20: GS TEST_1 value of the clear */
+    unsigned char unmodeled_28[0x18];
+    struct {
+        unsigned char red;              /* +0x40 */
+        unsigned char green;            /* +0x41 */
+        unsigned char blue;             /* +0x42 */
+        unsigned char alpha;            /* +0x43 */
+    } color;
+    unsigned char unmodeled_44[0x10C];
+} XglClearPacket;
+
+extern XglClearPacket gEnvFlags;
+
 #endif

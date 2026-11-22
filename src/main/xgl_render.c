@@ -71,42 +71,6 @@ typedef union GsExtdataRegister {
 #include "main/xgl_render.h"
 
 /*
- * GS clear-environment block (ClearEnv, 0x006457C0, size 0x60). xglRenderClearDepth
- * and xglRenderClearFrame each write only the 8-byte tag at +0x10 (a
- * GS-register-shaped value selecting what a queued clear targets);
- * xglRenderClearColor splits a packed 0xAABBGGRR colour into the four
- * one-byte-per-word fields at +0x20..+0x2c. Bytes no claimed function
- * touches stay unmodeled.
- */
-typedef struct GsClearEnv {
-    u32 gif_tag_low;
-    u32 gif_tag_high;
-    u32 gif_registers_low;
-    u32 gif_registers_high;
-    u64 clearAlphaDepthTest;
-    u64 clearAlphaDepthTestAddress;
-    u32 color_r;
-    u32 color_g;
-    u32 color_b;
-    u32 color_a;
-    u32 left;
-    u32 top;
-    unsigned char unmodeled_38[0x08];
-    u32 right;
-    u32 bottom;
-    unsigned char unmodeled_48[0x08];
-    u64 restoreAlphaDepthTest;
-    u64 restoreAlphaDepthTestAddress;
-} GsClearEnv;
-
-typedef union GsClearPacket {
-    GsClearEnv env;
-    AlignedVector4 quadwords[6];
-} GsClearPacket;
-
-extern GsClearPacket ClearEnv;
-
-/*
  * GS display-environment block (0x004A9000, size 0x50). xglRenderDispOff/On
  * only touch the 8-byte flag word at +0x00 (bit 0x2 gates display output).
  */
@@ -549,31 +513,20 @@ void xglRenderDispEnvMove(void)
 
 void xglRenderClearDepth(void)
 {
-    ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_DEPTH;
+    gEnvFlags.test = GS_TEST_CLEAR_DEPTH;
 }
 
 void xglRenderClearFrame(void)
 {
-    ClearEnv.env.clearAlphaDepthTest = GS_TEST_CLEAR_FRAME;
+    gEnvFlags.test = GS_TEST_CLEAR_FRAME;
 }
-
-/* The clear colour bytes in this build: gEnvFlags + 0x40..0x43 (ClearEnv + 0x30, a packed RGBAQ). */
-typedef struct XglRenderClearColorBlock {
-    u8 unmodeled_00[0x40];
-    u8 red;   /* 0x40 */
-    u8 green; /* 0x41 */
-    u8 blue;  /* 0x42 */
-    u8 alpha; /* 0x43 */
-} XglRenderClearColorBlock;
-
-extern XglRenderClearColorBlock gEnvFlags;
 
 void func_0019A530(u32 color)
 {
-    gEnvFlags.red = color;
-    gEnvFlags.green = color >> 8;
-    gEnvFlags.blue = color >> 16;
-    gEnvFlags.alpha = color >> 24;
+    gEnvFlags.color.red = color;
+    gEnvFlags.color.green = color >> 8;
+    gEnvFlags.color.blue = color >> 16;
+    gEnvFlags.color.alpha = color >> 24;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A558);
