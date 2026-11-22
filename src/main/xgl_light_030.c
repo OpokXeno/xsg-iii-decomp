@@ -178,16 +178,54 @@ int xglLightPackRelease(XglLightPack *pack)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197A00);
-
-
-/* One light entry of a pack: its channel types select how each of the 20 values is produced. */
 /* One word of a light entry's key stream: a raw constant value or a curve header word. */
 typedef union XglLightStreamWord {
     s32 word;
     f32 value;
 } XglLightStreamWord;
 
+/* A curve in a light entry's key stream: a header, then count key rows (time, value). The sample
+ * time is held in 24.8 fixed point, clamped to [minimum, maximum]. */
+typedef struct XglLightCurve {
+    int count;
+    int minimum;
+    int maximum;
+    int unknown12;
+    int fixed;
+    u8 unmodeled_14[0x20 - 0x14];
+    Vector4 keys[1];         /* +0x20: count key rows (time, value) */
+} XglLightCurve;
+
+#define LIGHT_CURVE_FIXED_ONE 256.0f
+#define LIGHT_CURVE_KEY_WEIGHT 0.2f
+
+float func_0019FA20(int count, Vector4 *keyframes, float time, float weight);
+
+/* XS2 xglLightPackSampleCurve: samples the curve at *cursor at time and moves *cursor past it. */
+f32 func_00197A00(XglLightStreamWord **cursor, f32 time)
+{
+    float result = 0.0f;
+    XglLightCurve *record;
+    Vector4 *keys;
+
+    record = (XglLightCurve *) *cursor;
+    record->fixed = ((int) time << 8) + (int) ((time - (float) (int) time) * LIGHT_CURVE_FIXED_ONE);
+    if (record->fixed > (record->maximum << 8)) {
+        record->fixed = record->maximum << 8;
+    }
+    if (record->fixed < (record->minimum << 8)) {
+        record->fixed = record->minimum << 8;
+    }
+    keys = record->keys;
+    result = func_0019FA20(record->count, keys,
+                           (float) (record->fixed / 256) + (float) (record->fixed % 256) / LIGHT_CURVE_FIXED_ONE,
+                           LIGHT_CURVE_KEY_WEIGHT);
+    *cursor = (XglLightStreamWord *) &keys[record->count];
+    return result;
+}
+
+
+/* One light entry of a pack: its channel types select how each of the 20 values is produced. */
 typedef struct XglLightEntry {
     u8 unmodeled_00[0x10];
     u8 channelTypes[20];    /* 0x10 */
@@ -235,9 +273,85 @@ void xglLightPackEvaluate(XglLightPack *pack, f32 curveTime)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197C98);
+/* One light direction slot; directions[0].weakest is the index of the weakest colour slot. */
+typedef struct XglLightSlotDir {
+    float x;
+    float y;
+    float z;
+    int weakest;
+} XglLightSlotDir;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197DB0);
+/* The six strongest lights at a receiver: colours (w = strength) and directions. */
+typedef struct XglLightSlots {
+    Vector4 colors[6];
+    XglLightSlotDir directions[6];
+} XglLightSlots;
+
+#define LIGHT_SLOT_COUNT 6
+
+/* XS2 xglLightSlotsInsert: replaces the weakest of the six slots when color (strength = its largest
+ * channel) is stronger, stores its normalised direction (+z when zero) and finds the new weakest slot.
+ * The (&array[0])[index] form is the XS2 one: plain lightSlots->colors[index] makes GCC keep &colors[0].w
+ * in an extra s-register (73 instead of 70 instructions). */
+void func_00197C98(XglLightSlots *lightSlots, Vector4 *color, Vector4 *lightDir)
+{
+    float strength;
+    int i;
+    float weakestStrength;
+    Vector4 *slot;
+
+    strength = color->x;
+    if (strength < color->y) {
+        strength = color->y;
+    }
+    if (strength < color->z) {
+        strength = color->z;
+    }
+    if ((&lightSlots->colors[0])[(&lightSlots->directions[0])->weakest].w < strength) {
+        weakestStrength = 0;
+        slot = &(&lightSlots->colors[0])[(&lightSlots->directions[0])->weakest];
+        QuadwordCopy(slot, color);
+        slot->w = strength;
+        slot[LIGHT_SLOT_COUNT].x = lightDir->x;
+        slot[LIGHT_SLOT_COUNT].y = lightDir->y;
+        slot[LIGHT_SLOT_COUNT].z = lightDir->z;
+        if (slot[LIGHT_SLOT_COUNT].x == 0.0f && slot[LIGHT_SLOT_COUNT].y == 0.0f
+            && slot[LIGHT_SLOT_COUNT].z == 0.0f) {
+            slot[LIGHT_SLOT_COUNT].z = 1.0f;
+        }
+        xglVectorNormal(&slot[LIGHT_SLOT_COUNT], &slot[LIGHT_SLOT_COUNT]);
+        weakestStrength = (&lightSlots->colors[0])[0].w;
+        (&lightSlots->directions[0])->weakest = 0;
+        for (i = 1; i < LIGHT_SLOT_COUNT; i++) {
+            if ((&lightSlots->colors[0])[i].w < weakestStrength) {
+                weakestStrength = (&lightSlots->colors[0])[i].w;
+                (&lightSlots->directions[0])->weakest = i;
+            }
+        }
+    }
+}
+
+/* XS2 xglLightPointColor: the key's colour at the receiver, faded linearly between extent.x and
+ * extent.y; 0 (and a zero colour) when the receiver is at extent.y or farther. */
+int func_00197DB0(Vector4 *color, XglLightKey *key, Vector4 *receiver)
+{
+    Vector4 toLight;
+    float distance;
+
+    QuadwordZero(color);
+    Vu0SubVectorXYZ(&toLight, &key->position, receiver);
+    distance = toLight.x * toLight.x + toLight.y * toLight.y + toLight.z * toLight.z;
+    if (key->extent.y * key->extent.y <= distance) {
+        return 0;
+    }
+    distance = __builtin_sqrtf(distance);
+    QuadwordCopy(color, &key->color);
+    if (distance > key->extent.x) {
+        distance = (key->extent.y - distance) / (key->extent.y - key->extent.x);
+        xglVectorScale(color, color, distance);
+    }
+    return 1;
+}
 
 int xglLightSpotColor(Vector4 *color, Vector4 *lightDirection, XglLightKey *key, Vector4 *receiver)
 {
