@@ -706,9 +706,9 @@ void sceVif1PkAddCode(XglPacket *packet, unsigned int code);
 void sceVif1PkCloseDirectCode(XglPacket *packet);
 /* The packet template func_0019B3C0 sends: four quadwords, the TEX0 slot, then seven more from +0x60. */
 extern u64 xglRenderMovieTex0Packet[][2];
-extern u16 movieFramebufferBasePage[];
 
-/* Sends the xglRenderMovieTex0Packet packet with a TEX0 register that points at the movie frame buffer page. */
+/* Sends the xglRenderMovieTex0Packet packet with a TEX0 register that points at the display buffer page
+ * (the movie frame buffer). */
 void func_0019B3C0(void)
 {
     XglPacket *packet = xglPacketGetCurrent();
@@ -719,7 +719,7 @@ void func_0019B3C0(void)
     sceVif1PkOpenDirectHLCode(packet, 0);
     sceVif1PkAddDirectDataN(packet, xglRenderMovieTex0Packet, 4);
     scratch = (u64 *)SCRATCHPAD_BASE;
-    scratch[0] = 0x24020000 | (movieFramebufferBasePage[0] << 5) | ((u64)0xc800 << 19);
+    scratch[0] = 0x24020000 | (D_004C8390.display_buffer_base << 5) | ((u64)0xc800 << 19);
     scratch[1] = GS_TEX0_1;
     sceVif1PkAddDirectDataN(packet, (void *)SCRATCHPAD_BASE, 1);
     sceVif1PkAddDirectDataN(packet, xglRenderMovieTex0Packet[6], 7);
