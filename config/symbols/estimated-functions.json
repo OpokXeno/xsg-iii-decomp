@@ -1458,7 +1458,7 @@
      1
     ],
     [
-     "func_00A87740",
+     "ov02ExpRecordFlagIsSet",
      11040576,
      100,
      1
@@ -2442,13 +2442,13 @@
      1
     ],
     [
-     "func_00A8C4F8",
+     "dataVPadReadButtons",
      11060472,
      116,
      1
     ],
     [
-     "func_00A8C570",
+     "dataVPadReadTailWord",
      11060592,
      116,
      1
@@ -4362,13 +4362,13 @@
      1
     ],
     [
-     "func_00A99230",
+     "unitPlayerCreate",
      11113008,
      72,
      1
     ],
     [
-     "func_00A99278",
+     "unitEnemyCreate",
      11113080,
      84,
      1
@@ -31986,7 +31986,7 @@
      2
     ],
     [
-     "func_00193960",
+     "xglCameraTravelDefaultInit",
      1653088,
      220,
      2
@@ -32010,13 +32010,13 @@
      2
     ],
     [
-     "func_00193D90",
+     "xglCameraPadUpdateFree",
      1654160,
      1068,
      2
     ],
     [
-     "func_001941C0",
+     "xglCameraPadUpdateChase",
      1655232,
      1548,
      2
@@ -32694,7 +32694,7 @@
      2
     ],
     [
-     "func_00197B10",
+     "xglLightPackEvaluate",
      1669904,
      392,
      2
@@ -32814,7 +32814,7 @@
      2
     ],
     [
-     "func_00199650",
+     "xglLightPackDebugDrawAll",
      1676880,
      380,
      2
@@ -32916,7 +32916,7 @@
      2
     ],
     [
-     "func_0019A1E8",
+     "xglRenderDrawEnvMove",
      1679848,
      148,
      2
@@ -33198,13 +33198,13 @@
      2
     ],
     [
-     "func_0019B8D8",
+     "xglStudioReset",
      1685720,
      148,
      2
     ],
     [
-     "func_0019B970",
+     "xglStudioMove",
      1685872,
      176,
      2
@@ -33384,19 +33384,19 @@
      2
     ],
     [
-     "func_0019CCE8",
+     "pxyProfileGetMs",
      1690856,
      268,
      2
     ],
     [
-     "func_0019CDF8",
+     "pxyProfileGetMsUnchecked",
      1691128,
      220,
      2
     ],
     [
-     "func_0019CED8",
+     "pxyProfileDrawEntries",
      1691352,
      164,
      2
@@ -33516,7 +33516,7 @@
      2
     ],
     [
-     "func_0019E510",
+     "pxyBuildFadeRamp",
      1697040,
      160,
      2
@@ -33588,7 +33588,7 @@
      2
     ],
     [
-     "func_0019E9A8",
+     "cfeModelFindPart",
      1698216,
      184,
      2
@@ -33822,7 +33822,7 @@
      2
     ],
     [
-     "func_0019F048",
+     "nmlModelGetFogParaStudio",
      1699912,
      236,
      2
@@ -33864,7 +33864,7 @@
      2
     ],
     [
-     "func_0019F210",
+     "nmlModelSetTexture",
      1700368,
      184,
      2
@@ -34116,7 +34116,7 @@
      2
     ],
     [
-     "func_001A1B10",
+     "pxyUnscrambleHeader",
      1710864,
      520,
      2
@@ -34230,7 +34230,7 @@
      2
     ],
     [
-     "func_001A8280",
+     "pxyDrawBatches",
      1737344,
      7040,
      2
@@ -34470,7 +34470,7 @@
      2
     ],
     [
-     "func_001ABCA0",
+     "pxyUploadPartStateDefault",
      1752224,
      192,
      2
@@ -34530,7 +34530,7 @@
      2
     ],
     [
-     "func_001ACE80",
+     "nmlPacketTextureTrans",
      1756800,
      340,
      2
@@ -34542,13 +34542,13 @@
      2
     ],
     [
-     "func_001AD190",
+     "nmlPacketAddGsFlush",
      1757584,
      232,
      2
     ],
     [
-     "func_001AD278",
+     "nmlPacketAddGsFlushWide",
      1757816,
      232,
      2
@@ -34572,7 +34572,7 @@
      2
     ],
     [
-     "func_001AD628",
+     "pxyDrawPartData",
      1758760,
      144,
      2
@@ -34692,19 +34692,19 @@
      2
     ],
     [
-     "func_001AEB20",
+     "xglPsmBufferWidthEven",
      1764128,
      140,
      2
     ],
     [
-     "func_001AEBB0",
+     "xglPsmBufferWidth",
      1764272,
      144,
      2
     ],
     [
-     "func_001AEC40",
+     "nmlPacketGsInit",
      1764416,
      128,
      2
@@ -34722,7 +34722,7 @@
      2
     ],
     [
-     "func_001AED28",
+     "xglDirectQueueDefer",
      1764648,
      140,
      2
@@ -34734,7 +34734,7 @@
      2
     ],
     [
-     "func_001AEDC0",
+     "xglDirectQueueSubmitRef",
      1764800,
      124,
      2
@@ -34770,7 +34770,7 @@
      2
     ],
     [
-     "func_001AF4C8",
+     "nmlPacketSendCircleTexture",
      1766600,
      384,
      2
@@ -57198,7 +57198,7 @@
      2
     ],
     [
-     "func_0029BF48",
+     "tiMotionSolveLocatorOutOfLine",
      2735944,
      372,
      2
@@ -60726,7 +60726,7 @@
      2
     ],
     [
-     "func_002C73A0",
+     "padCirclePressedAlone",
      2913184,
      52,
      2
@@ -62490,13 +62490,13 @@
      2
     ],
     [
-     "njStringSetByteFields",
+     "njStringSetZoom",
      2976248,
      12,
      2
     ],
     [
-     "njStringSetTextIndexRaw",
+     "njStringSetTextNoLayout",
      2976264,
      8,
      2
@@ -62592,7 +62592,7 @@
      2
     ],
     [
-     "njStringSetTextIndex",
+     "njStringSetText",
      2984848,
      64,
      2
@@ -62604,7 +62604,7 @@
      2
     ],
     [
-     "njStringSetByteFieldsB",
+     "njStringSetZoomB",
      2984928,
      12,
      2
@@ -62634,13 +62634,13 @@
      2
     ],
     [
-     "njStringSetHalf104",
+     "njStringSetFirstVisibleLine",
      2985216,
      12,
      2
     ],
     [
-     "njStringSetHalf100",
+     "njStringSetVisibleLineSpan",
      2985232,
      12,
      2
@@ -62652,7 +62652,7 @@
      2
     ],
     [
-     "func_002D8D28",
+     "njStringLayoutText",
      2985256,
      7392,
      2

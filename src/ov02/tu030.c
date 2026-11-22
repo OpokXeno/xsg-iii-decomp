@@ -3,7 +3,6 @@
 
 void dataVPadModeSet(int mode);
 void dataVPadSet(int virtualPad);
-
 extern int padMode;
 extern short padData;
 
@@ -18,28 +17,27 @@ struct SaveStack;
 
 #include "ov02/tu030.h"
 
-
 /* battleStackSetSlot: writes value to slot of the current level; returns the cell's byte offset. */
 int battleStackSetSlot(struct SaveStack *stack, int cellInLevel, int cellValue) {
     int cellIndex;
-    int *cell;
+    int *slotCell;
 
     cellIndex = stack->count * SAVE_STACK_LEVEL_CELLS + cellInLevel;
-    cell = &stack->cells[cellIndex];
-    *cell = cellValue;
+    slotCell = &stack->cells[cellIndex];
+    *slotCell = cellValue;
     return cellIndex * 4;
 }
 
 /* battleStackGetSlot: reads slot of the current level. */
 int battleStackGetSlot(struct SaveStack *stack, int cellInLevel)
 {
-    int *cell = &stack->cells[stack->count * SAVE_STACK_LEVEL_CELLS + cellInLevel];
-    return *cell;
+    int *slotCell = &stack->cells[stack->count * SAVE_STACK_LEVEL_CELLS + cellInLevel];
+    return *slotCell;
 }
 
 struct BattleUnit;
 extern struct BattleUnit *gBattleUnitTable[];
-extern int gBattleUnitGrid[];
+extern struct BattleUnit *gBattleUnitGrid[];
 
 /* Zeroes the 32-word table at gBattleUnitTable (walked from its last word down), the two rows of
  * two words at gBattleUnitGrid (each row written from its second word down), and the words
@@ -48,38 +46,36 @@ void battleTablesReset(void)
 {
     extern int gBattleUnitCount;
     extern int gBattleCounter;
-    int rowStep;
-    int column;
-    int index;
-    struct BattleUnit **cell;
-    int *rowCell;
-    int *row;
+    int rowsPerPass;
+    int columnsLeft;
+    int clearedCount;
+    struct BattleUnit **tableCell;
+    struct BattleUnit **rowCellCursor;
+    struct BattleUnit **rowCursor;
 
-    cell = gBattleUnitTable;
-    cell += 31;
-    for (index = 0; index < 32; index++) {
-        *cell = 0;
-        cell -= 1;
+    tableCell = gBattleUnitTable;
+    tableCell += 31;
+    for (clearedCount = 0; clearedCount < 32; clearedCount++) {
+        *tableCell = 0;
+        tableCell -= 1;
     }
 
-    index = 0;
-    row = gBattleUnitGrid;
+    clearedCount = 0;
+    rowCursor = gBattleUnitGrid;
     do {
-        do {
-            rowStep = 1;
-            column = rowStep;
-            rowCell = row + 1;
-        loop_column:
-            column -= 1;
-            *rowCell = 0;
-            rowCell -= 1;
-            if (column >= 0) {
-                goto loop_column;
-            }
-            index += rowStep;
-            row += 2;
-        } while (0);
-    } while (index < 2);
+        rowsPerPass = 1;
+        columnsLeft = rowsPerPass;
+        rowCellCursor = rowCursor + 1;
+    loop_column:
+        columnsLeft -= 1;
+        *rowCellCursor = 0;
+        rowCellCursor -= 1;
+        if (columnsLeft >= 0) {
+            goto loop_column;
+        }
+        clearedCount += rowsPerPass;
+        rowCursor += 2;
+    } while (clearedCount < 2);
     gBattleUnitCount = 0;
     gBattleCounter = 0;
 }
@@ -141,7 +137,7 @@ int battleUnitTableStore(struct BattleUnit *battleUnit, int column)
     overLimit = battleUnit->stockCounters->stockCurrent <= (0x12 - 1);
     overLimit = overLimit == 0;
     cellIndex = overLimit * 2 + column;
-    ((struct BattleUnit **) gBattleUnitGrid)[cellIndex] = battleUnit;
+    gBattleUnitGrid[cellIndex] = battleUnit;
     return cellIndex * 4;
 }
 
@@ -151,8 +147,8 @@ struct BattleUnit *battleUnitGet(int unitNumber)
     return gBattleUnitTable[unitNumber];
 }
 
-/* Word at row, column of the 2x2 table at gBattleUnitGrid. */
-int battleTableCellGet(int row, int column)
+/* Battle unit pointer at row, column of the 2x2 table at gBattleUnitGrid. */
+struct BattleUnit *battleTableCellGet(int row, int column)
 {
     return gBattleUnitGrid[row * 2 + column];
 }
@@ -202,6 +198,67 @@ void dataVPadSet(int virtualPad)
     padData = convertedPad;
 }
 
-INCLUDE_ASM("asm/nonmatchings/ov02/tu030", func_00A8C4F8);
+#include "main/tu007.h"
 
-INCLUDE_ASM("asm/nonmatchings/ov02/tu030", func_00A8C570);
+struct PadRecordView {
+    unsigned char unmodeled_00[0x30];
+    unsigned short directionHeld;
+    unsigned short directionPressed;
+    unsigned short directionRepeated;
+    unsigned char unmodeled_36[0x32];
+    unsigned short tailHalfword[3];
+};
+
+extern struct PadRecordView gPadPortRecords[2];
+
+/* Reads the pad word of the current mode: while padMode is zero, the directionHeld, directionPressed or
+ * directionRepeated halfword of port 0 (ports 0 to 2); otherwise the padData word. */
+unsigned short dataVPadReadButtons(int port)
+{
+    unsigned short padButtons;
+
+    padButtons = 0;
+    if (padMode == 0) {
+        switch (port) {
+        case 0:
+            padButtons = gPadPortRecords[0].directionHeld;
+            break;
+        case 1:
+            padButtons = gPadPortRecords[0].directionPressed;
+            break;
+        case 2:
+            padButtons = gPadPortRecords[0].directionRepeated;
+            break;
+        }
+    } else {
+        padButtons = padData;
+    }
+    return padButtons;
+}
+
+/* Port record of the pad table as this TU reads it: the direction halfwords at +0x30 and the three
+ * halfwords at +0x68 that PadRecord leaves unmodeled. */
+
+/* Reads the same pad word as dataVPadReadButtons for the three halfwords at +0x68 of the port 0 record. */
+unsigned short dataVPadReadTailWord(int port)
+{
+    unsigned short padButtons;
+
+    padButtons = 0;
+    if (padMode == 0) {
+        switch (port) {
+        case 0:
+            padButtons = gPadPortRecords[0].tailHalfword[0];
+            break;
+        case 1:
+            padButtons = gPadPortRecords[0].tailHalfword[1];
+            break;
+        case 2:
+            padButtons = gPadPortRecords[0].tailHalfword[2];
+            break;
+        }
+    } else {
+        padButtons = padData;
+    }
+    return padButtons;
+}

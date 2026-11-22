@@ -6,10 +6,19 @@
 #include "main/TiMRPackage.h"
 /* Address of a table at a byte displacement read from the data at runtime (not a constant field). */
 #define BYTE_OFFSET(base, displacement) ((u8 *) (base) + (displacement))
+/* The same address typed as `type *`, so each table pointer needs no cast at its use. */
+#define BYTE_OFFSET_AS(type, base, displacement) ((type *) BYTE_OFFSET(base, displacement))
 
 /* The record tables sit at runtime byte offsets from hrcData (hrcData->xxxOffset), as in TiMRPackage.c: no typed
  * field of TiHrcData holds their pointers, so each table is reached through one cast of hrcData + displacement. */
-typedef struct TiCollSphere { int matrixIndex; f32 radius; /* +0x04 */ unsigned int disableBits; /* +0x08: bit 0x1 disables the record */ unsigned char unmodeled_0C[0x4]; Vector4 localCenter; /* +0x10 */ Vector4 worldCenter; /* +0x20 */ } TiCollSphere;
+typedef struct TiCollSphere {
+    int matrixIndex;
+    f32 radius;                   /* +0x04 */
+    unsigned int disableBits;     /* +0x08: bit 0x1 disables the record */
+    unsigned char unmodeled_0C[0x4];
+    Vector4 localCenter;          /* +0x10 */
+    Vector4 worldCenter;          /* +0x20 */
+} TiCollSphere;
 
 void xglVectorMulMat(Vector4 *destination, Matrix4 matrix, const Vector4 *vector);
 void assertFailed(const char *message, const char *file, int line);
@@ -20,7 +29,7 @@ void tiDynamicsCollTransformVectors(TiMRPackage *mrPackage)
     TiCollSphere *sphere;
     unsigned int sphereIndex;
 
-    sphere = (TiCollSphere *) BYTE_OFFSET(mrPackage->hrcData, mrPackage->hrcData->sphereOffset);
+    sphere = BYTE_OFFSET_AS(TiCollSphere, mrPackage->hrcData, mrPackage->hrcData->sphereOffset);
     if (mrPackage->globalMat == 0) {
         assertFailed("pMRPack->pGlobalMat", "TiDynamicsColl.euc.c", 17);
     }
@@ -84,7 +93,7 @@ void tiDynamicsCollBuildInverseMatrices(TiMRPackage *mrPackage) {
 
     matrixIndex = 0;
     hrcData = mrPackage->hrcData;
-    matrixRecord = (TiCollMatrix *) BYTE_OFFSET(hrcData, hrcData->matrixOffset);
+    matrixRecord = BYTE_OFFSET_AS(TiCollMatrix, hrcData, hrcData->matrixOffset);
     if (hrcData->matrixCount != 0) {
         do {
             if (matrixRecord->placedMatrixIndex == -1) {
@@ -122,7 +131,7 @@ void tiDynamicsCollBuildWideInverseMatrices(TiMRPackage *mrPackage) {
 
     capsuleIndex = 0;
     hrcData = mrPackage->hrcData;
-    capsuleRecord = (TiCollCapsule *) BYTE_OFFSET(hrcData, hrcData->capsuleOffset);
+    capsuleRecord = BYTE_OFFSET_AS(TiCollCapsule, hrcData, hrcData->capsuleOffset);
     if (hrcData->capsuleCount != 0) {
         do {
             if (capsuleRecord->placedMatrixIndex == -1) {
@@ -299,7 +308,22 @@ void tiDynamicsCollPushOutCapsule(Vector4 *position, Vector4 *accumulator, TiCol
     position->z = point.z;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/TiDynamicsColl", tiDynamicsCollPushOutSphereList);
+/* Pushes the solver body out of every sphere record of the node, in entry order. */
+void tiDynamicsCollPushOutSphereList(TiMRPackage *mrPackage, TiHrcDynamics *hrcNode, TiSolverState *solverState)
+{
+    TiCollSphere *sphereRecords;
+    TiCollEntry *collEntry;
+    unsigned int i;
+
+    if (hrcNode->sphereCount == 0) {
+        return;
+    }
+    collEntry = hrcNode->entries;
+    sphereRecords = BYTE_OFFSET_AS(TiCollSphere, mrPackage->hrcData, mrPackage->hrcData->sphereOffset);
+    for (i = 0; i < hrcNode->sphereCount; i++, collEntry++) {
+        tiDynamicsCollPushOutSphere(&solverState->position.vector, &solverState->accumulator.vector, &sphereRecords[collEntry->recordIndex]);
+    }
+}
 
 /* Pushes the solver body out of every matrix record of the node, after the sphere entries. */
 void tiDynamicsCollPushOutMatrixList(TiMRPackage *mrPackage, TiHrcDynamics *hrcNode, TiSolverState *solverState) {
@@ -310,7 +334,7 @@ void tiDynamicsCollPushOutMatrixList(TiMRPackage *mrPackage, TiHrcDynamics *hrcN
     if (hrcNode->matrixCount == 0) {
         return;
     }
-    matrixRecords = (TiCollMatrix *)BYTE_OFFSET(mrPackage->hrcData, mrPackage->hrcData->matrixOffset);
+    matrixRecords = BYTE_OFFSET_AS(TiCollMatrix, mrPackage->hrcData, mrPackage->hrcData->matrixOffset);
     collEntry = hrcNode->entries + hrcNode->sphereCount;
     for (i = 0; i < hrcNode->matrixCount; i++, collEntry++) {
         tiDynamicsCollClampAbovePlane(&solverState->position.vector, &solverState->accumulator.vector, &matrixRecords[collEntry->recordIndex], mrPackage);
@@ -329,7 +353,7 @@ void tiDynamicsCollPushOutCapsuleList(TiMRPackage *mrPackage, TiHrcDynamics *hrc
         return;
     }
     hrcData = mrPackage->hrcData;
-    capsuleRecords = (TiCollCapsule *) BYTE_OFFSET(hrcData, hrcData->capsuleOffset);
+    capsuleRecords = BYTE_OFFSET_AS(TiCollCapsule, hrcData, hrcData->capsuleOffset);
     collEntry = hrcNode->entries + hrcNode->sphereCount + hrcNode->matrixCount;
     for (i = 0; i < hrcNode->capsuleCount; i++, collEntry++) {
         tiDynamicsCollPushOutCapsule(&solverState->position.vector, &solverState->accumulator.vector, &capsuleRecords[collEntry->recordIndex], mrPackage);
@@ -353,7 +377,7 @@ void tiDynamicsCollSolveSpherePair(TiSolverState *firstSolverBody, TiSolverState
     }
     collEntry = firstSolverBody->node->entries;
     hrcData = mrPackage->hrcData;
-    sphereRecords = (TiCollSphere *) BYTE_OFFSET(hrcData, hrcData->sphereOffset);
+    sphereRecords = BYTE_OFFSET_AS(TiCollSphere, hrcData, hrcData->sphereOffset);
     midpoint.vector.w = 1.0f;
     correction.vector.w = 1.0f;
     midpoint.vector.x = (secondSolverBody->position.vector.x - firstSolverBody->position.vector.x) * 0.5f + firstSolverBody->position.vector.x;
@@ -400,9 +424,8 @@ void tiDynamicsCollSolveMatrixPair(TiSolverState *firstSolverBody, TiSolverState
     if (firstSolverBody->node->matrixCount == 0) {
         return;
     }
-    matrixIndex = 0;
     hrcData = mrPackage->hrcData;
-    matrixRecords = (TiCollMatrix *) BYTE_OFFSET(hrcData, hrcData->matrixOffset);
+    matrixRecords = BYTE_OFFSET_AS(TiCollMatrix, hrcData, hrcData->matrixOffset);
     sphereCount = firstSolverBody->node->sphereCount;
     collEntry = &firstSolverBody->node->entries[sphereCount];
     midpoint.vector.w = 1.0f;
@@ -420,18 +443,18 @@ void tiDynamicsCollSolveMatrixPair(TiSolverState *firstSolverBody, TiSolverState
         contactRecordIndex = collEntry->recordIndex;
         collEntry++;
         tiDynamicsCollClampAbovePlane(&midpoint.vector, &correction.vector, &matrixRecords[contactRecordIndex], mrPackage);
-        firstSolverBody->position.vector.x = firstSolverBody->position.vector.x + correction.vector.x;
-        firstSolverBody->position.vector.y = firstSolverBody->position.vector.y + correction.vector.y;
-        firstSolverBody->position.vector.z = firstSolverBody->position.vector.z + correction.vector.z;
-        firstSolverBody->accumulator.vector.x = firstSolverBody->accumulator.vector.x + correction.vector.x;
-        firstSolverBody->accumulator.vector.y = firstSolverBody->accumulator.vector.y + correction.vector.y;
-        firstSolverBody->accumulator.vector.z = firstSolverBody->accumulator.vector.z + correction.vector.z;
-        secondSolverBody->position.vector.x = secondSolverBody->position.vector.x + correction.vector.x;
-        secondSolverBody->position.vector.y = secondSolverBody->position.vector.y + correction.vector.y;
-        secondSolverBody->position.vector.z = secondSolverBody->position.vector.z + correction.vector.z;
-        secondSolverBody->accumulator.vector.x = secondSolverBody->accumulator.vector.x + correction.vector.x;
-        secondSolverBody->accumulator.vector.y = secondSolverBody->accumulator.vector.y + correction.vector.y;
-        secondSolverBody->accumulator.vector.z = secondSolverBody->accumulator.vector.z + correction.vector.z;
+        firstSolverBody->position.vector.x += correction.vector.x;
+        firstSolverBody->position.vector.y += correction.vector.y;
+        firstSolverBody->position.vector.z += correction.vector.z;
+        firstSolverBody->accumulator.vector.x += correction.vector.x;
+        firstSolverBody->accumulator.vector.y += correction.vector.y;
+        firstSolverBody->accumulator.vector.z += correction.vector.z;
+        secondSolverBody->position.vector.x += correction.vector.x;
+        secondSolverBody->position.vector.y += correction.vector.y;
+        secondSolverBody->position.vector.z += correction.vector.z;
+        secondSolverBody->accumulator.vector.x += correction.vector.x;
+        secondSolverBody->accumulator.vector.y += correction.vector.y;
+        secondSolverBody->accumulator.vector.z += correction.vector.z;
     }
 }
 
@@ -452,7 +475,7 @@ void tiDynamicsCollSolveCapsulePair(TiSolverState *firstSolverBody, TiSolverStat
     }
     collEntry = &(&firstSolverBody->node->entries[firstSolverBody->node->sphereCount])[firstSolverBody->node->matrixCount];
     hrcData = mrPackage->hrcData;
-    capsuleRecords = (TiCollCapsule *) BYTE_OFFSET(hrcData, hrcData->capsuleOffset);
+    capsuleRecords = BYTE_OFFSET_AS(TiCollCapsule, hrcData, hrcData->capsuleOffset);
     midpoint.vector.w = 1.0f;
     correction.vector.w = 1.0f;
     midpoint.vector.x = (secondSolverBody->position.vector.x - firstSolverBody->position.vector.x) * 0.5f + firstSolverBody->position.vector.x;

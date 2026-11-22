@@ -2,7 +2,6 @@
 #include "shared.h"
 #include "vu0_macro.h"
 
-
 /*
  * One culling volume: the position, rotation and scale culling_matrix reads,
  * the transform it builds from them, and the four corners it derives.
@@ -101,7 +100,28 @@ void _FacePoint(void *hitPoint, void *lineStart, void *lineEnd, void *planeNorma
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", _CheckLine);
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", plane_from_points);
+void xglVectorOuter(Vector4 *destination, const Vector4 *left, const Vector4 *right);
+
+void plane_from_points(const Vector4 *origin, const Vector4 *firstPoint,
+                       const Vector4 *secondPoint, Vector4 *plane)
+{
+    Vector4 originToFirst;
+    Vector4 originToSecond;
+    Vector4 normal;
+
+    originToFirst.x = firstPoint->x - origin->x;
+    originToFirst.y = firstPoint->y - origin->y;
+    originToFirst.z = firstPoint->z - origin->z;
+    originToSecond.x = secondPoint->x - origin->x;
+    originToSecond.y = secondPoint->y - origin->y;
+    originToSecond.z = secondPoint->z - origin->z;
+    xglVectorOuter(&normal, &originToFirst, &originToSecond);
+    xglVectorNormal(&normal, &normal);
+    plane->x = normal.x;
+    plane->y = normal.y;
+    plane->z = normal.z;
+    plane->w = -(normal.x * origin->x + normal.y * origin->y + normal.z * origin->z);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", setup_occlusion);
 
@@ -145,10 +165,39 @@ void xglCullingMapClear(void)
     map->unmodeled_DE4 = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", check_culling_map);
+typedef struct CullingMapEntry {
+    const char *name;
+    /* The loop tests these pointer fields only for nullness. */
+    const float *entryCount;
+    const s32 *source;
+    unsigned char unmodeled_00C[4];
+} CullingMapEntry;
 
-void xglCullingMapClear(void);
+/*
+ * Declared as an incomplete array, not a scalar: a plain scalar extern would
+ * be classified as small data and emit a single gp-relative load, but the
+ * original site is two absolute hi/lo instructions.
+ */
+extern const CullingMapEntry gCullingNameTable[];
 s32 func_0030E68C(void *, void *);
+
+/*
+ * Finds a named culling-map entry in the current map table and returns its
+ * index or minus one. The table ends at the first row with entryCount and
+ * source both zero.
+ */
+s32 check_culling_map(const char *name) {
+    s32 foundRowIndex = -1;
+    s32 rowIndex;
+
+    for (rowIndex = 0; gCullingNameTable[rowIndex].entryCount != 0 || gCullingNameTable[rowIndex].source != 0; rowIndex++) {
+        if (func_0030E68C((void *)gCullingNameTable[rowIndex].name, (void *)name) == 0) {
+            foundRowIndex = rowIndex;
+            break;
+        }
+    }
+    return foundRowIndex;
+}
 
 s32 xglCullingRecordQuery(CullingMapRecord *volumeRecord) {
     s32 queryResult;
@@ -167,8 +216,6 @@ s32 xglCullingRecordQuery(CullingMapRecord *volumeRecord) {
 INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C538);
 
 INCLUDE_ASM("asm/main/nonmatchings/face_point", xglCullingMapCreate);
-
-void xglCullingVolumeDisplay(void *volumeRecord);
 
 void xglCullingMapDisp(void)
 {

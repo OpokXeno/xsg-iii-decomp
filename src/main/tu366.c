@@ -39,7 +39,7 @@ typedef struct NjPlaneBlock {
 #define gNjPlaneBlock (*(NjPlaneBlock *) gNjPlaneBlockStorage)
 void njPlaneSetLevel(NjPlane *, f32);
 void func_002D6978();
-void njStringSetByteFields();
+void njStringSetZoom();
 void njStringSetFlags();
 void *memset(void *destination, s32 value, unsigned int size);
 
@@ -67,7 +67,7 @@ void njPlaneBlockInit(void)
     njStringSetFlags(primaryText, 0x80C);
     func_002D6978(secondaryText);
     njStringSetFlags(secondaryText, 0xA0C);
-    njStringSetByteFields(secondaryText, 0x10, 0x10);
+    njStringSetZoom(secondaryText, 0x10, 0x10);
   }
   while (stringIndex < 0x80);
   memset(gNjPlaneWorkBuffer, 0, 0xC00);

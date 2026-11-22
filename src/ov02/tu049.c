@@ -38,10 +38,10 @@ void battleDropRequestArm(void) {
     seVoiceCursorSetEnable(1);
 }
 
-s32 func_00A8C4F8(s32);
+s32 dataVPadReadButtons(s32);
 
 s32 battleDropRequestConsume(void) {
-    if (!(func_00A8C4F8(1) & 0x60)) {
+    if (!(dataVPadReadButtons(1) & 0x60)) {
         return 0;
     }
     seVoiceCursorSetEnable(0);

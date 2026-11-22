@@ -1,13 +1,12 @@
 #include "common.h"
 #include "shared.h"
-
 #include "main/tu031.h"
 
 extern const DoublewordVector4 lightDebugBoxPointTable;
-extern const DoublewordVector4 D_00541390;
-extern const DoublewordVector4 D_005413A0;
-extern const DoublewordVector4 D_005413B0;
-extern const DoublewordVector4 D_005413C0;
+extern const DoublewordVector4 lightDebugBoxPointB;
+extern const DoublewordVector4 lightDebugBoxPointC;
+extern const DoublewordVector4 lightDebugBoxPointD;
+extern const DoublewordVector4 lightDebugBoxPointE;
 void xglMatrixStackUnit(void);
 void xglMatrixStackTrans(const Vector4 *vector);
 void xglMatrixStackRotX(float angle);
@@ -26,10 +25,10 @@ void xglLightPackDebugBox(XglLightKey *key)
     DoublewordVector4 debugBoxPointE;
 
     debugBoxPointA = lightDebugBoxPointTable;
-    debugBoxPointB = D_00541390;
-    debugBoxPointC = D_005413A0;
-    debugBoxPointD = D_005413B0;
-    debugBoxPointE = D_005413C0;
+    debugBoxPointB = lightDebugBoxPointB;
+    debugBoxPointC = lightDebugBoxPointC;
+    debugBoxPointD = lightDebugBoxPointD;
+    debugBoxPointE = lightDebugBoxPointE;
     xglMatrixStackUnit();
     xglMatrixStackTrans(&key->position);
     xglMatrixStackRotZ(key->rotation.z);
@@ -43,7 +42,7 @@ void xglLightPackDebugBox(XglLightKey *key)
     xglMatrixStackMulVector(&debugBoxPointE.vector, &debugBoxPointE.vector);
 }
 
-void xglLightPackDebugEmpty(void) {
+void xglLightPackDebugEmpty(XglLightKey *key) {
 
 }
 
@@ -59,4 +58,87 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199160);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_001994F0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_031", func_00199650);
+/* Light pack as the light-packEntry loop reads it: lightEntryCount at 0x30, keyOffset at 0x3C, lightEntryByteOffsets at 0xF0. */
+typedef struct XglLightPack {
+    u8 unmodeled_00[0x30];
+    int lightEntryCount;                 /* 0x30 */
+    u8 unmodeled_34[0x8];
+    int keyOffset;                  /* 0x3C */
+    u8 unmodeled_40[0xB0];
+    int lightEntryByteOffsets[1];            /* 0xF0: byte offsets of the entries, relative to the pack */
+} XglLightPack;
+
+/* One packEntry of a light pack: its entryType is read at 0x04. */
+typedef struct XglLightEntry {
+    u8 unmodeled_00[0x4];
+    int entryType;                       /* 0x04 */
+} XglLightEntry;
+
+/* One of the 16 light slots at xglLightSlotTable: the pack registered in it (0 when free). */
+typedef struct XglLightPackSlot {
+    XglLightPack *pack;             /* 0x00 */
+    u8 unmodeled_04[0xC];
+} XglLightPackSlot;
+
+extern XglLightPackSlot xglLightSlotTable[16];
+
+void func_001994F0(XglLightKey *key);
+void func_00199030(XglLightKey *key);
+void func_00199148(XglLightKey *key);
+void func_00198E48(XglLightKey *key);
+void func_00199160(XglLightKey *key);
+void func_00199018(XglLightKey *key);
+
+void xglLightPackDebugDrawAll(void)
+{
+    int lightSlotIndex;
+    int lightEntryIndex;
+    XglLightKey *key;
+    int *lightEntryByteOffsets;
+    XglLightEntry *packEntry;
+
+    for (lightSlotIndex = 0; lightSlotIndex < 16; lightSlotIndex++) {
+        if (xglLightSlotTable[lightSlotIndex].pack != 0) {
+            key = (XglLightKey *)((u8 *)xglLightSlotTable[lightSlotIndex].pack + xglLightSlotTable[lightSlotIndex].pack->keyOffset);
+            lightEntryByteOffsets = xglLightSlotTable[lightSlotIndex].pack->lightEntryByteOffsets;
+            for (lightEntryIndex = 0; lightEntryIndex < xglLightSlotTable[lightSlotIndex].pack->lightEntryCount; lightEntryIndex++) {
+                packEntry = (XglLightEntry *)((u8 *)xglLightSlotTable[lightSlotIndex].pack + lightEntryByteOffsets[lightEntryIndex]);
+                switch (packEntry->entryType - 1) {
+                case 0:
+                    xglLightPackDebugEmpty(key);
+                    break;
+                case 1:
+                    func_001994F0(key);
+                    break;
+                case 7:
+                case 9:
+                    func_00199030(key);
+                    break;
+                case 3:
+                case 4:
+                case 20:
+                case 21:
+                    xglLightPackDebugBox(key);
+                    break;
+                case 5:
+                case 22:
+                    func_00198E48(key);
+                    break;
+                case 23:
+                    func_00199160(key);
+                    break;
+                case 10:
+                case 18:
+                    func_00199018(key);
+                    break;
+                case 2:
+                case 19:
+                case 34:
+                    func_00199148(key);
+                    break;
+                }
+                key++;
+            }
+        }
+    }
+}

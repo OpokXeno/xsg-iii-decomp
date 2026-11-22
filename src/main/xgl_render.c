@@ -407,7 +407,8 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 typedef struct XglRenderStateBlock {
     unsigned char unmodeled_00[2];
     short psm;                          /* +0x02 */
-    unsigned char unmodeled_04[6];
+    unsigned char unmodeled_04[4];
+    unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
     unsigned char unmodeled_0e[0x67];   /* +0x0E..+0x74 */
@@ -415,8 +416,11 @@ typedef struct XglRenderStateBlock {
     unsigned char unmodeled_76[0x0e];   /* +0x76..+0x83 */
     unsigned char syncBacklogFull;              /* +0x84 */
 } XglRenderStateBlock;
+
 typedef int s32;
+
 typedef signed char s8;
+
 extern volatile unsigned int gVsyncsSinceFlip;
 extern unsigned char func_00199CE0[];
 s32 func_002F47D8();
@@ -427,21 +431,8 @@ void xglRenderSyncInit(void) {
 }
 
 /* X3 scaffold label 0x004c8390: the fields xglRenderSyncWait reads and writes, at their asm offsets. */
-
-
-
-
-
-
-
-
-
-
-
-
 extern XglRenderStateBlock D_004C8390;
 extern signed char gVsyncsPerFrame;
-extern volatile unsigned int gVsyncsSinceFlip;
 /* Scaffold labels of the callees (config has no name for them). */
 void func_001337B8(void);
 void func_002F32B8(void);
@@ -493,8 +484,8 @@ void xglRenderSyncWait(void)
         packet[1] = GIF_REG_AD;
         packet[2] = 0;
         packet[3] = 0x3F;
-        packet[4] = ((u64) (D_004C8390.dispfb_base << 5) | 0x80000)
-            | ((u64) (D_004C8390.prev_dispfb_base << 5) << 32) | ((u64) 0x8000 << 36)
+        packet[4] = ((D_004C8390.dispfb_base << 5) | 0x80000)
+            | ((u64) (D_004C8390.prev_dispfb_base << 5) << 32) | (0x8000ULL << 36)
             | ((u64) D_004C8390.psm << 24) | ((u64) D_004C8390.psm << 56);
         packet[5] = 0x50;
         packet[6] = 0;
@@ -519,21 +510,32 @@ void xglRenderSyncWait(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199FE8);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A1E8);
+/* X3 scaffold label of the draw-environment packet (0x004c80c0); config names it only by address. */
+extern GsDrawPacket gXglRenderDrawPacket;
+/* Scaffold labels of the two callees (config has no name for them, and the sync and put calls keep them). */
+void func_002E7348(void *start, void *end);
+void func_002F3808(GsDrawEnv *env);
+
+void xglRenderDrawEnvMove(void)
+{
+    gXglRenderDrawPacket.env.firstFrame.fbp = D_004C8390.prev_dispfb_base;
+    gXglRenderDrawPacket.env.secondFrame.fbp = D_004C8390.prev_dispfb_base;
+    gXglRenderDrawPacket.env.firstZbuf.zbp = D_004C8390.zbuf_base;
+    gXglRenderDrawPacket.env.secondZbuf.zbp = D_004C8390.zbuf_base;
+    func_002E7348(&gXglRenderDrawPacket, &gXglRenderDrawPacket + 1);
+    func_002F3808(&gXglRenderDrawPacket.env);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A280);
 
-/* X3 scaffold labels of the display environment block (0x004c81c0) and of ScanLineInterpolate (0x00551210); config names neither. */
+/* The display environment block (0x004c81c0). */
 extern GsDispEnv xglRenderDispEnvBlock;
-extern int D_00551210;
-/* Scaffold labels of the two callees (config has no name for them). */
-void func_002E7348(void *start, void *end);
 void func_002F3748(GsDispEnv *env);
 
 void xglRenderDispEnvMove(void)
 {
     xglRenderDispEnvBlock.firstDispfb.dispfbFields.fbp = sRender.vram.flip_base;
-    switch (D_00551210) {
+    switch (ScanLineInterpolate) {
     case 0:
         xglRenderDispEnvBlock.pmode.firstCircuitEnable = 0;
         break;
@@ -577,7 +579,7 @@ void xglRenderScanLineInit(void)
 {
   *((volatile s32 *) 0x10003820) = 0;
   *((volatile s32 *) 0x10003C20) = 0;
-  D_00551210 = 1;
+  ScanLineInterpolate = 1;
   func_002F38F0(0);
   if (D_004C8390.unmodeled_76[0xA] == 0)
   {
@@ -603,8 +605,8 @@ void xglRenderScanLineInit();
 void xglRenderDispEnvFlagSet();
 s32 xglIntcEnable();
 
-void xglRenderStart(s32 startMode) {
-    xglRenderStartFlag[0] = startMode;
+void xglRenderStart(s32 renderStartMode) {
+    xglRenderStartFlag[0] = renderStartMode;
     xglRenderScanLineInit();
     xglIntcEnable(5);
     func_0019A280();
@@ -619,6 +621,7 @@ typedef struct XglRenderFadeView {
   unsigned char fade_gain;            /* +0x86 */
   unsigned char fade_level;           /* +0x87 */
 } XglRenderFadeView;
+
 #define D_004C8390_FADE (*(XglRenderFadeView *) &D_004C8390)
 
 s32 xglRenderFadeAlpha(void)
@@ -684,14 +687,41 @@ void xglRenderGlobalFadeValueSet(s32 fadeValue) {
     xglRenderGlobalFadeValue = fadeValue;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderGlobalFadeSet);
+void xglRenderGlobalFadeSet(float red, float green, float blue, float alpha)
+{
+    if (red < 0.0f) {
+        red = 0.0f;
+    }
+    if (green < 0.0f) {
+        green = 0.0f;
+    }
+    if (blue < 0.0f) {
+        blue = 0.0f;
+    }
+    if (alpha < 0.0f) {
+        alpha = 0.0f;
+    }
+    if (1.0f < red) {
+        red = 1.0f;
+    }
+    if (1.0f < green) {
+        green = 1.0f;
+    }
+    if (1.0f < blue) {
+        blue = 1.0f;
+    }
+    if (1.0f < alpha) {
+        alpha = 1.0f;
+    }
+    xglRenderGlobalFadeValue = ((int) (red * 255.0f) & 0xff) + (((int) (green * 255.0f) & 0xff) << 8) + (((int) (blue * 255.0f) & 0xff) << 16) + (((int) (alpha * 128.0f) & 0xff) << 24);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B020);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B3C0);
 
 extern s32 xglRenderFadeGifWord[];
-extern unsigned char D_004C8412[];
+extern unsigned char gXglRenderFadeDisabled[];
 s32 xglRenderFadeAlpha();
 s32 sceVif1PkRef();
 
@@ -699,7 +729,7 @@ void xglRenderGlobalFadeSend(void) {
     s32 alpha;
     XglPacket *packet;
 
-    if (D_004C8412[0] == 0) {
+    if (gXglRenderFadeDisabled[0] == 0) {
         alpha = xglRenderFadeAlpha();
         xglRenderFadeGifWord[0] = alpha;
         packet = xglPacketGetCurrent();
@@ -715,7 +745,7 @@ s32 func_0019ADD8();
 s32 moviePlayerInit();
 
 void xglRenderMovieBegin(void) {
-    D_004C8412[0] = 1;
+    gXglRenderFadeDisabled[0] = 1;
     xglRenderMovieActive = 1;
     func_0019ADD8();
     moviePlayerInit();

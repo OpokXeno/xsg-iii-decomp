@@ -7,6 +7,11 @@
 #include "main/xgl_2.h"
 #include "main/xgl_render.h"
 
+/* Address at a byte offset read from a header (the offset is data, not a field): base + off bytes. */
+#define BYTE_OFFSET(base, off) ((unsigned char *) (base) + (off))
+/* The same address typed as `type *`, so each use needs no cast. */
+#define BYTE_OFFSET_AS(type, base, off) ((type *) BYTE_OFFSET(base, off))
+
 struct PxyModelHeader;
 void tiWaterObjectUpdate(struct PxyModelHeader *pxyModelPack, int stepMode);
 
@@ -123,6 +128,9 @@ extern const char tiWaterMenuMarker[];
 /* Range of the random heights given to a new item. */
 #define TI_WATER_RANDOM_RANGE 30
 
+/* Registers a water table in tiWaterSubList and sets each of its items up once: the block and the height
+ * buffers (offsets from the table), the translate, rotate and scale transform, its inverse and random heights.
+ * Returns 0 when the list is full or the table is not a water table, 1 otherwise. */
 int tiWaterRegisterSub(TiWaterSub *waterSub);
 /* The water state template sent by tiWaterSendStateTemplate, and its length for sceVif1PkAddDataN. */
 extern u64 tiWaterStateTemplate[];
@@ -222,16 +230,48 @@ void tiWaterDebugUpdate(void)
     nmlModelUseSubWindow(3, tiWaterIntVals[3]);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/TiWater", tiWaterRegisterSub);
+/* Registers a water table in tiWaterSubList and sets each of its items up once: the block and the height
+ * buffers (offsets from the table), the translate, rotate and scale transform, its inverse and random heights.
+ * Returns 0 when the list is full or the table is not a water table, 1 otherwise. */
+int tiWaterRegisterSub(TiWaterSub *waterSub)
+{
+    unsigned int i;
+    TiWatSimItem *waterItem;
+    TiWaterSub *registeredSub;
+
+    if (tiWaterSubCount >= TI_WATER_MAX_SUBS) {
+        return 0;
+    }
+    if (waterSub->magic != TI_WATER_SUB_MAGIC) {
+        return 0;
+    }
+    registeredSub = waterSub;
+    if (!registeredSub->active) {
+        return 1;
+    }
+    tiWaterSubList[tiWaterSubCount++] = registeredSub;
+    waterItem = registeredSub->items;
+    for (i = 0; i < registeredSub->active; i += 1, waterItem++) {
+        if ((waterItem->flags & TI_WATER_ITEM_SET_UP) == 0) {
+            waterItem->height_buffer_a = BYTE_OFFSET_AS(float, registeredSub, waterItem->height_offset_a);
+            waterItem->height_buffer_b = BYTE_OFFSET_AS(float, registeredSub, waterItem->height_offset_b);
+            waterItem->block = (u8 *) registeredSub;
+            xglCurSetTranslate(&waterItem->translate);
+            xglCurMulRotateY(waterItem->rotateY);
+            xglCurMulScaleXYZ(&waterItem->scale.x);
+            xglCurMatrixGet(waterItem->transform.rows);
+            xglMatrixInverse(&waterItem->matrix, &waterItem->transform);
+            tiWatSimRandomizeItem(waterItem, TI_WATER_RANDOM_RANGE);
+            waterItem->flags |= TI_WATER_ITEM_SET_UP;
+        }
+    }
+    return 1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/TiWater", tiWaterSendStateTemplate);
 
-/* Scaffold data: the render state u16 words (flip base at +0x0E, display base at +0x16), the two grid headers of
- * the passes and the depth program flag (gp-relative). */
+/* Scaffold data: the render state u16 words (flip base at +0x0E, display base at +0x16). */
 extern u16 D_004C8390[];
-extern unsigned char D_003EC020[];
-extern unsigned char D_003EC030[];
-extern int D_00550E2C;
 
 /* Draws one water item: sends its frame, values and direction, then for each enabled pass the GS state
  * (clamp, frame on the display page, blend, the frame page as texture, Z test) and the VU1 program with
@@ -260,7 +300,7 @@ void tiWaterDrawItem(TiWatSimItem *waterItem)
         sceVif1PkCloseDirectHLCode(packet);
         sceVif1PkCnt(packet, 0);
         sceVif1PkAddCode(packet, TI_WATER_VIF_MSCAL(D_688));
-        tiWaterSendGrid(waterItem, D_003EC020);
+        tiWaterSendGrid(waterItem, tiWaterSurfaceGridHeader);
     }
     if (waterItem->flags & TI_WATER_ITEM_DRAW_DEPTH) {
         sceVif1PkCnt(packet, 0);
@@ -277,12 +317,12 @@ void tiWaterDrawItem(TiWatSimItem *waterItem)
         gifStateFlush();
         sceVif1PkCloseDirectHLCode(packet);
         sceVif1PkCnt(packet, 0);
-        if (D_00550E2C != 0) {
+        if (tiWaterDepthProgramSelect != 0) {
             sceVif1PkAddCode(packet, TI_WATER_VIF_MSCAL(D_7F0));
         } else {
             sceVif1PkAddCode(packet, TI_WATER_VIF_MSCAL(D_9F0));
         }
-        tiWaterSendGrid(waterItem, D_003EC030);
+        tiWaterSendGrid(waterItem, tiWaterDepthGridHeader);
     }
 }
 
@@ -515,18 +555,15 @@ void tiWaterSceneLoop(void)
     gifStateModeHook[0] = 0;
 }
 
-/* Byte offset from a header: the pxy header keeps the offset of its sub-blocks as data (see tiWaterObjectUpdate). */
-#define BYTE_OFFSET(base, off) ((unsigned char *) (base) + (off))
-
 /* Per-object update: the word at +0xC0 of the pxy header (waterFlag) is the offset of its water table; registers the
- * table when it has items, steps it when stepMode is 0, and installs the draw callback tiWaterDrawAll. */
-void tiWaterObjectUpdate(PxyModelHeader *pxyModelPack, int stepMode) {
+ * table when it has items, steps it unless isPaused is set, and installs the draw callback tiWaterDrawAll. */
+void tiWaterObjectUpdate(PxyModelHeader *pxyModelPack, int isPaused) {
     TiWaterSub *waterSub;
 
-    waterSub = (TiWaterSub *) BYTE_OFFSET(pxyModelPack, pxyModelPack->waterFlag);
+    waterSub = BYTE_OFFSET_AS(TiWaterSub, pxyModelPack, pxyModelPack->waterFlag);
     if (waterSub->active != 0) {
         tiWaterRegisterSub(waterSub);
-        if (stepMode == 0) {
+        if (!isPaused) {
             tiWaterStepSub(waterSub);
         }
         pxyRequestTextureCopyPass();

@@ -522,8 +522,8 @@ void *partyRecordTableGet();
 void *enemyRecordTableGet();
 s32 func_00A8F490(s32, s32);
 s32 sbThreadPostValue(s32, s32);
-s32 func_00A99230(s32);
-s32 func_00A99278(s32);
+s32 unitPlayerCreate(s32);
+s32 unitEnemyCreate(s32);
 s32 unitSetPositionPercent(s32, s32, s32);
 s32 unitSetTargetPercent(s32, s32, s32);
 s32 unitSetFacing(s32, f32);
@@ -544,7 +544,7 @@ void battleStepPlaceUnits(struct SaveStack *saveStack) {
     for (party_index = 0; party_index < 3; party_index++) {
         party_chara_id = party_record->charaId;
         if (party_chara_id != 0) {
-            party_unit = func_00A99230(party_chara_id);
+            party_unit = unitPlayerCreate(party_chara_id);
             unitSetTargetPercent(party_unit, party_record->position, party_record->direction);
             unitSetPositionPercent(party_unit, party_record->position, party_record->direction);
             unitSetFacing(party_unit, party_record->scale);
@@ -559,7 +559,7 @@ void battleStepPlaceUnits(struct SaveStack *saveStack) {
     for (enemy_index = 0; enemy_index < 5; enemy_index++) {
         enemy_chara_id = enemy_record->charaId;
         if (enemy_chara_id != 0) {
-            enemy_unit = func_00A99278(enemy_chara_id);
+            enemy_unit = unitEnemyCreate(enemy_chara_id);
             unitSetTargetPercent(enemy_unit, enemy_record->position, enemy_record->direction);
             unitSetPositionPercent(enemy_unit, enemy_record->position, enemy_record->direction);
             unitSetFacing(enemy_unit, enemy_record->scale);
@@ -639,11 +639,11 @@ void battleStepAwaitPendingCount(struct SaveStack *saveStack) {
 }
 
 s32 advanceStatusGet();
-s32 func_00A8C4F8(s32);
+s32 dataVPadReadButtons(s32);
 s32 unitCountFlagged(s32);
 
 void battleStepCheckUnitsReady(struct SaveStack *saveStack) {
-    if ((unitCountFlagged(2) == 0) || ((advanceStatusGet() == 1) && ((func_00A8C4F8(1) == 0x20) || (func_00A8C4F8(1) == 0x40)))) {
+    if ((unitCountFlagged(2) == 0) || ((advanceStatusGet() == 1) && ((dataVPadReadButtons(1) == 0x20) || (dataVPadReadButtons(1) == 0x40)))) {
         battleStackSetSuccessorStep(saveStack, func_00A86490);
     }
 }

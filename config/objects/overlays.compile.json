@@ -1435,7 +1435,7 @@
       "asm/nonmatchings/ov02/tu017/func_00A87590.s",
       "asm/nonmatchings/ov02/tu017/func_00A87608.s",
       "asm/nonmatchings/ov02/tu017/func_00A876C8.s",
-      "asm/nonmatchings/ov02/tu017/func_00A87740.s",
+      "asm/nonmatchings/ov02/tu017/ov02ExpRecordFlagIsSet.s",
       "asm/nonmatchings/ov02/tu017/func_00A877A8.s",
       "asm/nonmatchings/ov02/tu017/func_00A87820.s",
       "asm/nonmatchings/ov02/tu017/func_00A878E0.s",
@@ -2327,8 +2327,8 @@
       "asm/nonmatchings/ov02/tu030/battleVPadReset.s",
       "asm/nonmatchings/ov02/tu030/dataVPadModeSet.s",
       "asm/nonmatchings/ov02/tu030/dataVPadSet.s",
-      "asm/nonmatchings/ov02/tu030/func_00A8C4F8.s",
-      "asm/nonmatchings/ov02/tu030/func_00A8C570.s"
+      "asm/nonmatchings/ov02/tu030/dataVPadReadButtons.s",
+      "asm/nonmatchings/ov02/tu030/dataVPadReadTailWord.s"
      ],
      "accepted_asm_files": [],
      "c_functions": [],
@@ -4383,8 +4383,8 @@
       "g_basis": "no gp-relative instruction in the whole overlay"
      },
      "include_asm_files": [
-      "asm/nonmatchings/ov02/tu061/func_00A99230.s",
-      "asm/nonmatchings/ov02/tu061/func_00A99278.s",
+      "asm/nonmatchings/ov02/tu061/unitPlayerCreate.s",
+      "asm/nonmatchings/ov02/tu061/unitEnemyCreate.s",
       "asm/nonmatchings/ov02/tu061/func_00A992D0.s",
       "asm/nonmatchings/ov02/tu061/func_00A99390.s",
       "asm/nonmatchings/ov02/tu061/unitReleaseSoundAndResources.s",

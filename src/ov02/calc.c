@@ -45,7 +45,7 @@ typedef struct BattlePoolOwner {
 BattlePoolEntry *battleEntrySlot(int key);
 BattlePoolEntry *battleEntryFindByKey(int key);
 BattlePoolEntry *ov02GetExpRecord(int key);
-int func_00A87740(int key, int index);
+int ov02ExpRecordFlagIsSet(int key, int index);
 BattlePoolEntry *ov02PoolEntryGet(int index);
 void func_00A876C8(int key, int index);
 void func_00A988E0(BattlePoolEntry *entry, int keyA, int keyB);

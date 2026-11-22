@@ -1,8 +1,6 @@
 #include "common.h"
 #include "shared.h"
-
 /* Row-major 4x4 float matrix. */
-
 #include "quadword.h"
 
 void cfeDirectionFromAngles(float *direction, const float *angles);
@@ -14,43 +12,45 @@ void xglMatrixStackSave(Matrix4 matrix);
 extern const AlignedVector4 cfeForwardVector;
 
 typedef int s32;
+
 typedef struct PxyModelRenderState {
-    u8 unmodeled_000[0x300];
+    u8 pad_000[0x300];
     int renderStatus; /* +0x300 */
-    u8 unmodeled_304[0x308 - 0x304];
+    u8 pad_304[0x308 - 0x304];
     int shadowMode; /* +0x308 */
-    u8 unmodeled_30c[0x330 - 0x30c];
+    u8 pad_30c[0x330 - 0x30c];
     Matrix4 *jointMatrices; /* +0x330 */
-    u8 unmodeled_334[0x360 - 0x334];
+    u8 pad_334[0x360 - 0x334];
     float shadowAlpha; /* +0x360 */
-    u8 unmodeled_364[0x368 - 0x364];
+    u8 pad_364[0x368 - 0x364];
     float shadowOffsetX; /* +0x368 */
     float shadowOffsetY; /* +0x36c */
-    u8 unmodeled_370[0x394 - 0x370];
+    u8 pad_370[0x394 - 0x370];
     int renderLevel; /* +0x394 */
-    u8 unmodeled_398[0x39c - 0x398];
+    u8 pad_398[0x39c - 0x398];
     float animTime; /* +0x39c */
-    u8 unmodeled_3a0[0x3a4 - 0x3a0];
+    u8 pad_3a0[0x3a4 - 0x3a0];
     float shadowPlaneHeight; /* +0x3a4 */
-    u8 unmodeled_3a8[0x3bc - 0x3a8];
+    u8 pad_3a8[0x3bc - 0x3a8];
     Matrix4 *globalMatrices; /* +0x3bc */
-    u8 unmodeled_3c0[0x3d0 - 0x3c0];
+    u8 pad_3c0[0x3d0 - 0x3c0];
     float planeParamY; /* +0x3d0 */
-    u8 unmodeled_3d4[0x3d8 - 0x3d4];
+    u8 pad_3d4[0x3d8 - 0x3d4];
     float planeParamX; /* +0x3d8 */
-    u8 unmodeled_3dc[0x3e4 - 0x3dc];
-    int stateFlags3E4; /* +0x3e4 */
-    u8 unmodeled_3e8[0x4d0 - 0x3e8];
+    u8 pad_3dc[0x3e4 - 0x3dc];
+    int renderStateFlags; /* +0x3e4 */
+    u8 pad_3e8[0x4d0 - 0x3e8];
     int latchedValueA; /* +0x4d0 */
-    u8 unmodeled_4d4[0x4e0 - 0x4d4];
+    u8 pad_4d4[0x4e0 - 0x4d4];
     int latchedValueB; /* +0x4e0 */
-    u8 unmodeled_4e4[0x698 - 0x4e4];
+    u8 pad_4e4[0x698 - 0x4e4];
     int drawFlags; /* +0x698 */
-    u8 unmodeled_69c[0x6a8 - 0x69c];
+    u8 pad_69c[0x6a8 - 0x69c];
     int freezeAnimation; /* +0x6a8 */
-    u8 unmodeled_6ac[0x6e8 - 0x6ac];
+    u8 pad_6ac[0x6e8 - 0x6ac];
     float shadowScale; /* +0x6e8 */
 } PxyModelRenderState;
+
 extern s32 gPxySyncMode;
 extern PxyModelRenderState gPxyModelRenderStateStorage;
 
@@ -72,7 +72,26 @@ void cfeDirectionFromAngles(float *direction, const float *angles)
     QuadwordCopy(direction, &vector);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019E9A8);
+#include "main/tu045.h"
+
+int func_0030E68C(unsigned char *geometryEntry, const char *name);
+
+/* Index of the first geometry geometryEntry (112 bytes each) of a "pxy" pack whose name matches partName; -1 when none does. */
+int cfeModelFindPart(PxyModelHeader *pack, const char *partName) {
+    unsigned char *geometryEntry;
+    int i;
+
+    if (partName != 0 && pack != 0 && (*(u64 *)pack & 0xFFFFFF) == 0x797870) {
+        geometryEntry = (unsigned char *)pack + pack->geometryOffset;
+        for (i = 0; i < pack->geometryCount; i++) {
+            if (func_0030E68C(geometryEntry, partName) == 0) {
+                return i;
+            }
+            geometryEntry += 112;
+        }
+    }
+    return -1;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/cfePlugIn", func_0019EA60);
 
@@ -142,7 +161,7 @@ void pxySetBlackFog(void) {
 
 void pxySetStateFlag4(void)
 {
-    gPxyModelRenderStateStorage.stateFlags3E4 |= 0x4;
+    gPxyModelRenderStateStorage.renderStateFlags |= 0x4;
 }
 
 void pxyEnableRenderFlag800(void) {

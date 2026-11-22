@@ -27,6 +27,7 @@ float xglFRand(void)
 }
 
 #include "main/tu141.h"
+
 typedef int s32;
 
 void xglFRandSeed(f32 seed) {
@@ -95,9 +96,19 @@ void xglLightPrepare(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001975C8);
 
-/* One of the 16 light slots at xglLightSlotTable: the handle of the light it holds (0 when free). */
+/* A light pack: the pack a light slot holds is its address. Only the fields the light readers use are named. */
+typedef struct XglLightPack {
+    u8 unmodeled_00[0x30];
+    s32 lightEntryCount;         /* 0x30 */
+    u8 unmodeled_34[0x8];
+    s32 keyOffset;          /* 0x3C */
+    u8 unmodeled_40[0xB0];
+    s32 lightEntryByteOffsets[1]; /* 0xF0 */
+} XglLightPack;
+
+/* One of the 16 light slots at xglLightSlotTable: the light pack it holds (0 when free). */
 typedef struct XglLightSlot {
-    s32 lightHandle;
+    XglLightPack *lightPack;
     s32 unk_04;
     u8 unk_08[0x8];
 } XglLightSlot;
@@ -110,7 +121,7 @@ void xglLightSlotsClear(void) {
 
     lightSlot = xglLightSlotTable;
     for (lightSlotNumber = 0; lightSlotNumber < 16; lightSlotNumber++) {
-        lightSlot->lightHandle = 0;
+        lightSlot->lightPack = 0;
         lightSlot->unk_04 = 0;
         lightSlot += 1;
     }
@@ -122,7 +133,60 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197970);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197A00);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197B10);
+
+/* One light entry of a pack: its channel types select how each of the 20 values is produced. */
+/* One word of a light entry's key stream: a raw constant value or a curve header word. */
+typedef union XglLightStreamWord {
+    s32 word;
+    f32 value;
+} XglLightStreamWord;
+
+typedef struct XglLightEntry {
+    u8 unmodeled_00[0x10];
+    u8 channelTypes[20];    /* 0x10 */
+    u8 unmodeled_24[0xC];
+    XglLightStreamWord stream[1]; /* 0x30 */
+} XglLightEntry;
+
+f32 func_00197A00(XglLightStreamWord **cursor, f32 time);
+
+void xglLightPackEvaluate(XglLightPack *pack, f32 curveTime)
+{
+    s32 *lightEntryByteOffsets;
+    XglLightKey *keys;
+    XglLightEntry *packEntry;
+    XglLightStreamWord *cursor;
+    f32 *keyValues;
+    s32 lightEntryIndex;
+    s32 channel;
+
+    lightEntryByteOffsets = pack->lightEntryByteOffsets;
+    keys = (XglLightKey *)((u8 *)pack + pack->keyOffset);
+    for (lightEntryIndex = 0; lightEntryIndex < pack->lightEntryCount; lightEntryIndex++) {
+        packEntry = (XglLightEntry *)((u8 *)pack + lightEntryByteOffsets[lightEntryIndex]);
+        cursor = packEntry->stream;
+        keyValues = (f32 *)&keys[lightEntryIndex];
+        for (channel = 0; channel < 20; channel++) {
+            switch (packEntry->channelTypes[channel]) {
+            case 2:
+                keyValues[channel] = (cursor++)->value;
+                break;
+            case 3:
+                keyValues[channel] = 0.0f;
+                break;
+            case 4:
+                keyValues[channel] = 1.0f;
+                break;
+            case 1:
+                while (((s32)cursor & 0xf) != 0) {
+                    cursor++;
+                }
+                keyValues[channel] = func_00197A00(&cursor, curveTime);
+                break;
+            }
+        }
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00197C98);
 
@@ -202,8 +266,6 @@ int xglLightBoxColor(Vector4 *color, Vector4 *lightDirection, XglLightKey *key, 
     *lightDirection = boxAxis;
     return 1;
 }
-
-#include "main/tu141.h"
 
 void xglMatrixStackSave(Matrix4 matrix);
 void xglMatrixStackLoad(Matrix4 matrix);
@@ -314,25 +376,25 @@ void xglLightSlotsInit(void) {
 
     lightSlot = xglLightSlotTable;
     for (lightSlotNumber = 0; lightSlotNumber < 16; lightSlotNumber++) {
-        lightSlot->lightHandle = 0;
+        lightSlot->lightPack = 0;
         lightSlot->unk_04 = 0;
         lightSlot += 1;
     }
 }
 
-void func_00197B10(s32 lightHandle, f32 value);
+void xglLightPackEvaluate(XglLightPack *pack, f32 curveTime);
 
-void xglLightSlotsApply(f32 value) {
-    s32 lightHandle;
+void xglLightSlotsApply(f32 curveTime) {
+    XglLightPack *lightPack;
     s32 lightSlotNumber;
     XglLightSlot *lightSlot;
 
     lightSlot = xglLightSlotTable;
     for (lightSlotNumber = 0; lightSlotNumber < 16; lightSlotNumber++) {
-        lightHandle = lightSlot->lightHandle;
+        lightPack = lightSlot->lightPack;
         lightSlot += 1;
-        if (lightHandle != 0) {
-            func_00197B10(lightHandle, value);
+        if (lightPack != 0) {
+            xglLightPackEvaluate(lightPack, curveTime);
         }
     }
 }

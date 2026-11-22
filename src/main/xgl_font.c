@@ -22,42 +22,11 @@ const char *xglFontCopyTextUnit(char *textUnitBuffer, const char *text, int *len
 /* GIFtag register descriptor of an A+D (address plus data) register. */
 #define GIF_AD 0x0E
 #include "main/Packet.h"
+#include "main/xgl_font_codes.h"
 
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int qwc);
 void *sceVif1PkReserve(XglPacket *packet, unsigned int words);
 
-/*
- * Control codes embedded in queued text. Bytes below 32 start a command whose length
- * xglFontGetSPcodeSize returns; the compact position codes 1..5 are the high byte of an
- * X (1..3) or Y (4..5) coordinate.
- */
-typedef enum FontOpcode {
-    FONT_OP_POS_X_0 = 1,
-    FONT_OP_POS_X_1 = 2,
-    FONT_OP_POS_X_2 = 3,
-    FONT_OP_POS_Y_0 = 4,
-    FONT_OP_POS_Y_1 = 5,
-    FONT_OP_DEPTH = 6,
-    FONT_OP_NOP = 7,
-    FONT_OP_POSITION = 8,
-    FONT_OP_TAB = 9,
-    FONT_OP_NEWLINE = 10,
-    FONT_OP_RESET = 11,
-    FONT_OP_COLOR = 12,
-    FONT_OP_EFFECT_MODE = 13,
-    FONT_OP_EFFECT_PARAMS = 14,
-    FONT_OP_BLEND = 15,
-    FONT_OP_HEX_DIGITS = 16,
-    FONT_OP_NUMBER = 17,
-    FONT_OP_SCALE = 18,
-    FONT_OP_EFFECT_PACKET = 19,
-    FONT_OP_CONFIG = 21,
-    FONT_OP_INCLUDE = 22,
-    FONT_OP_CALLBACK = 23,
-    FONT_OP_COMPACT = 24,
-    FONT_OP_STYLE = 25,
-    FONT_OP_GLYPH = 27
-} FontOpcode;
 
 /* FontState.text_mode bits, set by the $prop and $han inline commands. */
 #define FONT_MODE_PROP 1

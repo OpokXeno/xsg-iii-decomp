@@ -6,13 +6,15 @@
 INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A874A0);
 
 typedef int s32;
+
 typedef unsigned char u8;
 
-/* One 0x58-byte record of gOv02ExpRecords; the experience points at +0x08 are the ones ov02AddRecordPoints adds to. */
 typedef struct Ov02ExpRecord {
     unsigned char unk_00[0x8];
     s32 expPoints;
-    unsigned char unk_0C[0x58 - 0x0C];
+    unsigned char unmodeled_0C[0x38 - 0x0C];
+    unsigned char flagBits[15];
+    unsigned char unmodeled_47[0x58 - 0x47];
 } Ov02ExpRecord;
 
 extern Ov02ExpRecord gOv02ExpRecords[];
@@ -23,12 +25,12 @@ typedef struct Ov02ClassSlot {
     unsigned char classFlags;
 } Ov02ClassSlot;
 
-/* Returns the 0x58-byte record number record_number (1-based) of gOv02ExpRecords, or null when record_number is out of range. */
-Ov02ExpRecord *ov02GetExpRecord(s32 record_number) {
-    if (!(record_number < 0x12)) {
+/* Returns the 0x58-byte record recordNumber (1-based) of gOv02ExpRecords, or null when recordNumber is out of range. */
+Ov02ExpRecord *ov02GetExpRecord(s32 recordNumber) {
+    if (!(recordNumber < 0x12)) {
         return 0;
     }
-    return &gOv02ExpRecords[record_number - 1];
+    return &gOv02ExpRecords[recordNumber - 1];
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A87590);
@@ -37,7 +39,21 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A87608);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A876C8);
 
-INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A87740);
+/* Tests flag number flagNumber (1-based, 1..120) of the flag bits of record recordNumber: returns 1 when that flag is set, 0 when it is clear or out of range. */
+s32 ov02ExpRecordFlagIsSet(s32 recordNumber, s32 flagNumber)
+{
+    Ov02ExpRecord *expRecord;
+    s32 flagBitPosition;
+
+    flagNumber = flagNumber - 1;
+    if ((unsigned int)flagNumber >= 120) {
+        return 0;
+    }
+    flagBitPosition = flagNumber;
+    flagNumber = 0;
+    expRecord = ov02GetExpRecord(recordNumber);
+    return ((unsigned int)expRecord->flagBits[flagBitPosition / 8] >> (flagBitPosition % 8)) & 1;
+}
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A877A8);
 
@@ -112,13 +128,13 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A88248);
 
 Ov02ExpRecord *ov02GetExpRecord(s32 record_number);
 
-/* Adds arg1 to the experience points at +8 of record arg0 and clamps them to 0..99999. */
-void ov02AddRecordPoints(s32 record_number, s32 points_delta) {
+/* Adds pointsDelta to the experience points of record recordNumber and clamps them to 0..99999. */
+void ov02AddRecordPoints(s32 recordNumber, s32 pointsDelta) {
     s32 expPoints;
     Ov02ExpRecord *expRecord;
 
-    expRecord = ov02GetExpRecord(record_number);
-    expPoints = expRecord->expPoints + points_delta;
+    expRecord = ov02GetExpRecord(recordNumber);
+    expPoints = expRecord->expPoints + pointsDelta;
     expRecord->expPoints = expPoints;
     if (expPoints < 0) {
         expRecord->expPoints = 0;
@@ -141,7 +157,7 @@ s32 ov02GetRecordClass(s32 unused_first, s32 unused_second, s32 slotNumber)
   if (!(classFlags & 4))
   {
     recordClass = 2;
-    if (!((classFlags & 1) & 0xFF))
+    if (!(classFlags & 1))
     {
       recordClass = 4;
       if (!(classFlags & 2))

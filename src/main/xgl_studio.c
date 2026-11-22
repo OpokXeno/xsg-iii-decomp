@@ -1,17 +1,8 @@
 #include "common.h"
 #include "shared.h"
-
 #include "main/xgl_2.h"
 
 /* Row-major 4x4 float matrix. */
-
-
-
-
-
-
-
-
 struct XglCamera;
 
 typedef float RgVector[4];
@@ -66,6 +57,7 @@ typedef struct StudioSlot {
 extern Studio *pCurrentStudio;
 
 typedef int s32;
+
 extern StudioSlot gStudioRecords[];
 
 /* Makes studio record number studio_index (0xD80 bytes each in gStudioRecords) the current studio. */
@@ -101,7 +93,24 @@ XglCamera *xglStudioGetActiveCamera(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_studio", xglStudioSelectGetActiveCamera);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_studio", xglStudioFlushActiveCamera);
+XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
+void xglCameraInit(XglCamera *camera);
+void xglCameraMove(XglCamera *camera);
+void func_001947F0(XglCamera *camera);
+void xglRenderIoEnd(void);
+void xglLightPrepare(StudioLight *light);
+
+void xglStudioFlushActiveCamera(void)
+{
+    XglCamera *camera;
+    s32 studio_index;
+
+    for (studio_index = 0; studio_index < 4; studio_index++) {
+        camera = xglStudioSelectGetActiveCamera(studio_index);
+        if (camera != 0)
+            xglCameraMove(camera);
+    }
+}
 
 extern s32 gStudioSceneFlag;
 
@@ -122,25 +131,18 @@ XglCamera *xglStudioGetCamera2(int camera_index)
     return &pCurrentStudio->cameras[camera_index];
 }
 
-void setCurrentStudio();
-
 void xglStudioMainCameraInit(void)
 {
-  XglCamera *camera;
-  s32 initializedStudioCount;
-  s32 studioIndex;
-  initializedStudioCount = 0;
-  do
-  {
-    studioIndex = initializedStudioCount;
-    initializedStudioCount += 1;
-    setCurrentStudio(studioIndex);
-    camera = xglStudioGetCamera2(0);
-    camera->active = 1;
-    camera->cameraState = 1;
-  }
-  while (initializedStudioCount < 4);
-  setCurrentStudio(0);
+    XglCamera *camera;
+    s32 studio_index;
+
+    for (studio_index = 0; studio_index < 4; studio_index++) {
+        setCurrentStudio(studio_index);
+        camera = xglStudioGetCamera2(0);
+        camera->active = 1;
+        camera->cameraState = 1;
+    }
+    setCurrentStudio(0);
 }
 
 void xglStudioSetCurrentSelected(void) {
@@ -148,26 +150,56 @@ void xglStudioSetCurrentSelected(void) {
     xglStudioGetCamera2(0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_studio", func_0019B8D8);
+extern s32 gStudioEntrySkip;
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_studio", func_0019B970);
+void xglStudioReset(void)
+{
+    s32 studio_index;
+    s32 camera_index;
 
-void func_0019B8D8(void);
-void xglStudioMainCameraInit(void);
+    gStudioEntrySkip = 0;
+    xglRenderIoEnd();
+    for (studio_index = 0; studio_index < 4; studio_index++) {
+        setCurrentStudio(studio_index);
+        xglLightPrepare(&xglStudioGetCurrent()->light);
+        for (camera_index = 0; camera_index < 2; camera_index++) {
+            xglCameraInit(xglStudioGetCamera2(camera_index));
+        }
+    }
+    setCurrentStudio(0);
+    gStudioSceneFlag = 1;
+    gSelectedStudioIndex = 0;
+}
+
+void xglStudioMove(void)
+{
+    XglCamera *camera;
+    s32 studio_index;
+    s32 camera_index;
+
+    for (studio_index = 0; studio_index < 4; studio_index++) {
+        setCurrentStudio(studio_index);
+        for (camera_index = 0; camera_index < 2; camera_index++) {
+            camera = xglStudioGetCamera2(camera_index);
+            if (camera->active == 1) {
+                if (studio_index == gSelectedStudioIndex && gStudioSceneFlag != 0)
+                    func_001947F0(camera);
+                xglCameraMove(camera);
+            }
+        }
+    }
+    setCurrentStudio(0);
+}
 
 void xglStudioInit(void)
 {
-    func_0019B8D8();
+    xglStudioReset();
     xglStudioMainCameraInit();
 }
-
-extern s32 gStudioEntrySkip;
-void xglStudioSetCurrentSelected();
-s32 func_0019B970();
 
 void xglStudioUpdate(void) {
     if (gStudioEntrySkip == 0) {
         xglStudioSetCurrentSelected();
-        func_0019B970();
+        xglStudioMove();
     }
 }

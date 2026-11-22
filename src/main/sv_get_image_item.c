@@ -1543,7 +1543,7 @@ void pxyAddRenderLevel(int level);
 void func_0019EF08(const Vector4 *color);
 void nmlModelSetFogDist(float d0, float d1, float d2, float d3);
 void nmlModelSetSortOffset(float offset);
-void func_0019F210(TxyBlock *txy);
+void nmlModelSetTexture(TxyBlock *txy);
 void func_0019F308(Matrix4 *matrix);
 void func_0019F338(const Vector4 *scale);
 void nmlModelSetZwrite(int zwrite);
@@ -1609,7 +1609,7 @@ void svSetModelRenderState(SvRenderItem *renderItem, Matrix4 *matrix, int scale)
         transparency = renderItem->transparency * 0.0078125f;
         func_0019F488(svCurrentVertexViewBlock);
         pxySetAnimTime(renderItem->animTime);
-        func_0019F210(renderItem->part->txyBlock);
+        nmlModelSetTexture(renderItem->part->txyBlock);
         func_0019F308(matrix);
         if (D_00551520 != 0) {
             transparency *= D_00551520->w;

@@ -5,8 +5,10 @@ void xacEvalJointTransformCurves(f32 *jointValues, u8 *pJointHeader, f32 curvePa
 
 /* A byte offset read from a header (data-driven, not a field): the record starts at base + off bytes. */
 #define BYTE_OFFSET(base, off) ((unsigned char *) (base) + (off))
+/* The same record addressed as `type *`, so callers need no cast. */
+#define BYTE_OFFSET_AS(type, base, off) ((type *) BYTE_OFFSET(base, off))
 /* The 32-bit word of a bit set that holds bit `index` (the set is addressed by bytes). */
-#define BIT_WORD(bits, nodeIndex) (*(int *) BYTE_OFFSET(bits, ((nodeIndex) >> 5) << 2))
+#define BIT_WORD(bits, nodeIndex) (*BYTE_OFFSET_AS(int, bits, ((nodeIndex) >> 5) << 2))
 
 typedef struct TiMotionOffsetBlock {
     unsigned char unmodeled_00[0x30];
@@ -16,7 +18,6 @@ typedef struct TiMotionOffsetBlock {
 INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_002998C0);
 
 INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_00299C70);
-
 
 /* One transform: parent index, offset, rotation and scale. */
 typedef struct TiMotionTransform {
@@ -38,24 +39,12 @@ void xglCurMatrixGet(Matrix4 matrix);
 #include "main/TiMRPackage.h"
 #include "main/TiXacAnimCurve.h"
 
-
-
-
-
-
-
-
-
-
-
-
-
 void assertFailed(const char *message, const char *file, int line);
 void xglCurMatrixSet(Matrix4 matrix);
 void xglCurMatrixMul(Matrix4 matrix);
 TiHrcDynamics *func_002980A0(Matrix4 *localMat, TiMRPackage *pMRPack, TiHrcDynamics *record, TiSolverState *state);
 void tiDynamicsSolveCellPairs(TiMRPackage *pMRPack);
-f32 *xacFindCurveKey(int *pFlag, XacCurveKeyTable *pTable, f32 curveParam);
+XacCurveKeyTable *xacFindCurveKey(int *pFlag, XacCurveKeyTable *pTable, f32 curveParam);
 extern const unsigned char gTiMotionSolverFileName[];
 extern const unsigned char gTiMotionNullPackMessage[];
 extern const unsigned char gTiMotionNullVisibleMessage[];
@@ -73,7 +62,6 @@ float *tiMotionFindParentScale(TiMRPackage *pMRPack, int scaleNodeIndex)
     int dynamicsIndex;
     unsigned int skipEnd;
     int dynamicsSteps;
-    unsigned int base;
     int locatorCount;
     unsigned int secondJointEnd;
     unsigned int thirdJointEnd;
@@ -96,19 +84,19 @@ float *tiMotionFindParentScale(TiMRPackage *pMRPack, int scaleNodeIndex)
     jointCount = hrc->jointCount;
     locatorCount = jointCount;
     if ((unsigned int) scaleNodeIndex < locatorCount + hrc->joint2Count) {
-        TiHrcJoint *secondJointTable = (TiHrcJoint *) BYTE_OFFSET(hrc, hrc->joint2Offset);
+        TiHrcJoint *secondJointTable = BYTE_OFFSET_AS(TiHrcJoint, hrc, hrc->joint2Offset);
         return secondJointTable[scaleNodeIndex - locatorCount].scale;
     } else {
         locatorCount += hrc->joint2Count;
         thirdJointEnd = locatorCount + hrc->joint3Count;
         if (scaleNodeIndex < thirdJointEnd) {
-            TiHrcJoint *thirdJointTable = (TiHrcJoint *) BYTE_OFFSET(hrc, hrc->joint3Offset);
+            TiHrcJoint *thirdJointTable = BYTE_OFFSET_AS(TiHrcJoint, hrc, hrc->joint3Offset);
             return thirdJointTable[scaleNodeIndex - locatorCount].scale;
         } else {
             locatorCount = thirdJointEnd;
             skipEnd = locatorCount + hrc->skipCount;
             if (scaleNodeIndex < skipEnd) {
-                skipRecords = (TiHrcSkip *) BYTE_OFFSET(hrc, hrc->skipOffset);
+                skipRecords = BYTE_OFFSET_AS(TiHrcSkip, hrc, hrc->skipOffset);
                 return skipRecords[scaleNodeIndex - thirdJointEnd].scale;
             }
         }
@@ -117,7 +105,7 @@ float *tiMotionFindParentScale(TiMRPackage *pMRPack, int scaleNodeIndex)
     if ((unsigned int) scaleNodeIndex < locatorCount + hrc->dynamicsCount) {
         skipEnd = locatorCount + hrc->dynamicsCount;
         dynamicsIndex = scaleNodeIndex - locatorCount;
-        dynamics = (TiHrcDynamics *) BYTE_OFFSET(hrc, hrc->dynamicsOffset);
+        dynamics = BYTE_OFFSET_AS(TiHrcDynamics, hrc, hrc->dynamicsOffset);
         if (dynamicsIndex > 0) {
             dynamicsSteps = dynamicsIndex;
             do {
@@ -178,18 +166,22 @@ typedef struct TiMotionVectors {
     float rotation[3];
     float scale[3];
 } TiMotionVectors;
+
 typedef struct TiMotionSlot {
     unsigned char unmodeled_00[0x40];
     float rotation[3];
     unsigned char unmodeled_4C[0x24];
     float resultScale[3];
 } TiMotionSlot;
+
 typedef struct TiMotionSource {
     unsigned char unmodeled_00[0x10];
     unsigned int bits[2];
     float weight;
 } TiMotionSource;
+
 typedef int s32;
+
 TiHrcDynamics *tiDynamicsNodeSolveNext(TiMRPackage *object, TiHrcDynamics *solveNode, TiSolverState *state);
 
 /* The solver bodies are 0x40 bytes each, so body i is pMRPack->dynMat + i. */
@@ -236,11 +228,11 @@ void tiMotionUpdateVisibility(TiMRPackage *pMRPack, unsigned char *visibilityBit
         return;
     }
     curveIndex = 0;
-    visibilityTable = (XacCurveKeyTable *) BYTE_OFFSET(bodyAnimEntry, bodyAnimEntry->tables.second.visibilityOffset);
+    visibilityTable = BYTE_OFFSET_AS(XacCurveKeyTable, bodyAnimEntry, bodyAnimEntry->tables.second.visibilityOffset);
     if (bodyAnimEntry->tables.second.visibilityCount != 0) {
         do {
             /* The next table follows the keys of this one. */
-            visibilityTable = (XacCurveKeyTable *) xacFindCurveKey(&isHidden, visibilityTable, pMRPack->bodyAnimBlend.position);
+            visibilityTable = xacFindCurveKey(&isHidden, visibilityTable, pMRPack->bodyAnimBlend.position);
             if (isHidden != 0) {
                 BIT_WORD(visibilityBits, curveIndex) &= ~(1 << (curveIndex & 0x1F));
             } else {
@@ -260,7 +252,37 @@ void tiMotionSampleJoint(float *jointValues, TiMotionOffsetBlock *jointBlock, fl
 
 INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_0029BEE0);
 
-INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_0029BF48);
+void tiWordSetBits(unsigned int *bits, int count);
+void func_0029BEE0(float *values, unsigned char **ppCursor, int unmodeled_e8, int valueCount);
+
+/* Evaluates one locator into `matrix`: its values, then translate, rotate Z/Y/X and scale. */
+void tiMotionSolveLocatorOutOfLine(Matrix4 matrix, TiMRPackage *pMRPack, TiHrcLocator *locator, unsigned char **ppCursor)
+{
+    float locatorValues[9];
+
+    func_0029BEE0(locatorValues, ppCursor, pMRPack->unmodeled_e8, 9);
+    tiVu0LoadIdentityMatrix();
+    if (locatorValues[0] != 0.0f || locatorValues[1] != 0.0f || locatorValues[2] != 0.0f) {
+        xglCurMulTranslate(locatorValues);
+    }
+    if (locatorValues[5] != 0.0f) {
+        xglCurMulRotateZ(locatorValues[5]);
+    }
+    if (locatorValues[4] != 0.0f) {
+        xglCurMulRotateY(locatorValues[4]);
+    }
+    if (locatorValues[3] != 0.0f) {
+        xglCurMulRotateX(locatorValues[3]);
+    }
+    if (locatorValues[6] != 1.0f || locatorValues[7] != 1.0f || locatorValues[8] != 1.0f) {
+        tiWordSetBits(&pMRPack->bodyAnimBlend.motionFlags, 32);
+        xglCurMulScaleXYZ(&locatorValues[6]);
+    }
+    locator->scale[0] = locatorValues[6];
+    locator->scale[1] = locatorValues[7];
+    locator->scale[2] = locatorValues[8];
+    xglCurMatrixGet(matrix);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_0029C0C0);
 
@@ -281,29 +303,9 @@ INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_0029D9D0);
 INCLUDE_ASM("asm/main/nonmatchings/TiMotionSolver", func_0029DC40);
 
 /* Transform vectors filled by xacEvalTransDynamics: offset, rotation and scale (the local vectors, sp+0 to sp+32). */
-
-
-
-
-
-
 /* One transform slot: its rotation at +0x40 and the result scale at +0x70. */
-
-
-
-
-
-
-
 /* The source record: its bit words at +0x10 and a weight at +0x18. */
-
-
-
-
-
-
 void xacEvalTransDynamics(TiMotionVectors *out, TiMotionSlot *motionSlot, int curveParam, float weight);
-void tiWordSetBits(unsigned int *bits, int count);
 
 void tiMotionSlotToMatrix(Matrix4 matrix, TiMotionSource *motionSource, TiMotionSlot *motionSlot, int curveParam)
 {
@@ -365,7 +367,7 @@ void tiMotionTransformToMatrix(Matrix4 matrix, TiMotionTransform *transform)
     xglCurMatrixGet(matrix);
 }
 
-s32 xacReadJointValueAndStart(f32 *, void *, s32, f32);
+unsigned char *xacReadJointValueAndStart(f32 *, void *, s32, f32);
 
 /* The curve block that tiMotionSampleCurve samples: its end time at +0x3C. */
 typedef struct TiMotionCurveBlock {

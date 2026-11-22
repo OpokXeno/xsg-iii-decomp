@@ -35,7 +35,7 @@ s32 unitStepSendPairA(s32 unused_arg0, UnitActionRecord *actionRecord) {
 s32 battleClearEntryFlags(void);
 s32 func_00A8F490(s32 unit, s32 unitIndex);
 s32 soundSlotSystemInit(void);
-s32 func_00A99230(s32 unitIndex);
+s32 unitPlayerCreate(s32 unitIndex);
 s32 unitSetPositionPercent(s32 unit, s32 firstPercent, s32 secondPercent);
 s32 unitSetTargetPercent(s32 unit, s32 firstPercent, s32 secondPercent);
 s32 unitSetFacing(s32 unit, f32 angle);
@@ -54,7 +54,7 @@ s32 unitPlaceAt(s32 unused_arg0, UnitPlaceRecord *placeRecord)
     placedUnitIndex = placeRecord->placedUnitSlot;
     xScaled = placeRecord->positionX * 100.0f;
     yScaled = placeRecord->positionY * 100.0f;
-    battleUnit = func_00A99230(placedUnitIndex);
+    battleUnit = unitPlayerCreate(placedUnitIndex);
     yInt = yScaled;
     xInt = xScaled;
     unitSetTargetPercent(battleUnit, xInt, yInt);

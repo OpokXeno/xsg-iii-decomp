@@ -284,11 +284,11 @@ void memoryBanksReset(s32 memoryBankMask) {
     }
 }
 
-void func_0019B8D8(void);
+void xglStudioReset(void);
 void xglStudioMainCameraInit(void);
 
 void studioCameraInit(void) {
-    func_0019B8D8();
+    xglStudioReset();
     xglStudioMainCameraInit();
 }
 

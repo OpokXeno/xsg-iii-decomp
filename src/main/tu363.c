@@ -449,7 +449,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu363", func_002B1948);
 s32 drawEntrySetPosition(void *, s32, s32);
 s32 drawEntrySetValue(void *, s32);
 s32 njStringSetPosition(void *, f32, f32);
-s32 njStringSetByteFields(void *, s32, s32);
+s32 njStringSetZoom(void *, s32, s32);
 s32 njStringSetColor(void *, s32, s32, s32);
 s32 njStringSetFlags(void *, s32);
 
@@ -468,7 +468,7 @@ void slotSetPosition(SlotRecord *positionedSlot, f32 x, f32 y) {
     drawEntrySetValue(positionedSlot->label, 0x4E);
     drawEntrySetPosition(positionedSlot->label, (s32) (positionedSlot->x + (f32) gSlotLayoutTableB[8]), (s32) (positionedSlot->y + (f32) gSlotLayoutTableB[9]));
     njStringSetPosition(positionedSlot->text, positionedSlot->x + (f32) gSlotLayoutTableB[12], positionedSlot->y);
-    njStringSetByteFields(positionedSlot->text, 0xE, 0xE);
+    njStringSetZoom(positionedSlot->text, 0xE, 0xE);
     njStringSetColor(positionedSlot->text, 0xC4, 0xC4, 0xC4);
     njStringSetFlags(positionedSlot->text, 0xA0C);
     njPlaneSetMode((NjPlane *) positionedSlot->plane_a, 2);

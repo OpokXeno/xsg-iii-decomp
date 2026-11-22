@@ -512,6 +512,101 @@
     }
    ]
   },
+  "main/tu028": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fea4",
+      "0x0054fea8"
+     ],
+     "generated": [
+      "0x0054fea4",
+      "0x0054fea8"
+     ],
+     "generated_by": [
+      "xglCameraTravelDefaultInit"
+     ],
+     "c_owned_symbols": [
+      "D_0054FEA4"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_camera.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fec8",
+      "0x0054ff14"
+     ],
+     "generated": [
+      "0x0054fec8",
+      "0x0054ff14"
+     ],
+     "generated_by": [
+      "xglCameraPadUpdateFree",
+      "xglCameraPadUpdateChase"
+     ],
+     "c_owned_symbols": [
+      "D_0054FEC8",
+      "D_0054FECC",
+      "D_0054FED0",
+      "D_0054FED4",
+      "D_0054FED8",
+      "D_0054FEDC",
+      "D_0054FEE0",
+      "D_0054FEE4",
+      "D_0054FEE8",
+      "D_0054FEEC",
+      "D_0054FEF0",
+      "D_0054FEF4",
+      "D_0054FEF8",
+      "D_0054FEFC",
+      "D_0054FF00",
+      "D_0054FF04",
+      "D_0054FF08",
+      "D_0054FF0C",
+      "D_0054FF10"
+     ],
+     "also_referenced_by_c": [
+      "gCameraHalfPi"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_camera.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054ff18",
+      "0x0054ff20"
+     ],
+     "generated": [
+      "0x0054ff18",
+      "0x0054ff20"
+     ],
+     "generated_by": [
+      "xglCameraPadUpdateChase"
+     ],
+     "c_owned_symbols": [
+      "D_0054FF18",
+      "D_0054FF1C"
+     ],
+     "also_referenced_by_c": [
+      "gCameraDefaultNearClip",
+      "gCameraDefaultFarClip"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_camera.o"
+     }
+    }
+   ]
+  },
   "main/tu029": {
    ".lit4": [
     {
@@ -631,6 +726,38 @@
     }
    ]
   },
+  "main/tu031": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00541460",
+      "0x005414f0"
+     ],
+     "generated": [
+      "0x00541460",
+      "0x005414ec"
+     ],
+     "generated_by": [
+      "xglLightPackDebugDrawAll"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00541460"
+     ],
+     "also_referenced_by_c": [
+      "lightDebugBoxPointTable",
+      "lightDebugBoxPointB",
+      "lightDebugBoxPointC",
+      "lightDebugBoxPointD",
+      "lightDebugBoxPointE"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_light_031.o"
+     }
+    }
+   ]
+  },
   "main/tu037": {
    ".lit4": [
     {
@@ -647,6 +774,32 @@
      ],
      "c_owned_symbols": [
       "D_0054FFD8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/pxy_profile_037.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054ffe0",
+      "0x0054ffec"
+     ],
+     "generated": [
+      "0x0054ffe0",
+      "0x0054ffec"
+     ],
+     "generated_by": [
+      "pxyProfileGetMs",
+      "pxyProfileGetMsUnchecked",
+      "pxyProfileDrawEntries"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFE0",
+      "D_0054FFE4",
+      "D_0054FFE8"
      ],
      "also_referenced_by_c": [],
      "basis": {
@@ -677,6 +830,32 @@
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/pxy_profile_037.o"
+     }
+    }
+   ]
+  },
+  "main/tu041": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffec",
+      "0x0054fff0"
+     ],
+     "generated": [
+      "0x0054ffec",
+      "0x0054fff0"
+     ],
+     "generated_by": [
+      "pxyBuildFadeRamp"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFEC"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu041.o"
      }
     }
    ]
@@ -813,6 +992,36 @@
   },
   "main/tu131": {
    ".lit4": [
+    {
+     "range": [
+      "0x0054fcf0",
+      "0x0054fd14"
+     ],
+     "generated": [
+      "0x0054fcf0",
+      "0x0054fd14"
+     ],
+     "generated_by": [
+      "srsAtan2"
+     ],
+     "c_owned_symbols": [
+      "D_0054FCF0",
+      "D_0054FCF4",
+      "D_0054FCF8",
+      "D_0054FCFC",
+      "D_0054FD00",
+      "D_0054FD04",
+      "D_0054FD08",
+      "D_0054FD0C",
+      "D_0054FD10"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sef.o"
+     }
+    },
     {
      "range": [
       "0x0054fd24",

@@ -156,7 +156,26 @@ float xglAtan2(float y, float x)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy64);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy64b);
+void xglMemCopy64b(void *destination, const void *source, int count)
+{
+    __asm__ __volatile__(
+        "1:\n\t"
+        "lq $2,0(%1)\n\t"
+        "sq $2,0(%0)\n\t"
+        "lq $2,-16(%1)\n\t"
+        "sq $2,-16(%0)\n\t"
+        "lq $2,-32(%1)\n\t"
+        "sq $2,-32(%0)\n\t"
+        "lq $2,-48(%1)\n\t"
+        "sq $2,-48(%0)\n\t"
+        "addi %2,%2,-1\n\t"
+        "addi %0,%0,-64\n\t"
+        "addi %1,%1,-64\n\t"
+        "bne $0,%2,1b\n\t"
+        : "+r"(destination), "+r"(source), "+r"(count)
+        :
+        : "$2", "memory");
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMemCopy16);
 
@@ -406,7 +425,7 @@ void xglVectorLength(float *length, const Vector4 *vector)
 
 float xglPointLength(Vector4 *startPoint, Vector4 *endPoint)
 {
-    register Vector4 *f = startPoint;
+    Vector4 *f = startPoint;
     __asm__ __volatile__(
         "lqc2 vf2, 0(%0)\n\t"
         "lqc2 vf3, 0(%1)\n\t"
@@ -424,7 +443,7 @@ float xglPointLength(Vector4 *startPoint, Vector4 *endPoint)
 
 float xglPointLengthXZ(Vector4 *startPoint, Vector4 *endPoint)
 {
-    register Vector4 *f = startPoint;
+    Vector4 *f = startPoint;
     __asm__ __volatile__(
         "lqc2 vf2, 0(%0)\n\t"
         "lqc2 vf3, 0(%1)\n\t"
@@ -670,7 +689,30 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixRotY);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixRotZ);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_2", xglMatrixFrustum);
+void xglMatrixFrustum(Matrix *destination, Matrix *source,
+                      float left, float right, float bottom, float top,
+                      float nearPlane, float farPlane)
+{
+    Matrix projection;
+
+    projection.elements[0] = (2.0f * nearPlane) / (right - left);
+    projection.elements[1] = 0.0f;
+    projection.elements[2] = 0.0f;
+    projection.elements[3] = 0.0f;
+    projection.elements[4] = 0.0f;
+    projection.elements[5] = (2.0f * nearPlane) / (top - bottom);
+    projection.elements[6] = 0.0f;
+    projection.elements[7] = 0.0f;
+    projection.elements[8] = (right + left) / (right - left);
+    projection.elements[9] = (top + bottom) / (top - bottom);
+    projection.elements[10] = -(farPlane + nearPlane) / (farPlane - nearPlane);
+    projection.elements[11] = -1.0f;
+    projection.elements[12] = 0.0f;
+    projection.elements[13] = 0.0f;
+    projection.elements[14] = -(2.0f * farPlane * nearPlane) / (farPlane - nearPlane);
+    projection.elements[15] = 0.0f;
+    xglMatrixMul(destination->rows, source->rows, projection.rows);
+}
 
 void xglMatrixStackUnit(void)
 {

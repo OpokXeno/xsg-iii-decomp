@@ -1,23 +1,12 @@
 #include "common.h"
 #include "shared.h"
-
 #include "main/res_get_path.h"
 #include "main/tu352.h"
 #include "main/xenoActor.h"
 #include "ov02/tu012.h"
 #include "ov02/tu060.h"
 
-
-
-
-
-
 struct XenoActor;
-
-
-
-
-
 
 /* Indices of XenoActor.rsrc: the model pack (.pxy, xenoActor.c reads it as PxyModelHeader *), the texture (.txy), the
  * hierarchy (.xhr, XenoActorAllocMatrices builds the matrices from it), the motion tables (.xap: slot n is
@@ -39,9 +28,6 @@ enum XActRsrc {
     XAct_Rsrc_Count
 };
 
-
-
-
 void XenoActorSetMode(struct XenoActor *actor, int mode);
 void XenoActorEnableChannel(struct XenoActor *actor);
 void XenoActorEnableChannelB(struct XenoActor *actor);
@@ -51,21 +37,12 @@ void XenoActorSetSelector(struct XenoActor *actor, int selector);
 
 #define DATA_LOOKUP_CAPACITY 12 /* items in a DataLookup block */
 
-
-
-
 struct BattleUnit;
 
 /* A unit has three child units (and three slot flags, one per child); the command table has 40 handlers. */
 #define UNIT_CHILD_COUNT 3
 
-
 struct FadeTask;
-
-
-
-
-
 int unitCurrentPhase(BattleUnit *battleUnit);
 void unitSetPhase(BattleUnit *battleUnit, int phase);
 void unitSetSelector(BattleUnit *battleUnit, int selector);
@@ -73,14 +50,8 @@ void unitRefreshPhase(BattleUnit *battleUnit);
 struct XenoLight;
 int partyUnitHpLow(struct BattleUnit *owner);
 int unitCmdFinish(BattleUnit *battleUnit, BattleUnitCommand *command);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99230);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99278);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A992D0);
-
-INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99390);
+int unitTblSet(int side, BattleUnit *battleUnit);
+BattleUnit *func_00A992D0(int id, int side);
 
 typedef int s32;
 
@@ -90,11 +61,41 @@ typedef struct UnitPoolRow {
     short gridX;                            /* +0x1C: shifted left by 12 before func_002105B8 */
     unsigned char unmodeled_1E[0x3E - 0x1E];
     short lookupKey;                        /* +0x3E: the unit filter is lookupKey < 0x12 */
-    unsigned char unmodeled_40[0x78 - 0x40];
+    unsigned char unmodeled_40[0x72 - 0x40];
+    short tblSlot;                          /* +0x72: the slot unitTblSet returned for the unit */
+    unsigned char unmodeled_74[0x78 - 0x74];
     float targetX;                          /* +0x78: first percent / 100 */
     float targetZ;                          /* +0x7C: second percent / 100 */
     short moveState;                        /* +0x80: cleared when the arrive command starts */
 } UnitPoolRow;
+
+/* Creates a player unit and enters it in the player side of the unit table; returns the unit or 0. */
+BattleUnit *unitPlayerCreate(int id) {
+    BattleUnit *playerUnit;
+
+    playerUnit = func_00A992D0(id, 0);
+    if (playerUnit != 0) {
+        ((UnitPoolRow *) playerUnit->lookupKeyRecord)->tblSlot = unitTblSet(0, playerUnit);
+    }
+    return playerUnit;
+}
+
+/* Creates an enemy unit, sets the 0xC bits of its targetingFlags word, then enters it in the enemy side of the unit
+ * table; returns the unit or 0. */
+BattleUnit *unitEnemyCreate(int id) {
+    BattleUnit *enemyUnit;
+
+    enemyUnit = func_00A992D0(id, 1);
+    enemyUnit->targetingFlags |= 0xC;
+    if (enemyUnit != 0) {
+        ((UnitPoolRow *) enemyUnit->lookupKeyRecord)->tblSlot = unitTblSet(1, enemyUnit);
+    }
+    return enemyUnit;
+}
+
+INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A992D0);
+
+INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99390);
 
 /* The step counter and the timer of a unit command. They sit in the opaque commandQueue block of BattleUnit
  * (ov02/tu060.h, +0x10 for 0x12C bytes); the offsets are measured here. */
@@ -131,7 +132,10 @@ void unitSoundPlay(BattleUnit *battleUnit, s32 sound);
 void unitSetupPhaseActor(BattleUnit *battleUnit, s32 phase);
 
 void unitReleaseSoundAndResources(BattleUnit *battleUnit) {
-    if (((UnitPoolRow *) battleUnit->lookupKeyRecord)->lookupKey < 0x12) {
+    UnitPoolRow *poolRow;
+
+    poolRow = (UnitPoolRow *) battleUnit->lookupKeyRecord;
+    if (poolRow->lookupKey < 0x12) {
         unitSoundSlotRelease();
     }
     unitReleaseResources(battleUnit);
@@ -139,6 +143,7 @@ void unitReleaseSoundAndResources(BattleUnit *battleUnit) {
 
 void unitReleaseResources(BattleUnit *battleUnit) {
     int childIndex;
+    UnitPoolRow *poolRow;
 
     func_00A857F0(battleUnit);
     for (childIndex = 0; childIndex < 4; childIndex++) {
@@ -147,8 +152,9 @@ void unitReleaseResources(BattleUnit *battleUnit) {
         }
     }
     XenoActorRelease(battleUnit->motionActor);
-    if (((UnitPoolRow *) battleUnit->lookupKeyRecord)->lookupKey < 0x12) {
-        func_002105B8(((UnitPoolRow *) battleUnit->lookupKeyRecord)->gridX << 0xC, 1);
+    poolRow = (UnitPoolRow *) battleUnit->lookupKeyRecord;
+    if (poolRow->lookupKey < 0x12) {
+        func_002105B8(poolRow->gridX << 0xC, 1);
     }
     unitSideRelease(battleUnit);
     unitTblRemove(battleUnit);
@@ -196,15 +202,11 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99638);
 void unitSetChildFlags(BattleUnit *battleUnit);
 
 void unitSetDrawFlagTree(BattleUnit *battleUnit) {
-    s32 actorDrawFlags;
-    s32 unitFlagsDrawTree;
     XenoActor *actor;
 
     actor = battleUnit->motionActor;
-    actorDrawFlags = actor->drawFlags | 4;
-    actor->drawFlags = actorDrawFlags;
-    unitFlagsDrawTree = battleUnit->targetingFlags | 2;
-    battleUnit->targetingFlags = unitFlagsDrawTree;
+    actor->drawFlags |= 4;
+    battleUnit->targetingFlags |= 2;
     unitSetChildFlags(battleUnit);
 }
 
@@ -234,12 +236,12 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A997E8);
 INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99860);
 
 /* The command queue is the block at +0x10 of the unit. */
-void unitCommandQueueClear(s32 unitAddress) {
-    func_00A83BF0(unitAddress + 0x10);
+void unitCommandQueueClear(s32 battleUnitAddress) {
+    func_00A83BF0(battleUnitAddress + 0x10);
 }
 
-void unitCommandQueueReset(s32 unitAddress) {
-    commandQueueReset(unitAddress + 0x10);
+void unitCommandQueueReset(s32 battleUnitAddress) {
+    commandQueueReset(battleUnitAddress + 0x10);
 }
 
 /* Tail-calls commandQueueDone on the command queue at +0x10 of the unit. */
@@ -266,14 +268,12 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99C40);
 
 s32 unitCmdRelease(BattleUnit *battleUnit) {
     UnitCommandState *commandState;
-    s32 nextStepsTaken;
 
     commandState = (UnitCommandState *) battleUnit;
     if (commandState->stepsTaken == 0) {
         func_00A8AD20(battleUnit, 0xB);
         func_00A9AB70(battleUnit);
-        nextStepsTaken = commandState->stepsTaken + 1;
-        commandState->stepsTaken = nextStepsTaken;
+        commandState->stepsTaken += 1;
     } else if (unitIsActorDone(battleUnit) != 0) {
         unitReleaseSoundAndResources(battleUnit);
         return 1;
@@ -302,18 +302,14 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A99ED8);
 
 s32 unitCmdWaitClearActive(BattleUnit *battleUnit) {
     UnitCommandState *commandState;
-    s32 nextStepsTaken;
-    s32 flagsWithoutActive;
 
     commandState = (UnitCommandState *) battleUnit;
     if (commandState->stepsTaken == 0) {
         func_00A8AD20(battleUnit, 6);
         unitSoundSlotStart(battleUnit, 1);
-        nextStepsTaken = commandState->stepsTaken + 1;
-        commandState->stepsTaken = nextStepsTaken;
+        commandState->stepsTaken += 1;
     } else if (unitIsActorDone(battleUnit) != 0) {
-        flagsWithoutActive = battleUnit->targetingFlags & ~1;
-        battleUnit->targetingFlags = flagsWithoutActive;
+        battleUnit->targetingFlags &= ~1;
         return 1;
     }
     return 0;
@@ -328,8 +324,6 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu061", func_00A9A4A0);
 s32 unitCmdPoseArrive(BattleUnit *battleUnit) {
     UnitCommandState *commandState;
     UnitPoolRow *poolRow;
-    s32 nextStepsTaken;
-    s32 flagsWithoutActive;
     s32 arriveFrameLimit;
 
     poolRow = (UnitPoolRow *) battleUnit->lookupKeyRecord;
@@ -347,8 +341,7 @@ s32 unitCmdPoseArrive(BattleUnit *battleUnit) {
         func_00A940E8(battleUnit, 0, -1);
         func_00A940E8(battleUnit, 1, -1);
         ((UnitPoolRow *) battleUnit->lookupKeyRecord)->moveState = 0;
-        nextStepsTaken = commandState->stepsTaken + 1;
-        commandState->stepsTaken = nextStepsTaken;
+        commandState->stepsTaken += 1;
     } else {
         arriveFrameLimit = 0x46;
         if (poolRow->lookupKey < 0x12) {
@@ -357,8 +350,7 @@ s32 unitCmdPoseArrive(BattleUnit *battleUnit) {
             }
         }
         if (arriveFrameLimit < commandState->framesWaited) {
-            flagsWithoutActive = battleUnit->targetingFlags & ~1;
-            battleUnit->targetingFlags = flagsWithoutActive;
+            battleUnit->targetingFlags &= ~1;
             return 1;
         }
     }
@@ -372,20 +364,16 @@ s32 unitCmdClearActive(BattleUnit *battleUnit) {
 
 s32 unitCmdSoundWaitRefresh(BattleUnit *battleUnit) {
     UnitCommandState *commandState;
-    s32 nextStepsTaken;
     u32 keepFlagsMask;
-    u32 flagsAfterClear;
 
     commandState = (UnitCommandState *) battleUnit;
     if (commandState->stepsTaken == 0) {
         func_00A8AD20(battleUnit, 0x12);
         unitSoundPlay(battleUnit, 0xB);
-        nextStepsTaken = commandState->stepsTaken + 1;
-        commandState->stepsTaken = nextStepsTaken;
+        commandState->stepsTaken += 1;
     } else if (unitIsActorDone(battleUnit) != 0) {
         keepFlagsMask = 0xFFFF7FFF;
-        flagsAfterClear = (battleUnit->targetingFlags & keepFlagsMask) & ~1;
-        battleUnit->targetingFlags = flagsAfterClear;
+        battleUnit->targetingFlags = (battleUnit->targetingFlags & keepFlagsMask) & ~1;
         battleUnitRefreshActionCode(battleUnit);
         unitRefreshPhase(battleUnit);
         return 1;
@@ -395,7 +383,6 @@ s32 unitCmdSoundWaitRefresh(BattleUnit *battleUnit) {
 
 s32 unitCmdSetupPhaseActor(BattleUnit *battleUnit) {
     UnitCommandState *commandState;
-    s32 nextStepsTaken;
 
     commandState = (UnitCommandState *) battleUnit;
     if (commandState->stepsTaken == 0) {
@@ -403,8 +390,7 @@ s32 unitCmdSetupPhaseActor(BattleUnit *battleUnit) {
         unitSetupPhaseActor(battleUnit, 4);
         func_00A854D8(battleUnit, 0x136, 0x11);
         unitSoundSlotStart(battleUnit, 3);
-        nextStepsTaken = commandState->stepsTaken + 1;
-        commandState->stepsTaken = nextStepsTaken;
+        commandState->stepsTaken += 1;
     } else if (unitIsActorDone(battleUnit) != 0) {
         unitSetupPhaseActor(battleUnit, 0);
         return 1;

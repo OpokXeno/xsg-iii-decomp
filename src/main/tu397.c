@@ -134,7 +134,7 @@ void planeHostSetWordE4(void *header, s32 value);
 void planeHostSetWordE0(void *header, s32 value);
 void seVoiceHeaderSetPosition(void *header, f32 a, f32 b);
 void func_002D6978(void *entry);
-void njStringSetByteFields(void *entry, s32 a, s32 b);
+void njStringSetZoom(void *entry, s32 a, s32 b);
 void njStringSetFlags(void *string, s32 flags);
 
 void panelBlockInit(PanelBlock *panelBlock) {
@@ -156,7 +156,7 @@ void panelBlockInit(PanelBlock *panelBlock) {
     seVoiceHeaderSetPosition(planeHeader, 10.0f, 2.0f);
     for (i = 0; i < 5; i++) {
         func_002D6978(panelBlock->stringEntries[i]);
-        njStringSetByteFields(panelBlock->stringEntries[i], 0xE, 0xE);
+        njStringSetZoom(panelBlock->stringEntries[i], 0xE, 0xE);
         njStringSetFlags(panelBlock->stringEntries[i], 0xC);
     }
     panelBlock->trailer = 0;

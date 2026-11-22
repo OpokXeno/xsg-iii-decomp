@@ -1,49 +1,27 @@
 #include "common.h"
 #include "shared.h"
-
 #include "main/Packet.h"
 #include "main/tu045.h"
 #include "main/tu141.h"
 #include "main/xgl_2.h"
 
 /* Row-major 4x4 float matrix. */
-
-
-
-
-
-
-
-
-
-
 /* A vector kept as a plain float[4] (like sceVu0FVECTOR); its w is element 3. Vector4 here changes the
  * address arithmetic of the w stores, so the casts to Vector4 * at the calls stay. */
-
-
-
-
 /* One 16-byte entry of the direct queue (a GIF packet of A+D pairs): data and register address, or four words (the tag,
  * then the header words, are written through the word view). */
 typedef union XglDirectQueueEntry {
     struct {
         u64 registerValue;
-        u64 address;
+        u64 registerAddress;
     };
     u32 tagAndHeaderWords[4];
 } XglDirectQueueEntry;
-
-
-
-
 
 struct PxyDrawPartRange;
 union Matrix;
 struct PxyShadow;
 struct PxyHideMask;
-
-
-
 extern XglDirectQueueEntry *xglDirectQueueBuffer;
 extern int xglDirectQueueCount;
 void nmlPacketClrTextureCache(void);
@@ -54,8 +32,6 @@ void xglPacketSelectDefaultMode(void);
 void nmlPacketAddGsFlush(void);
 void xglPacketInitVuState(void);
 void xglPacketInitVuStateArg(int value);
-
-
 
 /* Appends one A+D register write (value, then register address) at the u64 cursor p. */
 #define GS_PUT(p, reg, value) ((p)[0] = (value), (p)[1] = (reg), (p) += 2)
@@ -296,18 +272,52 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AB4E0);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ABB48);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ABCA0);
+/* One 16-byte VIF upload quadword built field by field: float x, int y, float z, int w. */
+typedef union PxyVifUnpackQuad {
+    struct {
+        float x;
+        s32 y;
+        float z;
+        s32 w;
+    } field;
+    Quadword quadword;
+} PxyVifUnpackQuad;
+
+extern s32 D_00551274;
+
+void pxyUploadPartStateDefault(void) {
+    XglPacket *packet;
+    PxyVifUnpackQuad unpackQuad;
+    PxyVifUnpackQuad reserved;
+
+    packet = xglPacketGetCurrent();
+    unpackQuad.field.z = 4.0f;
+    unpackQuad.field.w = D_00551274;
+    unpackQuad.field.x = -1.0f;
+    unpackQuad.field.y = 0;
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenUpkCode(packet, 966, 108, 1, 1);
+    sceVif1PkAddUpkData128(packet, unpackQuad.quadword);
+    sceVif1PkCloseUpkCode(packet);
+    unpackQuad.field.x = 0.0f;
+    unpackQuad.field.y = 0;
+    unpackQuad.field.z = 0.0f;
+    unpackQuad.field.w = 0;
+    sceVif1PkOpenUpkCode(packet, 1020, 108, 1, 1);
+    sceVif1PkAddUpkData128(packet, unpackQuad.quadword);
+    sceVif1PkCloseUpkCode(packet);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ABD60);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AC0D0);
 
-void pxyPacketUploadUnpack(void *unpackData, u32 quadwordCount, s32 address) {
+void pxyPacketUploadUnpack(void *unpackData, u32 quadwordCount, s32 vifAddress) {
     XglPacket *packet;
 
     packet = xglPacketGetCurrent();
     sceVif1PkCnt(packet, 0U);
-    sceVif1PkOpenUpkCode(packet, address & 0xFFFF, 0x6CU, 1U, 1U);
+    sceVif1PkOpenUpkCode(packet, vifAddress & 0xFFFF, 0x6CU, 1U, 1U);
     sceVif1PkAddUpkData128N(packet, unpackData, quadwordCount);
     sceVif1PkCloseUpkCode(packet);
 }
@@ -343,7 +353,6 @@ void pxyPacketUploadLightTables(s32 alternate) {
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", xglPacketInitVuState);
 
-extern s32 pxyModeZeroPending;
 s32 func_001AAA00(s32 index);
 
 void pxyPacketEnterPlainMode(void) {
@@ -360,7 +369,7 @@ void pxyPacketEnterPlainMode(void) {
     sceVif1PkCnt(packet, 0U);
     mscalTag = func_001AAA00(3);
     sceVif1PkAddCode(packet, mscalTag | 0x14000000);
-    pxyModeZeroPending = 0;
+    xglDirectQueueCount = 0;
 }
 
 void pxyPacketSelectMode(PxyPacketModeState *modeSelector) {
@@ -396,13 +405,134 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ACB50);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ACD30);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ACE80);
+void xglPacketAddVifFlush(void);
+
+/* One 32-byte record of a texture set; its data sits dataOffset bytes past the table. */
+typedef struct PxyTextureRecord {
+    s32 dataOffset;     /* +0x00 */
+    u16 destX;          /* +0x04 */
+    u8 unmodeled_06[2];
+    s16 width;          /* +0x08 */
+    u8 unmodeled_0A[2];
+    s16 height;         /* +0x0C */
+    u8 unmodeled_0E[6];
+    s32 dataQuadwordCount;          /* +0x14 */
+    u8 unmodeled_18[8];
+} PxyTextureRecord;
+
+/* A texture set of a txy block: its record count at +0x14, records from +0x20. */
+typedef struct PxyTextureSet {
+    u8 unmodeled_00[0x14];
+    s32 textureRecordCount;          /* +0x14 */
+    u8 unmodeled_18[0x20 - 0x18];
+    PxyTextureRecord records[8];
+} PxyTextureSet;
+
+/* One direct-mode message: a GIF tag quadword, then the six-quadword block. */
+typedef struct PxyDirectMessage {
+    u32 tag[4];
+    u64 block[12];
+} PxyDirectMessage;
+
+void sceGsSetDefLoadImage(void *image, s16 fbp, s16 fbw, s16 psm, s16 x, s16 y, s16 w, s16 h);
+void nmlModelDirectSend(s32 slot, void *data, s32 quadwordCount);
+s32 xglPsmBufferWidth(s32 width, s32 psm);
+void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int count);
+void func_002F4BA0(XglPacket *packet, unsigned int mode);
+void func_002F4BF8(XglPacket *packet);
+
+/* Uploads a texture set's records to the packet, last record first: each record is a GS load-image block sent as
+ * a direct-mode GIF packet, followed by the record's data. */
+void nmlPacketTextureTrans(TxyBlock *txyBlock, s32 textureSetSlot, s32 originX) {
+    XglPacket *packet;
+    PxyTextureSet *textureSet;
+    s32 textureSetAddress;
+    s32 recordIndex;
+    u64 loadImage[12];
+    PxyTextureRecord *textureRecord;
+
+    textureSetAddress = txyBlock->setOffset[textureSetSlot] + (int) txyBlock;
+    textureSet = (PxyTextureSet *) textureSetAddress;
+    if (textureSet != 0) {
+        packet = xglPacketGetCurrent();
+        recordIndex = textureSet->textureRecordCount - 1;
+        while (recordIndex >= 0) {
+            textureRecord = &textureSet->records[recordIndex];
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkAddCode(packet, 0x11000000);
+            sceGsSetDefLoadImage(loadImage, ((u16) originX + textureRecord->destX), xglPsmBufferWidth(512, 0), 0, 0, 0,
+                                 textureRecord->width, textureRecord->height);
+            loadImage[0] &= ~0x8000;
+            func_002F4BA0(packet, 0);
+            sceVif1PkAddDirectDataN(packet, loadImage, 5);
+            func_002F4BF8(packet);
+            sceVif1PkRef(packet, (u8 *) txyBlock + textureRecord->dataOffset, textureRecord->dataQuadwordCount, 0, 0, 0);
+            recordIndex--;
+        }
+        sceVif1PkCnt(packet, 0);
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001ACFD8);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD190);
+/* Flushes the pending direct-queue entries to VIF1 as one GS packet, then runs the MSCAL program 3 and a VIF flush. */
+void nmlPacketAddGsFlush(void) {
+    XglPacket *packet;
+    XglDirectQueueEntry *queue;
+    s32 pendingCount;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD278);
+    packet = xglPacketGetCurrent();
+    pendingCount = xglDirectQueueCount;
+    if (pendingCount >= 3) {
+        packet->cursor += pendingCount << 4;
+        queue = xglDirectQueueBuffer;
+        queue[0].tagAndHeaderWords[3] = ((pendingCount - 1) << 16) + 0x6C000330;
+        queue[1].tagAndHeaderWords[0] = pendingCount + 0x7FFE;
+        queue[1].tagAndHeaderWords[1] = 0x10000000;
+        queue[1].tagAndHeaderWords[2] = 0xE;
+        queue[0].tagAndHeaderWords[0] = 0;
+        queue[0].tagAndHeaderWords[1] = 0;
+        queue[0].tagAndHeaderWords[2] = 0;
+        queue[1].tagAndHeaderWords[3] = 0;
+        sceVif1PkRef(packet, queue, pendingCount, 0, 0, 0);
+        sceVif1PkCnt(packet, 0);
+        sceVif1PkAddCode(packet, func_001AAA00(3) | 0x14000000);
+        sceVif1PkAddCode(packet, 0x17000000);
+        xglPacketAddVifFlush();
+        sceVif1PkCnt(packet, 0);
+    }
+    xglDirectQueueCount = 0;
+}
+
+/* Same as nmlPacketAddGsFlush but runs the wide GS program (MSCAL 4, tag 0x228) and clears the matrix cache. */
+void nmlPacketAddGsFlushWide(void) {
+    XglPacket *packet;
+    XglDirectQueueEntry *queue;
+    s32 pendingCount;
+
+    packet = xglPacketGetCurrent();
+    pendingCount = xglDirectQueueCount;
+    if (pendingCount >= 3) {
+        packet->cursor += pendingCount << 4;
+        queue = xglDirectQueueBuffer;
+        queue[0].tagAndHeaderWords[3] = ((pendingCount - 1) << 16) + 0x6C000228;
+        queue[1].tagAndHeaderWords[0] = pendingCount + 0x7FFE;
+        queue[1].tagAndHeaderWords[1] = 0x10000000;
+        queue[1].tagAndHeaderWords[2] = 0xE;
+        queue[0].tagAndHeaderWords[0] = 0;
+        queue[0].tagAndHeaderWords[1] = 0;
+        queue[0].tagAndHeaderWords[2] = 0;
+        queue[1].tagAndHeaderWords[3] = 0;
+        sceVif1PkRef(packet, queue, pendingCount, 0, 0, 0);
+        sceVif1PkCnt(packet, 0);
+        sceVif1PkAddCode(packet, func_001AAA00(4) | 0x14000000);
+        sceVif1PkAddCode(packet, 0x17000000);
+        xglPacketAddVifFlush();
+        sceVif1PkCnt(packet, 0);
+    }
+    xglDirectQueueCount = 0;
+    nmlPacketClrMatrixCache();
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD360);
 
@@ -410,7 +540,43 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD480);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD5A0);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD628);
+typedef struct PxyDrawPartEntry {
+    u32 offset;
+    u32 count;
+    u8 unmodeled_08[24];
+} PxyDrawPartEntry;
+
+typedef struct PxyDrawPartModel {
+    u8 unmodeled_00[20];
+    u8 *header;
+    u8 unmodeled_18[44];
+    PxyDrawPartEntry *entries;
+} PxyDrawPartModel;
+
+typedef struct PxyDrawPartChannel {
+    u8 unmodeled_00[4];
+    s16 entryIndex;
+} PxyDrawPartChannel;
+
+typedef struct PxyScratchpad {
+    u8 unmodeled_00[16];
+    PxyDrawPartModel *model;
+    u8 unmodeled_14[8];
+    PxyDrawPartChannel *channel;
+} PxyScratchpad;
+
+void pxyDrawPartData(void) {
+    XglPacket *packet;
+    PxyScratchpad *scratchpad;
+
+    packet = xglPacketGetCurrent();
+    scratchpad = (PxyScratchpad *) 0x70000000;
+    sceVif1PkCnt(packet, 0U);
+    sceVif1PkAddCode(packet, func_001AAA00(2) | 0x14000000);
+    sceVif1PkRef(packet, scratchpad->model->header + scratchpad->model->entries[scratchpad->channel->entryIndex].offset,
+                 scratchpad->model->entries[scratchpad->channel->entryIndex].count, 0U, 0U, 0U);
+    xglPacketAddVifFlush();
+}
 
 void xglPacketAddVifFlushIrq(void) {
     XglPacket *packet;
@@ -428,16 +594,16 @@ void xglPacketAddVifFlush(void) {
     sceVif1PkAddCode(packet, 0x11000000U);
 }
 
-void xglPacketAddRefFlagged(void *refAddress, u32 qwc, u32 refControlBits) {
+void xglPacketAddRefFlagged(void *refDmaBytes, u32 qwc, u32 refControlBits) {
     XglPacket *packet;
     packet = xglPacketGetCurrent();
-    sceVif1PkRef(packet, refAddress, qwc, 0U, refControlBits, 0U);
+    sceVif1PkRef(packet, refDmaBytes, qwc, 0U, refControlBits, 0U);
 }
 
-void xglPacketAddRef(void *refAddress, u32 qwc) {
+void xglPacketAddRef(void *refDmaBytes, u32 qwc) {
     XglPacket *packet;
     packet = xglPacketGetCurrent();
-    sceVif1PkRef(packet, refAddress, qwc, 0U, 0U, 0U);
+    sceVif1PkRef(packet, refDmaBytes, qwc, 0U, 0U, 0U);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AD7D8);
@@ -458,12 +624,12 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE748);
 
 void *memcpy(void *dest, const void *src, s32 size);
 
-u8 *xglPacketCopyBytes(const void *sourceAddress, s32 byteLength) {
+u8 *xglPacketCopyBytes(const void *packetSourceBytes, s32 byteLength) {
     XglPacket *packet;
     u8 *newCursor;
 
     packet = xglPacketGetCurrent();
-    memcpy(packet->cursor, sourceAddress, byteLength);
+    memcpy(packet->cursor, packetSourceBytes, byteLength);
     newCursor = &packet->cursor[byteLength];
     packet->cursor = newCursor;
     return newCursor - byteLength;
@@ -473,14 +639,14 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AE870);
 
 void xglMemCopy64(u8 *dest, const void *src, s32 count);
 
-u8 *xglPacketCopy64(const void *sourceAddress, s32 sixtyFourByteBlockCount) {
+u8 *xglPacketCopy64(const void *packetSourceBytes, s32 sixtyFourByteBlockCount) {
     XglPacket *packet;
     s32 copiedBytes;
     u8 *newCursor;
 
     packet = xglPacketGetCurrent();
     copiedBytes = sixtyFourByteBlockCount << 6;
-    xglMemCopy64(packet->cursor, sourceAddress, sixtyFourByteBlockCount);
+    xglMemCopy64(packet->cursor, packetSourceBytes, sixtyFourByteBlockCount);
     newCursor = packet->cursor + copiedBytes;
     packet->cursor = newCursor;
     return newCursor - copiedBytes;
@@ -488,14 +654,14 @@ u8 *xglPacketCopy64(const void *sourceAddress, s32 sixtyFourByteBlockCount) {
 
 void xglMemCopy16(u8 *dest, const void *src, s32 count);
 
-u8 *xglPacketCopy16(const void *sourceAddress, s32 quadwordCount) {
+u8 *xglPacketCopy16(const void *packetSourceBytes, s32 quadwordCount) {
     XglPacket *packet;
     s32 copiedBytes;
     u8 *newCursor;
 
     packet = xglPacketGetCurrent();
     copiedBytes = quadwordCount * 0x10;
-    xglMemCopy16(packet->cursor, sourceAddress, quadwordCount);
+    xglMemCopy16(packet->cursor, packetSourceBytes, quadwordCount);
     newCursor = packet->cursor + copiedBytes;
     packet->cursor = newCursor;
     return newCursor - copiedBytes;
@@ -601,25 +767,102 @@ s32 xglPacketCeilLogTwo(s32 requestedCount) {
     return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEB20);
+s32 xglPsmBufferWidthEven(s32 byteLength, s32 psm) {
+    s32 result;
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEBB0);
+    result = 1;
+    switch (psm) {
+    case 20:
+        result = byteLength / 128 * 2;
+        if ((byteLength & 0x7F) != 0) {
+            result += 2;
+        }
+        break;
+    case 19:
+        result = byteLength / 128 * 2;
+        if ((byteLength & 0x7F) != 0) {
+            result += 2;
+        }
+        break;
+    case 0:
+        result = byteLength / 128 * 2;
+        if ((byteLength & 0x7F) != 0) {
+            result += 2;
+        }
+        break;
+    }
+    return result;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEC40);
+s32 xglPsmBufferWidth(s32 width, s32 psm) {
+    s32 pageCount;
+
+    pageCount = 1;
+    switch (psm) {
+    case 20:
+        pageCount = width / 256 + 1;
+        break;
+    case 19:
+        pageCount = width / 128 + 1;
+        break;
+    case 0:
+        pageCount = width / 64;
+        if ((width & 0x3F) != 0) {
+            pageCount += 1;
+        }
+        break;
+    }
+    return pageCount;
+}
+
+void nmlPacketGsInit(void) {
+    XglPacket *packet;
+
+    packet = xglPacketGetCurrent();
+    xglDirectQueueBuffer = (XglDirectQueueEntry *) packet->cursor;
+    xglDirectQueueCount = 0;
+    xglDirectQueueBuffer[xglDirectQueueCount].tagAndHeaderWords[0] = 0;
+    xglDirectQueueBuffer[xglDirectQueueCount].tagAndHeaderWords[1] = 0;
+    xglDirectQueueBuffer[xglDirectQueueCount].tagAndHeaderWords[2] = 0;
+    xglDirectQueueBuffer[xglDirectQueueCount++].tagAndHeaderWords[3] = 0x50000000;
+    xglDirectQueueBuffer[xglDirectQueueCount].registerValue = 0x1000000000008000ULL;
+    xglDirectQueueBuffer[xglDirectQueueCount++].registerAddress = 14;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AECC0);
 
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AECF8);
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AED28);
+extern s32 pxySecondaryCount;
+void nmlModelDirectSendFull(s32 key, void *buffer, s32 count, s32 flag, s32 refOffset);
 
-extern s32 D_0055127C;
+void xglDirectQueueDefer(s32 sendFlag, s32 key) {
+    XglPacket *packet;
 
-void pxyPacketSetSecondCount(s32 secondaryCount) {
-    D_0055127C = secondaryCount;
+    packet = xglPacketGetCurrent();
+    xglDirectQueueBuffer[0].tagAndHeaderWords[3] = xglDirectQueueCount + 0x4fffffff;
+    xglDirectQueueBuffer[1].tagAndHeaderWords[0] = xglDirectQueueCount + 0x7ffe;
+    nmlModelDirectSendFull(key | 1, xglDirectQueueBuffer, xglDirectQueueCount, sendFlag, pxySecondaryCount);
+    packet->cursor += xglDirectQueueCount << 4;
+    xglDirectQueueCount = 0;
+    pxySecondaryCount = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AEDC0);
+void pxyPacketSetSecondCount(s32 secondaryCount) {
+    pxySecondaryCount = secondaryCount;
+}
+
+void xglDirectQueueSubmitRef(void) {
+    XglPacket *packet;
+
+    packet = xglPacketGetCurrent();
+    xglDirectQueueBuffer[0].tagAndHeaderWords[3] = xglDirectQueueCount + 0x4fffffff;
+    xglDirectQueueBuffer[1].tagAndHeaderWords[0] = xglDirectQueueCount + 0x7ffe;
+    sceVif1PkRef(packet, xglDirectQueueBuffer, xglDirectQueueCount, 0U, pxySecondaryCount, 0U);
+    packet->cursor += xglDirectQueueCount << 4;
+    xglDirectQueueCount = 0;
+    pxySecondaryCount = 0;
+}
 
 extern s32 pxyPacketCount;
 

@@ -74,7 +74,7 @@ s32 func_00A80318(void *);
 s32 func_00A80360(void *);
 s32 func_00A80418(void *);
 s32 func_00A819D8(void *);
-s32 func_00A8C4F8(s32);
+s32 dataVPadReadButtons(s32);
 
 void advanceRunCurrentEntry(void) {
     AdvanceEntry *currentAdvanceEntry;
@@ -88,7 +88,7 @@ void advanceRunCurrentEntry(void) {
         if (func_00A80360(currentAdvanceEntry) != 0) {
             func_00A80318(currentAdvanceEntry);
         }
-    } else if (!(func_00A8C4F8(0) & 0xA) && (func_00A80418(currentAdvanceEntry) != 0)) {
+    } else if (!(dataVPadReadButtons(0) & 0xA) && (func_00A80418(currentAdvanceEntry) != 0)) {
         func_00A80318(currentAdvanceEntry);
     }
 }

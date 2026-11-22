@@ -32,10 +32,10 @@ void stateExchangeOverrideSet(void) {
     gStateExchangeOverride = 1;
 }
 
-extern unsigned char D_004C8412[];
+extern unsigned char gXglRenderFadeDisabled[];
 
 s32 xglRenderMovieIsActive(void) {
-    return D_004C8412[0] != 0;
+    return gXglRenderFadeDisabled[0] != 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu033", func_00199BE0);
