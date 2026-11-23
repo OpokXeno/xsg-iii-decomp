@@ -47,6 +47,12 @@ typedef union SoundChannelState {
 
 /* Channels in the assignment table of the record block (soundApplySettings counts its channel states with SOUND_CHANNEL_COUNT). */
 #define SOUND_ASSIGN_COUNT 0x118
+/* The songs with a swapped channel bank keep three banks of SOUND_BANK_CHANNELS channels from
+ * SOUND_LIVE_BANK in the save area from SOUND_SAVED_BANK, which runs past the channel table. */
+#define SOUND_BANK_CHANNELS 24
+#define SOUND_LIVE_BANK 0x60
+#define SOUND_SAVED_BANK 0x100
+#define SOUND_CHANNEL_SLOTS (SOUND_ASSIGN_COUNT + 2 * SOUND_BANK_CHANNELS)
 typedef struct SoundRecordBlock {
     unsigned char master_volume; /* +0x00: scales the level of slot 0 */
     unsigned char volumeLevels[3];
@@ -54,8 +60,8 @@ typedef struct SoundRecordBlock {
     unsigned char unmodeled_05[3];
     int driver_work;             /* +0x08 */
     VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
-    unsigned int channelAssign[SOUND_ASSIGN_COUNT]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
-    unsigned char unmodeled_470[0x534 - 0x470];
+    unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
+    unsigned char unmodeled_530[0x534 - 0x530];
     SoundChannelState table_b[63]; /* +0x534: channels 1..63, see soundApplySettings */
     SoundSlot soundSlotRecords[4]; /* +0x630 */
 } SoundRecordBlock;
@@ -659,7 +665,76 @@ void soundSetFullVolume(void) {
     gSoundRecordBlock.volumeLevels[2] = 0x7F;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FAC8);
+/* One key/value pair of a song's list; the list ends with key SOUND_PAIR_END. */
+typedef struct SoundSongPair {
+    int key;
+    int value;
+} SoundSongPair;
+#define SOUND_PAIR_END -1
+#define SOUND_SONG_PAIRS 48
+/* The pair table func_0017D348 takes: the keys, then the values. */
+typedef struct SoundSongPairTable {
+    int key[SOUND_SONG_PAIRS];
+    int value[SOUND_SONG_PAIRS];
+} SoundSongPairTable;
+/* The pair list of each song number. */
+extern SoundSongPair *soundSongPairLists[];
+void func_0017D348(SoundSongPairTable *table);
+/* Song 3 stops the channels with SOUND_STOP_SONG3 (when it starts or ends), other changes with SOUND_STOP_OTHER. */
+#define SOUND_SONG_3 3
+#define SOUND_STOP_SONG3 -1
+#define SOUND_STOP_OTHER -2
+/* The songs with a swapped bank: SOUND_BANK_SONG_FIRST and the next one, and SOUND_BANK_SONG_LAST. */
+#define SOUND_BANK_SONG_FIRST 1
+#define SOUND_BANK_SONG_RUN 2
+#define SOUND_BANK_SONG_LAST 4
+
+/* Switches to song `song`: stops the channels, passes the song's pair list on as a table and, for the
+ * songs with a swapped bank (1, 2 and 4), saves the live bank of the old song and restores the
+ * saved bank for the new one. */
+void func_0018FAC8(int song)
+{
+    SoundSongPairTable table;
+    SoundSongPair *pair;
+    int i;
+
+    if (gSoundRecordBlock.current_song == song) {
+        return;
+    }
+    if (song == SOUND_SONG_3 || gSoundRecordBlock.current_song == SOUND_SONG_3) {
+        func_0018EC68(SOUND_STOP_SONG3);
+    } else {
+        func_0018EC68(SOUND_STOP_OTHER);
+    }
+    pair = soundSongPairLists[song];
+    memset(&table, 0, sizeof(table));
+    for (i = 0; pair->key != SOUND_PAIR_END; i++) {
+        table.key[i] = pair->key;
+        table.value[i] = pair->value;
+        pair++;
+    }
+    func_0017D348(&table);
+    if ((unsigned char) (gSoundRecordBlock.current_song - SOUND_BANK_SONG_FIRST) < SOUND_BANK_SONG_RUN
+        || gSoundRecordBlock.current_song == SOUND_BANK_SONG_LAST) {
+        for (i = 0; i < SOUND_BANK_CHANNELS; i++) {
+            gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i] = gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i];
+            gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + SOUND_BANK_CHANNELS + i] =
+                gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + SOUND_BANK_CHANNELS + i];
+            gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + 2 * SOUND_BANK_CHANNELS + i] =
+                gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + 2 * SOUND_BANK_CHANNELS + i];
+        }
+    }
+    if ((unsigned int) (song - SOUND_BANK_SONG_FIRST) < SOUND_BANK_SONG_RUN || song == SOUND_BANK_SONG_LAST) {
+        for (i = 0; i < SOUND_BANK_CHANNELS; i++) {
+            gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i] = gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i];
+            gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + SOUND_BANK_CHANNELS + i] =
+                gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + SOUND_BANK_CHANNELS + i];
+            gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + 2 * SOUND_BANK_CHANNELS + i] =
+                gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + 2 * SOUND_BANK_CHANNELS + i];
+        }
+    }
+    gSoundRecordBlock.current_song = song;
+}
 
 int soundVSyncCallback(void)
 {
