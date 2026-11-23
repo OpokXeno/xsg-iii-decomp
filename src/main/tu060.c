@@ -226,7 +226,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu060", func_001B9590);
 
 extern unsigned char D_0031A560[];
 extern s16 gSaveTags[];
-PositionObject *func_001C0570(s32 mode);
+PositionObject *RgDispModelFindByKey(s32 mode);
 void func_0030C130(void *source, void *destination, s32 size);
 
 s32 stateSave(StateSaveImage *saveImage) {
@@ -234,7 +234,7 @@ s32 stateSave(StateSaveImage *saveImage) {
     s32 savedIndex;
     s32 savedCount;
 
-    positionObject = func_001C0570(0);
+    positionObject = RgDispModelFindByKey(0);
     memset(saveImage, 0, 0xA40);
     saveImage->saveTag = gSaveTags[0];
     if (positionObject != 0) {

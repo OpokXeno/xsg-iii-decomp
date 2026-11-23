@@ -999,6 +999,904 @@
     }
    ]
   },
+  "main/tu065": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00531170",
+      "0x00531188"
+     ],
+     "generated": [
+      "0x00531170",
+      "0x00531184"
+     ],
+     "generated_by": [
+      "gameRuntimeFullReset"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00531170"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu065.o"
+     }
+    }
+   ]
+  },
+  "main/tu066": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f3d0",
+      "0x0054f3e0"
+     ],
+     "generated": [
+      "0x0054f3d0",
+      "0x0054f3e0"
+     ],
+     "generated_by": [
+      "gameStartSavedPlacement",
+      "func_001BCF08"
+     ],
+     "c_owned_symbols": [
+      "D_0054F3D0",
+      "D_0054F3D4",
+      "D_0054F3D8",
+      "D_0054F3DC"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu066.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00531300",
+      "0x00531340"
+     ],
+     "generated": [
+      "0x00531300",
+      "0x00531340"
+     ],
+     "generated_by": [
+      "func_001BC9B0",
+      "func_001BCAD0"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00531300",
+      "jtbl_00531320"
+     ],
+     "also_referenced_by_c": [
+      "gDebugMenuEntries",
+      "D_00531288",
+      "D_005312A0",
+      "D_005312B0",
+      "D_005312C0",
+      "D_005312C8",
+      "D_005312D8",
+      "D_005312E0",
+      "gDebugValueFormat",
+      "D_00531340",
+      "D_00531348"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu066.o"
+     }
+    },
+    {
+     "range": [
+      "0x00531360",
+      "0x00531378"
+     ],
+     "generated": [
+      "0x00531360",
+      "0x00531374"
+     ],
+     "generated_by": [
+      "func_001BDEC8"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00531360"
+     ],
+     "also_referenced_by_c": [
+      "D_00531378",
+      "D_00531380"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu066.o"
+     }
+    }
+   ]
+  },
+  "main/tu067": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f3e0",
+      "0x0054f3f0"
+     ],
+     "generated": [
+      "0x0054f3e0",
+      "0x0054f3f0"
+     ],
+     "generated_by": [
+      "stageSetup",
+      "stagePartAlphaSet"
+     ],
+     "c_owned_symbols": [
+      "D_0054F3E0",
+      "D_0054F3E4",
+      "D_0054F3E8",
+      "D_0054F3EC"
+     ],
+     "also_referenced_by_c": [
+      "D_0054F3F0",
+      "gAngleUnitsToDegrees"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu067.o"
+     }
+    }
+   ]
+  },
+  "main/tu068": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f3fc",
+      "0x0054f400"
+     ],
+     "generated": [
+      "0x0054f3fc",
+      "0x0054f400"
+     ],
+     "generated_by": [
+      "func_001C0040"
+     ],
+     "c_owned_symbols": [
+      "D_0054F3FC"
+     ],
+     "also_referenced_by_c": [
+      "D_0054F3F8"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/rg_dispmodel.o"
+     }
+    }
+   ]
+  },
+  "main/tu073": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f400",
+      "0x0054f408"
+     ],
+     "generated": [
+      "0x0054f400",
+      "0x0054f408"
+     ],
+     "generated_by": [
+      "slotFollowTargetHeight",
+      "slotParticleCountCompute"
+     ],
+     "c_owned_symbols": [
+      "D_0054F400",
+      "D_0054F404"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu073.o"
+     }
+    }
+   ]
+  },
+  "main/tu074": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00531538",
+      "0x00531558"
+     ],
+     "generated": [
+      "0x00531538",
+      "0x00531554"
+     ],
+     "generated_by": [
+      "actorScanLookupStart"
+     ],
+     "c_owned_symbols": [
+      "D_00531538"
+     ],
+     "also_referenced_by_c": [
+      "gIndexedTableDefault"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu074.o"
+     }
+    }
+   ],
+   ".sdata": [
+    {
+     "range": [
+      "0x005509b8",
+      "0x005509c0"
+     ],
+     "generated": [
+      "0x005509b8",
+      "0x005509c0"
+     ],
+     "generated_by": [
+      "indexedTableGet",
+      "indexedValueGet"
+     ],
+     "c_owned_symbols": [
+      "gIndexedTableFallback",
+      "gIndexedValueFallback"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu074.o"
+     }
+    }
+   ]
+  },
+  "main/tu075": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f414",
+      "0x0054f424"
+     ],
+     "generated": [
+      "0x0054f414",
+      "0x0054f424"
+     ],
+     "generated_by": [
+      "func_001C3490",
+      "func_001C34E0",
+      "func_001C3598"
+     ],
+     "c_owned_symbols": [
+      "D_0054F414",
+      "D_0054F418",
+      "D_0054F41C",
+      "D_0054F420"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu075.o"
+     }
+    }
+   ]
+  },
+  "main/tu077": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f424",
+      "0x0054f434"
+     ],
+     "generated": [
+      "0x0054f424",
+      "0x0054f434"
+     ],
+     "generated_by": [
+      "func_001C4778",
+      "func_001C4A80"
+     ],
+     "c_owned_symbols": [
+      "D_0054F424",
+      "D_0054F428",
+      "D_0054F42C",
+      "D_0054F430"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu077.o"
+     }
+    }
+   ]
+  },
+  "main/tu079": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f434",
+      "0x0054f440"
+     ],
+     "generated": [
+      "0x0054f434",
+      "0x0054f440"
+     ],
+     "generated_by": [
+      "func_001C5250",
+      "playerFindNearestTarget"
+     ],
+     "c_owned_symbols": [
+      "D_0054F434",
+      "D_0054F438",
+      "D_0054F43C"
+     ],
+     "also_referenced_by_c": [
+      "D_0054F440"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu079.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054f444",
+      "0x0054f460"
+     ],
+     "generated": [
+      "0x0054f444",
+      "0x0054f460"
+     ],
+     "generated_by": [
+      "playerPadMoveVectorUpdate"
+     ],
+     "c_owned_symbols": [
+      "D_0054F444",
+      "D_0054F448",
+      "D_0054F44C",
+      "D_0054F450",
+      "D_0054F454",
+      "D_0054F458",
+      "D_0054F45C"
+     ],
+     "also_referenced_by_c": [
+      "gPlayerTurnStepMax",
+      "gPlayerTurnStepMin"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu079.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054f468",
+      "0x0054f474"
+     ],
+     "generated": [
+      "0x0054f468",
+      "0x0054f474"
+     ],
+     "generated_by": [
+      "playerFocusTargetUpdate",
+      "focusDebugOverlayDraw",
+      "func_001C6830"
+     ],
+     "c_owned_symbols": [
+      "D_0054F468",
+      "D_0054F46C",
+      "D_0054F470"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu079.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00531580",
+      "0x005315f0"
+     ],
+     "generated": [
+      "0x00531580",
+      "0x005315ec"
+     ],
+     "generated_by": [
+      "playerFrameUpdate",
+      "focusDebugOverlayDraw"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00531580",
+      "D_005315A0",
+      "D_005315B8",
+      "D_005315C8",
+      "D_005315D8"
+     ],
+     "also_referenced_by_c": [
+      "D_00531560",
+      "D_005315F0"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu079.o"
+     }
+    }
+   ]
+  },
+  "main/tu082": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f480",
+      "0x0054f484"
+     ],
+     "generated": [
+      "0x0054f480",
+      "0x0054f484"
+     ],
+     "generated_by": [
+      "descriptorSlotSpawn"
+     ],
+     "c_owned_symbols": [
+      "D_0054F480"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu082.o"
+     }
+    }
+   ]
+  },
+  "main/tu083": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f484",
+      "0x0054f494"
+     ],
+     "generated": [
+      "0x0054f484",
+      "0x0054f494"
+     ],
+     "generated_by": [
+      "modeSlotTriggerCheck",
+      "modeSlotActivate"
+     ],
+     "c_owned_symbols": [
+      "D_0054F484",
+      "D_0054F488",
+      "D_0054F48C",
+      "D_0054F490"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu083.o"
+     }
+    }
+   ]
+  },
+  "main/tu084": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f494",
+      "0x0054f49c"
+     ],
+     "generated": [
+      "0x0054f494",
+      "0x0054f49c"
+     ],
+     "generated_by": [
+      "flatSlotSpawn"
+     ],
+     "c_owned_symbols": [
+      "D_0054F494",
+      "D_0054F498"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu084.o"
+     }
+    }
+   ]
+  },
+  "main/tu086": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f4b4",
+      "0x0054f57c"
+     ],
+     "generated": [
+      "0x0054f4b4",
+      "0x0054f57c"
+     ],
+     "generated_by": [
+      "func_001C7F68",
+      "func_001C8100",
+      "sbNativeSetLight",
+      "func_001C85C8",
+      "func_001C8BC0",
+      "func_001C8CD0",
+      "func_001C8DC0",
+      "sbNativeCosine",
+      "sbNativeSine",
+      "sbNativeSetModelSize",
+      "func_001C91F0",
+      "func_001C99F8",
+      "sbNativeSetEffectVector",
+      "func_001C9F68",
+      "func_001CA0D8",
+      "func_001CA260",
+      "func_001CA3E8"
+     ],
+     "c_owned_symbols": [
+      "D_0054F4B4",
+      "D_0054F4B8",
+      "D_0054F4BC",
+      "D_0054F4C0",
+      "D_0054F4C4",
+      "D_0054F4C8",
+      "D_0054F4CC",
+      "D_0054F4D0",
+      "D_0054F4D4",
+      "D_0054F4D8",
+      "D_0054F4DC",
+      "D_0054F4E0",
+      "D_0054F4E4",
+      "D_0054F4E8",
+      "D_0054F4EC",
+      "D_0054F4F0",
+      "D_0054F4F4",
+      "D_0054F4F8",
+      "D_0054F4FC",
+      "D_0054F500",
+      "D_0054F504",
+      "D_0054F508",
+      "D_0054F50C",
+      "D_0054F510",
+      "D_0054F514",
+      "D_0054F518",
+      "D_0054F51C",
+      "D_0054F520",
+      "D_0054F524",
+      "D_0054F528",
+      "D_0054F52C",
+      "D_0054F530",
+      "D_0054F534",
+      "D_0054F538",
+      "D_0054F53C",
+      "D_0054F540",
+      "D_0054F544",
+      "D_0054F548",
+      "D_0054F54C",
+      "D_0054F550",
+      "D_0054F554",
+      "D_0054F558",
+      "D_0054F55C",
+      "D_0054F560",
+      "D_0054F564",
+      "D_0054F568",
+      "D_0054F56C",
+      "D_0054F570",
+      "D_0054F574",
+      "D_0054F578"
+     ],
+     "also_referenced_by_c": [
+      "D_0054F57C"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu086.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054f580",
+      "0x0054f58c"
+     ],
+     "generated": [
+      "0x0054f580",
+      "0x0054f58c"
+     ],
+     "generated_by": [
+      "func_001CA880"
+     ],
+     "c_owned_symbols": [
+      "D_0054F580",
+      "D_0054F584",
+      "D_0054F588"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu086.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00537820",
+      "0x00537888"
+     ],
+     "generated": [
+      "0x00537820",
+      "0x00537884"
+     ],
+     "generated_by": [
+      "sbNativeGetObjectTransform",
+      "func_001C99F8"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00537820",
+      "jtbl_00537850"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu086.o"
+     }
+    }
+   ]
+  },
+  "main/tu088": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f58c",
+      "0x0054f5d8"
+     ],
+     "generated": [
+      "0x0054f58c",
+      "0x0054f5d8"
+     ],
+     "generated_by": [
+      "scriptSlotObjectScaleOffsetSet",
+      "scriptObjectSetupRequestSubmit",
+      "scriptSlotObjectScaledArgSet",
+      "scriptFogOverrideSet",
+      "scriptSlotObjectPropertySet",
+      "sbSetObjectAngle"
+     ],
+     "c_owned_symbols": [
+      "D_0054F58C",
+      "D_0054F590",
+      "D_0054F594",
+      "D_0054F598",
+      "D_0054F59C",
+      "D_0054F5A0",
+      "D_0054F5A4",
+      "D_0054F5A8",
+      "D_0054F5AC",
+      "D_0054F5B0",
+      "D_0054F5B4",
+      "D_0054F5B8",
+      "D_0054F5BC",
+      "D_0054F5C0",
+      "D_0054F5C4",
+      "D_0054F5C8",
+      "D_0054F5CC",
+      "D_0054F5D0",
+      "D_0054F5D4"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu088.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x005379c0",
+      "0x005379e0"
+     ],
+     "generated": [
+      "0x005379c0",
+      "0x005379d8"
+     ],
+     "generated_by": [
+      "scriptSlotObjectPropertySet"
+     ],
+     "c_owned_symbols": [
+      "jtbl_005379C0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu088.o"
+     }
+    }
+   ]
+  },
+  "main/tu089": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f5d8",
+      "0x0054f5dc"
+     ],
+     "generated": [
+      "0x0054f5d8",
+      "0x0054f5dc"
+     ],
+     "generated_by": [
+      "func_001CC678"
+     ],
+     "c_owned_symbols": [
+      "D_0054F5D8"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu089.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x005379e0",
+      "0x005379f8"
+     ],
+     "generated": [
+      "0x005379e0",
+      "0x005379f4"
+     ],
+     "generated_by": [
+      "scriptGameStateQuery"
+     ],
+     "c_owned_symbols": [
+      "jtbl_005379E0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu089.o"
+     }
+    }
+   ]
+  },
+  "main/tu091": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f5dc",
+      "0x0054f5e0"
+     ],
+     "generated": [
+      "0x0054f5dc",
+      "0x0054f5e0"
+     ],
+     "generated_by": [
+      "func_001CD490"
+     ],
+     "c_owned_symbols": [
+      "D_0054F5DC"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu091.o"
+     }
+    }
+   ]
+  },
+  "main/tu093": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f5e0",
+      "0x0054f5e4"
+     ],
+     "generated": [
+      "0x0054f5e0",
+      "0x0054f5e4"
+     ],
+     "generated_by": [
+      "sbNativeActorPartsHide"
+     ],
+     "c_owned_symbols": [
+      "D_0054F5E0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu093.o"
+     }
+    }
+   ]
+  },
+  "main/tu100": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f49c",
+      "0x0054f4a8"
+     ],
+     "generated": [
+      "0x0054f49c",
+      "0x0054f4a8"
+     ],
+     "generated_by": [
+      "soundPanAngleFromOffset"
+     ],
+     "c_owned_symbols": [
+      "D_0054F49C",
+      "D_0054F4A0",
+      "D_0054F4A4"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu100.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x00531680",
+      "0x005316d0"
+     ],
+     "generated": [
+      "0x00531680",
+      "0x005316cc"
+     ],
+     "generated_by": [
+      "soundCueUpdate",
+      "soundCueReset"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00531680",
+      "jtbl_005316B0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu100.o"
+     }
+    }
+   ]
+  },
   "main/tu105": {
    ".rodata": [
     {
@@ -1103,6 +2001,36 @@
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/tu108.o"
+     }
+    }
+   ]
+  },
+  "main/tu109": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f40c",
+      "0x0054f414"
+     ],
+     "generated": [
+      "0x0054f40c",
+      "0x0054f414"
+     ],
+     "generated_by": [
+      "slotEntryOpenOnPad",
+      "kindFourSlotCreate"
+     ],
+     "c_owned_symbols": [
+      "D_0054F40C",
+      "D_0054F410"
+     ],
+     "also_referenced_by_c": [
+      "gPadTriggerMaxAngle"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu109.o"
      }
     }
    ]

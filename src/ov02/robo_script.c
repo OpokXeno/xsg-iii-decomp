@@ -31,10 +31,10 @@ typedef struct RoboBattleUnit {
     s32 storedResult;                   /* +0xE4 */
 } RoboBattleUnit;
 
-s32 func_001CE990(s32);
+s32 sbNativeBufferGet(s32);
 
 s32 roboScriptLoadImage(void) {
-    return func_001CE990(1);
+    return sbNativeBufferGet(1);
 }
 extern const char D_00ABB6C0[];
 void assertFailed(const char *message, const char *file, int line);

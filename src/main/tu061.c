@@ -38,7 +38,7 @@ s32 poolBlockTagWordGet(s32 handle, s32 mode);
 s32 func_001B6918(s32 unit, s32 channel, s32 command, s32 timeout);
 s32 xcLocatePayload(XcDataSection **payload, s32 handle);
 s32 func_001B9BF0();
-s32 func_001CFD50(s32 target, void *source, void *destination);
+s32 soundBankTagsSet(s32 target, void *source, void *destination);
 s32 xglSleep(void);
 
 s32 vmStreamPoll(s32 resetRequested)
@@ -51,7 +51,7 @@ s32 vmStreamPoll(s32 resetRequested)
   if ((vmStream->streamSize != 0) && (ready != 0))
   {
     ioRpcFetchBlock(vmStream->streamAddress, 0xA50000, vmStream->streamSize);
-    func_001CFD50(0xA50000, 0, &vmStream->ready);
+    soundBankTagsSet(0xA50000, 0, &vmStream->ready);
     while (func_0018EBE8(7) > 0)
     {
       xglSleep();
@@ -68,7 +68,7 @@ s32 vmStreamPoll(s32 resetRequested)
     poolBlockTagWordGet(fetchRequestId, 0);
     if (((xcLocatePayload(&fetchedPayload, fetchRequestId) != 0) && (fetchedPayload->contentSize != 0)) && (ready != 0))
     {
-      func_001CFD50(0, (s8 *) fetchedPayload + fetchedPayload->contentOffset, vmPayloadBuffer);
+      soundBankTagsSet(0, (s8 *) fetchedPayload + fetchedPayload->contentOffset, vmPayloadBuffer);
       while (func_0018EBE8(0xE) > 0)
       {
         xglSleep();

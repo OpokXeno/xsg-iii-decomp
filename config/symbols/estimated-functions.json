@@ -36114,19 +36114,19 @@
      2
     ],
     [
-     "func_001BB5B0",
+     "gameLoopStartMenuUpdate",
      1815984,
      572,
      2
     ],
     [
-     "func_001BB7F0",
+     "gameLoopDebugPadUpdate",
      1816560,
      212,
      2
     ],
     [
-     "func_001BB8C8",
+     "soundWorkSourcesInit",
      1816776,
      188,
      2
@@ -36144,19 +36144,19 @@
      2
     ],
     [
-     "func_001BBA68",
+     "valueSlotAdvanceFromPlayerCounter",
      1817192,
      188,
      2
     ],
     [
-     "func_001BBB28",
+     "slotModelStateIsFour",
      1817384,
      84,
      2
     ],
     [
-     "func_001BBB80",
+     "padStartAndSoftResetHeld",
      1817472,
      52,
      2
@@ -36174,13 +36174,13 @@
      2
     ],
     [
-     "func_001BBCB8",
+     "valueSlotChangeRequest",
      1817784,
      232,
      2
     ],
     [
-     "func_001BBDA0",
+     "valueSlotChangeToPosition",
      1818016,
      164,
      2
@@ -36204,7 +36204,7 @@
      2
     ],
     [
-     "func_001BBF20",
+     "gameRuntimeFullReset",
      1818400,
      488,
      2
@@ -36228,13 +36228,13 @@
      2
     ],
     [
-     "func_001BC210",
+     "debugStageMenuStep",
      1819152,
      920,
      2
     ],
     [
-     "func_001BC5A8",
+     "gameStartSelectedMap",
      1820072,
      252,
      2
@@ -36246,7 +36246,7 @@
      2
     ],
     [
-     "func_001BC720",
+     "gameStartSavedPlacement",
      1820448,
      228,
      2
@@ -36510,13 +36510,13 @@
      2
     ],
     [
-     "func_001BE990",
+     "stageSetup",
      1829264,
      664,
      2
     ],
     [
-     "func_001BEC28",
+     "markerPositionGet",
      1829928,
      212,
      2
@@ -36540,7 +36540,7 @@
      2
     ],
     [
-     "func_001BEE80",
+     "trackedPointNearest",
      1830528,
      244,
      2
@@ -36552,19 +36552,19 @@
      2
     ],
     [
-     "func_001BEFD8",
+     "pointSlotStore",
      1830872,
      124,
      2
     ],
     [
-     "func_001BF058",
+     "pointSlotFind",
      1831000,
      88,
      2
     ],
     [
-     "func_001BF0B0",
+     "stagePartAlphaSet",
      1831088,
      152,
      2
@@ -36636,7 +36636,7 @@
      2
     ],
     [
-     "func_001BF810",
+     "actorFacingError",
      1832976,
      56,
      2
@@ -36684,7 +36684,7 @@
      2
     ],
     [
-     "func_001BFDE8",
+     "RgDispModelUpdate",
      1834472,
      600,
      2
@@ -36702,13 +36702,13 @@
      2
     ],
     [
-     "func_001C02E0",
+     "RgDispModelAlloc",
      1835744,
      212,
      2
     ],
     [
-     "func_001C03B8",
+     "RgDispModelReset",
      1835960,
      240,
      2
@@ -36726,19 +36726,19 @@
      2
     ],
     [
-     "func_001C0570",
+     "RgDispModelFindByKey",
      1836400,
      180,
      2
     ],
     [
-     "func_001C0628",
+     "RgDispModelFindByActor",
      1836584,
      92,
      2
     ],
     [
-     "func_001C0688",
+     "RgDispModelNextByKind",
      1836680,
      104,
      2
@@ -36756,7 +36756,7 @@
      2
     ],
     [
-     "func_001C0788",
+     "actorChildSlotCreate",
      1836936,
      232,
      2
@@ -36774,13 +36774,13 @@
      2
     ],
     [
-     "func_001C08E0",
+     "payloadSectionsLoad",
      1837280,
      192,
      2
     ],
     [
-     "func_001C09A0",
+     "payloadSectionsLocate",
      1837472,
      164,
      2
@@ -36792,31 +36792,31 @@
      2
     ],
     [
-     "func_001C0B38",
+     "SpawnSlotSetPosition",
      1837880,
      484,
      2
     ],
     [
-     "func_001C0D20",
+     "SpawnSlotSetRotation",
      1838368,
      268,
      2
     ],
     [
-     "func_001C0E30",
+     "SpawnSlotSetScale",
      1838640,
      268,
      2
     ],
     [
-     "func_001C0F40",
+     "stepMoveStart",
      1838912,
      80,
      2
     ],
     [
-     "func_001C0F90",
+     "stepRotationStart",
      1838992,
      200,
      2
@@ -36828,13 +36828,13 @@
      2
     ],
     [
-     "func_001C10A8",
+     "stepRatioStart",
      1839272,
      124,
      2
     ],
     [
-     "func_001C1128",
+     "bindRequestDispatch",
      1839400,
      356,
      2
@@ -36852,31 +36852,31 @@
      2
     ],
     [
-     "func_001C1388",
+     "slotFollowTargetHeight",
      1840008,
      444,
      2
     ],
     [
-     "func_001C1548",
+     "slotModelTopPointGet",
      1840456,
      72,
      2
     ],
     [
-     "func_001C1590",
+     "slotChildStateSelect",
      1840528,
      168,
      2
     ],
     [
-     "func_001C1638",
+     "slotLightSetBuild",
      1840696,
      404,
      2
     ],
     [
-     "func_001C17D0",
+     "boxPointSectorClassify",
      1841104,
      188,
      2
@@ -36888,13 +36888,13 @@
      2
     ],
     [
-     "func_001C18C8",
+     "slotParticleCountCompute",
      1841352,
      216,
      2
     ],
     [
-     "func_001C19A0",
+     "slotSceneTickSubmit",
      1841568,
      184,
      2
@@ -36918,25 +36918,25 @@
      2
     ],
     [
-     "func_001C1AE8",
+     "vibrationModeSet",
      1841896,
      116,
      2
     ],
     [
-     "func_001C1B60",
+     "slotEffectStartOnce",
      1842016,
      208,
      2
     ],
     [
-     "func_001C1C30",
+     "slotStateFlagEdgeUpdate",
      1842224,
      88,
      2
     ],
     [
-     "func_001C1C88",
+     "slotEntryDoorCreate",
      1842312,
      752,
      2
@@ -36954,43 +36954,43 @@
      2
     ],
     [
-     "func_001C20A0",
+     "slotEntryMotionStep",
      1843360,
      268,
      2
     ],
     [
-     "func_001C21B0",
+     "slotEntryPadTriggerCheck",
      1843632,
      236,
      2
     ],
     [
-     "func_001C22A0",
+     "slotEntryOpenOnPad",
      1843872,
      244,
      2
     ],
     [
-     "func_001C2398",
+     "slotEntryCloseWhenFar",
      1844120,
      188,
      2
     ],
     [
-     "func_001C2458",
+     "slotEntryMotionStart",
      1844312,
      296,
      2
     ],
     [
-     "func_001C2580",
+     "slotEntryMotionFinish",
      1844608,
      236,
      2
     ],
     [
-     "func_001C2670",
+     "effectSlotCreate",
      1844848,
      224,
      2
@@ -37014,13 +37014,13 @@
      2
     ],
     [
-     "playbackNoOp",
+     "slotUpdateNoOp",
      1845640,
      8,
      2
     ],
     [
-     "func_001C2990",
+     "kindFourSlotCreate",
      1845648,
      920,
      2
@@ -37032,7 +37032,7 @@
      2
     ],
     [
-     "func_001C2D90",
+     "kindFourEffectsArm",
      1846672,
      112,
      2
@@ -37044,19 +37044,19 @@
      2
     ],
     [
-     "func_001C2E38",
+     "kindFourSlotUpdate",
      1846840,
      204,
      2
     ],
     [
-     "func_001C2F08",
+     "slotEffectQueryStart",
      1847048,
      112,
      2
     ],
     [
-     "func_001C2F78",
+     "actorScanLookupStart",
      1847160,
      592,
      2
@@ -37152,19 +37152,19 @@
      2
     ],
     [
-     "func_001C3838",
+     "spawnMotionActorCreate",
      1849400,
      240,
      2
     ],
     [
-     "func_001C3928",
+     "spawnMotionActorUpdate",
      1849640,
      276,
      2
     ],
     [
-     "func_001C3A40",
+     "spawnDisplayRecordBind",
      1849920,
      652,
      2
@@ -37182,13 +37182,13 @@
      2
     ],
     [
-     "func_001C3DE8",
+     "spawnDisplayRecordRelease",
      1850856,
      84,
      2
     ],
     [
-     "func_001C3E40",
+     "spawnDisplayRecordUpdate",
      1850944,
      400,
      2
@@ -37254,25 +37254,25 @@
      2
     ],
     [
-     "func_001C4CE0",
+     "emitterSlotAttachActors",
      1854688,
      156,
      2
     ],
     [
-     "func_001C4D80",
+     "emitterActorAttachChild",
      1854848,
      364,
      2
     ],
     [
-     "func_001C4EF0",
+     "xenoSpawnerStartAim",
      1855216,
      216,
      2
     ],
     [
-     "func_001C4FC8",
+     "xenoSpawnerAimAtTarget",
      1855432,
      164,
      2
@@ -37308,19 +37308,19 @@
      2
     ],
     [
-     "func_001C53C0",
+     "playerFindNearestTarget",
      1856448,
      212,
      2
     ],
     [
-     "func_001C5498",
+     "playerProbeForwardPoint",
      1856664,
      612,
      2
     ],
     [
-     "func_001C5700",
+     "playerSoundEffectStart",
      1857280,
      124,
      2
@@ -37338,13 +37338,13 @@
      2
     ],
     [
-     "func_001C58C8",
+     "playerFrameUpdate",
      1857736,
      336,
      2
     ],
     [
-     "func_001C5A18",
+     "playerPadMoveVectorUpdate",
      1858072,
      680,
      2
@@ -37356,37 +37356,37 @@
      2
     ],
     [
-     "func_001C5D50",
+     "playerCueSelectUpdate",
      1858896,
      556,
      2
     ],
     [
-     "func_001C5F80",
+     "playerLinkedActorAimUpdate",
      1859456,
      324,
      2
     ],
     [
-     "func_001C60C8",
+     "playerButtonLatchUpdate",
      1859784,
      140,
      2
     ],
     [
-     "func_001C6158",
+     "playerWalkModeUpdate",
      1859928,
      472,
      2
     ],
     [
-     "func_001C6330",
+     "playerModeOneUpdate",
      1860400,
      272,
      2
     ],
     [
-     "func_001C6440",
+     "playerModeTwoUpdate",
      1860672,
      184,
      2
@@ -37404,13 +37404,13 @@
      2
     ],
     [
-     "func_001C65B0",
+     "playerFocusTargetUpdate",
      1861040,
      252,
      2
     ],
     [
-     "func_001C66B0",
+     "focusDebugOverlayDraw",
      1861296,
      384,
      2
@@ -37428,31 +37428,31 @@
      2
     ],
     [
-     "func_001C6A70",
+     "emitterScaleSelect",
      1862256,
      188,
      2
     ],
     [
-     "func_001C6B30",
+     "emitterSpawnEffectRecord",
      1862448,
      156,
      2
     ],
     [
-     "func_001C6BD0",
+     "emitterSoundUpdate",
      1862608,
      576,
      2
     ],
     [
-     "func_001C6E10",
+     "childTableSlotSpawn",
      1863184,
      496,
      2
     ],
     [
-     "func_001C7000",
+     "childTableSlotRelease",
      1863680,
      84,
      2
@@ -37464,13 +37464,13 @@
      2
     ],
     [
-     "func_001C7060",
+     "slotAttachFind",
      1863776,
      156,
      2
     ],
     [
-     "func_001C7100",
+     "descriptorSlotSpawn",
      1863936,
      672,
      2
@@ -37488,7 +37488,7 @@
      2
     ],
     [
-     "func_001C7450",
+     "modeSlotTrigger",
      1864784,
      280,
      2
@@ -37506,19 +37506,19 @@
      2
     ],
     [
-     "func_001C75E0",
+     "modeSlotTriggerCheck",
      1865184,
      216,
      2
     ],
     [
-     "func_001C76B8",
+     "modeSlotWaitHandler",
      1865400,
      188,
      2
     ],
     [
-     "func_001C7778",
+     "modeSlotActivate",
      1865592,
      168,
      2
@@ -37536,13 +37536,13 @@
      2
     ],
     [
-     "func_001C7940",
+     "modeSlotSwitchedHandler",
      1866048,
      212,
      2
     ],
     [
-     "func_001C7A18",
+     "flatSlotSpawn",
      1866264,
      336,
      2
@@ -37554,7 +37554,7 @@
      2
     ],
     [
-     "func_001C7BD0",
+     "flatSlotMarkAll",
      1866704,
      120,
      2
@@ -37602,7 +37602,7 @@
      2
     ],
     [
-     "func_001C8268",
+     "sbNativeSetLight",
      1868392,
      860,
      2
@@ -37626,7 +37626,7 @@
      2
     ],
     [
-     "func_001C8850",
+     "sbNativeSetPartsFlags",
      1869904,
      324,
      2
@@ -37674,13 +37674,13 @@
      2
     ],
     [
-     "func_001C8E68",
+     "sbNativeCosine",
      1871464,
      148,
      2
     ],
     [
-     "func_001C8F00",
+     "sbNativeSine",
      1871616,
      148,
      2
@@ -37692,7 +37692,7 @@
      2
     ],
     [
-     "func_001C9020",
+     "sbNativeSetModelSize",
      1871904,
      460,
      2
@@ -37740,7 +37740,7 @@
      2
     ],
     [
-     "func_001C98D8",
+     "sbNativeGetObjectTransform",
      1874136,
      284,
      2
@@ -37752,7 +37752,7 @@
      2
     ],
     [
-     "func_001C9D28",
+     "sbNativeSetEffectVector",
      1875240,
      292,
      2
@@ -37926,37 +37926,37 @@
      2
     ],
     [
-     "func_001CB238",
+     "scriptSlotObjectScaleOffsetSet",
      1880632,
      472,
      2
     ],
     [
-     "func_001CB410",
+     "scriptObjectSetupRequestSubmit",
      1881104,
      548,
      2
     ],
     [
-     "func_001CB638",
+     "scriptSlotObjectScaledArgSet",
      1881656,
      144,
      2
     ],
     [
-     "func_001CB6C8",
+     "scriptFogOverrideSet",
      1881800,
      484,
      2
     ],
     [
-     "func_001CB8B0",
+     "slotActorFogOverrideStore",
      1882288,
      48,
      2
     ],
     [
-     "func_001CB8E0",
+     "scriptRuntimeParamsSet",
      1882336,
      316,
      2
@@ -37986,7 +37986,7 @@
      2
     ],
     [
-     "func_001CBC98",
+     "scriptSlotObjectFlagBitsSet",
      1883288,
      200,
      2
@@ -37998,25 +37998,25 @@
      2
     ],
     [
-     "func_001CBD90",
+     "scriptSlotObjectPropertySet",
      1883536,
      832,
      2
     ],
     [
-     "func_001CC0D0",
+     "sbSetObjectBehaviorMode",
      1884368,
      76,
      2
     ],
     [
-     "func_001CC120",
+     "sbSetObjectFlagVector",
      1884448,
      196,
      2
     ],
     [
-     "func_001CC1E8",
+     "sbSetObjectAngle",
      1884648,
      156,
      2
@@ -38040,13 +38040,13 @@
      2
     ],
     [
-     "func_001CC2B8",
+     "scriptDispModelSlotPairVisibleSet",
      1884856,
      216,
      2
     ],
     [
-     "func_001CC390",
+     "scriptDispModelSlotPairHide",
      1885072,
      136,
      2
@@ -38058,13 +38058,13 @@
      2
     ],
     [
-     "func_001CC420",
+     "scriptEffectParamsSetDefault",
      1885216,
      176,
      2
     ],
     [
-     "func_001CC4D0",
+     "scriptEffectParamsSetChained",
      1885392,
      300,
      2
@@ -38088,13 +38088,13 @@
      2
     ],
     [
-     "func_001CC880",
+     "scriptCameraTargetFlagSet",
      1886336,
      168,
      2
     ],
     [
-     "func_001CC928",
+     "scriptDeferredCallRequest",
      1886504,
      188,
      2
@@ -38124,13 +38124,13 @@
      2
     ],
     [
-     "func_001CCBA8",
+     "scriptGameStateQuery",
      1887144,
      196,
      2
     ],
     [
-     "func_001CCC70",
+     "scriptRuntimeFlagToggle",
      1887344,
      396,
      2
@@ -38154,13 +38154,13 @@
      2
     ],
     [
-     "func_001CCF28",
+     "scriptMovieAutoSelectFlagGet",
      1888040,
      196,
      2
     ],
     [
-     "func_001CCFF0",
+     "scriptMovieFlagByteGet",
      1888240,
      220,
      2
@@ -38196,7 +38196,7 @@
      2
     ],
     [
-     "func_001CD410",
+     "scriptDispModelValueStore",
      1889296,
      128,
      2
@@ -38232,7 +38232,7 @@
      2
     ],
     [
-     "func_001CD610",
+     "sbNativeVibrationStart",
      1889808,
      256,
      2
@@ -38250,19 +38250,19 @@
      2
     ],
     [
-     "func_001CD758",
+     "sbNativeLoopScaleSet",
      1890136,
      176,
      2
     ],
     [
-     "func_001CD808",
+     "sbNativeActorPartsHide",
      1890312,
      612,
      2
     ],
     [
-     "func_001CDA70",
+     "sbNativeModelsTimeoutSet",
      1890928,
      132,
      2
@@ -38286,13 +38286,13 @@
      2
     ],
     [
-     "func_001CDBB8",
+     "sbNativeStoreValueAndStartFx",
      1891256,
      220,
      2
     ],
     [
-     "func_001CDC98",
+     "sbNativePlaySound",
      1891480,
      280,
      2
@@ -38316,7 +38316,7 @@
      2
     ],
     [
-     "func_001CDF68",
+     "soundOriginRecordCreate",
      1892200,
      320,
      2
@@ -38340,7 +38340,7 @@
      2
     ],
     [
-     "func_001CE438",
+     "soundSlotMovieControl",
      1893432,
      164,
      2
@@ -38370,7 +38370,7 @@
      2
     ],
     [
-     "func_001CE650",
+     "sbNativeMapProbeRequest",
      1893968,
      180,
      2
@@ -38388,19 +38388,19 @@
      2
     ],
     [
-     "func_001CE758",
+     "sbNativeValueSlotPush",
      1894232,
      96,
      2
     ],
     [
-     "func_001CE7B8",
+     "sbNativeValueSlotPop",
      1894328,
      60,
      2
     ],
     [
-     "func_001CE7F8",
+     "sbNativeValueSlotRun",
      1894392,
      124,
      2
@@ -38430,19 +38430,19 @@
      2
     ],
     [
-     "func_001CE990",
+     "sbNativeBufferGet",
      1894800,
      48,
      2
     ],
     [
-     "func_001CE9C0",
+     "sbNativeFileLoad",
      1894848,
      172,
      2
     ],
     [
-     "func_001CEA70",
+     "sbNativeBlockLoad",
      1895024,
      108,
      2
@@ -38460,73 +38460,73 @@
      2
     ],
     [
-     "func_001CEB20",
+     "sbNativeHandlerMessagePost",
      1895200,
      96,
      2
     ],
     [
-     "func_001CEB80",
+     "soundCueListenerUpdate",
      1895296,
      440,
      2
     ],
     [
-     "func_001CED38",
+     "soundCueCommand",
      1895736,
      388,
      2
     ],
     [
-     "func_001CEEC0",
+     "soundCueAmbientFadeOut",
      1896128,
      152,
      2
     ],
     [
-     "func_001CEF58",
+     "soundPanAngleFromOffset",
      1896280,
      240,
      2
     ],
     [
-     "func_001CF048",
+     "soundCueVoiceSync",
      1896520,
      188,
      2
     ],
     [
-     "func_001CF108",
+     "soundCueUpdate",
      1896712,
      1700,
      2
     ],
     [
-     "func_001CF7B0",
+     "soundCueSnapshotSave",
      1898416,
      280,
      2
     ],
     [
-     "func_001CF8C8",
+     "soundCueSnapshotRestore",
      1898696,
      248,
      2
     ],
     [
-     "func_001CF9C0",
+     "soundCueSeCommand",
      1898944,
      912,
      2
     ],
     [
-     "func_001CFD50",
+     "soundBankTagsSet",
      1899856,
      276,
      2
     ],
     [
-     "func_001CFE68",
+     "soundCueReset",
      1900136,
      696,
      2
@@ -38538,13 +38538,13 @@
      2
     ],
     [
-     "func_001D0148",
+     "nameMapLookup",
      1900872,
      200,
      2
     ],
     [
-     "func_001D0210",
+     "requestNameMappedPathGet",
      1901072,
      72,
      2
@@ -38556,19 +38556,19 @@
      2
     ],
     [
-     "func_001D02A0",
+     "nativeMethodEntryFind",
      1901216,
      72,
      2
     ],
     [
-     "func_001D02E8",
+     "actorScanEntryFind",
      1901288,
      72,
      2
     ],
     [
-     "func_001D0330",
+     "actorExtentShapeFromName",
      1901360,
      648,
      2

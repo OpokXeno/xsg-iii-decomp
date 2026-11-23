@@ -9,20 +9,20 @@ typedef struct RgDispModelHead {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu103", func_001D05B8);
 
-extern s32 D_00532FC0[];
+extern s32 gShapeAngleSecondTable[];
 
 s32 wordTableGetEntry(s32 entryNumber) {
-    return D_00532FC0[entryNumber];
+    return gShapeAngleSecondTable[entryNumber];
 
 }
 
-RgDispModelHead *func_001C0570();
+RgDispModelHead *RgDispModelFindByKey();
 
 s32 rgDispModelGetActorId(void) {
     RgDispModelHead *dispModel;
     s32 actorId;
 
-    dispModel = func_001C0570();
+    dispModel = RgDispModelFindByKey();
     actorId = 0;
     if (dispModel != 0) {
         actorId = dispModel->actorId;

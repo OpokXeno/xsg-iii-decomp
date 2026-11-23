@@ -5,11 +5,11 @@
 
 typedef int s32;
 extern s32 gSbScriptImageHandle;
-s32 func_001CE990(s32);
+s32 sbNativeBufferGet(s32);
 
 void sbScriptImageInit(void) {
     gSbScriptImageHandle = 0;
-    gSbScriptImageHandle = func_001CE990(1);
+    gSbScriptImageHandle = sbNativeBufferGet(1);
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu043", func_00A8EED0);

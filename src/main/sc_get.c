@@ -10,10 +10,10 @@ int scOfsToAdr(int encodedOffset);
 INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ECA60);
 
 typedef int s32;
-s32 func_001CF9C0(s32, s32, s32, s32);
+s32 soundCueSeCommand(s32, s32, s32, s32);
 
 void scQueueDefaultRequest(void) {
-    func_001CF9C0(0, -3, 0, 0);
+    soundCueSeCommand(0, -3, 0, 0);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sc_get", func_001ECE98);

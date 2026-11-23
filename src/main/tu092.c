@@ -1,17 +1,17 @@
 #include "common.h"
 
 typedef int s32;
-s32 func_001C4FC8();
+s32 xenoSpawnerAimAtTarget();
 
 s32 vmShootTrap(void) {
-    func_001C4FC8();
+    xenoSpawnerAimAtTarget();
     return 1;
 }
 
-s32 func_001C7BD0();
+s32 flatSlotMarkAll(void);
 
 s32 vmClearTrap(void) {
-    func_001C7BD0();
+    flatSlotMarkAll();
     return 1;
 }
 
