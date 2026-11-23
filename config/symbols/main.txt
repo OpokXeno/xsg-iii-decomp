@@ -10001,6 +10001,7 @@ headerALL = 0x004C69B0;
 imm0_3 = 0x004C6C20;
 imm1_4 = 0x004C6CC0;
 seVolumeCurveTable = 0x004C6F88;
+soundSongRangeSet = 0x004C6FD0;
 seMasterVolumeRamp = 0x004C7044;
 xglIntcSlotMap = 0x004C7AA8;
 xglDmaSlotMap = 0x004C7AD8;

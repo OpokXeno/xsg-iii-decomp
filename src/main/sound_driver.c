@@ -7,19 +7,6 @@
 int soundDriverReset(void);
 int korgEvagAllUnitsSoundOff(void);
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E6F0);
-
-void func_0018E6F0(int a0, int a1, int a2, unsigned int a3);
-
-void seBgmLoadDefault(int a0, int a1, int a2)
-{
-    func_0018E6F0(a0, a1, a2, 0);
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
-
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E940);
-
 /* One 16-byte sound slot. Driver calls take driver_id; the create call takes the voice's work
  * buffer and its size. */
 typedef struct SoundSlot {
@@ -58,14 +45,16 @@ typedef union SoundChannelState {
     } bytes;
 } SoundChannelState;
 
+/* Channels in the assignment table of the record block (soundApplySettings counts its channel states with SOUND_CHANNEL_COUNT). */
+#define SOUND_ASSIGN_COUNT 0x118
 typedef struct SoundRecordBlock {
     unsigned char master_volume; /* +0x00: scales the level of slot 0 */
     unsigned char volumeLevels[3];
-    int current_song;            /* +0x04 */
+    unsigned char current_song;  /* +0x04: selects the channel range set (soundSongRangeSet) */
+    unsigned char unmodeled_05[3];
     int driver_work;             /* +0x08 */
     VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
-    int reset_word;              /* +0x10 */
-    int lookupTable[279];        /* +0x14 */
+    unsigned int channelAssign[SOUND_ASSIGN_COUNT]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
     unsigned char unmodeled_470[0x534 - 0x470];
     SoundChannelState table_b[63]; /* +0x534: channels 1..63, see soundApplySettings */
     SoundSlot soundSlotRecords[4]; /* +0x630 */
@@ -76,6 +65,56 @@ extern unsigned char gSeBankFileExt[];
 extern SoundRecordBlock gSoundRecordBlock;
 extern s32 D_004C7040[];
 extern unsigned char gSeBankDirName[];
+
+/* Ids below SOUND_RANGE_IDS take their channel range from the range set of the current song. */
+#define SOUND_RANGE_IDS 0x100
+#define SOUND_RANGE_SET_COUNT 3
+#define SOUND_RANGE_BOUNDARIES 32 /* boundaries per range set */
+/* The range set (row of the range table) of each song number. */
+extern unsigned char soundSongRangeSet[];
+
+/* Assigns the channels of `id` to (id, a1, a2): ids below SOUND_RANGE_IDS use the range between
+ * their boundary and the next one in the current song's range set, other ids the one channel
+ * id & 0xFF. A nonzero `range` (first << 16 | count) gives the range relative to that start. */
+void func_0018E6F0(int id, int a1, int a2, unsigned int range)
+{
+    unsigned short boundaries[SOUND_RANGE_SET_COUNT][SOUND_RANGE_BOUNDARIES] = {
+        { 0x001, 0x013, 0x020, 0x02B, 0x100, 0x118, 0x130, 0x040, 0x042, 0x046, 0x04A, 0x04E,
+          0x052, 0x056, 0x05A, 0x05E, 0x060, 0x080, 0x0A0, 0x0AF, 0x0B9, 0x0EC, 0x0FF },
+        { 0x001, 0x013, 0x020, 0x02B, 0x060, 0x078, 0x090, 0x040, 0x0A8, 0x0C0, 0x0D8, 0x0F0,
+          0x0FF },
+        { 0x001, 0x013, 0x020, 0x02B, 0x040, 0x04C, 0x060, 0x066, 0x070, 0x040, 0x0C0, 0x0D0,
+          0x0E0, 0x0F0, 0x0FF },
+    };
+    int first;
+    int last;
+    int channel;
+
+    if (id < SOUND_RANGE_IDS) {
+        first = boundaries[soundSongRangeSet[gSoundRecordBlock.current_song]][id];
+        last = boundaries[soundSongRangeSet[gSoundRecordBlock.current_song]][id + 1];
+    } else {
+        last = id & 0xFF;
+        first = last;
+    }
+    if (range != 0) {
+        first += range >> 16;
+        last = first + (range & 0xFFFF);
+    }
+    for (channel = first; channel < last; channel++) {
+        gSoundRecordBlock.channelAssign[channel] = (id << 24) + (a1 << 16) + (a2 << 8) + (channel - first);
+    }
+}
+
+void seBgmLoadDefault(int a0, int a1, int a2)
+{
+    func_0018E6F0(a0, a1, a2, 0);
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
+
+INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E940);
+
 void func_001801C0();
 int func_0018EC68(int channel);
 

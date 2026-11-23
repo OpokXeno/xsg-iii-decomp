@@ -74,6 +74,7 @@
    "0x004c6c20": "imm0_3",
    "0x004c6cc0": "imm1_4",
    "0x004c6f88": "seVolumeCurveTable",
+   "0x004c6fd0": "soundSongRangeSet",
    "0x004c7044": "seMasterVolumeRamp",
    "0x004c7aa8": "xglIntcSlotMap",
    "0x004c7ad8": "xglDmaSlotMap",
