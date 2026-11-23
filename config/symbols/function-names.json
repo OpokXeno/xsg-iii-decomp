@@ -24,6 +24,7 @@
    "0x001828a0": "xglFontGetStringWidth2",
    "0x00182e78": "xglFontGetStringWidth",
    "0x001831d0": "xglFontParseHex",
+   "0x00184938": "xglFontGetGlyphIndex",
    "0x00185ee8": "xglDmaBufferReset",
    "0x00186198": "xglDmaInitial",
    "0x001863f0": "xglPadRead",

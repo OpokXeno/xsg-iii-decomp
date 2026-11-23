@@ -105,9 +105,9 @@
       "0x0053ffb0"
      ],
      "generated_by": [
-      "xglFontPrintSub",
       "xglFontCmdXx",
-      "xglFontParseHex"
+      "xglFontParseHex",
+      "xglFontPrintSub"
      ],
      "c_owned_symbols": [
       "jtbl_0053FD50",
@@ -118,6 +118,28 @@
       "spCodeParameterSizeTable",
       "fontInlineErrorFormat"
      ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_font.o"
+     }
+    },
+    {
+     "range": [
+      "0x00540080",
+      "0x005400c0"
+     ],
+     "generated": [
+      "0x00540080",
+      "0x005400b4"
+     ],
+     "generated_by": [
+      "func_00184938"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00540080"
+     ],
+     "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",

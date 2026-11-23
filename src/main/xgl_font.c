@@ -43,6 +43,9 @@ void *sceVif1PkReserve(XglPacket *packet, unsigned int words);
 #define EUC_ROW_HIRAGANA 0xa4
 #define EUC_ROW_KATAKANA 0xa5
 #define EUC_ROW_GREEK 0xa6
+#define EUC_ROW_CYRILLIC 0xa7
+#define EUC_ROW_BOX_DRAWING 0xa8
+#define EUC_ROW_HALF_WIDTH 0xa9
 #define EUC_ROW_NEC_SPECIAL 0xad
 #define EUC_ROW_SYMBOLS_2 0xa2
 #define EUC_ROW_KANJI_LEVEL1 0xb0
@@ -125,7 +128,7 @@ extern int fontAsciiWidthTable[];
 int xglFontParseNumber(const char **cursor, int *parsedNumber);
 unsigned short xglFontCharToEuc(signed char character, unsigned char **text);
 unsigned int xglFontGetDebugCell(unsigned char eucRow, unsigned char eucColumn);
-unsigned short xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn);
+int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn);
 /* * Reads a hex number up to ';' or ',' and moves the text cursor past the delimiter; returns 0 on any * other character. */
 int xglFontParseHex(const char **cursor, int *parsedNumber);
 
@@ -155,6 +158,12 @@ int xglFontFindPairGlyph(unsigned char eucRow, unsigned char eucColumn);
 #define FONT_GLYPH_NONE 0x7F
 /* The level-1 kanji glyphs follow the 0x400 symbol and kana glyphs. */
 #define FONT_GLYPH_KANJI_BASE 0x400
+/* Set above the 12-bit glyph index on some symbol glyphs; xglFontGetProportionalSize masks it off. */
+#define FONT_GLYPH_SYMBOL_FLAG 0x1000
+/* The symbol-row columns whose glyphs carry FONT_GLYPH_SYMBOL_FLAG: 0xB9, 0xBC and all from 0xF9 on. */
+#define EUC_SYMBOL_FLAGGED_A 0xb9
+#define EUC_SYMBOL_FLAGGED_B 0xbc
+#define EUC_SYMBOL_FLAGGED_FROM 0xf9
 
 int xglFontInlineCommand(FontDrawCursor *cursor, const char **text);
 /* The kana cell codes of the debug font, one per EUC column (copied to the stack before use). */
@@ -1356,7 +1365,82 @@ void xglFontFlushSubCRLF(void)
     cursor->y += (signed char) xglFontState.default_width;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184938);
+/* Glyph index of an EUC-JP code. Returns int, unlike XS2's unsigned short: the shared return is not
+ * truncated, only the kanji and pair results are (an unsigned short return adds the masks). */
+int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn)
+{
+    int glyph;
+
+    if (eucRow < EUC_ROW_KANJI_LEVEL1) {
+        glyph = FONT_GLYPH_NONE;
+        switch (eucRow) {
+        case EUC_ROW_SYMBOLS:
+            glyph = (unsigned short)(eucColumn - EUC_FIRST);
+            if (eucColumn == EUC_SYMBOL_FLAGGED_A || eucColumn == EUC_SYMBOL_FLAGGED_B
+                || eucColumn >= EUC_SYMBOL_FLAGGED_FROM) {
+                glyph |= FONT_GLYPH_SYMBOL_FLAG;
+            }
+            break;
+        case EUC_ROW_SYMBOLS_2:
+            switch (eucColumn & 0xF0) {
+            case 0xA0:
+                glyph = (eucColumn & 0xF) + FONT_GLYPH_SYMBOL_FLAG + 93;
+                break;
+            case 0xE0:
+                glyph = (eucColumn & 0xF) + 108;
+                break;
+            case 0xF0:
+                glyph = (eucColumn & 0xF) + 117;
+                break;
+            }
+            break;
+        case EUC_ROW_ALNUM:
+            switch (eucColumn & 0xE0) {
+            case 0xA0:
+                glyph = (eucColumn & 0xF) + 128;
+                break;
+            case 0xC0:
+                glyph = (eucColumn & 0x1F) + 137;
+                break;
+            case 0xE0:
+                glyph = (eucColumn & 0x1F) + 163;
+                break;
+            }
+            break;
+        case EUC_ROW_HIRAGANA:
+            glyph = eucColumn + 31;
+            break;
+        case EUC_ROW_KATAKANA:
+            glyph = eucColumn + 127;
+            break;
+        case EUC_ROW_GREEK:
+            if (eucColumn < 0xC0) {
+                glyph = (eucColumn & 0x1F) + 383;
+            } else {
+                glyph = (eucColumn & 0x1F) + 407;
+            }
+            break;
+        case EUC_ROW_CYRILLIC:
+            glyph = (unsigned short)(eucColumn < 0xD0 ? eucColumn + 271 : eucColumn + 256);
+            break;
+        case EUC_ROW_BOX_DRAWING:
+            glyph = eucColumn + 351;
+            break;
+        case EUC_ROW_HALF_WIDTH:
+            glyph = eucColumn + 256;
+            break;
+        case EUC_ROW_NEC_SPECIAL:
+            glyph = eucColumn + 383;
+            break;
+        }
+    } else if (eucRow < EUC_ROW_KANJI_LEVEL2) {
+        glyph = (unsigned short)((eucRow - EUC_ROW_KANJI_LEVEL1) * FONT_JIS_ROW_SIZE + (eucColumn - EUC_FIRST)
+                                 + FONT_GLYPH_KANJI_BASE);
+    } else {
+        glyph = (unsigned short)xglFontFindPairGlyph(eucRow, eucColumn);
+    }
+    return glyph;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184B30);
 

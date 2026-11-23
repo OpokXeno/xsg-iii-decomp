@@ -37508,9 +37508,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00184938",
+     "name": "xglFontGetGlyphIndex",
      "size": 500,
-     "splat_name": "func_00184938",
+     "splat_name": "xglFontGetGlyphIndex",
      "va": "0x00184938",
      "name_basis": "address",
      "provenance": "estimated"
