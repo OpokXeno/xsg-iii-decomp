@@ -385,6 +385,7 @@
    "0x002f3e88": "sceGsSetDefStoreImage",
    "0x002f3fc8": "sceGsExecLoadImage",
    "0x002f4148": "sceGsExecStoreImage",
+   "0x002f47d8": "sceGsSyncVCallback",
    "0x002f4908": "sceVif1PkCnt",
    "0x002f4960": "sceVif1PkRef",
    "0x002f4ac0": "sceVif1PkOpenUpkCode",

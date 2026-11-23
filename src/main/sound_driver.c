@@ -58,7 +58,7 @@ typedef struct SoundRecordBlock {
     unsigned char volumeLevels[3];
     unsigned char current_song;  /* +0x04: selects the channel range set (soundSongRangeSet) */
     unsigned char unmodeled_05[3];
-    int driver_work;             /* +0x08 */
+    unsigned char *driver_work;  /* +0x08: the driver work area D_0089BF00 */
     VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
     unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
     unsigned char unmodeled_530[0x534 - 0x530];
@@ -778,6 +778,74 @@ void soundSlotsCreateAll(void)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018FD58);
+/* The parameter block of the IOP sound driver setup (func_0017CE40 passes the six words on as they
+ * are); the setup gives only the first and the last word. */
+typedef struct SoundIopSetup {
+    int workSize;        /* +0x00 */
+    int unmodeled_04[4];
+    int workAddress;     /* +0x14 */
+} SoundIopSetup;
+#define SOUND_IOP_WORK_SIZE 0x35100
+#define SOUND_IOP_WORK_ADDRESS 0x1D9000
+/* No song loaded. */
+#define SOUND_SONG_NONE 0xFF
+/* Channels below SOUND_RANGE_IDS have a voice the setup switches on. */
+#define SOUND_SLOT_RECORDS 4
+#define SOUND_CHANNEL_STATES (SOUND_CHANNEL_COUNT - 1) /* channels 1..63 */
+extern unsigned char D_0089BF00[];
+void func_00166B30(int value);
+void func_0015F8C8(int value);
+int sceGsSyncVCallback(int (*callback)(void));
+void func_0015DD88(void);
+void func_0017CE40(SoundIopSetup *setup);
+void func_0017D020(void);
+int func_0017ED00(unsigned char channel, int enable);
+s32 func_00303328();
+
+/* The sound driver setup: no song, the IOP driver with its work area, song 0 at full volume, every
+ * channel assignment, channel state and slot record cleared, then the two output settings. */
+void func_0018FD58(void)
+{
+    SoundIopSetup setup;
+    int channel;
+    int slot;
+
+    gSoundRecordBlock.current_song = SOUND_SONG_NONE;
+    func_00166B30(0);
+    func_0015F8C8(0);
+    sceGsSyncVCallback(soundVSyncCallback);
+    func_0015DD88();
+    func_00160CE8(0);
+    memset(&setup, 0, sizeof(setup));
+    setup.workSize = SOUND_IOP_WORK_SIZE;
+    setup.unmodeled_04[0] = 0;
+    setup.unmodeled_04[1] = 0;
+    setup.unmodeled_04[2] = 0;
+    setup.workAddress = SOUND_IOP_WORK_ADDRESS;
+    func_0017CE40(&setup);
+    func_0017D020();
+    func_00180978(0, 0xA0320000, 0x7D);
+    func_0018FAC8(0);
+    soundSetFullVolume();
+    gSoundRecordBlock.channelAssign[0] = 0;
+    for (channel = 1; channel < SOUND_RANGE_IDS; channel++) {
+        gSoundRecordBlock.channelAssign[channel] = 0;
+        func_0017ED00(channel, 1);
+    }
+    for (; channel < SOUND_ASSIGN_COUNT; channel++) {
+        gSoundRecordBlock.channelAssign[channel] = 0;
+    }
+    for (channel = 1; channel < SOUND_CHANNEL_COUNT; channel++) {
+        gSoundRecordBlock.table_b[channel - 1].word = 0;
+    }
+    for (slot = 0; slot < SOUND_SLOT_RECORDS; slot++) {
+        gSoundRecordBlock.soundSlotRecords[slot].voiceWork.voiceWorkBuffer = 0;
+        gSoundRecordBlock.soundSlotRecords[slot].voiceWork.voiceWorkSize = 0;
+        gSoundRecordBlock.soundSlotRecords[slot].driver_id = 0;
+    }
+    gSoundRecordBlock.driver_work = D_0089BF00;
+    func_00303328(1, 0x8010, 0x800, 0xFF0);
+    func_00303328(1, 0x8010, 0x801, 0xFCC);
+}
 
 /* <<< CHUNK sound_driver */

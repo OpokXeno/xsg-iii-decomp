@@ -324,7 +324,7 @@ extern unsigned short moviePlayerHeight;
 
 void func_002FB030(void);
 
-void func_002F47D8(int value);
+int sceGsSyncVCallback(int (*callback)(void));
 
 void func_00132140(void);
 
@@ -428,7 +428,7 @@ void moviePlayerInit(void)
 
 void moviePlayerTerminate(void)
 {
-    func_002F47D8(0);
+    sceGsSyncVCallback(0);
     func_00132140();
     func_00167790();
     func_0015DF18();

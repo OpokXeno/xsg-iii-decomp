@@ -496,10 +496,10 @@ extern volatile unsigned int gVsyncsSinceFlip;
 
 extern unsigned char func_00199CE0[];
 
-s32 func_002F47D8();
+s32 sceGsSyncVCallback();
 
 void xglRenderSyncInit(void) {
-    func_002F47D8(func_00199CE0);
+    sceGsSyncVCallback(func_00199CE0);
     gVsyncsSinceFlip = 0;
 }
 
