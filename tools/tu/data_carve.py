@@ -6649,7 +6649,11 @@ def _derive_current(root, unit, unit_dir, tu_id, source, obj, *, _declared=None,
                     del declared[sec]
     orig = None
     names_ref = {s.name for s in elf.symbols if s.name and s.shndx == 0}
-    names_def = {s.name for s in elf.symbols if s.name and 0 < s.shndx < 0xff00 and s.type in (0, 1)}
+    # Compiler-local labels ($LC1, $L28) are names private to the object; splat may reuse the
+    # same spelling for an unrelated original item (ov04 `$LC1`, a jump table of another TU),
+    # so they never claim an original item by name (X3 ov04/tu005, 2026-11-22).
+    names_def = {s.name for s in elf.symbols if s.name and 0 < s.shndx < 0xff00 and s.type in (0, 1)
+                 and not s.name.startswith('$')}
     al = aliases(unit_dir)
     extern = set(names_ref)
     for n in names_ref:

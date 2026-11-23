@@ -431,7 +431,7 @@ extern float D_005500B8;
 extern float D_005500BC;
 extern float D_005500C0;
 extern float D_005500C4;
-void func_00299E98(TiMRPackage *pMRPackage, Matrix4 *globalMat);
+void tiMotionSolveLocalMatrices(TiMRPackage *pMRPackage, Matrix4 *globalMat);
 void func_0029AD70(TiMRPackage *pMRPackage);
 void func_0029C9A8(TiMRPackage *pMRPackage, Matrix4 *globalMat);
 void func_0029B8C0(TiMRPackage *pMRPackage);

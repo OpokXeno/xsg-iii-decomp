@@ -99,12 +99,7 @@ segments:
       - [0x7D8D0, c, pxy_profile_037]
       - [0x7DF80, c, tu038]
       - [0x7E6F0, c, tu039]
-      - [0x7F148, c, tu040]
-      - [0x7F510, c, tu041]
-      - [0x7F918, c, cfePlugIn]
-      - [0x7FEE8, c, nml_model_set]
-      - [0x7FF40, c, nml_model_set_044]
-      - [0x80580, c, nml_model_set_045]
+      - [0x7F148, c, nml_model_set]
       - [0x8B9D0, c, pxy_packet_state]
       - [0x904C8, c, cur_matrix_asm]
       - [0x90D58, c, model_calc_clip]
@@ -168,8 +163,6 @@ segments:
       - [0xB4FC0, c, sb_natives]
       - [0xB5520, c, tu107]
       - [0xB5C30, c, tu108]
-      - [0xB6B28, c, tu109]
-      - [0xB7370, c, tu110]
       - [0xC3450, c, tu111]
       - [0xC5F10, c, tu112]
       - [0xC7DE8, c, tu113]
@@ -577,7 +570,7 @@ segments:
       - [0x3A93F8, data, tu391]
       - [0x3A9414, data, tu051]
       - [0x3A9510, data, tu038]
-      - [0x3A9A80, data, tu041]
+      - [0x3A9A80, data, nml_model_set]
       - [0x3A9B20, data, rg_heap_debug]
       - [0x3A9F20, data, TiDrawCollision]
       - [0x3AA820, data, TiDrawJoint]
@@ -614,7 +607,7 @@ segments:
       - [0x411CC0, rodata, tu262]
       - [0x411CF0, rodata, tu264]
       - [0x411D00, rodata, tu265]
-      - [0x411D78, rodata, tu292]
+      - [0x411D38, rodata, tu292]
       - [0x411E30, rodata, tu293]
       - [0x411E70, rodata, tu253]
       - [0x411E78, rodata, tu254]
@@ -717,7 +710,6 @@ segments:
       - [0x41F2B0, rodata, sb_vm]
       - [0x41F418, rodata, tu107]
       - [0x41F740, rodata, tu108]
-      - [0x41F760, rodata, tu110]
       - [0x41F7A0, rodata, tu111]
       - [0x41F7D0, rodata, tu112]
       - [0x41F860, rodata, tu113]
@@ -728,8 +720,9 @@ segments:
       - [0x41F9C0, rodata, sdv_alter]
       - [0x41FA90, rodata, tu127]
       - [0x41FEC8, rodata, tu128]
-      - [0x41FF10, rodata, sef]
-      - [0x420278, rodata, sv_get_image_item]
+      - [0x41FEE0, rodata, sef]
+      - [0x420230, rodata, sv_scene_flags]
+      - [0x420258, rodata, sv_get_image_item]
       - [0x4204A0, rodata, draw_list]
       - [0x4204A8, rodata, tu150]
       - [0x4204B8, rodata, srs]
@@ -757,8 +750,7 @@ segments:
       - [0x4224F0, rodata, Packet]
       - [0x422B70, rodata, face_point]
       - [0x422DC8, rodata, pxy_profile_037]
-      - [0x422DE0, rodata, cfePlugIn]
-      - [0x422DF0, rodata, nml_model_set_045]
+      - [0x422DE0, rodata, nml_model_set]
       - [0x422EA0, rodata, pxy_packet_state]
       - [0x423178, rodata, rg_heap_debug]
       - [0x4236C0, rodata, TiCameraSolver]
@@ -875,7 +867,7 @@ segments:
       - [0x430ADC, lit4, tu398]
       - [0x430B78, lit4, tu400]
       - [0x430B84, lit4, sb_natives]
-      - [0x430B88, lit4, tu110]
+      - [0x430B88, lit4, tu108]
       - [0x430C1C, lit4, tu111]
       - [0x430C20, lit4, tu112]
       - [0x430C2C, lit4, tu115]
@@ -906,8 +898,7 @@ segments:
       - [0x430FD0, lit4, Packet]
       - [0x430FD4, lit4, face_point]
       - [0x430FD8, lit4, pxy_profile_037]
-      - [0x430FEC, lit4, tu041]
-      - [0x430FF4, lit4, nml_model_set_045]
+      - [0x430FEC, lit4, nml_model_set]
       - [0x431060, lit4, pxy_packet_state]
       - [0x431088, lit4, TiCameraSolver]
       - [0x431098, lit4, TiDrawCollision]
@@ -1006,7 +997,7 @@ segments:
       - [0x431FC4, sdata, tu398]
       - [0x431FD0, sdata, tu399]
       - [0x431FDC, sdata, tu401]
-      - [0x432000, sdata, tu110]
+      - [0x432000, sdata, tu108]
       - [0x43201C, sdata, tu119]
       - [0x432024, sdata, sc_get]
       - [0x43203C, sdata, sdv_alter]
@@ -1032,8 +1023,7 @@ segments:
       - [0x43221C, sdata, xgl_studio]
       - [0x43222C, sdata, face_point]
       - [0x432230, sdata, tu038]
-      - [0x432240, sdata, nml_model_set_045]
-      - [0x432248, sdata, tu041]
+      - [0x432240, sdata, nml_model_set]
       - [0x432250, sdata, pxy_packet_state]
       - [0x4322A8, sdata, rg_heap_debug]
       - [0x4322B4, sdata, TiGlobalColl]
@@ -1088,7 +1078,7 @@ segments:
       - { type: sbss, vram: 0x005514E4, name: tu395 }
       - { type: sbss, vram: 0x005514F8, name: tu401 }
       - { type: sbss, vram: 0x00551500, name: sb_vm }
-      - { type: sbss, vram: 0x0055150C, name: tu110 }
+      - { type: sbss, vram: 0x0055150C, name: tu108 }
       - { type: sbss, vram: 0x00551510, name: sc_get }
       - { type: sbss, vram: 0x00551514, name: sef }
       - { type: sbss, vram: 0x00551518, name: sv_get_image_item }
@@ -1181,7 +1171,7 @@ segments:
       - { type: bss, vram: 0x0060E080, name: tu403 }
       - { type: bss, vram: 0x0060E0A0, name: tu400 }
       - { type: bss, vram: 0x0060E0C0, name: sb_vm }
-      - { type: bss, vram: 0x0061A2C0, name: tu110 }
+      - { type: bss, vram: 0x0061A2C0, name: tu108 }
       - { type: bss, vram: 0x0061AAC0, name: tu112 }
       - { type: bss, vram: 0x0061B018, name: tu115 }
       - { type: bss, vram: 0x00628050, name: tu119 }
@@ -1208,12 +1198,8 @@ segments:
       - { type: bss, vram: 0x008BC260, name: Packet }
       - { type: bss, vram: 0x008BC2C0, name: xgl_studio }
       - { type: bss, vram: 0x008BF8C0, name: face_point }
-      - { type: bss, vram: 0x008C030C, name: nml_model_set_045 }
       - { type: bss, vram: 0x008C06B0, name: pxy_profile_037 }
-      - { type: bss, vram: 0x008C2BB4, name: nml_model_set_044 }
-      - { type: bss, vram: 0x008C2C14, name: nml_model_set }
-      - { type: bss, vram: 0x008C2C50, name: cfePlugIn }
-      - { type: bss, vram: 0x008C2C90, name: tu041 }
+      - { type: bss, vram: 0x008C28B0, name: nml_model_set }
       - { type: bss, vram: 0x008E2670, name: pxy_packet_state }
       - { type: bss, vram: 0x008E26D0, name: rg_heap_debug }
       - { type: bss, vram: 0x008E5790, name: TiDrawJoint }

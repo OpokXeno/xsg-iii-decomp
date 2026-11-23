@@ -107,102 +107,6 @@ s32 njStringTextTooWide(const char *text, s32 maxWidth, s32 scale)
   return maxWidth < xglFontGetStringWidth(&measured[0]);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D6CA8);
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8358);
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8458);
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D86C8);
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D88D8);
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8A00);
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8B30);
-
-void njStringSetText(NjString *string, unsigned char *text) {
-    char display[0x800];
-
-    string->text = text;
-    string->currentLine = 1;
-    if ((text != 0) && (string->styleFlags & NJ_STRING_STYLE_LAYOUT_ON_SET)) {
-        njStringLayoutText(string, display);
-    }
-}
-
-void njStringSetPositionB(NjString *string, f32 x, f32 y) {
-    string->x = x;
-    string->y = y;
-}
-
-void njStringSetZoomB(NjString *string, s8 zoomX, s8 zoomY) {
-    string->zoomX = zoomX;
-    string->zoomY = zoomY;
-}
-
-void njStringSetColorB(NjString *string, s32 red, s32 green, s32 blue) {
-    s32 redByte;
-    s32 greenByte;
-    s32 blueByte;
-
-    redByte = red;
-    if (red < 0) {
-        redByte = 0;
-    }
-    greenByte = green;
-    if (green < 0) {
-        greenByte = 0;
-    }
-    blueByte = blue;
-    if (blue < 0) {
-        blueByte = 0;
-    }
-    if (redByte >= 0x100) {
-        redByte = 0xFF;
-    }
-    string->red = (f32) redByte;
-    if (greenByte >= 0x100) {
-        greenByte = 0xFF;
-    }
-    string->green = (f32) greenByte;
-    if (blueByte >= 0x100) {
-        blueByte = 0xFF;
-    }
-    string->blue = (f32) blueByte;
-}
-
-void njStringSetAlphaB(NjString *string, s32 alpha) {
-    s32 alphaValue;
-
-    alphaValue = alpha;
-    if (alpha < 0) {
-        alphaValue = 0;
-    }
-    if (alphaValue >= 0x80) {
-        alphaValue = 0x7F;
-    }
-    string->alpha = (f32) alphaValue;
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8C80);
-
-void njStringSetFlagsB(NjString *string, s32 styleFlags) {
-    string->styleFlags = styleFlags;
-}
-
-void njStringSetFirstVisibleLine(NjString *string, s32 line) {
-    string->firstVisibleLine = line & 0xFF;
-}
-
-void njStringSetVisibleLineSpan(NjString *string, s32 span) {
-    string->visibleLineSpan = span & 0xFF;
-}
-
-void njStringSetWordFC(NjString *string, s32 value) {
-    string->wordFC = value;
-}
-
 const char *xglFontCopyTextUnit(char *textUnitBuffer, const char *text, int *length);
 
 /*
@@ -306,6 +210,443 @@ extern char gNjStringHighlightRgb[];                       /* "f24040": highligh
         lineLength += NJ_ICON_BLANK_LENGTH;                                                              \
         text += TAG_LENGTH("<L1>");                                                                      \
     }
+
+/* Byte writers of njStringLayoutLine: at the end of the display text, or of the measured line. */
+#define DISPLAY_PUT(k, value) display[displayLength + (k)] = (value)
+#define LINE_PUT(k, value) lineText[lineLength + (k)] = (value)
+
+/* Records a button icon at the measured pen x of line 0 (njStringLayoutLine). */
+#define NJ_STRING_MEASURE_ICON_RECORD(icon)                                                              \
+    if (string->iconCount < NJ_STRING_MAX_ICONS) {                                                       \
+        lineText[lineLength] = '\0';                                                                     \
+        iconX = xglFontGetStringWidth(lineText) + penOffsetX;                                            \
+        string->icons[string->iconCount].line = 0;                                                       \
+        string->icons[string->iconCount].button = (icon);                                                \
+        string->icons[string->iconCount].x = iconX;                                                      \
+        string->iconCount++;                                                                             \
+    }
+
+/* Reads the decimal digits before a tag's '>' into `number`, with `text` left on the first character that is not one. */
+#define NJ_STRING_READ_NUMBER(number)                                                                    \
+    do {                                                                                                 \
+        int tens;                                                                                        \
+                                                                                                         \
+        while ((digit = *scan++) != '>' && (unsigned char)(digit - '0') < 10) {                          \
+            tens = number * 10;                                                                          \
+            number = tens + digit - '0';                                                                 \
+            text++;                                                                                      \
+        }                                                                                                \
+    } while (0)
+
+/* Records a button icon, leaves a blank of width `blankWidth` for it and skips its 4-byte tag. */
+#define NJ_STRING_MEASURE_ICON(icon, blankWidth)                                                         \
+    {                                                                                                    \
+        NJ_STRING_MEASURE_ICON_RECORD(icon);                                                             \
+        NJ_ICON_BLANK(DISPLAY_PUT, blankWidth);                                                          \
+        displayLength += NJ_ICON_BLANK_LENGTH;                                                           \
+        NJ_ICON_BLANK(LINE_PUT, blankWidth);                                                             \
+        lineLength += NJ_ICON_BLANK_LENGTH;                                                              \
+        text += TAG_LENGTH("<L1>");                                                                      \
+    }
+
+/*
+ * Lays out one line of markup text (the text up to and including its "\n", CR LF or LF) into `display`, like
+ * njStringLayoutText without the visible-line window, and measures it: returns the line's width, keeps the widest
+ * in string->layoutCount and leaves the text after each line break in string->nextText. A <xN> pen move restarts
+ * the measured line.
+ */
+s32 njStringLayoutLine(NjString *string, char *markupLine, char *display)
+{
+    char lineText[0x400];
+    char colorSpanTag[NJ_COLOR_COMMAND_LENGTH];
+    char defaultZoomDigits[4];
+    char zoomSpanDigits[4];
+    NjStringProportionalStyle proportionalStyle = gNjStringProportionalStyle;
+    NjStringFixedStyle fixedStyle = gNjStringFixedStyle;
+    NjStringLineStartX lineStartX = gNjStringLineStartX;
+    NjStringScaleCode defaultScale = gNjStringDefaultScale;
+    char textUnit[16];
+    char penXDigits[3];
+    int unitLength;
+    unsigned char *text;
+    int penOffsetX;
+    int proportional;
+    int displayLength;
+    int lineLength;
+    int width;
+    int iconX;
+    int zoomX;
+    int zoomY;
+    f32 x;
+
+    zoomX = string->zoomX;
+    zoomY = string->zoomY;
+    defaultScale.bytes[1] = zoomX;
+    defaultScale.bytes[2] = zoomY;
+    text = (unsigned char *)markupLine;
+    penOffsetX = 0;
+    defaultZoomDigits[0] = zoomX / 10 + '0';
+    defaultZoomDigits[1] = zoomX % 10 + '0';
+    defaultZoomDigits[2] = zoomY / 10 + '0';
+    defaultZoomDigits[3] = zoomY % 10 + '0';
+    x = string->x;
+    if (x <= 255.0f) {
+        lineStartX.bytes[1] = x;
+    } else {
+        lineStartX.bytes[0] = FONT_OP_POS_X_1;
+        lineStartX.bytes[1] = x - 255.0f;
+    }
+    displayLength = lineLength = NJ_STYLE_CODE_LENGTH;
+    proportional = 1;
+    memset(lineText, 0, sizeof(lineText));
+    string->iconCount = 0;
+    string->nextText = 0;
+    display[0] = lineText[0] = proportionalStyle.bytes[0];
+    display[1] = lineText[1] = proportionalStyle.bytes[1];
+    display[displayLength] = lineText[lineLength] = defaultScale.bytes[0];
+    display[3] = defaultScale.bytes[1];
+    display[4] = defaultScale.bytes[2];
+    lineText[3] = defaultScale.bytes[1];
+    lineText[4] = defaultScale.bytes[2];
+    displayLength += 3;
+    lineLength += 3;
+    if (*text != 0) {
+        do {
+            xglFontCopyTextUnit(textUnit, (const char *)text, &unitLength);
+            switch (unitLength) {
+            case 2:
+                if (!(string->styleFlags & NJ_STRING_STYLE_PROPORTIONAL_ONLY) && proportional) {
+                    DISPLAY_PUT(0, fixedStyle.bytes[0]);
+                    DISPLAY_PUT(1, fixedStyle.bytes[1]);
+                    LINE_PUT(0, fixedStyle.bytes[0]);
+                    LINE_PUT(1, fixedStyle.bytes[1]);
+                    displayLength += NJ_STYLE_CODE_LENGTH;
+                    lineLength += NJ_STYLE_CODE_LENGTH;
+                    proportional = 0;
+                }
+                DISPLAY_PUT(0, text[0]);
+                DISPLAY_PUT(1, text[1]);
+                LINE_PUT(0, text[0]);
+                LINE_PUT(1, text[1]);
+                displayLength += 2;
+                lineLength += 2;
+                text += 2;
+                break;
+            case 1:
+                if (!proportional) {
+                    DISPLAY_PUT(0, proportionalStyle.bytes[0]);
+                    DISPLAY_PUT(1, proportionalStyle.bytes[1]);
+                    LINE_PUT(0, proportionalStyle.bytes[0]);
+                    LINE_PUT(1, proportionalStyle.bytes[1]);
+                    displayLength += NJ_STYLE_CODE_LENGTH;
+                    lineLength += NJ_STYLE_CODE_LENGTH;
+                    proportional = 1;
+                }
+                if (text[0] == '\\' && text[1] == 'n') {
+                    display[displayLength] = '\0';
+                    lineText[lineLength] = '\0';
+                    width = xglFontGetStringWidth(lineText) + penOffsetX;
+                    if (string->layoutCount < width) {
+                        string->layoutCount = width;
+                    }
+                    text += TAG_LENGTH("\\n");
+                    string->nextText = text;
+                } else if (text[0] == '\n') {
+                    display[displayLength] = '\0';
+                    lineText[lineLength] = '\0';
+                    width = xglFontGetStringWidth(lineText) + penOffsetX;
+                    if (string->layoutCount < width) {
+                        string->layoutCount = width;
+                    }
+                    text++;
+                    string->nextText = text;
+                } else if (text[0] == '<') {
+                    if (text[1] == 'c' && text[2] == 'o' && text[3] == 'l' && text[4] == 'e' && text[5] == '>') {
+                        /* <cole>: back to the text color, gray c0c0c0. */
+                        NJ_COLOR_COMMAND(DISPLAY_PUT, 'c', '0', 'c', '0', 'c', '0');
+                        displayLength += NJ_COLOR_COMMAND_LENGTH;
+                        text += TAG_LENGTH("<cole>");
+                    } else if (text[1] == 'c' && text[2] == 'o' && text[3] == 'l') {
+                        /* <colBBGGRR> */
+                        NJ_COLOR_COMMAND(DISPLAY_PUT, text[4], text[5], text[6], text[7], text[8], text[9]);
+                        displayLength += NJ_COLOR_COMMAND_LENGTH;
+                        NJ_COLOR_COMMAND(PUT_COLOR_SPAN, text[4], text[5], text[6], text[7], text[8], text[9]);
+                        text += TAG_LENGTH("<colBBGGRR>");
+                    } else if (text[1] == 'x') {
+                        /* <xN>: "$axNNN;" moves the pen to the string's x + N; the measured line restarts there. */
+                        int penX = 0;
+                        unsigned char digit;
+                        unsigned char *scan;
+                        int divisor;
+                        int i;
+
+                        DISPLAY_PUT(0, '$');
+                        DISPLAY_PUT(1, 'a');
+                        DISPLAY_PUT(2, 'x');
+                        LINE_PUT(0, '$');
+                        LINE_PUT(1, 'a');
+                        LINE_PUT(2, 'x');
+                        lineLength += 3;
+                        displayLength += 3;
+                        text += TAG_LENGTH("<x");
+                        scan = text;
+                        NJ_STRING_READ_NUMBER(penX);
+                        penOffsetX = penX;
+                        penX += (int)string->x;
+                        divisor = 100;
+                        for (i = 0; i < 3; i++) {
+                            penXDigits[i] = penX / divisor;
+                            penX -= penXDigits[i] * divisor;
+                            divisor /= 10;
+                        }
+                        DISPLAY_PUT(0, penXDigits[0] + '0');
+                        LINE_PUT(0, penXDigits[0] + '0');
+                        DISPLAY_PUT(1, penXDigits[1] + '0');
+                        LINE_PUT(1, penXDigits[1] + '0');
+                        DISPLAY_PUT(2, penXDigits[2] + '0');
+                        LINE_PUT(2, penXDigits[2] + '0');
+                        displayLength += 3;
+                        display[displayLength++] = ';';
+                        LINE_PUT(3, ';');
+                        text++;
+                        lineLength = 5;
+                        memset(lineText, 0, sizeof(lineText));
+                        lineText[0] = proportionalStyle.bytes[0];
+                        lineText[1] = proportionalStyle.bytes[1];
+                        lineText[2] = defaultScale.bytes[0];
+                        lineText[3] = defaultScale.bytes[1];
+                        lineText[4] = defaultScale.bytes[2];
+                        string->layoutCount = 0;
+                    } else if (text[1] == 'r' && text[2] == 'u' && text[3] == 'b' && text[4] == 'y' && text[5] == 's' && text[6] == '>') {
+                        NJ_RUBY_COMMAND(DISPLAY_PUT, 's');
+                        displayLength += NJ_RUBY_COMMAND_LENGTH;
+                        DISPLAY_PUT(0, defaultScale.bytes[0]);
+                        DISPLAY_PUT(1, defaultScale.bytes[1]);
+                        DISPLAY_PUT(2, defaultScale.bytes[2]);
+                        displayLength += 3;
+                        text += TAG_LENGTH("<rubys>");
+                    } else if (text[1] == 'r' && text[2] == 'u' && text[3] == 'b' && text[4] == 'y' && text[5] == 'e' && text[6] == '>') {
+                        NJ_RUBY_COMMAND(DISPLAY_PUT, 'e');
+                        displayLength += NJ_RUBY_COMMAND_LENGTH;
+                        DISPLAY_PUT(0, defaultScale.bytes[0]);
+                        DISPLAY_PUT(1, defaultScale.bytes[1]);
+                        DISPLAY_PUT(2, defaultScale.bytes[2]);
+                        displayLength += 3;
+                        text += TAG_LENGTH("<rubye>");
+                    } else if (text[1] == 'r' && text[2] == 'u' && text[3] == 'b' && text[4] == 'y' && text[5] == 'b' && text[6] == '>') {
+                        NJ_RUBY_COMMAND(DISPLAY_PUT, 'b');
+                        displayLength += NJ_RUBY_COMMAND_LENGTH;
+                        DISPLAY_PUT(0, defaultScale.bytes[0]);
+                        DISPLAY_PUT(1, defaultScale.bytes[1]);
+                        DISPLAY_PUT(2, defaultScale.bytes[2]);
+                        displayLength += 3;
+                        text += TAG_LENGTH("<rubyb>");
+                    } else if (text[1] == 's' && text[2] == 'i' && text[3] == 'z' && text[4] == 'e' && text[5] == 'e' && text[6] == '>') {
+                        /* <sizee>: back to the string's zoom. */
+                        if (!(string->styleFlags & NJ_STRING_STYLE_NO_ZOOM)) {
+                            NJ_ZOOM_COMMAND(DISPLAY_PUT, defaultZoomDigits[0], defaultZoomDigits[1],
+                                            defaultZoomDigits[2], defaultZoomDigits[3]);
+                            displayLength += NJ_ZOOM_COMMAND_LENGTH;
+                            if (!(string->styleFlags & NJ_STRING_STYLE_NO_ZOOM)) {
+                                NJ_ZOOM_COMMAND(LINE_PUT, defaultZoomDigits[0], defaultZoomDigits[1],
+                                                defaultZoomDigits[2], defaultZoomDigits[3]);
+                                lineLength += NJ_ZOOM_COMMAND_LENGTH;
+                            }
+                        }
+                        text += TAG_LENGTH("<sizee>");
+                    } else if (text[1] == 's' && text[2] == 'i' && text[3] == 'z' && text[4] == 'e') {
+                        /* <sizeNN>: zoom NN on both axes. */
+                        if (!(string->styleFlags & NJ_STRING_STYLE_NO_ZOOM)) {
+                            NJ_ZOOM_COMMAND(DISPLAY_PUT, text[5], text[6], text[5], text[6]);
+                            displayLength += NJ_ZOOM_COMMAND_LENGTH;
+                            if (!(string->styleFlags & NJ_STRING_STYLE_NO_ZOOM)) {
+                                NJ_ZOOM_COMMAND(LINE_PUT, text[5], text[6], text[5], text[6]);
+                                lineLength += NJ_ZOOM_COMMAND_LENGTH;
+                                zoomSpanDigits[0] = text[5];
+                                zoomSpanDigits[1] = text[6];
+                                zoomSpanDigits[2] = text[5];
+                                zoomSpanDigits[3] = text[6];
+                            }
+                        }
+                        text += TAG_LENGTH("<sizeNN>");
+                    } else if (text[1] == 0xA1 && text[2] == 0xFB) {            /* <○> */
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_CIRCLE, 20);
+                    } else if (text[1] == 0xA1 && text[2] == 0xDF) {            /* <×> */
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_CROSS, 20);
+                    } else if (text[1] == 0xA2 && text[2] == 0xA2) {            /* <□> */
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_SQUARE, 20);
+                    } else if (text[1] == 0xA2 && text[2] == 0xA4) {            /* <△> */
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_TRIANGLE, 20);
+                    } else if (text[1] == 'L' && text[2] == '1') {
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_L1, 24);
+                    } else if (text[1] == 'L' && text[2] == '2') {
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_L2, 24);
+                    } else if (text[1] == 'R' && text[2] == '1') {
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_R1, 24);
+                    } else if (text[1] == 'R' && text[2] == '2') {
+                        NJ_STRING_MEASURE_ICON(NJ_STRING_ICON_R2, 24);
+                    } else if (text[1] == 'A' && text[2] == 'T' && text[3] == 'R') {
+                        /* <ATRn>: an element attribute icon. */
+                        int icon;
+
+                        if (text[4] == '0') {
+                            icon = NJ_STRING_ICON_ATTRIBUTE(0);
+                        } else if (text[4] == '1') {
+                            icon = NJ_STRING_ICON_ATTRIBUTE(1);
+                        } else if (text[4] == '2') {
+                            icon = NJ_STRING_ICON_ATTRIBUTE(2);
+                        } else if (text[4] == '3') {
+                            icon = NJ_STRING_ICON_ATTRIBUTE(3);
+                        } else if (text[4] == '4') {
+                            icon = NJ_STRING_ICON_ATTRIBUTE(4);
+                        } else {
+                            icon = 0;
+                        }
+                        NJ_STRING_MEASURE_ICON_RECORD(icon);
+                        NJ_ICON_BLANK(DISPLAY_PUT, 24);
+                        displayLength += NJ_ICON_BLANK_LENGTH;
+                        NJ_ICON_BLANK(LINE_PUT, 24);
+                        lineLength += NJ_ICON_BLANK_LENGTH;
+                        text += TAG_LENGTH("<ATR0>");
+                    } else {
+                        /* Any other '<' opens a highlighted span, closed by '>'. */
+                        NJ_COLOR_COMMAND(DISPLAY_PUT, gNjStringHighlightRgb[4], gNjStringHighlightRgb[5], gNjStringHighlightRgb[2], gNjStringHighlightRgb[3],
+                                         gNjStringHighlightRgb[0], gNjStringHighlightRgb[1]);
+                        displayLength += NJ_COLOR_COMMAND_LENGTH;
+                        text++;
+                        NJ_COLOR_COMMAND(PUT_COLOR_SPAN, gNjStringHighlightRgb[4], gNjStringHighlightRgb[5], gNjStringHighlightRgb[2], gNjStringHighlightRgb[3],
+                                         gNjStringHighlightRgb[0], gNjStringHighlightRgb[1]);
+                    }
+                } else if (text[0] == '>') {
+                    /* End of a highlighted span: back to the text color. */
+                    NJ_COLOR_COMMAND(DISPLAY_PUT, 'c', '0', 'c', '0', 'c', '0');
+                    displayLength += NJ_COLOR_COMMAND_LENGTH;
+                    text++;
+                } else {
+                    display[displayLength++] = text[0];
+                    lineText[lineLength++] = *text++;
+                }
+                break;
+            default:
+                if (text[0] == '\r' && text[1] == '\n') {
+                    display[displayLength] = '\0';
+                    lineText[lineLength] = '\0';
+                    width = xglFontGetStringWidth(lineText) + penOffsetX;
+                    if (string->layoutCount < width) {
+                        string->layoutCount = width;
+                    }
+                    text += TAG_LENGTH("\r\n");
+                    string->nextText = text;
+                } else {
+                    display[displayLength++] = text[0];
+                    lineText[lineLength++] = *text++;
+                }
+                break;
+            }
+        } while (!(text[-2] == '\\' && text[-1] == 'n') && !(text[-2] == '\r' && text[-1] == '\n') && *text != 0);
+    }
+    display[displayLength] = '\0';
+    lineText[lineLength] = '\0';
+    width = xglFontGetStringWidth(lineText) + penOffsetX;
+    if (string->layoutCount < width) {
+        string->layoutCount = width;
+    }
+    return width;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8358);
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8458);
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D86C8);
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D88D8);
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8A00);
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8B30);
+
+void njStringSetText(NjString *string, unsigned char *text) {
+    char display[0x800];
+
+    string->text = text;
+    string->currentLine = 1;
+    if ((text != 0) && (string->styleFlags & NJ_STRING_STYLE_LAYOUT_ON_SET)) {
+        njStringLayoutText(string, display);
+    }
+}
+
+void njStringSetPositionB(NjString *string, f32 x, f32 y) {
+    string->x = x;
+    string->y = y;
+}
+
+void njStringSetZoomB(NjString *string, s8 zoomX, s8 zoomY) {
+    string->zoomX = zoomX;
+    string->zoomY = zoomY;
+}
+
+void njStringSetColorB(NjString *string, s32 red, s32 green, s32 blue) {
+    s32 redByte;
+    s32 greenByte;
+    s32 blueByte;
+
+    redByte = red;
+    if (red < 0) {
+        redByte = 0;
+    }
+    greenByte = green;
+    if (green < 0) {
+        greenByte = 0;
+    }
+    blueByte = blue;
+    if (blue < 0) {
+        blueByte = 0;
+    }
+    if (redByte >= 0x100) {
+        redByte = 0xFF;
+    }
+    string->red = (f32) redByte;
+    if (greenByte >= 0x100) {
+        greenByte = 0xFF;
+    }
+    string->green = (f32) greenByte;
+    if (blueByte >= 0x100) {
+        blueByte = 0xFF;
+    }
+    string->blue = (f32) blueByte;
+}
+
+void njStringSetAlphaB(NjString *string, s32 alpha) {
+    s32 alphaValue;
+
+    alphaValue = alpha;
+    if (alpha < 0) {
+        alphaValue = 0;
+    }
+    if (alphaValue >= 0x80) {
+        alphaValue = 0x7F;
+    }
+    string->alpha = (f32) alphaValue;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D8C80);
+
+void njStringSetFlagsB(NjString *string, s32 styleFlags) {
+    string->styleFlags = styleFlags;
+}
+
+void njStringSetFirstVisibleLine(NjString *string, s32 line) {
+    string->firstVisibleLine = line & 0xFF;
+}
+
+void njStringSetVisibleLineSpan(NjString *string, s32 span) {
+    string->visibleLineSpan = span & 0xFF;
+}
+
+void njStringSetWordFC(NjString *string, s32 value) {
+    string->wordFC = value;
+}
 
 /*
  * Lays out the string's markup text (string->text, EUC-JP and ASCII) into `display`: the font codes and
@@ -719,7 +1060,6 @@ INCLUDE_ASM("asm/main/nonmatchings/njString", func_002DAA08);
 
 INCLUDE_ASM("asm/main/nonmatchings/njString", func_002DAEE8);
 
-s32 func_002D6CA8(NjString *string, s32 limit, char *display);
 
 /* Lays out a scratch string at (x, y) with zoom 15,15 and returns its layoutCount. */
 s32 njStringLayoutCount(s32 limit, s32 x, s32 y) {
@@ -732,6 +1072,6 @@ s32 njStringLayoutCount(s32 limit, s32 x, s32 y) {
     njStringSetFlags(layoutString, 8);
     njStringSetCounter(layoutString, limit);
     njStringSetPosition(layoutString, x, y);
-    func_002D6CA8(layoutString, limit, display);
+    njStringLayoutLine(layoutString, (char *) limit, display);
     return layoutString->layoutCount;
 }

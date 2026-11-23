@@ -72,14 +72,10 @@ static inline float xglSinInline(float angle)
 
     __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
     __asm__ __volatile__(
-        "ctc2.i %1, $vi27
-	"
-        "vnop
-	"
-        "qmtc2.ni %2, $vf4
-	"
-        "vcallmsr $vi27
-	"
+        "ctc2.i %1, $vi27\n\t"
+        "vnop\n\t"
+        "qmtc2.ni %2, $vf4\n\t"
+        "vcallmsr $vi27\n\t"
         "qmfc2.i %0, $vf1"
         : "=r"(result) : "r"((u32)D_20 >> 3), "r"(angleBits));
     return result;
@@ -92,14 +88,10 @@ static inline float xglCosInline(float angle)
 
     __asm__("mfc1 %0, %1" : "=r"(angleBits) : "f"(angle));
     __asm__ __volatile__(
-        "ctc2.i %1, $vi27
-	"
-        "vnop
-	"
-        "qmtc2.ni %2, $vf4
-	"
-        "vcallmsr $vi27
-	"
+        "ctc2.i %1, $vi27\n\t"
+        "vnop\n\t"
+        "qmtc2.ni %2, $vf4\n\t"
+        "vcallmsr $vi27\n\t"
         "qmfc2.i %0, $vf1"
         : "=r"(result) : "r"((u32)D_E8 >> 3), "r"(angleBits));
     return result;

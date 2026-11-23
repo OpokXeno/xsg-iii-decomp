@@ -11,3 +11,5 @@ PROVIDE(litodp = 0x0030A358); /* libgcc */
 PROVIDE(dptoli = 0x0030A410); /* libgcc */
 PROVIDE(dptofp = 0x0030A4E0); /* libgcc */
 PROVIDE(__fixdfdi = 0x00317270); /* libgcc */
+PROVIDE(D_00000000 = 0x00000000); /* VU1 microprogram at VU address 0: the MSCAL of xglColorFilterApplyClut */
+PROVIDE(__fixunssfdi = 0x003098D0); /* libgcc: float to unsigned long long, called by gifStateDrawEchoBlur */

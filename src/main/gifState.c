@@ -71,6 +71,9 @@ extern int gifStateOriginY;
 /* The 512x448 frame buffer in pixels. */
 #define GIF_STATE_WIDTH 512
 #define GIF_STATE_HEIGHT 448
+/* The quarter-size copy of the page: 128x112 pixels. */
+#define GIF_QUARTER_WIDTH (GIF_STATE_WIDTH / 4)
+#define GIF_QUARTER_HEIGHT (GIF_STATE_HEIGHT / 4)
 
 /* One quadword of gifStatePacket: a data/address pair (A+D) or four raw words (the tag). */
 typedef union GifStateQword {
@@ -135,9 +138,21 @@ extern const char gifStateSourceFile[24];
 /* The queue size the assert names: numPacket < (STATEPACKET_MAX - 1); the compare is against 63 in this build. */
 #define STATEPACKET_MAX 0x40
 
-/* Scaffold u16 words at 0x004C8390 (no config name): +0x0E the flip base, +0x16 the display base, +0x18 the draw
- * base. */
+/* Scaffold u16 words at 0x004C8390 (no config name): the frame-buffer pages of the render state, in 32-word
+ * units (tu119 reads the same words as outlinePage +0x0E, glowSourcePage +0x12 and screenPage +0x16). */
 extern u16 D_004C8390[];
+#define GIF_PAGE_OUTLINE D_004C8390[7]
+#define GIF_PAGE_GLOW_SOURCE D_004C8390[9]
+#define GIF_PAGE_SCREEN D_004C8390[11]
+
+/* The frame register and the texture register that address a page (PSMCT32, 512 pixels wide, 512x512 texture). */
+#define GIF_PAGE_FRAME(page) GS_SET_FRAME(page, 8, GS_PSMCT32, 0xFF000000)
+#define GIF_PAGE_TEX0(page) GS_SET_TEX0((page) << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0)
+/* Alpha blend source * fixed alpha + destination * (1 - fixed alpha). */
+#define GIF_BLEND_FIXED_ALPHA(fixedAlpha) GS_SET_ALPHA(0, 2, 2, 1, fixedAlpha)
+/* Vertex colors: 0x80 is the neutral texture modulation; Q is 1.0f. */
+#define GIF_RGBAQ_NEUTRAL GS_SET_RGBAQ(0x80, 0x80, 0x80, 0x80, 0x3F800000)
+#define GIF_RGBAQ_BLACK GS_SET_RGBAQ(0, 0, 0, 0, 0x3F800000)
 
 /* Writes the setup packet for the page each call (its frame and texture words), sends it, then queues the
  * context registers: clamp, frame, the alpha blend picked by the effect state, texture, test and z buffer. */
@@ -146,13 +161,13 @@ void gifStateSetupContext(XglPacket *packet, signed char alphaFix)
     gifStateSetupPacket[6].adPair[0] = GS_SET_FRAME(D_004C8390[7], 8, GS_PSMCT32, 0);
     switch (gifStatus.fbp) {
     case 0:
-        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[11] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
+        gifStateSetupPacket[7].adPair[0] = GIF_PAGE_TEX0(GIF_PAGE_SCREEN);
         break;
     case 1:
         gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[12] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
         break;
     default:
-        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[11] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
+        gifStateSetupPacket[7].adPair[0] = GIF_PAGE_TEX0(GIF_PAGE_SCREEN);
         break;
     }
     sceVif1PkCnt(packet, 0);
@@ -163,7 +178,7 @@ void gifStateSetupContext(XglPacket *packet, signed char alphaFix)
     sceVif1PkAddDataN(packet, gifStateSetupPacket, GIF_SETUP_PACKET_WORDS);
     gifStateReset();
     gifStateAddReg(GS_FBA_1, 1);
-    gifStateAddReg(GS_FRAME_1, GS_SET_FRAME(D_004C8390[11], 8, GS_PSMCT32, 0xFF000000));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
     if (gifStatus.state == 1) {
         switch (gifStatus.effectAlphaType) {
         case 1:
@@ -180,7 +195,7 @@ void gifStateSetupContext(XglPacket *packet, signed char alphaFix)
     } else {
         switch (gifStatus.effectAlphaType) {
         case 1:
-            gifStateAddReg(GS_ALPHA_1, ((((long long) alphaFix) << 56) >> 24) | GS_SET_ALPHA(0, 2, 2, 1, 0));
+            gifStateAddReg(GS_ALPHA_1, ((((long long) alphaFix) << 56) >> 24) | GIF_BLEND_FIXED_ALPHA(0));
             break;
         case 2:
             gifStateAddReg(GS_ALPHA_1, ((((long long) alphaFix) << 56) >> 24) | GS_SET_ALPHA(2, 0, 2, 1, 0));
@@ -858,26 +873,27 @@ void gifStateDrawFadeQuad(XglPacket *packet)
 void gifStateDrawNone(XglPacket *packet) {
 }
 
-/* Three small-data words the timing setters below write (no config name yet: splat names). */
-extern int D_00550CFC;
-extern int D_00550D00;
-extern int D_00550D04;
+/* Three small-data words the timing setters below write (no config name yet: splat names): the echo pattern
+ * (switch of gifStateDrawEchoBlur), the numerator of its alpha (alpha = gifStateEchoAlphaBase / gifStateEchoPassCount) and the pass count. */
+extern int gifStateEchoPattern;
+extern int gifStateEchoAlphaBase;
+extern int gifStateEchoPassCount;
 
 void gifStateResetTimings(void)
 {
-    D_00550D00 = 90;
-    D_00550D04 = 6;
-    D_00550CFC = 0;
+    gifStateEchoAlphaBase = 90;
+    gifStateEchoPassCount = 6;
+    gifStateEchoPattern = 0;
 }
 
-void gifStateSetTimings(int first, int second, int third)
+void gifStateSetTimings(int echoPattern, int echoAlphaBase, int echoPassCount)
 {
-    D_00550CFC = first;
-    D_00550D00 = second;
-    if (third <= 0) {
-        D_00550D04 = 1;
+    gifStateEchoPattern = echoPattern;
+    gifStateEchoAlphaBase = echoAlphaBase;
+    if (echoPassCount <= 0) {
+        gifStateEchoPassCount = 1;
     } else {
-        D_00550D04 = third;
+        gifStateEchoPassCount = echoPassCount;
     }
 }
 
@@ -890,10 +906,10 @@ void gifStateDrawQuad(XglPacket *packet, unsigned int width, unsigned int height
     gifStateReset();
     gifStateAddReg(GS_TEXFLUSH, 0);
     gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(2, 2, 100, width + 99, 100, height + 99));
-    gifStateAddReg(GS_ALPHA_1, GS_SET_ALPHA(0, 2, 2, 1, alpha));
-    gifStateAddReg(GS_FRAME_1, GS_SET_FRAME(D_004C8390[9], 8, GS_PSMCT32, 0xFF000000));
-    gifStateAddReg(GS_TEX0_1, GS_SET_TEX0(D_004C8390[7] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0));
-    gifStateAddReg(GS_RGBAQ, GS_SET_RGBAQ(0x80, 0x80, 0x80, 0x80, 0x3F800000));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(alpha));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
     gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
     gifStateAddReg(GS_UV, GS_SET_UV(offsetX * 16 + 1600, offsetY * 16 + 1600));
     gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
@@ -903,17 +919,543 @@ void gifStateDrawQuad(XglPacket *packet, unsigned int width, unsigned int height
     sceVif1PkCloseDirectHLCode(packet);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00254B40);
+/* Queues the shown page as one quad like gifStateDrawQuad, its texture window one texel wider and the far texel
+ * corner moved back by the offset instead of forward. */
+void gifStateDrawPageQuadInset(XglPacket *packet, unsigned int width, unsigned int height, int offsetX, int offsetY, int alpha)
+{
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(2, 2, 100, width + 100, 100, height + 100));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(alpha));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(offsetX * 16 + 1600, offsetY * 16 + 1600));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV((width - offsetX) * 16 + 1600, (height - offsetY) * 16 + 1600));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_QUARTER_WIDTH), GIF_Y(GIF_QUARTER_HEIGHT), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00254D28);
+/* Copies the other page back at full size: black border strips below and right of the width x height area,
+ * then the 128x112 page as one textured sprite. */
+void gifStateRestorePageBorder(XglPacket *packet, int width, int height)
+{
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(2, 2, 0, GIF_QUARTER_WIDTH, 0, GIF_QUARTER_HEIGHT));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_BLACK);
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(100), GIF_Y(height + 95), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(width + 105), GIF_Y(height + 105), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(width + 105), GIF_Y(100), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(width + 105), GIF_Y(height + 105), 0));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(100), GIF_Y(100), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(width + 100), GIF_Y(height + 100), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00254F88);
+/* Two more small-data words of the echo blur (no config name yet: splat names): the offset step of one echo
+ * pass and the divisor of the darkening alpha (the darkening quad uses 40 / divisor). */
+extern int gifStateEchoOffsetStep;
+extern int gifStateEchoDarkenDivisor;
+
+/* Echo blur of the camera window: copies the window shrunk into the 256x224 corner of another page, darkens it,
+ * then draws the copy over itself in four shifted directions per pass with offsets growing every pass (the
+ * pattern is picked by gifStateEchoPattern, the pass count is gifStateEchoPassCount), shrinking the copy between passes, and finally
+ * stretches the result back over the window. */
+void gifStateDrawEchoBlur(XglPacket *packet)
+{
+    int echoAlpha = 15;
+    int fullWidth;
+    int fullHeight;
+    XglCamera *camera = xglStudioSelectGetActiveCamera(0);
+    /* One counter (kept as one variable): the strip column of the first copy, then the echo pass number. */
+    int stripOrPass;
+    int echoWidth;
+    int echoHeight;
+
+    if (gifStateEchoPattern != 0) {
+        echoAlpha = gifStateEchoAlphaBase / gifStateEchoPassCount;
+    }
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_SCISSOR_1, GS_SET_SCISSOR(camera->screen.window.vector.x, camera->screen.window.vector.z,
+                                                camera->screen.window.vector.y, camera->screen.window.vector.w));
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(1, 1, 0, 0, 0, 0));
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FBA_1, 1);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+    for (stripOrPass = 0; stripOrPass < GIF_STATE_WIDTH; stripOrPass += 64) {
+        gifStateAddReg(GS_UV, GS_SET_UV(stripOrPass * 16, camera->screen.window.vector.y * 16.0f));
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(stripOrPass), GIF_Y(camera->screen.window.vector.y), 0));
+        gifStateAddReg(GS_UV, GS_SET_UV((stripOrPass + 64) * 16, camera->screen.window.vector.w * 16.0f));
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(stripOrPass + 64), GIF_Y(camera->screen.window.vector.w), 0));
+    }
+    gifStateAddReg(GS_SCISSOR_1, GS_SET_SCISSOR(0, GIF_STATE_WIDTH, 0, GIF_STATE_HEIGHT));
+    gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    fullWidth = (camera->screen.window.vector.z - camera->screen.window.vector.x) / GIF_STATE_WIDTH * 256.0f;
+    fullHeight = (camera->screen.window.vector.w - camera->screen.window.vector.y) * (1.0f / GIF_STATE_HEIGHT) * 224.0f;
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(camera->screen.window.vector.x * 16.0f, camera->screen.window.vector.y * 16.0f));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(camera->screen.window.vector.z * 16.0f, camera->screen.window.vector.w * 16.0f));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(fullWidth), GIF_Y(fullHeight), 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_BLACK);
+    /* The original takes the echoWidth for both coordinates of these border strips. */
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(100), GIF_Y(fullWidth + 99), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(fullWidth + 101), GIF_Y(fullWidth + 101), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(fullWidth + 99), GIF_Y(100), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(fullWidth + 101), GIF_Y(fullWidth + 101), 0));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(100), GIF_Y(100), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(fullWidth * 16, fullHeight * 16));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(fullWidth + 100), GIF_Y(fullHeight + 100), 0));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(echoAlpha));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(40 / gifStateEchoDarkenDivisor));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_BLACK);
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(129), GIF_Y(113), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    echoWidth = fullWidth;
+    echoHeight = fullHeight;
+    switch (gifStateEchoPattern) {
+    case 0:
+        for (stripOrPass = 1; stripOrPass < 6; stripOrPass++) {
+            int passScale = stripOrPass / 2;
+
+            if (passScale == 0) {
+                passScale = 1;
+            }
+            if (stripOrPass >= 3) {
+                gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoOffsetStep * passScale, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            }
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            echoWidth = fullWidth / stripOrPass;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / stripOrPass;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            if (stripOrPass + 1 < 6) {
+                gifStateRestorePageBorder(packet, echoWidth, echoHeight);
+            }
+        }
+        break;
+    case 1:
+        for (stripOrPass = 1; stripOrPass < gifStateEchoPassCount; stripOrPass++) {
+            int passScale = stripOrPass / 2;
+
+            if (passScale == 0) {
+                passScale = 1;
+            }
+            if (stripOrPass >= 3) {
+                gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoOffsetStep * passScale, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            }
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            echoWidth = fullWidth / stripOrPass;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / stripOrPass;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            if (stripOrPass + 1 < gifStateEchoPassCount) {
+                gifStateRestorePageBorder(packet, echoWidth, echoHeight);
+            }
+        }
+        break;
+    case 2:
+        for (stripOrPass = 1; stripOrPass < gifStateEchoPassCount; stripOrPass++) {
+            int passScale = stripOrPass / 2;
+
+            if (passScale == 0) {
+                passScale = 1;
+            }
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            echoWidth = fullWidth / stripOrPass;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / stripOrPass;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            if (stripOrPass + 1 < gifStateEchoPassCount) {
+                gifStateRestorePageBorder(packet, echoWidth, echoHeight);
+            }
+        }
+        break;
+    case 3:
+        for (stripOrPass = 1; stripOrPass < gifStateEchoPassCount; stripOrPass++) {
+            int passScale = stripOrPass / 2;
+
+            if (passScale == 0) {
+                passScale = 1;
+            }
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoOffsetStep * passScale, 0, echoAlpha);
+            echoWidth = fullWidth / stripOrPass;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / stripOrPass;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            if (stripOrPass + 1 < gifStateEchoPassCount) {
+                gifStateRestorePageBorder(packet, echoWidth, echoHeight);
+            }
+        }
+        break;
+    case 4:
+        for (stripOrPass = 1; stripOrPass < gifStateEchoPassCount; stripOrPass++) {
+            int passScale = stripOrPass / 2;
+
+            if (passScale == 0) {
+                passScale = 1;
+            }
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoOffsetStep * passScale, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoOffsetStep * passScale, echoAlpha);
+            echoWidth = fullWidth / stripOrPass;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / stripOrPass;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            if (stripOrPass + 1 < gifStateEchoPassCount) {
+                gifStateRestorePageBorder(packet, echoWidth, echoHeight);
+            }
+        }
+        break;
+    case 5:
+        for (stripOrPass = 1; stripOrPass < gifStateEchoPassCount; stripOrPass++) {
+            int passScale = stripOrPass / 2;
+
+            if (passScale == 0) {
+                passScale = 1;
+            }
+            gifStateDrawPageQuadInset(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, 2.0f * echoAlpha);
+            gifStateDrawPageQuadInset(packet, echoWidth, echoHeight, gifStateEchoOffsetStep * passScale, gifStateEchoOffsetStep * passScale, 2.0f * echoAlpha);
+            echoWidth = fullWidth / stripOrPass;
+            if (echoWidth < 128) {
+                echoWidth = 128;
+            }
+            echoHeight = fullHeight / stripOrPass;
+            if (echoHeight < 112) {
+                echoHeight = 112;
+            }
+            if (stripOrPass + 1 < gifStateEchoPassCount) {
+                gifStateRestorePageBorder(packet, echoWidth, echoHeight);
+            }
+        }
+        break;
+    }
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_SCISSOR_1, GS_SET_SCISSOR(camera->screen.window.vector.x, camera->screen.window.vector.z,
+                                                camera->screen.window.vector.y, camera->screen.window.vector.w));
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(2, 2, 0, GIF_QUARTER_WIDTH, 0, GIF_QUARTER_HEIGHT));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(camera->screen.window.vector.x), GIF_Y(camera->screen.window.vector.y), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(camera->screen.window.vector.z), GIF_Y(camera->screen.window.vector.w), 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_SCISSOR_1, GS_SET_SCISSOR(0, GIF_STATE_WIDTH, 0, GIF_STATE_HEIGHT));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/gifState", func_002561E8);
 
 INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00256750);
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00256CE8);
+/* Offset step of the copies drawn by gifStateDrawCustomEchoBlur (no config name yet: splat name). */
+extern int gifStateEchoPassOffsetStep;
+
+/* Echo blur of the camera window with explicit parameters (the counterpart of gifStateDrawEchoBlur): shrinks the window
+ * into the corner of another page, darkens it, then draws the copy over itself echoPassCount - 1 times with
+ * offsets growing by gifStateEchoPassOffsetStep per pass (the shifts picked by echoPattern), shrinking it again after every pass,
+ * and finally stretches the result back over the window. */
+void gifStateDrawCustomEchoBlur(XglPacket *packet, int echoPattern, int echoAlpha, int echoPassCount)
+{
+    XglCamera *camera = xglStudioSelectGetActiveCamera(0);
+    int fullWidth = (camera->screen.window.vector.z - camera->screen.window.vector.x) / GIF_STATE_WIDTH * 256.0f;
+    int fullHeight = (camera->screen.window.vector.w - camera->screen.window.vector.y) * (1.0f / GIF_STATE_HEIGHT) * 224.0f;
+    int echoWidth;
+    int echoHeight;
+    int passIndex;
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(1, 1, 0, 0, 0, 0));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(camera->screen.window.vector.x * 16.0f, camera->screen.window.vector.y * 16.0f));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(camera->screen.window.vector.z * 16.0f, camera->screen.window.vector.w * 16.0f));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(fullWidth), GIF_Y(fullHeight), 0));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(echoAlpha));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(40 / gifStateEchoDarkenDivisor));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_BLACK);
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(148), GIF_Y(132), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    echoWidth = fullWidth;
+        echoHeight = fullHeight;
+    switch (echoPattern) {
+    case 0:
+        for (passIndex = 1; passIndex < echoPassCount; passIndex++) {
+            if (passIndex >= 3) {
+                gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, 0, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, 0, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+                gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            }
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            echoWidth = fullWidth / passIndex;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / passIndex;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkOpenDirectHLCode(packet, 0);
+            gifStateReset();
+            gifStateAddReg(GS_TEXFLUSH, 0);
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+            gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+            gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+            gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+            gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(echoWidth), GIF_Y(echoHeight), 0));
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(echoAlpha));
+            gifStateFlush();
+            sceVif1PkCloseDirectHLCode(packet);
+        }
+        break;
+    case 1:
+        for (passIndex = 1; passIndex < echoPassCount; passIndex++) {
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            echoWidth = fullWidth / passIndex;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / passIndex;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkOpenDirectHLCode(packet, 0);
+            gifStateReset();
+            gifStateAddReg(GS_TEXFLUSH, 0);
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+            gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+            gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+            gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+            gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(echoWidth), GIF_Y(echoHeight), 0));
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(echoAlpha));
+            gifStateFlush();
+            sceVif1PkCloseDirectHLCode(packet);
+        }
+        break;
+    case 2:
+        for (passIndex = 1; passIndex < echoPassCount; passIndex++) {
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, 0, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, 0, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, gifStateEchoPassOffsetStep * passIndex, 0, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, -gifStateEchoPassOffsetStep * passIndex, 0, echoAlpha);
+            echoWidth = fullWidth / passIndex;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / passIndex;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkOpenDirectHLCode(packet, 0);
+            gifStateReset();
+            gifStateAddReg(GS_TEXFLUSH, 0);
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+            gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+            gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+            gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+            gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(echoWidth), GIF_Y(echoHeight), 0));
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(echoAlpha));
+            gifStateFlush();
+            sceVif1PkCloseDirectHLCode(packet);
+        }
+        break;
+    case 3:
+        for (passIndex = 1; passIndex < echoPassCount; passIndex++) {
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            gifStateDrawQuad(packet, echoWidth, echoHeight, 0, -gifStateEchoPassOffsetStep * passIndex, echoAlpha);
+            echoWidth = fullWidth / passIndex;
+            if (echoWidth < 64) {
+                echoWidth = 64;
+            }
+            echoHeight = fullHeight / passIndex;
+            if (echoHeight < 56) {
+                echoHeight = 56;
+            }
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkOpenDirectHLCode(packet, 0);
+            gifStateReset();
+            gifStateAddReg(GS_TEXFLUSH, 0);
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+            gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+            gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+            gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+            gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+            gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+            gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(echoWidth), GIF_Y(echoHeight), 0));
+            gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(echoAlpha));
+            gifStateFlush();
+            sceVif1PkCloseDirectHLCode(packet);
+        }
+        break;
+    }
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_SCISSOR_1, GS_SET_SCISSOR(camera->screen.window.vector.x, camera->screen.window.vector.z,
+                                                camera->screen.window.vector.y, camera->screen.window.vector.w));
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(2, 2, 0, GIF_QUARTER_WIDTH, 0, GIF_QUARTER_HEIGHT));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(camera->screen.window.vector.x), GIF_Y(camera->screen.window.vector.y), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_QUARTER_WIDTH * 16, GIF_QUARTER_HEIGHT * 16));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(camera->screen.window.vector.z), GIF_Y(camera->screen.window.vector.w), 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_SCISSOR_1, GS_SET_SCISSOR(0, GIF_STATE_WIDTH, 0, GIF_STATE_HEIGHT));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00257CF8);
 

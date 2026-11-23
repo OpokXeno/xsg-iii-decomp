@@ -600,4 +600,601 @@ s32 movieReleaseActors(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu310", func_00288E30);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu310", func_00289168);
+void *memset(void *destination, int value, unsigned int size);
+s32 slotSetupMode0(s32 slotIndex, s32 setupValue, s32 *values);
+void slotReleaseChecked(s32 slotIndex, s32 forceRelease);
+extern ChannelParams D_003EC9C0[];
+extern ChannelParams D_003ED160[];
+extern ChannelParams D_003ED860[];
+extern ChannelParams D_003EE280[];
+extern ChannelParams D_003EE980[];
+extern ChannelParams D_003EF120[];
+extern ChannelParams D_003EF960[];
+extern ChannelParams D_003F02E0[];
+extern ChannelParams D_003F1E40[];
+extern ChannelParams D_003F2F78[];
+extern ChannelParams D_003F3AD8[];
+extern ChannelParams D_003F43B8[];
+extern ChannelParams D_003F4FB8[];
+extern ChannelParams D_003F5960[];
+extern ChannelParams D_003F66C0[];
+extern ChannelParams D_003F7110[];
+extern s32 D_003F8670[];
+extern ChannelParams D_003F86B0[];
+extern s32 D_003F9C10[];
+extern ChannelParams D_003F9C50[];
+extern s32 D_003FB1B0[];
+extern ChannelParams D_003FB1F0[];
+extern s32 D_003FC750[];
+extern ChannelParams D_003FC790[];
+extern s32 D_003FDCF0[];
+extern ChannelParams D_003FDD30[];
+extern s32 D_003FF290[];
+extern ChannelParams D_003FF2D0[];
+extern s32 D_00400830[];
+extern ChannelParams gMovieChannelEnable[];
+extern u16 gPadDataPressed[];
+
+/* Debug/test table driver: for each of 28 channels, when its enable word in gMovieChannelEnable is set, gather the
+ * channel's parameter words into setupArgs (some copied through to second tables) and start the slot with
+ * slotSetupMode0; START on pad 0 calls the channel's no-op stub; a disabled channel releases its slot. */
+#define PAD_START 0x0800
+
+/* A channel whose setting is a long value: read through its long view, which does not
+ * alias the s32 argument block. */
+#define CHANNEL_LONG_SETTING(table, index) (*(long *)&(table)[index].channelSetting)
+
+void movieChannelSlotsUpdate(void)
+{
+    s32 setupArgs[15];
+
+    memset(setupArgs, 0, sizeof(setupArgs));
+    if (gMovieChannelEnable[0].channelSetting != 0) {
+        setupArgs[0] = D_003EC9C0[0].channelSetting;
+        setupArgs[1] = D_003EC9C0[1].channelSetting;
+        setupArgs[2] = D_003EC9C0[2].channelSetting;
+        setupArgs[3] = D_003EC9C0[3].channelSetting;
+        setupArgs[4] = D_003EC9C0[4].channelSetting;
+        setupArgs[5] = D_003EC9C0[5].channelSetting;
+        setupArgs[6] = D_003EC9C0[6].channelSetting;
+        setupArgs[7] = D_003EC9C0[7].channelSetting;
+        slotSetupMode0(204, 4, setupArgs);
+    } else {
+        slotReleaseChecked(4, 0);
+    }
+    if (gMovieChannelEnable[1].channelSetting != 0) {
+        setupArgs[0] = D_003ED160[0].channelSetting << 8;
+        setupArgs[1] = D_003ED160[1].channelSetting + 256;
+        setupArgs[2] = D_003ED160[2].channelSetting + 224;
+        setupArgs[3] = D_003ED160[3].channelSetting;
+        setupArgs[4] = D_003ED160[4].channelSetting;
+        setupArgs[5] = D_003ED160[5].channelSetting;
+        setupArgs[6] = CHANNEL_LONG_SETTING(D_003ED160, 6);
+        slotSetupMode0(212, 12, setupArgs);
+    } else {
+        slotReleaseChecked(12, 0);
+    }
+    if (gMovieChannelEnable[2].channelSetting != 0) {
+        setupArgs[0] = D_003ED860[0].channelSetting << 8;
+        setupArgs[1] = D_003ED860[1].channelSetting + 256;
+        setupArgs[2] = D_003ED860[2].channelSetting + 224;
+        setupArgs[3] = D_003ED860[3].channelSetting;
+        setupArgs[4] = D_003ED860[4].channelSetting;
+        setupArgs[5] = D_003ED860[5].channelSetting;
+        setupArgs[6] = CHANNEL_LONG_SETTING(D_003ED860, 6);
+        setupArgs[7] = CHANNEL_LONG_SETTING(D_003ED860, 7);
+        setupArgs[8] = CHANNEL_LONG_SETTING(D_003ED860, 8);
+        setupArgs[9] = CHANNEL_LONG_SETTING(D_003ED860, 9);
+        setupArgs[10] = CHANNEL_LONG_SETTING(D_003ED860, 10);
+        setupArgs[11] = CHANNEL_LONG_SETTING(D_003ED860, 11);
+        slotSetupMode0(238, 38, setupArgs);
+    } else {
+        slotReleaseChecked(38, 0);
+    }
+    if (gMovieChannelEnable[3].channelSetting != 0) {
+        setupArgs[0] = D_003EE280[0].channelSetting << 8;
+        setupArgs[1] = D_003EE280[1].channelSetting;
+        setupArgs[2] = D_003EE280[2].channelSetting;
+        setupArgs[3] = D_003EE280[3].channelSetting;
+        setupArgs[4] = D_003EE280[4].channelSetting;
+        setupArgs[5] = D_003EE280[5].channelSetting;
+        setupArgs[6] = CHANNEL_LONG_SETTING(D_003EE280, 6);
+        slotSetupMode0(219, 19, setupArgs);
+    } else {
+        slotReleaseChecked(19, 0);
+    }
+    if (gMovieChannelEnable[4].channelSetting != 0) {
+        setupArgs[0] = D_003EE980[0].channelSetting << 8;
+        setupArgs[1] = D_003EE980[1].channelSetting;
+        setupArgs[2] = D_003EE980[2].channelSetting;
+        setupArgs[3] = D_003EE980[3].channelSetting;
+        setupArgs[4] = D_003EE980[4].channelSetting;
+        setupArgs[5] = D_003EE980[5].channelSetting;
+        setupArgs[6] = D_003EE980[6].channelSetting;
+        setupArgs[7] = CHANNEL_LONG_SETTING(D_003EE980, 7);
+        slotSetupMode0(220, 20, setupArgs);
+    } else {
+        slotReleaseChecked(20, 0);
+    }
+    if (gMovieChannelEnable[5].channelSetting != 0) {
+        setupArgs[0] = D_003EF120[0].channelSetting << 8;
+        setupArgs[1] = D_003EF120[1].channelSetting;
+        setupArgs[2] = D_003EF120[2].channelSetting;
+        setupArgs[3] = D_003EF120[3].channelSetting;
+        setupArgs[4] = D_003EF120[4].channelSetting;
+        setupArgs[5] = D_003EF120[5].channelSetting;
+        setupArgs[6] = D_003EF120[6].channelSetting;
+        setupArgs[7] = CHANNEL_LONG_SETTING(D_003EF120, 7);
+        setupArgs[8] = CHANNEL_LONG_SETTING(D_003EF120, 8);
+        slotSetupMode0(211, 11, setupArgs);
+    } else {
+        slotReleaseChecked(11, 0);
+    }
+    if (gMovieChannelEnable[6].channelSetting != 0) {
+        setupArgs[0] = D_003EF960[0].channelSetting << 8;
+        setupArgs[1] = D_003EF960[1].channelSetting + 256;
+        setupArgs[2] = D_003EF960[2].channelSetting + 224;
+        setupArgs[3] = D_003EF960[3].channelSetting;
+        setupArgs[4] = D_003EF960[4].channelSetting;
+        setupArgs[5] = D_003EF960[5].channelSetting;
+        setupArgs[6] = D_003EF960[6].channelSetting;
+        setupArgs[7] = D_003EF960[7].channelSetting;
+        setupArgs[8] = D_003EF960[8].channelSetting;
+        setupArgs[9] = D_003EF960[9].channelSetting;
+        setupArgs[10] = CHANNEL_LONG_SETTING(D_003EF960, 10);
+        slotSetupMode0(217, 17, setupArgs);
+    } else {
+        slotReleaseChecked(17, 0);
+    }
+    if (gMovieChannelEnable[7].channelSetting != 0) {
+        setupArgs[0] = D_003F02E0[0].channelSetting << 8;
+        setupArgs[1] = D_003F02E0[1].channelSetting + 256;
+        setupArgs[2] = D_003F02E0[2].channelSetting + 224;
+        setupArgs[3] = D_003F02E0[3].channelSetting;
+        setupArgs[4] = D_003F02E0[4].channelSetting;
+        setupArgs[5] = D_003F02E0[5].channelSetting;
+        setupArgs[6] = D_003F02E0[6].channelSetting;
+        setupArgs[7] = D_003F02E0[7].channelSetting;
+        setupArgs[8] = D_003F02E0[8].channelSetting;
+        setupArgs[9] = D_003F02E0[9].channelSetting;
+        setupArgs[10] = CHANNEL_LONG_SETTING(D_003F02E0, 10);
+        slotSetupMode0(218, 18, setupArgs);
+    } else {
+        slotReleaseChecked(18, 0);
+    }
+    if (gMovieChannelEnable[8].channelSetting != 0) {
+        setupArgs[0] = gMovieChannelsResetA[0].channelSetting << 8;
+        setupArgs[1] = gMovieChannelsResetA[1].channelSetting;
+        setupArgs[2] = gMovieChannelsResetA[2].channelSetting;
+        setupArgs[3] = gMovieChannelsResetA[3].channelSetting;
+        slotSetupMode0(221, 21, setupArgs);
+    } else {
+        slotReleaseChecked(21, 0);
+    }
+    if (gMovieChannelEnable[9].channelSetting != 0) {
+        setupArgs[0] = gMovieChannelsResetB[0].channelSetting << 8;
+        setupArgs[1] = gMovieChannelsResetB[1].channelSetting;
+        setupArgs[2] = gMovieChannelsResetB[2].channelSetting;
+        slotSetupMode0(237, 37, setupArgs);
+    } else {
+        slotReleaseChecked(37, 0);
+    }
+    if (gMovieChannelEnable[10].channelSetting != 0) {
+        setupArgs[0] = gMovieLatchChannels[0].channelSetting << 8;
+        setupArgs[1] = gMovieLatchChannels[1].channelSetting;
+        setupArgs[2] = gMovieLatchChannels[2].channelSetting;
+        setupArgs[3] = gMovieLatchChannels[3].channelSetting;
+        setupArgs[4] = gMovieLatchChannels[4].channelSetting;
+        setupArgs[5] = gMovieLatchChannels[5].channelSetting;
+        setupArgs[6] = gMovieLatchChannels[7].channelSetting;
+        setupArgs[7] = gMovieLatchChannels[8].channelSetting;
+        setupArgs[8] = gMovieLatchChannels[9].channelSetting;
+        slotSetupMode0(224, 24, setupArgs);
+    } else {
+        slotReleaseChecked(24, 0);
+    }
+    if (gMovieChannelEnable[11].channelSetting != 0) {
+        setupArgs[0] = D_003F1E40[0].channelSetting << 8;
+        setupArgs[1] = D_003F1E40[1].channelSetting;
+        setupArgs[2] = D_003F1E40[2].channelSetting;
+        setupArgs[3] = D_003F1E40[3].channelSetting;
+        setupArgs[4] = D_003F1E40[4].channelSetting;
+        setupArgs[5] = D_003F1E40[5].channelSetting;
+        setupArgs[6] = D_003F1E40[6].channelSetting;
+        setupArgs[7] = D_003F1E40[7].channelSetting;
+        setupArgs[8] = D_003F1E40[8].channelSetting;
+        setupArgs[9] = D_003F1E40[9].channelSetting;
+        setupArgs[10] = D_003F1E40[10].channelSetting;
+        setupArgs[11] = D_003F1E40[11].channelSetting;
+        slotSetupMode0(222, 22, setupArgs);
+    } else {
+        slotReleaseChecked(22, 0);
+    }
+    if (gMovieChannelEnable[12].channelSetting != 0) {
+        setupArgs[0] = gMovieChannelsResetC[0].channelSetting << 8;
+        setupArgs[1] = gMovieChannelsResetC[1].channelSetting;
+        setupArgs[2] = gMovieChannelsResetC[2].channelSetting;
+        setupArgs[3] = gMovieChannelsResetC[3].channelSetting;
+        setupArgs[4] = gMovieChannelsResetC[4].channelSetting;
+        setupArgs[5] = gMovieChannelsResetC[5].channelSetting;
+        setupArgs[6] = gMovieChannelsResetC[6].channelSetting;
+        slotSetupMode0(223, 23, setupArgs);
+    } else {
+        slotReleaseChecked(23, 0);
+    }
+    if (gMovieChannelEnable[13].channelSetting != 0) {
+        setupArgs[0] = D_003F2F78[0].channelSetting << 8;
+        setupArgs[1] = D_003F2F78[1].channelSetting + 256;
+        setupArgs[2] = D_003F2F78[2].channelSetting + 224;
+        setupArgs[3] = D_003F2F78[3].channelSetting;
+        setupArgs[4] = D_003F2F78[4].channelSetting;
+        setupArgs[5] = D_003F2F78[5].channelSetting;
+        setupArgs[6] = D_003F2F78[6].channelSetting;
+        setupArgs[7] = D_003F2F78[7].channelSetting;
+        setupArgs[8] = D_003F2F78[8].channelSetting;
+        setupArgs[9] = D_003F2F78[9].channelSetting;
+        setupArgs[10] = D_003F2F78[10].channelSetting;
+        setupArgs[11] = D_003F2F78[11].channelSetting;
+        setupArgs[12] = D_003F2F78[12].channelSetting;
+        setupArgs[13] = D_003F2F78[13].channelSetting;
+        slotSetupMode0(213, 13, setupArgs);
+    } else {
+        slotReleaseChecked(13, 0);
+    }
+    if (gMovieChannelEnable[14].channelSetting != 0) {
+        setupArgs[0] = D_003F3AD8[0].channelSetting << 8;
+        setupArgs[1] = D_003F3AD8[1].channelSetting + 256;
+        setupArgs[2] = D_003F3AD8[2].channelSetting + 224;
+        setupArgs[3] = D_003F3AD8[3].channelSetting;
+        setupArgs[4] = D_003F3AD8[4].channelSetting;
+        setupArgs[5] = D_003F3AD8[5].channelSetting;
+        setupArgs[6] = D_003F3AD8[6].channelSetting;
+        setupArgs[7] = D_003F3AD8[7].channelSetting;
+        setupArgs[8] = D_003F3AD8[8].channelSetting;
+        setupArgs[9] = D_003F3AD8[9].channelSetting;
+        slotSetupMode0(226, 26, setupArgs);
+    } else {
+        slotReleaseChecked(26, 0);
+    }
+    if (gMovieChannelEnable[15].channelSetting != 0) {
+        setupArgs[0] = D_003F43B8[0].channelSetting;
+        setupArgs[1] = D_003F43B8[1].channelSetting;
+        setupArgs[2] = D_003F43B8[2].channelSetting << 8;
+        setupArgs[3] = D_003F43B8[3].channelSetting;
+        setupArgs[4] = D_003F43B8[4].channelSetting;
+        setupArgs[5] = D_003F43B8[5].channelSetting;
+        setupArgs[6] = D_003F43B8[6].channelSetting;
+        setupArgs[7] = D_003F43B8[7].channelSetting;
+        setupArgs[8] = D_003F43B8[8].channelSetting;
+        setupArgs[9] = D_003F43B8[9].channelSetting;
+        setupArgs[10] = D_003F43B8[10].channelSetting | (D_003F43B8[11].channelSetting << 8) | (D_003F43B8[12].channelSetting << 16) | (D_003F43B8[13].channelSetting << 24);
+        setupArgs[11] = 8;
+        setupArgs[14] = D_003F43B8[14].channelSetting;
+        slotSetupMode0(225, 25, setupArgs);
+    } else {
+        slotReleaseChecked(25, 0);
+    }
+    if (gMovieChannelEnable[16].channelSetting != 0) {
+        setupArgs[0] = D_003F4FB8[0].channelSetting << 8;
+        setupArgs[1] = D_003F4FB8[1].channelSetting + 256;
+        setupArgs[2] = D_003F4FB8[2].channelSetting + 224;
+        setupArgs[3] = D_003F4FB8[3].channelSetting;
+        setupArgs[4] = D_003F4FB8[4].channelSetting;
+        setupArgs[5] = gMoviePlayBankThreeOffsets[D_003F4FB8[5].channelSetting];
+        setupArgs[6] = D_003F4FB8[6].channelSetting;
+        setupArgs[7] = D_003F4FB8[7].channelSetting;
+        setupArgs[8] = D_003F4FB8[8].channelSetting;
+        setupArgs[9] = D_003F4FB8[9].channelSetting;
+        setupArgs[10] = D_003F4FB8[10].channelSetting;
+        slotSetupMode0(205, 5, setupArgs);
+    } else {
+        slotReleaseChecked(5, 0);
+    }
+    if (gMovieChannelEnable[17].channelSetting != 0) {
+        setupArgs[0] = D_003F5960[0].channelSetting << 8;
+        setupArgs[1] = D_003F5960[1].channelSetting + 256;
+        setupArgs[2] = D_003F5960[2].channelSetting + 224;
+        setupArgs[3] = D_003F5960[3].channelSetting;
+        setupArgs[4] = D_003F5960[4].channelSetting;
+        setupArgs[5] = D_003F5960[5].channelSetting;
+        setupArgs[6] = D_003F5960[6].channelSetting;
+        setupArgs[7] = D_003F5960[7].channelSetting;
+        slotSetupMode0(206, 6, setupArgs);
+    } else {
+        slotReleaseChecked(6, 0);
+    }
+    if (gMovieChannelEnable[18].channelSetting != 0) {
+        setupArgs[0] = gMovieChannelsResetD[0].channelSetting;
+        setupArgs[1] = gMovieChannelsResetD[1].channelSetting;
+        setupArgs[2] = gMovieChannelsResetD[2].channelSetting;
+        setupArgs[3] = gMovieChannelsResetD[3].channelSetting;
+        setupArgs[4] = gMovieChannelsResetD[4].channelSetting;
+        slotSetupMode0(209, 9, setupArgs);
+    } else {
+        slotReleaseChecked(9, 0);
+    }
+    if (gMovieChannelEnable[19].channelSetting != 0) {
+        setupArgs[0] = D_003F66C0[0].channelSetting;
+        setupArgs[1] = D_003F66C0[1].channelSetting;
+        setupArgs[2] = D_003F66C0[2].channelSetting;
+        setupArgs[3] = D_003F66C0[3].channelSetting;
+        setupArgs[4] = D_003F66C0[4].channelSetting;
+        setupArgs[5] = 0;
+        setupArgs[6] = D_003F66C0[5].channelSetting;
+        slotSetupMode0(229, 29, setupArgs);
+    } else {
+        slotReleaseChecked(29, 0);
+    }
+    if (gMovieChannelEnable[20].channelSetting != 0) {
+        setupArgs[0] = gMovieChannelsResetE[0].channelSetting;
+        setupArgs[1] = gMovieChannelsResetE[1].channelSetting;
+        setupArgs[2] = gMovieChannelsResetE[2].channelSetting;
+        slotSetupMode0(230, 30, setupArgs);
+    } else {
+        slotReleaseChecked(30, 0);
+    }
+    if (gMovieChannelEnable[21].channelSetting != 0) {
+        setupArgs[0] = D_003F7110[0].channelSetting;
+        setupArgs[1] = D_003F7110[1].channelSetting;
+        setupArgs[2] = D_003F7110[2].channelSetting;
+        setupArgs[3] = D_003F7110[3].channelSetting;
+        setupArgs[4] = D_003F7110[4].channelSetting;
+        setupArgs[5] = D_003F7110[5].channelSetting;
+        setupArgs[6] = D_003F7110[6].channelSetting;
+        setupArgs[7] = D_003F7110[7].channelSetting;
+        setupArgs[8] = D_003F7110[8].channelSetting;
+        setupArgs[9] = D_003F7110[9].channelSetting;
+        setupArgs[10] = D_003F7110[10].channelSetting;
+        setupArgs[11] = D_003F7110[11].channelSetting;
+        setupArgs[12] = D_003F7110[12].channelSetting;
+        setupArgs[13] = D_003F7110[13].channelSetting;
+        setupArgs[14] = D_003F7110[14].channelSetting;
+        D_003F8670[0] = D_003F7110[15].channelSetting;
+        D_003F8670[1] = D_003F7110[16].channelSetting;
+        D_003F8670[2] = D_003F7110[17].channelSetting;
+        D_003F8670[3] = D_003F7110[18].channelSetting;
+        D_003F8670[4] = D_003F7110[19].channelSetting;
+        D_003F8670[5] = D_003F7110[20].channelSetting;
+        D_003F8670[6] = D_003F7110[21].channelSetting;
+        D_003F8670[7] = D_003F7110[22].channelSetting;
+        D_003F8670[8] = D_003F7110[23].channelSetting;
+        D_003F8670[9] = D_003F7110[24].channelSetting;
+        D_003F8670[10] = D_003F7110[25].channelSetting;
+        D_003F8670[11] = D_003F7110[26].channelSetting;
+        D_003F8670[12] = D_003F7110[27].channelSetting;
+        D_003F8670[13] = D_003F7110[28].channelSetting;
+        D_003F8670[14] = D_003F7110[29].channelSetting;
+        slotSetupMode0(242, D_003F7110[30].channelSetting, setupArgs);
+    } else {
+        slotReleaseChecked(42, 0);
+    }
+    if (gMovieChannelEnable[22].channelSetting != 0) {
+        setupArgs[0] = D_003F86B0[0].channelSetting;
+        setupArgs[1] = D_003F86B0[1].channelSetting;
+        setupArgs[2] = D_003F86B0[2].channelSetting;
+        setupArgs[3] = D_003F86B0[3].channelSetting;
+        setupArgs[4] = D_003F86B0[4].channelSetting;
+        setupArgs[5] = D_003F86B0[5].channelSetting;
+        setupArgs[6] = D_003F86B0[6].channelSetting;
+        setupArgs[7] = D_003F86B0[7].channelSetting;
+        setupArgs[8] = D_003F86B0[8].channelSetting;
+        setupArgs[9] = D_003F86B0[9].channelSetting;
+        setupArgs[10] = D_003F86B0[10].channelSetting;
+        setupArgs[11] = D_003F86B0[11].channelSetting;
+        setupArgs[12] = D_003F86B0[12].channelSetting;
+        setupArgs[13] = D_003F86B0[13].channelSetting;
+        setupArgs[14] = D_003F86B0[14].channelSetting;
+        D_003F9C10[0] = D_003F86B0[15].channelSetting;
+        D_003F9C10[1] = D_003F86B0[16].channelSetting;
+        D_003F9C10[2] = D_003F86B0[17].channelSetting;
+        D_003F9C10[3] = D_003F86B0[18].channelSetting;
+        D_003F9C10[4] = D_003F86B0[19].channelSetting;
+        D_003F9C10[5] = D_003F86B0[20].channelSetting;
+        D_003F9C10[6] = D_003F86B0[21].channelSetting;
+        D_003F9C10[7] = D_003F86B0[22].channelSetting;
+        D_003F9C10[8] = D_003F86B0[23].channelSetting;
+        D_003F9C10[9] = D_003F86B0[24].channelSetting;
+        D_003F9C10[10] = D_003F86B0[25].channelSetting;
+        D_003F9C10[11] = D_003F86B0[26].channelSetting;
+        D_003F9C10[12] = D_003F86B0[27].channelSetting;
+        D_003F9C10[13] = D_003F86B0[28].channelSetting;
+        D_003F9C10[14] = D_003F86B0[29].channelSetting;
+        slotSetupMode0(243, D_003F86B0[30].channelSetting, setupArgs);
+        if (gPadDataPressed[0] & PAD_START) {
+            movieNoOpStub24();
+        }
+    } else {
+        slotReleaseChecked(43, 0);
+    }
+    if (gMovieChannelEnable[23].channelSetting != 0) {
+        setupArgs[0] = D_003F9C50[0].channelSetting;
+        setupArgs[1] = D_003F9C50[1].channelSetting;
+        setupArgs[2] = D_003F9C50[2].channelSetting;
+        setupArgs[3] = D_003F9C50[3].channelSetting;
+        setupArgs[4] = D_003F9C50[4].channelSetting;
+        setupArgs[5] = D_003F9C50[5].channelSetting;
+        setupArgs[6] = D_003F9C50[6].channelSetting;
+        setupArgs[7] = D_003F9C50[7].channelSetting;
+        setupArgs[8] = D_003F9C50[8].channelSetting;
+        setupArgs[9] = D_003F9C50[9].channelSetting;
+        setupArgs[10] = D_003F9C50[10].channelSetting;
+        setupArgs[11] = D_003F9C50[11].channelSetting;
+        setupArgs[12] = D_003F9C50[12].channelSetting;
+        setupArgs[13] = D_003F9C50[13].channelSetting;
+        setupArgs[14] = D_003F9C50[14].channelSetting;
+        D_003FB1B0[0] = D_003F9C50[15].channelSetting;
+        D_003FB1B0[1] = D_003F9C50[16].channelSetting;
+        D_003FB1B0[2] = D_003F9C50[17].channelSetting;
+        D_003FB1B0[3] = D_003F9C50[18].channelSetting;
+        D_003FB1B0[4] = D_003F9C50[19].channelSetting;
+        D_003FB1B0[5] = D_003F9C50[20].channelSetting;
+        D_003FB1B0[6] = D_003F9C50[21].channelSetting;
+        D_003FB1B0[7] = D_003F9C50[22].channelSetting;
+        D_003FB1B0[8] = D_003F9C50[23].channelSetting;
+        D_003FB1B0[9] = D_003F9C50[24].channelSetting;
+        D_003FB1B0[10] = D_003F9C50[25].channelSetting;
+        D_003FB1B0[11] = D_003F9C50[26].channelSetting;
+        D_003FB1B0[12] = D_003F9C50[27].channelSetting;
+        D_003FB1B0[13] = D_003F9C50[28].channelSetting;
+        D_003FB1B0[14] = D_003F9C50[29].channelSetting;
+        slotSetupMode0(244, D_003F9C50[30].channelSetting, setupArgs);
+        if (gPadDataPressed[0] & PAD_START) {
+            movieNoOpStub25();
+        }
+    } else {
+        slotReleaseChecked(44, 0);
+    }
+    if (gMovieChannelEnable[24].channelSetting != 0) {
+        setupArgs[0] = D_003FB1F0[0].channelSetting;
+        setupArgs[1] = D_003FB1F0[1].channelSetting;
+        setupArgs[2] = D_003FB1F0[2].channelSetting;
+        setupArgs[3] = D_003FB1F0[3].channelSetting;
+        setupArgs[4] = D_003FB1F0[4].channelSetting;
+        setupArgs[5] = D_003FB1F0[5].channelSetting;
+        setupArgs[6] = D_003FB1F0[6].channelSetting;
+        setupArgs[7] = D_003FB1F0[7].channelSetting;
+        setupArgs[8] = D_003FB1F0[8].channelSetting;
+        setupArgs[9] = D_003FB1F0[9].channelSetting;
+        setupArgs[10] = D_003FB1F0[10].channelSetting;
+        setupArgs[11] = D_003FB1F0[11].channelSetting;
+        setupArgs[12] = D_003FB1F0[12].channelSetting;
+        setupArgs[13] = D_003FB1F0[13].channelSetting;
+        setupArgs[14] = D_003FB1F0[14].channelSetting;
+        D_003FC750[0] = D_003FB1F0[15].channelSetting;
+        D_003FC750[1] = D_003FB1F0[16].channelSetting;
+        D_003FC750[2] = D_003FB1F0[17].channelSetting;
+        D_003FC750[3] = D_003FB1F0[18].channelSetting;
+        D_003FC750[4] = D_003FB1F0[19].channelSetting;
+        D_003FC750[5] = D_003FB1F0[20].channelSetting;
+        D_003FC750[6] = D_003FB1F0[21].channelSetting;
+        D_003FC750[7] = D_003FB1F0[22].channelSetting;
+        D_003FC750[8] = D_003FB1F0[23].channelSetting;
+        D_003FC750[9] = D_003FB1F0[24].channelSetting;
+        D_003FC750[10] = D_003FB1F0[25].channelSetting;
+        D_003FC750[11] = D_003FB1F0[26].channelSetting;
+        D_003FC750[12] = D_003FB1F0[27].channelSetting;
+        D_003FC750[13] = D_003FB1F0[28].channelSetting;
+        D_003FC750[14] = D_003FB1F0[29].channelSetting;
+        slotSetupMode0(245, D_003FB1F0[30].channelSetting, setupArgs);
+        if (gPadDataPressed[0] & PAD_START) {
+            movieNoOpStub26();
+        }
+    } else {
+        slotReleaseChecked(45, 0);
+    }
+    if (gMovieChannelEnable[25].channelSetting != 0) {
+        setupArgs[0] = D_003FC790[0].channelSetting;
+        setupArgs[1] = D_003FC790[1].channelSetting;
+        setupArgs[2] = D_003FC790[2].channelSetting;
+        setupArgs[3] = D_003FC790[3].channelSetting;
+        setupArgs[4] = D_003FC790[4].channelSetting;
+        setupArgs[5] = D_003FC790[5].channelSetting;
+        setupArgs[6] = D_003FC790[6].channelSetting;
+        setupArgs[7] = D_003FC790[7].channelSetting;
+        setupArgs[8] = D_003FC790[8].channelSetting;
+        setupArgs[9] = D_003FC790[9].channelSetting;
+        setupArgs[10] = D_003FC790[10].channelSetting;
+        setupArgs[11] = D_003FC790[11].channelSetting;
+        setupArgs[12] = D_003FC790[12].channelSetting;
+        setupArgs[13] = D_003FC790[13].channelSetting;
+        setupArgs[14] = D_003FC790[14].channelSetting;
+        D_003FDCF0[0] = D_003FC790[15].channelSetting;
+        D_003FDCF0[1] = D_003FC790[16].channelSetting;
+        D_003FDCF0[2] = D_003FC790[17].channelSetting;
+        D_003FDCF0[3] = D_003FC790[18].channelSetting;
+        D_003FDCF0[4] = D_003FC790[19].channelSetting;
+        D_003FDCF0[5] = D_003FC790[20].channelSetting;
+        D_003FDCF0[6] = D_003FC790[21].channelSetting;
+        D_003FDCF0[7] = D_003FC790[22].channelSetting;
+        D_003FDCF0[8] = D_003FC790[23].channelSetting;
+        D_003FDCF0[9] = D_003FC790[24].channelSetting;
+        D_003FDCF0[10] = D_003FC790[25].channelSetting;
+        D_003FDCF0[11] = D_003FC790[26].channelSetting;
+        D_003FDCF0[12] = D_003FC790[27].channelSetting;
+        D_003FDCF0[13] = D_003FC790[28].channelSetting;
+        D_003FDCF0[14] = D_003FC790[29].channelSetting;
+        slotSetupMode0(246, D_003FC790[30].channelSetting, setupArgs);
+        if (gPadDataPressed[0] & PAD_START) {
+            movieNoOpStub27();
+        }
+    } else {
+        slotReleaseChecked(46, 0);
+    }
+    if (gMovieChannelEnable[26].channelSetting != 0) {
+        setupArgs[0] = D_003FDD30[0].channelSetting;
+        setupArgs[1] = D_003FDD30[1].channelSetting;
+        setupArgs[2] = D_003FDD30[2].channelSetting;
+        setupArgs[3] = D_003FDD30[3].channelSetting;
+        setupArgs[4] = D_003FDD30[4].channelSetting;
+        setupArgs[5] = D_003FDD30[5].channelSetting;
+        setupArgs[6] = D_003FDD30[6].channelSetting;
+        setupArgs[7] = D_003FDD30[7].channelSetting;
+        setupArgs[8] = D_003FDD30[8].channelSetting;
+        setupArgs[9] = D_003FDD30[9].channelSetting;
+        setupArgs[10] = D_003FDD30[10].channelSetting;
+        setupArgs[11] = D_003FDD30[11].channelSetting;
+        setupArgs[12] = D_003FDD30[12].channelSetting;
+        setupArgs[13] = D_003FDD30[13].channelSetting;
+        setupArgs[14] = D_003FDD30[14].channelSetting;
+        D_003FF290[0] = D_003FDD30[15].channelSetting;
+        D_003FF290[1] = D_003FDD30[16].channelSetting;
+        D_003FF290[2] = D_003FDD30[17].channelSetting;
+        D_003FF290[3] = D_003FDD30[18].channelSetting;
+        D_003FF290[4] = D_003FDD30[19].channelSetting;
+        D_003FF290[5] = D_003FDD30[20].channelSetting;
+        D_003FF290[6] = D_003FDD30[21].channelSetting;
+        D_003FF290[7] = D_003FDD30[22].channelSetting;
+        D_003FF290[8] = D_003FDD30[23].channelSetting;
+        D_003FF290[9] = D_003FDD30[24].channelSetting;
+        D_003FF290[10] = D_003FDD30[25].channelSetting;
+        D_003FF290[11] = D_003FDD30[26].channelSetting;
+        D_003FF290[12] = D_003FDD30[27].channelSetting;
+        D_003FF290[13] = D_003FDD30[28].channelSetting;
+        D_003FF290[14] = D_003FDD30[29].channelSetting;
+        slotSetupMode0(247, D_003FDD30[30].channelSetting, setupArgs);
+        if (gPadDataPressed[0] & PAD_START) {
+            movieNoOpStub28();
+        }
+    } else {
+        slotReleaseChecked(47, 0);
+    }
+    if (gMovieChannelEnable[27].channelSetting != 0) {
+        setupArgs[0] = D_003FF2D0[0].channelSetting;
+        setupArgs[1] = D_003FF2D0[1].channelSetting;
+        setupArgs[2] = D_003FF2D0[2].channelSetting;
+        setupArgs[3] = D_003FF2D0[3].channelSetting;
+        setupArgs[4] = D_003FF2D0[4].channelSetting;
+        setupArgs[5] = D_003FF2D0[5].channelSetting;
+        setupArgs[6] = D_003FF2D0[6].channelSetting;
+        setupArgs[7] = D_003FF2D0[7].channelSetting;
+        setupArgs[8] = D_003FF2D0[8].channelSetting;
+        setupArgs[9] = D_003FF2D0[9].channelSetting;
+        setupArgs[10] = D_003FF2D0[10].channelSetting;
+        setupArgs[11] = D_003FF2D0[11].channelSetting;
+        setupArgs[12] = D_003FF2D0[12].channelSetting;
+        setupArgs[13] = D_003FF2D0[13].channelSetting;
+        setupArgs[14] = D_003FF2D0[14].channelSetting;
+        D_00400830[0] = D_003FF2D0[15].channelSetting;
+        D_00400830[1] = D_003FF2D0[16].channelSetting;
+        D_00400830[2] = D_003FF2D0[17].channelSetting;
+        D_00400830[3] = D_003FF2D0[18].channelSetting;
+        D_00400830[4] = D_003FF2D0[19].channelSetting;
+        D_00400830[5] = D_003FF2D0[20].channelSetting;
+        D_00400830[6] = D_003FF2D0[21].channelSetting;
+        D_00400830[7] = D_003FF2D0[22].channelSetting;
+        D_00400830[8] = D_003FF2D0[23].channelSetting;
+        D_00400830[9] = D_003FF2D0[24].channelSetting;
+        D_00400830[10] = D_003FF2D0[25].channelSetting;
+        D_00400830[11] = D_003FF2D0[26].channelSetting;
+        D_00400830[12] = D_003FF2D0[27].channelSetting;
+        D_00400830[13] = D_003FF2D0[28].channelSetting;
+        D_00400830[14] = D_003FF2D0[29].channelSetting;
+        slotSetupMode0(248, D_003FF2D0[30].channelSetting, setupArgs);
+        if (gPadDataPressed[0] & PAD_START) {
+            movieNoOpStub29();
+        }
+    } else {
+        slotReleaseChecked(48, 0);
+    }
+}
+

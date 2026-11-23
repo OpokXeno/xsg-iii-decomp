@@ -99,6 +99,10 @@ typedef struct PxyShadowLight {
 } PxyShadowLight;
 
 /* The shadow projector pxyCurrentShadow points to (0x36 quadwords). */
+typedef union PxyVector {
+    AlignedVector4 vector;
+    u32 words[4];
+} PxyVector;
 typedef struct PxyShadow {
     Matrix light; /* +0x000: light space to world */
     Matrix textureInverse; /* +0x040 */
@@ -115,9 +119,7 @@ typedef struct PxyShadow {
     s16 frameBase; /* +0x296 */
     int clutOffset; /* +0x298 */
     u8 unk29C[4];
-    float scaleU; /* +0x2a0 */
-    float scaleV; /* +0x2a4 */
-    u8 unk2A8[8];
+    PxyVector scale; /* +0x2a0: x, y = texture scale */
     u64 tex0; /* +0x2b0 */
     u64 clamp; /* +0x2b8 */
     Vector4 uv; /* +0x2c0: offset u, scale u, offset v, scale v */
@@ -127,7 +129,7 @@ typedef struct PxyShadow {
     Vector4 min; /* +0x300 */
     Vector4 max; /* +0x310 */
     Vector4 bounds; /* +0x320: centre and radius */
-    int unk330; /* +0x330 */
+    void *unk330; /* +0x330: cleared when the projector is set up */
     u8 unk334[4];
     u64 alphaData; /* +0x338: GS ALPHA_1 data (0x42 or 0x89) */
 } PxyShadow;

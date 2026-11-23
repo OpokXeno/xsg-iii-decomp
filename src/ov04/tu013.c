@@ -13,7 +13,7 @@ INCLUDE_ASM("asm/nonmatchings/ov04/tu013", func_00A9CCB0);
 
 typedef short s16;
 typedef int s32;
-extern s32 D_00AAD620[];   /* bitmap A: one bit per index, 32 indices per word */
+extern s32 gOptionWords[];   /* bitmap A: one bit per index, 32 indices per word */
 extern s32 D_00AAD624[];   /* bitmap B */
 
 s32 indexBitTest(s16 bitIndex)
@@ -26,7 +26,7 @@ s32 indexBitTest(s16 bitIndex)
     bitmapWordIndex = bitIndex + 0x1F;
   }
   bitMask = 1 << bitIndex;
-  return (D_00AAD620[bitmapWordIndex >> 5] & bitMask) != 0;
+  return (gOptionWords[bitmapWordIndex >> 5] & bitMask) != 0;
 }
 
 void indexBitSet(s16 bitIndex)
@@ -39,7 +39,7 @@ void indexBitSet(s16 bitIndex)
   {
     bitmapWordIndex = bitIndex + 0x1F;
   }
-  bitmapWordPtr = &D_00AAD620[bitmapWordIndex >> 5];
+  bitmapWordPtr = &gOptionWords[bitmapWordIndex >> 5];
   updatedWord = *bitmapWordPtr | (1 << bitIndex);
   *bitmapWordPtr = updatedWord;
 }
@@ -116,7 +116,7 @@ void indexBitClearSecond(s16 bitIndex)
   {
     bitmapWordIndex = bitIndex + 0x1F;
   }
-  secondBitmap = D_00AAD620 - -1;
+  secondBitmap = gOptionWords - -1;
   bitmapWordPtr = &secondBitmap[bitmapWordIndex >> 5];
   updatedWord = *bitmapWordPtr & (~(1 << bitIndex));
   *bitmapWordPtr = updatedWord;

@@ -25,6 +25,10 @@ typedef short s16;
 
 /* styleFlags bit: njStringSetText lays the text out at once, which counts its lines and places its icons. */
 #define NJ_STRING_STYLE_LAYOUT_ON_SET 0x20
+/* styleFlags bit: two-byte text stays in the proportional style (no fixed-pitch style code). */
+#define NJ_STRING_STYLE_PROPORTIONAL_ONLY 0x800
+/* styleFlags bit: <size..> tags are skipped. */
+#define NJ_STRING_STYLE_NO_ZOOM 0x1000
 
 /* A button icon the layout left room for; the caller draws it over that blank. */
 typedef struct NjStringIcon {
@@ -46,7 +50,8 @@ typedef struct NjString {
     s32 word20;                         /* 0x20 */
     s32 layoutCount;                    /* 0x24 */
     s32 layoutLimit;                    /* 0x28 */
-    unsigned char unmodeled_2C[0x38 - 0x2C];
+    unsigned char *nextText;            /* 0x2C text after the last line break njStringLayoutLine laid out */
+    unsigned char unmodeled_30[0x38 - 0x30];
     struct NjStringIcon icons[NJ_STRING_MAX_ICONS]; /* 0x38 */
     s8 iconCount;                       /* 0xF8 */
     u8 zoomX;                           /* 0xF9 default "$zoom" x, two decimal digits */

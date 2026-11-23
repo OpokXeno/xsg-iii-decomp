@@ -474,6 +474,18 @@ def fix_rom_bss_pins(unit_dir, unit, script, carve_report):
     return script
 
 
+def scaffold_data_piece(unit_dir, unit, name, section):
+    """The scaffold data source a carved TU section is cut from, relative to the unit directory.
+
+    An X3 overlay without per-TU data families keeps its data in one `unsplit.data.s` piece
+    (data_carve.ovl_unsplit_piece)."""
+    piece = f'asm/data/{unit}/{name}{section}.s'
+    unsplit = f'asm/data/{unit}/unsplit.data.s'
+    if not (unit_dir / piece).is_file() and (unit_dir / unsplit).is_file():
+        return unsplit
+    return piece
+
+
 def main():
     global ROOT, PY, BIN, BSS_RECORD, CARVE_REGISTRY
     ap = argparse.ArgumentParser()
@@ -723,7 +735,7 @@ def main():
             if split:
                 split_deps = [str(CARVE_REGISTRY), str(HERE / 'data_carve.py'),
                               str(ROOT / 'tools/tu/elfinfo.py'), str(compile_input), 'layout.json', target]
-                split_deps += [f'asm/data/{unit}/{name}{r["section"]}.s'
+                split_deps += [scaffold_data_piece(unit_dir, unit, name, r["section"])
                                for r in carve_report if r['tu'] == split['tu']]
                 lines += [f"build {obj}: carvesplit {compiled_obj} | {' '.join(split_deps)}",
                           f"  tu = {split['tu']}"]
@@ -763,7 +775,7 @@ def main():
                 split_deps = [str(CARVE_REGISTRY), str(HERE / 'data_carve.py'),
                               str(ROOT / 'tools/tu/elfinfo.py'), str(compile_input),
                               'layout.json', target]
-                split_deps += [f'asm/data/{unit}/{t["name"]}{r["section"]}.s'
+                split_deps += [scaffold_data_piece(unit_dir, unit, t["name"], r["section"])
                                for r in carve_report if r['tu'] == split['tu']]
                 lines += [f"build {obj}: carvesplit {compiled_obj} | {' '.join(split_deps)}",
                           f"  tu = {split['tu']}"]

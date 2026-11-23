@@ -8418,7 +8418,7 @@
      1
     ],
     [
-     "func_00A82968",
+     "actorTableStepMotion",
      11020648,
      3876,
      1
@@ -8616,7 +8616,7 @@
      1
     ],
     [
-     "func_00A870A8",
+     "boardPlaceCell",
      11038888,
      1092,
      1
@@ -8646,7 +8646,7 @@
      1
     ],
     [
-     "func_00A87A20",
+     "boardCellCenter",
      11041312,
      116,
      1
@@ -8688,7 +8688,7 @@
      1
     ],
     [
-     "func_00A888C8",
+     "boardEditorUpdate",
      11045064,
      6004,
      1
@@ -8766,7 +8766,7 @@
      1
     ],
     [
-     "func_00A8AD68",
+     "boardLiftsUpdate",
      11054440,
      4404,
      1
@@ -8898,7 +8898,7 @@
      1
     ],
     [
-     "func_00A8E658",
+     "screenModePadDisplayUpdate",
      11069016,
      4392,
      1
@@ -9738,13 +9738,13 @@
      1
     ],
     [
-     "func_00A9EC90",
+     "ov04StepLatchPair",
      11136144,
      84,
      1
     ],
     [
-     "func_00A9ECE8",
+     "ov04StepLatchIdAndOperands",
      11136232,
      112,
      1
@@ -9768,13 +9768,13 @@
      1
     ],
     [
-     "func_00A9EF18",
+     "ov04ScriptSetDemoButtons",
      11136792,
      284,
      1
     ],
     [
-     "ov04ScriptSetStateBit10",
+     "ov04ScriptSetDemoInput",
      11137080,
      144,
      1
@@ -9786,7 +9786,7 @@
      1
     ],
     [
-     "func_00A9F118",
+     "ov04ScriptShowMessage",
      11137304,
      192,
      1
@@ -34056,7 +34056,7 @@
      2
     ],
     [
-     "func_0019FB28",
+     "pxySetupShadowProjector",
      1702696,
      3732,
      2
@@ -34104,7 +34104,7 @@
      2
     ],
     [
-     "func_001A1688",
+     "pxyCalcFogFactors",
      1709704,
      364,
      2
@@ -34122,7 +34122,7 @@
      2
     ],
     [
-     "func_001A1D18",
+     "pxySubmitModel",
      1711384,
      6428,
      2
@@ -34176,7 +34176,7 @@
      2
     ],
     [
-     "func_001A40C8",
+     "pxyDrawShadowCasterTexture",
      1720520,
      4160,
      2
@@ -39636,13 +39636,13 @@
      2
     ],
     [
-     "func_001D63B8",
+     "xglPacketAppendWordQuad",
      1926072,
      56,
      2
     ],
     [
-     "func_001D63F0",
+     "xglPacketAppendFloatQuad",
      1926128,
      56,
      2
@@ -39690,7 +39690,7 @@
      2
     ],
     [
-     "func_001D6518",
+     "colorHsvToRgb",
      1926424,
      332,
      2
@@ -39720,7 +39720,7 @@
      2
     ],
     [
-     "func_001D67F8",
+     "xglFilterShouldSkip",
      1927160,
      96,
      2
@@ -39756,7 +39756,7 @@
      2
     ],
     [
-     "func_001D7638",
+     "xglColorFilterApplyClut",
      1930808,
      4540,
      2
@@ -39888,13 +39888,13 @@
      2
     ],
     [
-     "func_001E1128",
+     "xglColorFilterApply",
      1970472,
      4904,
      2
     ],
     [
-     "func_001E2450",
+     "blurBeginBlendPass",
      1975376,
      160,
      2
@@ -39906,19 +39906,19 @@
      2
     ],
     [
-     "func_001E2518",
+     "blurQueueSprite",
      1975576,
      216,
      2
     ],
     [
-     "func_001E25F0",
+     "xglRadialBlurApply",
      1975792,
      3824,
      2
     ],
     [
-     "func_001E34E0",
+     "xglDepthFocusBlurApply",
      1979616,
      3688,
      2
@@ -40632,7 +40632,7 @@
      2
     ],
     [
-     "func_001EAEE0",
+     "sceneShatterTransitionUpdate",
      2010848,
      7040,
      2
@@ -40884,7 +40884,7 @@
      2
     ],
     [
-     "func_001EFF50",
+     "sdvApplySlotEvent",
      2031440,
      3676,
      2
@@ -48546,19 +48546,19 @@
      2
     ],
     [
-     "func_00254B40",
+     "gifStateDrawPageQuadInset",
      2444096,
      488,
      2
     ],
     [
-     "func_00254D28",
+     "gifStateRestorePageBorder",
      2444584,
      604,
      2
     ],
     [
-     "func_00254F88",
+     "gifStateDrawEchoBlur",
      2445192,
      4704,
      2
@@ -48576,7 +48576,7 @@
      2
     ],
     [
-     "func_00256CE8",
+     "gifStateDrawCustomEchoBlur",
      2452712,
      4112,
      2
@@ -55596,7 +55596,7 @@
      2
     ],
     [
-     "func_00289168",
+     "movieChannelSlotsUpdate",
      2658664,
      5280,
      2
@@ -57120,7 +57120,7 @@
      2
     ],
     [
-     "func_00299E98",
+     "tiMotionSolveLocalMatrices",
      2727576,
      3800,
      2
@@ -60510,7 +60510,7 @@
      2
     ],
     [
-     "func_002C4858",
+     "seVoiceCursorDrawStatusPanel",
      2902104,
      6208,
      2
@@ -62550,7 +62550,7 @@
      2
     ],
     [
-     "func_002D6CA8",
+     "njStringLayoutLine",
      2976936,
      5808,
      2

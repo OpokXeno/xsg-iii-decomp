@@ -1139,10 +1139,10 @@
     {
      "c_split": false,
      "end": "0x004C8B20",
-     "ordinal": 41,
-     "piece": "tu041",
+     "ordinal": 40,
+     "piece": "nml_model_set",
      "start": "0x004C8A80",
-     "tu": "tu041"
+     "tu": "nml_model_set"
     },
     {
      "c_split": false,
@@ -1377,7 +1377,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00530D78",
+     "end": "0x00530D38",
      "ordinal": 265,
      "piece": "tu265",
      "start": "0x00530D00",
@@ -1388,7 +1388,7 @@
      "end": "0x00530E30",
      "ordinal": 292,
      "piece": "tu292",
-     "start": "0x00530D78",
+     "start": "0x00530D38",
      "tu": "tu292"
     },
     {
@@ -2201,19 +2201,11 @@
     },
     {
      "c_split": false,
-     "end": "0x0053E760",
+     "end": "0x0053E7A0",
      "ordinal": 108,
      "piece": "tu108",
      "start": "0x0053E740",
      "tu": "tu108"
-    },
-    {
-     "c_split": false,
-     "end": "0x0053E7A0",
-     "ordinal": 110,
-     "piece": "tu110",
-     "start": "0x0053E760",
-     "tu": "tu110"
     },
     {
      "c_split": false,
@@ -2289,7 +2281,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0053EF10",
+     "end": "0x0053EEE0",
      "ordinal": 128,
      "piece": "tu128",
      "start": "0x0053EEC8",
@@ -2297,18 +2289,26 @@
     },
     {
      "c_split": false,
-     "end": "0x0053F278",
+     "end": "0x0053F230",
      "ordinal": 131,
      "piece": "sef",
-     "start": "0x0053EF10",
+     "start": "0x0053EEE0",
      "tu": "sef"
+    },
+    {
+     "c_split": false,
+     "end": "0x0053F258",
+     "ordinal": 140,
+     "piece": "sv_scene_flags",
+     "start": "0x0053F230",
+     "tu": "sv_scene_flags"
     },
     {
      "c_split": false,
      "end": "0x0053F4A0",
      "ordinal": 141,
      "piece": "sv_get_image_item",
-     "start": "0x0053F278",
+     "start": "0x0053F258",
      "tu": "sv_get_image_item"
     },
     {
@@ -2529,19 +2529,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00541DF0",
-     "ordinal": 42,
-     "piece": "cfePlugIn",
-     "start": "0x00541DE0",
-     "tu": "cfePlugIn"
-    },
-    {
-     "c_split": false,
      "end": "0x00541EA0",
-     "ordinal": 45,
-     "piece": "nml_model_set_045",
-     "start": "0x00541DF0",
-     "tu": "nml_model_set_045"
+     "ordinal": 40,
+     "piece": "nml_model_set",
+     "start": "0x00541DE0",
+     "tu": "nml_model_set"
     },
     {
      "c_split": false,
@@ -3473,10 +3465,10 @@
     {
      "c_split": false,
      "end": "0x0054FC1C",
-     "ordinal": 110,
-     "piece": "tu110",
+     "ordinal": 108,
+     "piece": "tu108",
      "start": "0x0054FB88",
-     "tu": "tu110"
+     "tu": "tu108"
     },
     {
      "c_split": false,
@@ -3720,19 +3712,11 @@
     },
     {
      "c_split": false,
-     "end": "0x0054FFF4",
-     "ordinal": 41,
-     "piece": "tu041",
-     "start": "0x0054FFEC",
-     "tu": "tu041"
-    },
-    {
-     "c_split": false,
      "end": "0x00550060",
-     "ordinal": 45,
-     "piece": "nml_model_set_045",
-     "start": "0x0054FFF4",
-     "tu": "nml_model_set_045"
+     "ordinal": 40,
+     "piece": "nml_model_set",
+     "start": "0x0054FFEC",
+     "tu": "nml_model_set"
     },
     {
      "c_split": false,
@@ -4520,10 +4504,10 @@
     {
      "c_split": false,
      "end": "0x0055101C",
-     "ordinal": 110,
-     "piece": "tu110",
+     "ordinal": 108,
+     "piece": "tu108",
      "start": "0x00551000",
-     "tu": "tu110"
+     "tu": "tu108"
     },
     {
      "c_split": false,
@@ -4727,19 +4711,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00551248",
-     "ordinal": 45,
-     "piece": "nml_model_set_045",
-     "start": "0x00551240",
-     "tu": "nml_model_set_045"
-    },
-    {
-     "c_split": false,
      "end": "0x00551250",
-     "ordinal": 41,
-     "piece": "tu041",
-     "start": "0x00551248",
-     "tu": "tu041"
+     "ordinal": 40,
+     "piece": "nml_model_set",
+     "start": "0x00551240",
+     "tu": "nml_model_set"
     },
     {
      "c_split": false,
@@ -5175,10 +5151,10 @@
     {
      "c_split": false,
      "end": "0x00551510",
-     "ordinal": 110,
-     "piece": "tu110",
+     "ordinal": 108,
+     "piece": "tu108",
      "start": "0x0055150C",
-     "tu": "tu110"
+     "tu": "tu108"
     },
     {
      "c_split": false,
@@ -5918,10 +5894,10 @@
     {
      "c_split": false,
      "end": "0x0061AAC0",
-     "ordinal": 110,
-     "piece": "tu110",
+     "ordinal": 108,
+     "piece": "tu108",
      "start": "0x0061A2C0",
-     "tu": "tu110"
+     "tu": "tu108"
     },
     {
      "c_split": false,
@@ -6125,7 +6101,7 @@
     },
     {
      "c_split": false,
-     "end": "0x008C030C",
+     "end": "0x008C06B0",
      "ordinal": 36,
      "piece": "face_point",
      "start": "0x008BF8C0",
@@ -6133,15 +6109,7 @@
     },
     {
      "c_split": false,
-     "end": "0x008C06B0",
-     "ordinal": 45,
-     "piece": "nml_model_set_045",
-     "start": "0x008C030C",
-     "tu": "nml_model_set_045"
-    },
-    {
-     "c_split": false,
-     "end": "0x008C2BB4",
+     "end": "0x008C28B0",
      "ordinal": 37,
      "piece": "pxy_profile_037",
      "start": "0x008C06B0",
@@ -6149,35 +6117,11 @@
     },
     {
      "c_split": false,
-     "end": "0x008C2C14",
-     "ordinal": 44,
-     "piece": "nml_model_set_044",
-     "start": "0x008C2BB4",
-     "tu": "nml_model_set_044"
-    },
-    {
-     "c_split": false,
-     "end": "0x008C2C50",
-     "ordinal": 43,
-     "piece": "nml_model_set",
-     "start": "0x008C2C14",
-     "tu": "nml_model_set"
-    },
-    {
-     "c_split": false,
-     "end": "0x008C2C90",
-     "ordinal": 42,
-     "piece": "cfePlugIn",
-     "start": "0x008C2C50",
-     "tu": "cfePlugIn"
-    },
-    {
-     "c_split": false,
      "end": "0x008E2670",
-     "ordinal": 41,
-     "piece": "tu041",
-     "start": "0x008C2C90",
-     "tu": "tu041"
+     "ordinal": 40,
+     "piece": "nml_model_set",
+     "start": "0x008C28B0",
+     "tu": "nml_model_set"
     },
     {
      "c_split": false,
@@ -6325,12 +6269,7 @@
   "pxy_profile_037",
   "tu038",
   "tu039",
-  "tu040",
-  "tu041",
-  "cfePlugIn",
   "nml_model_set",
-  "nml_model_set_044",
-  "nml_model_set_045",
   "pxy_packet_state",
   "cur_matrix_asm",
   "model_calc_clip",
@@ -6394,8 +6333,6 @@
   "sb_natives",
   "tu107",
   "tu108",
-  "tu109",
-  "tu110",
   "tu111",
   "tu112",
   "tu113",
@@ -46499,18 +46436,18 @@
       "0x008bc441",
       "0x008c030c"
      ],
-     "end": "0x008C030C",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x008C06B0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-23 (nml_model_set merge)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x008C030C",
+       "end": "0x008C06B0",
        "name": "face_point",
        "start": "0x008BF8C0"
       }
      ],
-     "size": 2636,
+     "size": 3568,
      "splat_type": "bss",
      "start": "0x008BF8C0"
     }
@@ -46725,18 +46662,18 @@
       "0x008d3601",
       "0x008c2bb4"
      ],
-     "end": "0x008C2BB4",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x008C28B0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-23 (nml_model_set merge)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x008C2BB4",
+       "end": "0x008C28B0",
        "name": "pxy_profile_037",
        "start": "0x008C06B0"
       }
      ],
-     "size": 9476,
+     "size": 8704,
      "splat_type": "bss",
      "start": "0x008C06B0"
     }
@@ -47075,9 +47012,9 @@
    "id": "main/tu040",
    "unit": "main",
    "ordinal": 40,
-   "name": "tu040",
-   "path": "src/main/tu040.c",
-   "scaffold_path": "scaffold/src/main/tu040.c",
+   "name": "nml_model_set",
+   "path": "src/main/nml_model_set.c",
+   "scaffold_path": "scaffold/src/main/nml_model_set.c",
    "kind": "gcc",
    "mode": "c",
    "category": "game",
@@ -47087,7 +47024,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds 0.42",
-    "precision of this score band on X1, held out: 0.257 (9/35)"
+    "precision of this score band on X1, held out: 0.257 (9/35)",
+    "TU merge 2026-11-23: tu040, tu041, cfePlugIn, nml_model_set, nml_model_set_044, nml_model_set_045"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -47102,7 +47040,7 @@
     "compiler_profile": "ee-gcc2_96-realconv-lp7",
     "flags": [
      "-O2",
-     "-G0"
+     "-G8"
     ],
     "language": "c",
     "source_class": "c",
@@ -47115,8 +47053,8 @@
     "compiler_confidence": "medium",
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
-    "g_flag": "-G0",
-    "g_basis": "no gp-relative instruction in the code; -G0 cannot add one",
+    "g_flag": "-G8",
+    "g_basis": "TU merge 2026-11-23 of 6 TUs (flags were ['-G0', '-G8'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -47124,7 +47062,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 9,
+    "of": 145,
     "migration_hints": [],
     "records": []
    },
@@ -47209,94 +47147,7 @@
      "va": "0x0019e480",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x0019e148",
-    "end": "0x0019e510",
-    "code_end": "0x0019e510",
-    "size": 968,
-    "splat": "c",
-    "splat_range": [
-     "0x0019e148",
-     "0x0019e510"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu040.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu041",
-   "unit": "main",
-   "ordinal": 41,
-   "name": "tu041",
-   "path": "src/main/tu041.c",
-   "scaffold_path": "scaffold/src/main/tu041.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.66",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G8"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G8",
-    "g_basis": "6 gp-relative instructions in the code",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 10,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "pxyBuildFadeRamp",
@@ -47386,195 +47237,7 @@
      "va": "0x0019e8f8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm",
-    ".lit4": "asm",
-    ".sdata": "asm",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x004c8a80",
-      "0x004c8a81"
-     ],
-     "bounds": [
-      "0x004c888d",
-      "0x004c8b20"
-     ],
-     "end": "0x004C8B20",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x004C8B20",
-       "name": "tu041",
-       "start": "0x004C8A80"
-      }
-     ],
-     "size": 160,
-     "splat_type": "data",
-     "start": "0x004C8A80"
     },
-    ".lit4": {
-     "anchored": [
-      "0x0054ffec",
-      "0x0054fff1"
-     ],
-     "bounds": [
-      "0x0054ffe9",
-      "0x0054fff4"
-     ],
-     "end": "0x0054FFF4",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FFF4",
-       "name": "tu041",
-       "start": "0x0054FFEC"
-      }
-     ],
-     "size": 8,
-     "splat_type": "lit4",
-     "start": "0x0054FFEC"
-    },
-    ".sdata": {
-     "anchored": [
-      "0x00551248",
-      "0x00551249"
-     ],
-     "bounds": [
-      "0x0055124d",
-      "0x00551250"
-     ],
-     "end": "0x00551250",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00551250",
-       "name": "tu041",
-       "start": "0x00551248"
-      }
-     ],
-     "size": 8,
-     "splat_type": "sdata",
-     "start": "0x00551248"
-    },
-    ".bss": {
-     "anchored": [
-      "0x008c2c90",
-      "0x008e1671"
-     ],
-     "bounds": [
-      "0x008c2f5d",
-      "0x008e2670"
-     ],
-     "end": "0x008E2670",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x008E2670",
-       "name": "tu041",
-       "start": "0x008C2C90"
-      }
-     ],
-     "size": 129504,
-     "splat_type": "bss",
-     "start": "0x008C2C90"
-    }
-   },
-   "text": {
-    "start": "0x0019e510",
-    "end": "0x0019e918",
-    "code_end": "0x0019e914",
-    "size": 1032,
-    "splat": "c",
-    "splat_range": [
-     "0x0019e510",
-     "0x0019e918"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X2 port phase 2 express (user 2026-11-20: Express, sin revisi\u00f3n)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu041.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu042",
-   "unit": "main",
-   "ordinal": 42,
-   "name": "cfePlugIn",
-   "path": "src/main/cfePlugIn.c",
-   "scaffold_path": "scaffold/src/main/cfePlugIn.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -2.07",
-    "precision of this score band on X1, held out: 0.231 (3/13)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "X1 file of 1 homolog function(s)",
-   "name_confidence": "medium",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G0"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G0",
-    "g_basis": "no gp-relative instruction in the code; -G0 cannot add one",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 36,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "pxySetSyncMode",
@@ -47898,145 +47561,7 @@
      "va": "0x0019eed0",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".rodata": "asm",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x00541de0",
-      "0x00541de1"
-     ],
-     "bounds": [
-      "0x00541dc9",
-      "0x00541df0"
-     ],
-     "end": "0x00541DF0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00541DF0",
-       "name": "cfePlugIn",
-       "start": "0x00541DE0"
-      }
-     ],
-     "size": 16,
-     "splat_type": "rodata",
-     "start": "0x00541DE0"
     },
-    ".bss": {
-     "anchored": [
-      "0x008c2c50",
-      "0x008c2f5d"
-     ],
-     "bounds": [
-      "0x008c2c61",
-      "0x008c2c90"
-     ],
-     "end": "0x008C2C90",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x008C2C90",
-       "name": "cfePlugIn",
-       "start": "0x008C2C50"
-      }
-     ],
-     "size": 64,
-     "splat_type": "bss",
-     "start": "0x008C2C50"
-    }
-   },
-   "text": {
-    "start": "0x0019e918",
-    "end": "0x0019eee8",
-    "code_end": "0x0019eee4",
-    "size": 1488,
-    "splat": "c",
-    "splat_range": [
-     "0x0019e918",
-     "0x0019eee8"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
-    "source": {
-     "kind": "file",
-     "path": "src/main/cfePlugIn.c",
-     "include_dirs": [
-      "include"
-     ]
-    }
-   }
-  },
-  {
-   "id": "main/tu043",
-   "unit": "main",
-   "ordinal": 43,
-   "name": "nml_model_set",
-   "path": "src/main/nml_model_set.c",
-   "scaffold_path": "scaffold/src/main/nml_model_set.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.79",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G0"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G0",
-    "g_basis": "no gp-relative instruction in the code; -G0 cannot add one",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 3,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "pxySetMotionGlobalMatrices",
@@ -48063,120 +47588,7 @@
      "va": "0x0019ef08",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".bss": {
-     "anchored": [
-      "0x008c2c14",
-      "0x008c2c61"
-     ],
-     "bounds": [
-      "0x008c3011",
-      "0x008c2c50"
-     ],
-     "end": "0x008C2C50",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x008C2C50",
-       "name": "nml_model_set",
-       "start": "0x008C2C14"
-      }
-     ],
-     "size": 60,
-     "splat_type": "bss",
-     "start": "0x008C2C14"
-    }
-   },
-   "text": {
-    "start": "0x0019eee8",
-    "end": "0x0019ef40",
-    "code_end": "0x0019ef40",
-    "size": 88,
-    "splat": "c",
-    "splat_range": [
-     "0x0019eee8",
-     "0x0019ef40"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
-    "source": {
-     "kind": "file",
-     "path": "src/main/nml_model_set.c",
-     "include_dirs": [
-      "include"
-     ]
-    }
-   }
-  },
-  {
-   "id": "main/tu044",
-   "unit": "main",
-   "ordinal": 44,
-   "name": "nml_model_set_044",
-   "path": "src/main/nml_model_set_044.c",
-   "scaffold_path": "scaffold/src/main/nml_model_set_044.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -0.85",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "X1 file of 1 homolog function(s)",
-   "name_confidence": "medium",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G0"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G0",
-    "g_basis": "no gp-relative instruction in the code; -G0 cannot add one",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 26,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "nmlModelFogPara",
@@ -48410,120 +47822,7 @@
      "va": "0x0019f570",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".bss": {
-     "anchored": [
-      "0x008c2bb4",
-      "0x008c3011"
-     ],
-     "bounds": [
-      "0x008c0741",
-      "0x008c2c14"
-     ],
-     "end": "0x008C2C14",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x008C2C14",
-       "name": "nml_model_set_044",
-       "start": "0x008C2BB4"
-      }
-     ],
-     "size": 96,
-     "splat_type": "bss",
-     "start": "0x008C2BB4"
-    }
-   },
-   "text": {
-    "start": "0x0019ef40",
-    "end": "0x0019f580",
-    "code_end": "0x0019f57c",
-    "size": 1600,
-    "splat": "c",
-    "splat_range": [
-     "0x0019ef40",
-     "0x0019f580"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
-    "source": {
-     "kind": "file",
-     "path": "src/main/nml_model_set_044.c",
-     "include_dirs": [
-      "include"
-     ]
-    }
-   }
-  },
-  {
-   "id": "main/tu045",
-   "unit": "main",
-   "ordinal": 45,
-   "name": "nml_model_set_045",
-   "path": "src/main/nml_model_set_045.c",
-   "scaffold_path": "scaffold/src/main/nml_model_set_045.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.64",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G8"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G8",
-    "g_basis": "162 gp-relative instructions in the code",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 61,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "pxyAbortModel",
@@ -48661,9 +47960,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019FB28",
+     "name": "pxySetupShadowProjector",
      "size": 3732,
-     "splat_name": "func_0019FB28",
+     "splat_name": "pxySetupShadowProjector",
      "va": "0x0019fb28",
      "name_basis": "address",
      "provenance": "estimated"
@@ -48733,9 +48032,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A1688",
+     "name": "pxyCalcFogFactors",
      "size": 364,
-     "splat_name": "func_001A1688",
+     "splat_name": "pxyCalcFogFactors",
      "va": "0x001a1688",
      "name_basis": "address",
      "provenance": "estimated"
@@ -48760,9 +48059,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A1D18",
+     "name": "pxySubmitModel",
      "size": 6428,
-     "splat_name": "func_001A1D18",
+     "splat_name": "pxySubmitModel",
      "va": "0x001a1d18",
      "name_basis": "address",
      "provenance": "estimated"
@@ -48841,9 +48140,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A40C8",
+     "name": "pxyDrawShadowCasterTexture",
      "size": 4160,
-     "splat_name": "func_001A40C8",
+     "splat_name": "pxyDrawShadowCasterTexture",
      "va": "0x001a40c8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -49076,133 +48375,167 @@
    ],
    "owners": {
     ".text": "c",
-    ".rodata": "asm",
+    ".data": "asm",
     ".lit4": "asm",
     ".sdata": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".rodata": "asm"
    },
    "sections": {
+    ".data": {
+     "anchored": [
+      "0x004c8a80",
+      "0x004c8a81"
+     ],
+     "bounds": [
+      "0x004c888d",
+      "0x004c8b20"
+     ],
+     "end": "0x004C8B20",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-23",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x004C8B20",
+       "name": "nml_model_set",
+       "start": "0x004C8A80"
+      }
+     ],
+     "size": 160,
+     "splat_type": "data",
+     "start": "0x004C8A80"
+    },
     ".rodata": {
      "anchored": [
+      "0x00541de0",
+      "0x00541de1",
       "0x00541df0",
       "0x00541e89"
      ],
      "bounds": [
-      "0x00541de1",
-      "0x00541ea0"
+      "0x00541dc9",
+      "0x00541df0"
      ],
      "end": "0x00541EA0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-23",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00541EA0",
-       "name": "nml_model_set_045",
-       "start": "0x00541DF0"
+       "name": "nml_model_set",
+       "start": "0x00541DE0"
       }
      ],
-     "size": 176,
+     "size": 192,
      "splat_type": "rodata",
-     "start": "0x00541DF0"
+     "start": "0x00541DE0"
     },
     ".lit4": {
      "anchored": [
+      "0x0054ffec",
+      "0x0054fff1",
       "0x0054fff4",
       "0x0055005d"
      ],
      "bounds": [
-      "0x0054fff1",
-      "0x00550060"
+      "0x0054ffe9",
+      "0x0054fff4"
      ],
      "end": "0x00550060",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-23",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00550060",
-       "name": "nml_model_set_045",
-       "start": "0x0054FFF4"
+       "name": "nml_model_set",
+       "start": "0x0054FFEC"
       }
      ],
-     "size": 108,
+     "size": 116,
      "splat_type": "lit4",
-     "start": "0x0054FFF4",
-     "notes": [
-      "2026-11-20: 0x550004-0x550060 moved from TiXacAnimCurve (false anchor 0x550006); every cell is referenced only by tu045 functions"
-     ]
+     "start": "0x0054FFEC"
     },
     ".sdata": {
      "anchored": [
       "0x00551240",
+      "0x00551248",
+      "0x00551249",
       "0x0055124d"
      ],
      "bounds": [
-      "0x00551239",
-      "0x00551248"
+      "0x0055124d",
+      "0x00551250"
      ],
-     "end": "0x00551248",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00551250",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-23",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00551248",
-       "name": "nml_model_set_045",
+       "end": "0x00551250",
+       "name": "nml_model_set",
        "start": "0x00551240"
       }
      ],
-     "size": 8,
+     "size": 16,
      "splat_type": "sdata",
      "start": "0x00551240"
     },
     ".bss": {
      "anchored": [
-      "0x008c030c",
-      "0x008d3601"
+      "0x008c2bb4",
+      "0x008c2c14",
+      "0x008c2c50",
+      "0x008c2c61",
+      "0x008c2c90",
+      "0x008c2f5d",
+      "0x008c3011",
+      "0x008e1671"
      ],
      "bounds": [
-      "0x008c06a1",
-      "0x008c06b0"
+      "0x008c0741",
+      "0x008c2c14"
      ],
-     "end": "0x008C06B0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x008E2670",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-23",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x008C06B0",
-       "name": "nml_model_set_045",
-       "start": "0x008C030C"
+       "end": "0x008E2670",
+       "name": "nml_model_set",
+       "start": "0x008C28B0"
       }
      ],
-     "size": 932,
+     "size": 130496,
      "splat_type": "bss",
-     "start": "0x008C030C"
+     "start": "0x008C28B0"
     }
    },
    "text": {
-    "start": "0x0019f580",
+    "start": "0x0019e148",
     "end": "0x001aa9d0",
     "code_end": "0x001aa9d0",
-    "size": 46160,
+    "size": 51336,
     "splat": "c",
     "splat_range": [
-     "0x0019f580",
+     "0x0019e148",
      "0x001aa9d0"
     ],
-    "note": null
+    "note": "TU merge 2026-11-23 (user order: cuts removed, one object)"
    },
    "import": {
     "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
+    "note": "X3 bulk express integration (user 2026-11-21)",
     "source": {
-     "kind": "file",
-     "path": "src/main/nml_model_set_045.c",
      "include_dirs": [
       "include"
-     ]
+     ],
+     "kind": "file",
+     "path": "src/main/nml_model_set.c"
     }
    }
   },
@@ -65254,7 +64587,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.47",
-    "precision of this score band on X1, held out: 0.271 (16/59)"
+    "precision of this score band on X1, held out: 0.271 (16/59)",
+    "TU merge 2026-11-22: tu108, tu109, tu110"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -65269,7 +64603,7 @@
     "compiler_profile": "ee-gcc2_96-realconv-lp7",
     "flags": [
      "-O2",
-     "-G0"
+     "-G8"
     ],
     "language": "c",
     "source_class": "c",
@@ -65282,8 +64616,8 @@
     "compiler_confidence": "medium",
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
-    "g_flag": "-G0",
-    "g_basis": "no gp-relative instruction in the code; -G0 cannot add one",
+    "g_flag": "-G8",
+    "g_basis": "TU merge 2026-11-22 of 3 TUs (flags were ['-G0', '-G8'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -65291,7 +64625,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 24,
+    "of": 74,
     "migration_hints": [],
     "records": []
    },
@@ -65511,120 +64845,7 @@
      "va": "0x001d5ae0",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".rodata": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x0053e740",
-      "0x0053e741"
-     ],
-     "bounds": [
-      "0x0053e421",
-      "0x0053e760"
-     ],
-     "end": "0x0053E760",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0053E760",
-       "name": "tu108",
-       "start": "0x0053E740"
-      }
-     ],
-     "size": 32,
-     "splat_type": "rodata",
-     "start": "0x0053E740"
-    }
-   },
-   "text": {
-    "start": "0x001d4c30",
-    "end": "0x001d5b28",
-    "code_end": "0x001d5b28",
-    "size": 3832,
-    "splat": "c",
-    "splat_range": [
-     "0x001d4c30",
-     "0x001d5b28"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu108.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu109",
-   "unit": "main",
-   "ordinal": 109,
-   "name": "tu109",
-   "path": "src/main/tu109.c",
-   "scaffold_path": "scaffold/src/main/tu109.c",
-   "kind": "gcc",
-   "mode": "asm",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -0.53",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G0"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G0",
-    "g_basis": "no gp-relative instruction in the code; -G0 cannot add one",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 5,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_001D5B28",
@@ -65669,83 +64890,7 @@
      "va": "0x001d61a8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "asm"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x001d5b28",
-    "end": "0x001d6370",
-    "code_end": "0x001d636c",
-    "size": 2120,
-    "splat": "c",
-    "splat_range": [
-     "0x001d5b28",
-     "0x001d6370"
-    ],
-    "note": null
-   }
-  },
-  {
-   "id": "main/tu110",
-   "unit": "main",
-   "ordinal": 110,
-   "name": "tu110",
-   "path": "src/main/tu110.c",
-   "scaffold_path": "scaffold/src/main/tu110.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.55",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G8"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G8",
-    "g_basis": "84 gp-relative instructions in the code",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 45,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "xglPacketBufferInit",
@@ -65766,18 +64911,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001D63B8",
+     "name": "xglPacketAppendWordQuad",
      "size": 56,
-     "splat_name": "func_001D63B8",
+     "splat_name": "xglPacketAppendWordQuad",
      "va": "0x001d63b8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001D63F0",
+     "name": "xglPacketAppendFloatQuad",
      "size": 56,
-     "splat_name": "func_001D63F0",
+     "splat_name": "xglPacketAppendFloatQuad",
      "va": "0x001d63f0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65847,9 +64992,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001D6518",
+     "name": "colorHsvToRgb",
      "size": 332,
-     "splat_name": "func_001D6518",
+     "splat_name": "colorHsvToRgb",
      "va": "0x001d6518",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65892,9 +65037,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001D67F8",
+     "name": "xglFilterShouldSkip",
      "size": 96,
-     "splat_name": "func_001D67F8",
+     "splat_name": "xglFilterShouldSkip",
      "va": "0x001d67f8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65946,9 +65091,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001D7638",
+     "name": "xglColorFilterApplyClut",
      "size": 4540,
-     "splat_name": "func_001D7638",
+     "splat_name": "xglColorFilterApplyClut",
      "va": "0x001d7638",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66144,9 +65289,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001E1128",
+     "name": "xglColorFilterApply",
      "size": 4904,
-     "splat_name": "func_001E1128",
+     "splat_name": "xglColorFilterApply",
      "va": "0x001e1128",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66163,27 +65308,29 @@
    "sections": {
     ".rodata": {
      "anchored": [
+      "0x0053e740",
+      "0x0053e741",
       "0x0053e760",
       "0x0053e799"
      ],
      "bounds": [
-      "0x0053e741",
-      "0x0053e7a0"
+      "0x0053e421",
+      "0x0053e760"
      ],
      "end": "0x0053E7A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-22",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053E7A0",
-       "name": "tu110",
-       "start": "0x0053E760"
+       "name": "tu108",
+       "start": "0x0053E740"
       }
      ],
-     "size": 64,
+     "size": 96,
      "splat_type": "rodata",
-     "start": "0x0053E760"
+     "start": "0x0053E740"
     },
     ".lit4": {
      "anchored": [
@@ -66195,13 +65342,13 @@
       "0x0054fc1c"
      ],
      "end": "0x0054FC1C",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-22",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054FC1C",
-       "name": "tu110",
+       "name": "tu108",
        "start": "0x0054FB88"
       }
      ],
@@ -66219,13 +65366,13 @@
       "0x0055101c"
      ],
      "end": "0x0055101C",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-22",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0055101C",
-       "name": "tu110",
+       "name": "tu108",
        "start": "0x00551000"
       }
      ],
@@ -66243,13 +65390,13 @@
       "0x00551510"
      ],
      "end": "0x00551510",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-22",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00551510",
-       "name": "tu110",
+       "name": "tu108",
        "start": "0x0055150C"
       }
      ],
@@ -66267,13 +65414,13 @@
       "0x0061aac0"
      ],
      "end": "0x0061AAC0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-22",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0061AAC0",
-       "name": "tu110",
+       "name": "tu108",
        "start": "0x0061A2C0"
       }
      ],
@@ -66283,16 +65430,16 @@
     }
    },
    "text": {
-    "start": "0x001d6370",
+    "start": "0x001d4c30",
     "end": "0x001e2450",
     "code_end": "0x001e2450",
-    "size": 49376,
+    "size": 55328,
     "splat": "c",
     "splat_range": [
-     "0x001d6370",
+     "0x001d4c30",
      "0x001e2450"
     ],
-    "note": null
+    "note": "TU merge 2026-11-22 (reorg nothrow evidence: xglColorFilterApply needs drawEnvSetLarge compiled as C earlier in the same file)"
    },
    "import": {
     "mode": "c",
@@ -66302,7 +65449,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu110.c"
+     "path": "src/main/tu108.c"
     }
    }
   },
@@ -66366,9 +65513,9 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_001E2450",
+     "name": "blurBeginBlendPass",
      "size": 160,
-     "splat_name": "func_001E2450",
+     "splat_name": "blurBeginBlendPass",
      "va": "0x001e2450",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66384,27 +65531,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001E2518",
+     "name": "blurQueueSprite",
      "size": 216,
-     "splat_name": "func_001E2518",
+     "splat_name": "blurQueueSprite",
      "va": "0x001e2518",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001E25F0",
+     "name": "xglRadialBlurApply",
      "size": 3824,
-     "splat_name": "func_001E25F0",
+     "splat_name": "xglRadialBlurApply",
      "va": "0x001e25f0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001E34E0",
+     "name": "xglDepthFocusBlurApply",
      "size": 3688,
-     "splat_name": "func_001E34E0",
+     "splat_name": "xglDepthFocusBlurApply",
      "va": "0x001e34e0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68463,9 +67610,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EAEE0",
+     "name": "sceneShatterTransitionUpdate",
      "size": 7040,
-     "splat_name": "func_001EAEE0",
+     "splat_name": "sceneShatterTransitionUpdate",
      "va": "0x001eaee0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69743,9 +68890,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EFF50",
+     "name": "sdvApplySlotEvent",
      "size": 3676,
-     "splat_name": "func_001EFF50",
+     "splat_name": "sdvApplySlotEvent",
      "va": "0x001eff50",
      "name_basis": "address",
      "provenance": "estimated"
@@ -70758,18 +69905,18 @@
       "0x0053ea91",
       "0x0053ef10"
      ],
-     "end": "0x0053EF10",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x0053EEE0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu128)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0053EF10",
+       "end": "0x0053EEE0",
        "name": "tu128",
        "start": "0x0053EEC8"
       }
      ],
-     "size": 72,
+     "size": 24,
      "splat_type": "rodata",
      "start": "0x0053EEC8"
     },
@@ -72938,20 +72085,20 @@
       "0x0053eec9",
       "0x0053f278"
      ],
-     "end": "0x0053F278",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "end": "0x0053F230",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu128)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0053F278",
+       "end": "0x0053F230",
        "name": "sef",
-       "start": "0x0053EF10"
+       "start": "0x0053EEE0"
       }
      ],
-     "size": 872,
+     "size": 848,
      "splat_type": "rodata",
-     "start": "0x0053EF10"
+     "start": "0x0053EEE0"
     },
     ".lit4": {
      "anchored": [
@@ -73734,9 +72881,32 @@
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".rodata": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x0053F230",
+      "0x0053F278"
+     ],
+     "end": "0x0053F258",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by sv_scene_flags)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0053F258",
+       "name": "sv_scene_flags",
+       "start": "0x0053F230"
+      }
+     ],
+     "size": 40,
+     "splat_type": "rodata",
+     "start": "0x0053F230"
+    }
+   },
    "text": {
     "start": "0x00208458",
     "end": "0x002085c0",
@@ -74525,19 +73695,19 @@
       "0x0053f400"
      ],
      "end": "0x0053F4A0",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by sv_scene_flags)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053F4A0",
        "name": "sv_get_image_item",
-       "start": "0x0053F278"
+       "start": "0x0053F258"
       }
      ],
-     "size": 552,
+     "size": 584,
      "splat_type": "rodata",
-     "start": "0x0053F278"
+     "start": "0x0053F258"
     },
     ".lit4": {
      "anchored": [
@@ -92477,27 +91647,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00254B40",
+     "name": "gifStateDrawPageQuadInset",
      "size": 488,
-     "splat_name": "func_00254B40",
+     "splat_name": "gifStateDrawPageQuadInset",
      "va": "0x00254b40",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00254D28",
+     "name": "gifStateRestorePageBorder",
      "size": 604,
-     "splat_name": "func_00254D28",
+     "splat_name": "gifStateRestorePageBorder",
      "va": "0x00254d28",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00254F88",
+     "name": "gifStateDrawEchoBlur",
      "size": 4704,
-     "splat_name": "func_00254F88",
+     "splat_name": "gifStateDrawEchoBlur",
      "va": "0x00254f88",
      "name_basis": "address",
      "provenance": "estimated"
@@ -92522,9 +91692,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00256CE8",
+     "name": "gifStateDrawCustomEchoBlur",
      "size": 4112,
-     "splat_name": "func_00256CE8",
+     "splat_name": "gifStateDrawCustomEchoBlur",
      "va": "0x00256ce8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -102776,18 +101946,18 @@
       "0x00530cf1",
       "0x00530d78"
      ],
-     "end": "0x00530D78",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00530D38",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu265)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00530D78",
+       "end": "0x00530D38",
        "name": "tu265",
        "start": "0x00530D00"
       }
      ],
-     "size": 120,
+     "size": 56,
      "splat_type": "rodata",
      "start": "0x00530D00"
     },
@@ -108369,19 +107539,19 @@
       "0x00530e30"
      ],
      "end": "0x00530E30",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu265)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00530E30",
        "name": "tu292",
-       "start": "0x00530D78"
+       "start": "0x00530D38"
       }
      ],
-     "size": 184,
+     "size": 248,
      "splat_type": "rodata",
-     "start": "0x00530D78"
+     "start": "0x00530D38"
     },
     ".sdata": {
      "anchored": [
@@ -114703,9 +113873,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00289168",
+     "name": "movieChannelSlotsUpdate",
      "size": 5280,
-     "splat_name": "func_00289168",
+     "splat_name": "movieChannelSlotsUpdate",
      "va": "0x00289168",
      "name_basis": "address",
      "provenance": "estimated"
@@ -119564,9 +118734,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00299E98",
+     "name": "tiMotionSolveLocalMatrices",
      "size": 3800,
-     "splat_name": "func_00299E98",
+     "splat_name": "tiMotionSolveLocalMatrices",
      "va": "0x00299e98",
      "name_basis": "address",
      "provenance": "estimated"
@@ -129670,9 +128840,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002C4858",
+     "name": "seVoiceCursorDrawStatusPanel",
      "size": 6208,
-     "splat_name": "func_002C4858",
+     "splat_name": "seVoiceCursorDrawStatusPanel",
      "va": "0x002c4858",
      "name_basis": "address",
      "provenance": "estimated"
@@ -135314,9 +134484,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002D6CA8",
+     "name": "njStringLayoutLine",
      "size": 5808,
-     "splat_name": "func_002D6CA8",
+     "splat_name": "njStringLayoutLine",
      "va": "0x002d6ca8",
      "name_basis": "address",
      "provenance": "estimated"

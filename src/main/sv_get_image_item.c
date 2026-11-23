@@ -1548,7 +1548,6 @@ void nmlModelSetZwrite(int zwrite);
 void nmlModelSetTransparency(float transparency);
 void nmlModelSetStencil(int stencil);
 void pxySetAnimTime(float animTime);
-void func_001A1D18(PxyModelHeader *submit);
 SefFogOverride *sefGetFogOverrideBlock(void);
 
 /* Sets the render state of one model item and submits it: the stencil word from D_0053F258, the scaled colour into the
@@ -1639,7 +1638,7 @@ void svSetModelRenderState(SvRenderItem *renderItem, Matrix4 *matrix, int scale)
             nmlModelSetSortOffset(scale * D_0054FD88);
         }
         nmlModelSetScale(&renderItem->scale);
-        func_001A1D18(renderItem->part->submitBlock);
+        pxySubmitModel(renderItem->part->submitBlock);
     }
 }
 
