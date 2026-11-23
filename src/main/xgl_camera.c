@@ -468,12 +468,54 @@ void xglCameraSetPadPort(XglCamera *camera, s32 port) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001947F0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001948E0);
-
-float tanf(float angle);
-
 void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
 
+/* The GS primitive coordinate range (12.4 fixed point) and its centre. */
+#define CAMERA_GS_COORD_SIZE 4096.0f
+#define CAMERA_GS_COORD_CENTER 2048.0f
+/* The horizontal projection scale. XS2 computes (135 / 11) / (54 / (MAGH + 1)) from DISPLAY1; XS3 keeps the
+ * value for MAGH 4. */
+#define CAMERA_PROJECTION_SCALE (25.0f / 22.0f)
+
+/* Derives the screen offset and scale, the clip range and the projection from the window, resolution and
+ * port effect of the camera screen. */
+void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
+{
+    XglCameraScreen *screen = &camera->screen;
+    float scale;
+    float depth[2];
+    Vector4 scaled;
+    float offsetX;
+    float offsetY;
+
+    offsetX = (screen->window.vector.z + screen->window.vector.x) * 0.5f - screen->resolution.vector.x * 0.5f;
+    offsetY = (screen->window.vector.w + screen->window.vector.y) * 0.5f - screen->resolution.vector.y * 0.5f;
+    scale = CAMERA_PROJECTION_SCALE;
+    depth[0] = (float) screen->depthMin;
+    depth[1] = (float) (screen->depthMax - screen->depthMin);
+    if (screen->resolution.vector.z > screen->resolution.vector.w) {
+        xglVectorScale(&scaled, &screen->resolution.vector,
+                       (CAMERA_GS_COORD_SIZE - __builtin_fabsf(2.0f * offsetX)) / screen->resolution.vector.z);
+    } else {
+        xglVectorScale(&scaled, &screen->resolution.vector,
+                       (CAMERA_GS_COORD_SIZE - __builtin_fabsf(2.0f * offsetY)) / screen->resolution.vector.w);
+    }
+    screen->clipRange.vector.z = screen->projection.x * (scaled.z / screen->resolution.vector.z);
+    screen->clipRange.vector.w = screen->projection.y * (scaled.w / screen->resolution.vector.w);
+    QuadwordCopy(&screen->projection, &screen->resolution);
+    screen->projection.x = screen->projection.x * scale;
+    screen->projection.z = screen->projection.z * scale;
+    screen->screenOffset.x = offsetX + CAMERA_GS_COORD_CENTER;
+    screen->screenOffset.y = offsetY + CAMERA_GS_COORD_CENTER;
+    screen->screenOffset.z = depth[0] + depth[1] * 0.5f;
+    screen->screenOffset.w = (1.0f - screen->portEffect.z) * 255.0f;
+    screen->screenScale.x = (scaled.x * screen->portEffect.x) * 0.5f;
+    screen->screenScale.y = -((scaled.y * screen->portEffect.y) * 0.5f);
+    screen->screenScale.z = -(depth[1] * 0.5f);
+    screen->screenScale.w = (screen->portEffect.z * screen->portEffect.w) * 255.0f;
+}
+
+float tanf(float angle);
 void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
 
 void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b, const Vector4 *c);
@@ -593,8 +635,6 @@ void xglCameraTravelDefaultInit(XglCamera *camera);
 
 void xglCameraScreenInit(XglCamera *camera);
 
-void func_001948E0();
-
 void xglCameraViewTravel(XglCamera *camera, Vector4 *cameraShift);
 
 void xglCameraViewVolume(XglCamera *camera, Vector4 *cameraShift);
@@ -610,13 +650,13 @@ void xglCameraMove(XglCamera *camera) {
     Vector4 cameraShift;
 
     cameraShift = (Vector4){0, 0, 0, 0};
-    func_001948E0(camera, &cameraShift);
+    xglCameraViewScreen(camera, &cameraShift);
     xglCameraViewTravel(camera, &cameraShift);
     xglCameraViewVolume(camera, &cameraShift);
 }
 
 void xglCameraMoveOffset(XglCamera *camera, Vector4 *cameraShift) {
-    func_001948E0();
+    xglCameraViewScreen(camera, cameraShift);
     xglCameraViewTravel(camera, cameraShift);
     xglCameraViewVolume(camera, cameraShift);
 }

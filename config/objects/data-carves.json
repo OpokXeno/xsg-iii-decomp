@@ -1284,18 +1284,20 @@
     {
      "range": [
       "0x0054ff18",
-      "0x0054ff20"
+      "0x0054ff24"
      ],
      "generated": [
       "0x0054ff18",
-      "0x0054ff20"
+      "0x0054ff24"
      ],
      "generated_by": [
+      "xglCameraViewScreen",
       "xglCameraPadUpdateChase"
      ],
      "c_owned_symbols": [
       "D_0054FF18",
-      "D_0054FF1C"
+      "D_0054FF1C",
+      "D_0054FF20"
      ],
      "also_referenced_by_c": [
       "gCameraDefaultNearClip",

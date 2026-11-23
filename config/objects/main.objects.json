@@ -42622,9 +42622,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001948E0",
+     "name": "xglCameraViewScreen",
      "size": 636,
-     "splat_name": "func_001948E0",
+     "splat_name": "xglCameraViewScreen",
      "va": "0x001948e0",
      "name_basis": "address",
      "provenance": "estimated"

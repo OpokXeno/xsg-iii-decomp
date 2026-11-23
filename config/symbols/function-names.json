@@ -77,6 +77,7 @@
    "0x00190500": "xglDmaEnable",
    "0x00190550": "xglDmaDisable",
    "0x00193690": "assertFailed",
+   "0x001948e0": "xglCameraViewScreen",
    "0x00195050": "xglCameraSetWindow",
    "0x00195148": "xglEulerFromRotation",
    "0x001959e0": "xglVectorScale",
