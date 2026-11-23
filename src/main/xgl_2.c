@@ -475,19 +475,19 @@ void xglVectorScaleSubXYZ(Vector4 *scaledDifference, const Vector4 *vector, cons
     scaledDifference->w = vector->w;
 }
 
-void xglVectorInter(Vector4 *interpolated, const Vector4 *startVector, const Vector4 *endVector, float t)
+void xglVectorInter(Vector4 *interpolated, const Vector4 *startVector, const Vector4 *endVector, float ratio)
 {
-    interpolated->x = (endVector->x - startVector->x) * t + startVector->x;
-    interpolated->y = (endVector->y - startVector->y) * t + startVector->y;
-    interpolated->z = (endVector->z - startVector->z) * t + startVector->z;
-    interpolated->w = (endVector->w - startVector->w) * t + startVector->w;
+    interpolated->x = (endVector->x - startVector->x) * ratio + startVector->x;
+    interpolated->y = (endVector->y - startVector->y) * ratio + startVector->y;
+    interpolated->z = (endVector->z - startVector->z) * ratio + startVector->z;
+    interpolated->w = (endVector->w - startVector->w) * ratio + startVector->w;
 }
 
-void xglVectorInterXYZ(Vector4 *interpolated, const Vector4 *startVector, const Vector4 *endVector, float t)
+void xglVectorInterXYZ(Vector4 *interpolated, const Vector4 *startVector, const Vector4 *endVector, float ratio)
 {
-    interpolated->x = (endVector->x - startVector->x) * t + startVector->x;
-    interpolated->y = (endVector->y - startVector->y) * t + startVector->y;
-    interpolated->z = (endVector->z - startVector->z) * t + startVector->z;
+    interpolated->x = (endVector->x - startVector->x) * ratio + startVector->x;
+    interpolated->y = (endVector->y - startVector->y) * ratio + startVector->y;
+    interpolated->z = (endVector->z - startVector->z) * ratio + startVector->z;
     interpolated->w = endVector->w;
 }
 
@@ -656,17 +656,17 @@ void xglVectorClampXYZ(Vector4 *destination, const Vector4 *source,
     destination->w = source->w;
 }
 
-void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b,
-                       const Vector4 *c)
+void xglPlaneParameter(Vector4 *plane, const Vector4 *corner0, const Vector4 *corner1,
+                       const Vector4 *corner2)
 {
     Vector4 edge1;
     Vector4 edge2;
 
-    Vu0SubVectorXYZ(&edge1, b, a);
-    Vu0SubVectorXYZ(&edge2, c, b);
+    Vu0SubVectorXYZ(&edge1, corner1, corner0);
+    Vu0SubVectorXYZ(&edge2, corner2, corner1);
     xglVectorOuter(plane, &edge1, &edge2);
     xglVectorNormal(plane, plane);
-    xglVectorInner(&plane->w, plane, a);
+    xglVectorInner(&plane->w, plane, corner0);
     plane->w = -plane->w;
 }
 

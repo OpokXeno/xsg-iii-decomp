@@ -88,9 +88,8 @@ extern ScreenModeControl gScreenModeControlStorage;
 extern s16 *gEntryCellTable;
 
 #define ENTRY_CELL(group, row, column) gEntryCellTable[(row) * 0x13 + (group) * 0x98 + (column)]
-/* Byte offset of a coordinate's cell in gEntryCellTable, and the cell at a byte offset (see ov04/tu004). */
-#define ENTRY_CELL_BYTE_OFFSET(coord) (((coord)->rowIndex * 0x13 + (coord)->cellGroupIndex * 0x98 + (coord)->columnIndex) * 2)
-#define ENTRY_CELL_AT_OFFSET(tableByteDistance) (*(s16 *) ((u8 *) gEntryCellTable + (tableByteDistance)))
+/* Index of a coordinate's cell in gEntryCellTable. */
+#define ENTRY_CELL_INDEX(coord) ((coord)->rowIndex * 0x13 + (coord)->cellGroupIndex * 0x98 + (coord)->columnIndex)
 /* The home coordinates of the 10 lifts follow the 19 x 8 x 19 cell grid in the same table (tu004: lift travel and axis follow them). */
 #define LIFT_HOME_COORD_OFFSET(liftIndex) (0x1690 + (liftIndex) * 6)
 
@@ -215,16 +214,16 @@ extern f32 gWalkSpeedByLevel[];
 extern f32 gWalkChannelByLevel[];
 extern f32 gWalkChannelValueByLevel[];
 
-/* Index of a coordinate's cell in gEntryCellTable. */
-static inline s32 entryCellIndex(EntryCoord *coord)
+/* The address of a cell of gEntryCellTable. */
+static inline s16 *entryCellAt(s32 cellIndex)
 {
-    return coord->rowIndex * 0x13 + coord->cellGroupIndex * 0x98 + coord->columnIndex;
+    return &gEntryCellTable[cellIndex];
 }
 
-/* The halfword at a byte offset from the address of a coordinate field. */
-static inline s16 cellFieldAtByteOffset(s16 *coordField, s32 tableByteDistance)
+/* The address of the halfword at a byte offset from a coordinate field or cell. */
+static inline s16 *cellFieldAtByteOffset(s16 *coordField, s32 tableByteDistance)
 {
-    return *(s16 *) ((u8 *) coordField + tableByteDistance);
+    return (s16 *) ((u8 *) coordField + tableByteDistance);
 }
 
 /* One frame of a moving actor: the special states run their own handler; otherwise it falls, lands, slows
@@ -247,8 +246,8 @@ s32 actorTableStepMotion(s16 actorIndex)
     s32 moving;
     s32 i;
     s16 cellValue;
-    s32 cellOffset;
-    s32 floorCellOffset;
+    s32 cellIndex;
+    s32 floorCellIndex;
 
     actor = gMovingActorSlots + actorIndex;
     grounded = 0;
@@ -405,9 +404,9 @@ s32 actorTableStepMotion(s16 actorIndex)
             s32 liftCoordOffset;
 
             liftCoordOffset = LIFT_HOME_COORD_OFFSET(actor->liftIndex);
-            cellValue = cellFieldAtByteOffset(&((EntryCoord *) gEntryCellTable)->columnIndex, liftCoordOffset);
-            liftCoordOffset = (cellFieldAtByteOffset(&((EntryCoord *) gEntryCellTable)->rowIndex, liftCoordOffset) * 0x13 + cellFieldAtByteOffset(&((EntryCoord *) gEntryCellTable)->cellGroupIndex, liftCoordOffset) * 0x98 + cellValue) * 2;
-            cellValue = ENTRY_CELL_AT_OFFSET(liftCoordOffset) - 6;
+            cellValue = *cellFieldAtByteOffset(&((EntryCoord *) gEntryCellTable)->columnIndex, liftCoordOffset);
+            liftCoordOffset = (*cellFieldAtByteOffset(&((EntryCoord *) gEntryCellTable)->rowIndex, liftCoordOffset) * 0x13 + *cellFieldAtByteOffset(&((EntryCoord *) gEntryCellTable)->cellGroupIndex, liftCoordOffset) * 0x98 + cellValue) * 2;
+            cellValue = *cellFieldAtByteOffset(gEntryCellTable, liftCoordOffset) - 6;
             switch (cellValue) {
             case 0:
                 gScreenModeControlStorage.demoButtons = PAD_CIRCLE;
@@ -505,8 +504,8 @@ s32 actorTableStepMotion(s16 actorIndex)
     if (grounded == 1 && !(gScreenModeControlStorage.modeBits & 0x100)) {
         actorTableQueryPosition(actorIndex, &cell, 0.0f, -0.1f, 0.0f);
         if ((u16) cell.cellGroupIndex < 0x13 && (u16) cell.rowIndex < 8 && (u16) cell.columnIndex < 0x13) {
-            cellOffset = ENTRY_CELL_BYTE_OFFSET(&cell);
-            cellValue = ENTRY_CELL_AT_OFFSET(cellOffset);
+            cellIndex = ENTRY_CELL_INDEX(&cell);
+            cellValue = *entryCellAt(cellIndex);
             if (cellValue == 23 || cellValue == actor->id + 19) {
                 do {
                     func_00A84238(actorIndex, &cell);
@@ -516,8 +515,8 @@ s32 actorTableStepMotion(s16 actorIndex)
         }
     }
     if (grounded == 1 && floorCell.cellGroupIndex != -1 && floorCell.rowIndex != -1 && floorCell.columnIndex != -1) {
-        floorCellOffset = ENTRY_CELL_BYTE_OFFSET(&floorCell);
-        cellValue = ENTRY_CELL_AT_OFFSET(floorCellOffset);
+        floorCellIndex = ENTRY_CELL_INDEX(&floorCell);
+        cellValue = *entryCellAt(floorCellIndex);
         if (cellValue >= 2 && cellValue <= 5) {
             actor->timer = 0;
             actor->motionState = 2;

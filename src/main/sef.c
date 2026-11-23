@@ -1967,7 +1967,7 @@ void sefGetCameraPos(Matrix4 *destMatrix)
     if (destMatrix == 0) {
         destMatrix = sefCameraMatrix;
     }
-    sefMergeMatrixPos(destMatrix, &camera->travel.transform, &sefDefaultPoint);
+    sefMergeMatrixPos(destMatrix, &camera->travel.transform.rows, &sefDefaultPoint);
 }
 
 /* VU0 product of a Vector4 and a column-major matrix: destination = matrix * vector. */

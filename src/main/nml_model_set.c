@@ -1404,10 +1404,10 @@ void pxySetupShadowProjector(PxyModelHeader *modelHeader)
             minV = shadow->repeatV ? shadow->height - 1 : shadow->y;
             maxV = shadow->repeatV ? shadow->y : shadow->y + shadow->height - 1;
             shadow->clamp = GS_SET_CLAMP(wrapU, wrapV, minU, maxU, minV, maxV);
-            shadow->uv.y = (float)shadow->width / (float)texWidth;
-            shadow->uv.x = (float)shadow->x / (float)texWidth + shadow->uv.y * 0.5f;
-            shadow->uv.w = -(float)shadow->height / (float)texHeight;
-            shadow->uv.z = (float)shadow->y / (float)texHeight - shadow->uv.w * 0.5f;
+            shadow->uv.vector.y = (float)shadow->width / (float)texWidth;
+            shadow->uv.vector.x = (float)shadow->x / (float)texWidth + shadow->uv.vector.y * 0.5f;
+            shadow->uv.vector.w = -(float)shadow->height / (float)texHeight;
+            shadow->uv.vector.z = (float)shadow->y / (float)texHeight - shadow->uv.vector.w * 0.5f;
             xglVectorScaleXYZ(&shadow->direction, &shadow->direction, -1.0f);
             shadow->lighting.direction.x = shadow->direction.x;
             shadow->lighting.direction.y = shadow->direction.y;
@@ -2440,8 +2440,6 @@ typedef struct PxyClipPlaneTable {
 
 typedef struct XglPacket XglPacket;
 typedef unsigned int XglQuadword __attribute__((mode(TI)));
-/* The texture-coordinate vector of a shadow, uploaded as one 128-bit VIF datum. */
-#define SHADOW_UV_QUADWORD(shadow) (*(XglQuadword *)&(shadow)->uv)
 
 extern PxyDrawEntry D_008D3600[];
 int func_001A4058(PxyDrawPacket *packet, PxyDrawWork *work);
@@ -2571,7 +2569,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
             sceVif1PkAddUpkData128N(shadowQueue, uploadMatrix, 4);
             sceVif1PkCloseUpkCode(shadowQueue);
             sceVif1PkOpenUpkCode(shadowQueue, 0x3C3, 0x6C, 1, 1);
-            sceVif1PkAddUpkData128(shadowQueue, SHADOW_UV_QUADWORD(shadow));
+            sceVif1PkAddUpkData128(shadowQueue, shadow->uv.quadword);
             sceVif1PkCloseUpkCode(shadowQueue);
             xglMatrixUnit(uploadMatrix);
             shadow->center.w = 1.0f;
@@ -2725,7 +2723,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
                     sceVif1PkAddUpkData128N(partQueue, partMatrix, 4);
                     sceVif1PkCloseUpkCode(partQueue);
                     sceVif1PkOpenUpkCode(partQueue, 0x3C3, 0x6C, 1, 1);
-                    sceVif1PkAddUpkData128(partQueue, SHADOW_UV_QUADWORD(shadow));
+                    sceVif1PkAddUpkData128(partQueue, shadow->uv.quadword);
                     sceVif1PkCloseUpkCode(partQueue);
                     xglMatrixMul(partMatrix, drawWork->packet->localMatrix,
                                  drawWork->packet->boneMatrices[drawWork->part->matrixIndex].rows);

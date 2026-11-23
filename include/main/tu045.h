@@ -103,6 +103,11 @@ typedef union PxyVector {
     AlignedVector4 vector;
     u32 words[4];
 } PxyVector;
+/* The texture-coordinate vector of a shadow, uploaded as one 128-bit VIF datum. */
+typedef union PxyShadowUv {
+    Vector4 vector;
+    XglMatrixQuadword quadword;
+} PxyShadowUv;
 typedef struct PxyShadow {
     Matrix light; /* +0x000: light space to world */
     Matrix textureInverse; /* +0x040 */
@@ -122,7 +127,7 @@ typedef struct PxyShadow {
     PxyVector scale; /* +0x2a0: x, y = texture scale */
     u64 tex0; /* +0x2b0 */
     u64 clamp; /* +0x2b8 */
-    Vector4 uv; /* +0x2c0: offset u, scale u, offset v, scale v */
+    PxyShadowUv uv; /* +0x2c0: offset u, scale u, offset v, scale v */
     Vector4 unk2D0; /* +0x2d0 */
     Vector4 direction; /* +0x2e0 */
     Vector4 center; /* +0x2f0 */

@@ -13,6 +13,17 @@ typedef struct XglCamera XglCamera;
 
 typedef struct XglCameraScreen XglCameraScreen;
 
+/* A 4x4 matrix as xgl_2.c and nml_model_set.c read it: floats, rows, words or quadwords. */
+typedef unsigned int XglMatrixQuadword __attribute__((mode(TI)));
+
+typedef union Matrix {
+    float elements[16];
+    Matrix4 rows;
+    int words[4][4];
+    XglMatrixQuadword quadwords[4];
+    Vector4 vectors[4];
+} Matrix;
+
 /* The four frustum vectors of a travel view; xglCameraViewTravel copies them as one matrix into the camera volume. */
 typedef union CameraFrustum {
     Vector4 corner[4];
@@ -38,7 +49,7 @@ typedef struct CameraTravel {
     Vector4 chase_position;
     CameraFrustum frustum;
     /* +0xE0 and +0x120 of the travel view: the camera transform pair saved by xglCameraViewTravel. */
-    Matrix4 transform;
+    Matrix transform;
     Matrix4 inverseTransform;
 } CameraTravel;
 
@@ -57,17 +68,6 @@ typedef struct CameraVolume {
     unsigned char unmodeled_240[0x40];
     float planeSet[4][4][4];
 } CameraVolume;
-
-/* A 4x4 matrix as xgl_2.c and nml_model_set.c read it: floats, rows, words or quadwords. */
-typedef unsigned int XglMatrixQuadword __attribute__((mode(TI)));
-
-typedef union Matrix {
-    float elements[16];
-    Matrix4 rows;
-    int words[4][4];
-    XglMatrixQuadword quadwords[4];
-    Vector4 vectors[4];
-} Matrix;
 
 /* One projected point as the rot-trans-pers functions store it: GS fixed-point x, y and z (the vftoi result
    of the VU0 vertex) and the float w that stays in the fourth word (the perspective scale). */

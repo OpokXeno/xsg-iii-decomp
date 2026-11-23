@@ -89,9 +89,13 @@ extern struct PadRecord D_4B3470[2]; /* both controller ports */
 #define ENTRY_CELL(group, row, column) gEntryCellTable[(row) * 0x13 + (group) * 0x98 + (column)]
 #define ENTRY_CELL_AT(group, row, column) (gEntryCellTable + ((row) * 0x13 + (group) * 0x98 + (column)))
 
-/* Byte offset of a coordinate's cell in gEntryCellTable, and the cell at a byte offset. */
-#define ENTRY_CELL_BYTE_OFFSET(coord) (((coord)->rowIndex * 0x13 + (coord)->cellGroupIndex * 0x98 + (coord)->columnIndex) * 2)
-#define ENTRY_CELL_AT_OFFSET(tableByteDistance) (*(s16 *) ((u8 *) gEntryCellTable + (tableByteDistance)))
+/* Index of a coordinate's cell in gEntryCellTable, and the address of a cell. */
+#define ENTRY_CELL_INDEX(coord) ((coord)->rowIndex * 0x13 + (coord)->cellGroupIndex * 0x98 + (coord)->columnIndex)
+
+static inline s16 *entryCellAt(s32 cellIndex)
+{
+    return &gEntryCellTable[cellIndex];
+}
 
 /* Model record of a moving actor; only the word cleared when the actor is crushed is known. */
 typedef struct ActorModel {
@@ -193,8 +197,8 @@ s32 func_00A874F0(EntryCoord *coord);
 
 /* Places cellValue on the board cell at coord. Returns 1 when placed, 0 when refused (a refusal shows its message). */
 s32 boardPlaceCell(EntryCoord *coord, s16 cellValue) {
-    s32 cellByteOffset = ENTRY_CELL_BYTE_OFFSET(coord);
-    s16 currentCell = ENTRY_CELL_AT_OFFSET(cellByteOffset);
+    s32 cellIndex = ENTRY_CELL_INDEX(coord);
+    s16 currentCell = *entryCellAt(cellIndex);
     s32 actorIndex;
 
     if (currentCell == cellValue) {
@@ -234,9 +238,9 @@ s32 boardPlaceCell(EntryCoord *coord, s16 cellValue) {
             REFUSE_PLACEMENT(MESSAGE_LIMIT_KIND_A_AND_D);
         }
         {
-            s32 cellOffset = ENTRY_CELL_BYTE_OFFSET(coord);
+            s32 newCellIndex = ENTRY_CELL_INDEX(coord);
 
-            ENTRY_CELL_AT_OFFSET(cellOffset) = cellValue;
+            *entryCellAt(newCellIndex) = cellValue;
         }
         gScreenModeControlStorage->placedKindAD++;
     }
@@ -245,9 +249,9 @@ s32 boardPlaceCell(EntryCoord *coord, s16 cellValue) {
             REFUSE_PLACEMENT(MESSAGE_LIMIT_KIND_C);
         }
         {
-            s32 cellOffset = ENTRY_CELL_BYTE_OFFSET(coord);
+            s32 newCellIndex = ENTRY_CELL_INDEX(coord);
 
-            ENTRY_CELL_AT_OFFSET(cellOffset) = cellValue;
+            *entryCellAt(newCellIndex) = cellValue;
         }
         gScreenModeControlStorage->placedKindC++;
     }
@@ -259,9 +263,9 @@ s32 boardPlaceCell(EntryCoord *coord, s16 cellValue) {
             REFUSE_PLACEMENT(MESSAGE_LIMIT_KIND_D);
         }
         {
-            s32 cellOffset = ENTRY_CELL_BYTE_OFFSET(coord);
+            s32 newCellIndex = ENTRY_CELL_INDEX(coord);
 
-            ENTRY_CELL_AT_OFFSET(cellOffset) = cellValue;
+            *entryCellAt(newCellIndex) = cellValue;
         }
         gScreenModeControlStorage->placedKindAD++;
         gScreenModeControlStorage->placedKindD++;

@@ -467,7 +467,7 @@ void sceneShatterTransitionUpdate(void)
         return;
     }
 
-    viewMatrix = *(Matrix *)&xglStudioGetActiveCamera()->travel.transform;
+    viewMatrix = xglStudioGetActiveCamera()->travel.transform;
     viewMatrix.rows[3][0] = viewMatrix.rows[3][1] = viewMatrix.rows[3][2] = 0.0f;
     viewMatrix.rows[3][3] = 1.0f;
     nearOrigin = xglStudioGetActiveCamera()->volume[0].vertex[2].vector;

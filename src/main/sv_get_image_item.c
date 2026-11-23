@@ -2064,7 +2064,7 @@ void svDrawEffectRecords3D(void) {
     drawKindCounts = sefEffectTallyAt(0);
     _draw3D = 2;
     camera = xglStudioGetActiveCamera();
-    QuadwordCopyMatrixT0(D_00770ED0, camera->travel.transform);
+    QuadwordCopyMatrixT0(D_00770ED0, camera->travel.transform.rows);
     MMathInvertAffineMatrix(&volumeMatrix, camera->volume[0].viewMatrix[0]);
     MMathMulMatrix(&D_00770ED0[1], &volumeMatrix, &D_0053F460);
     memset(D_0076D7E0, 0, 0x180);

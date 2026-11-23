@@ -407,7 +407,7 @@ void xglCameraViewTravel(XglCamera *camera, Vector4 *offset)
     xglMatrixStackRotY(travel->rotation.y);
     xglMatrixStackRotX(travel->rotation.x);
     xglMatrixStackRotZ(travel->rotation.z);
-    xglMatrixStackSave(travel->transform);
+    xglMatrixStackSave(travel->transform.rows);
     xglMatrixStackInverse();
     xglMatrixStackSave(travel->inverseTransform);
 }
@@ -420,7 +420,7 @@ void xglCameraViewVolume(XglCamera *camera, Vector4 *offset) {
     CameraVolume *volume;
     AlignedVector4 corner;
     int x;
-    int b;
+    int verticalRow;
     int y;
     int i;
     int j;
@@ -439,13 +439,13 @@ void xglCameraViewVolume(XglCamera *camera, Vector4 *offset) {
         for (j = 0; j < 2; j++) {
             for (k = 0; k < 8; k++) {
                 x = k & 1;
-                b = ((k & 2) >> 1) | 2;
+                verticalRow = ((k & 2) >> 1) | 2;
                 y = ((k & 4) >> 2) | ((j & 1) << 1);
                 corner.x = volume->frustum[x][y];
-                corner.y = volume->frustum[b][y];
+                corner.y = volume->frustum[verticalRow][y];
                 corner.z = -screen->clipRange.component[y & 1];
                 corner.w = 1.0f;
-                xglVectorMulMat(&volume->vertex[j * 8 + k].vector, travel->transform, &corner);
+                xglVectorMulMat(&volume->vertex[j * 8 + k].vector, travel->transform.rows, &corner);
             }
             {
             for (k = 0; k < 6; k++) {
