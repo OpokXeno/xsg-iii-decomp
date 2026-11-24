@@ -163,8 +163,6 @@ segments:
       - [0xB4FC0, c, sb_natives]
       - [0xB5520, c, tu107]
       - [0xB5C30, c, tu108]
-      - [0xC3450, c, tu111]
-      - [0xC5F10, c, tu112]
       - [0xC7DE8, c, tu113]
       - [0xC8010, c, tu114]
       - [0xC8268, c, tu115]
@@ -709,8 +707,6 @@ segments:
       - [0x41F2B0, rodata, sb_vm]
       - [0x41F418, rodata, tu107]
       - [0x41F740, rodata, tu108]
-      - [0x41F7A0, rodata, tu111]
-      - [0x41F7D0, rodata, tu112]
       - [0x41F860, rodata, tu113]
       - [0x41F870, rodata, tu115]
       - [0x41F8F0, rodata, tu119]
@@ -867,8 +863,6 @@ segments:
       - [0x430B78, lit4, tu400]
       - [0x430B84, lit4, sb_natives]
       - [0x430B88, lit4, tu108]
-      - [0x430C1C, lit4, tu111]
-      - [0x430C20, lit4, tu112]
       - [0x430C2C, lit4, tu115]
       - [0x430C30, lit4, tu118]
       - [0x430C34, lit4, tu119]
@@ -1171,7 +1165,6 @@ segments:
       - { type: bss, vram: 0x0060E0A0, name: tu400 }
       - { type: bss, vram: 0x0060E0C0, name: sb_vm }
       - { type: bss, vram: 0x0061A2C0, name: tu108 }
-      - { type: bss, vram: 0x0061AAC0, name: tu112 }
       - { type: bss, vram: 0x0061B018, name: tu115 }
       - { type: bss, vram: 0x00628050, name: tu119 }
       - { type: bss, vram: 0x0062F4D0, name: sc_get }

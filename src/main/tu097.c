@@ -92,7 +92,7 @@ typedef struct SoundRecord {
     /* 0x1C */ f32 scale;
 } SoundRecord;
 
-f32 func_001D41E0(s32, s32, f32);
+f32 vmArgFloatGetOrDefault(s32, s32, f32);
 
 void soundRecordSelect(s32 vm) {
     s32 recordId;
@@ -112,13 +112,13 @@ void soundRecordDefine(s32 vm) {
     soundRecord = soundCueCommand(9, -1);
     id = vmArgGetOrDefault(vm, 1, -3);
     soundRecord->id = id;
-    scale = func_001D41E0(vm, 2, 10.0f);
+    scale = vmArgFloatGetOrDefault(vm, 2, 10.0f);
     soundRecord->scale = scale;
-    positionX = func_001D41E0(vm, 3, 0.0f);
+    positionX = vmArgFloatGetOrDefault(vm, 3, 0.0f);
     soundRecord->position[0] = positionX;
-    positionY = func_001D41E0(vm, 4, 0.0f);
+    positionY = vmArgFloatGetOrDefault(vm, 4, 0.0f);
     soundRecord->position[1] = positionY;
-    positionZ = func_001D41E0(vm, 5, 0.0f);
+    positionZ = vmArgFloatGetOrDefault(vm, 5, 0.0f);
     soundRecord->position[2] = positionZ;
     soundCueCommand(0xA, 0);
 }

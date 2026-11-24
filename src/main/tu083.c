@@ -78,7 +78,7 @@ typedef struct ModeSlot {
 } ModeSlot;
 
 void sefObjectSetStatePlay(ModeEffectRequest *request);
-void func_001E9888(ModeEffectRequest *request);
+void sefSpawnEffectFromRequest(ModeEffectRequest *request);
 void seVoiceStartDefault(unsigned int handle);
 ModeSlot *RgDispModelFindByKey(s32 mode);
 s32 SpawnSlotSetRotation(ModeSlot *slot, AlignedVector4 *vector);
@@ -110,7 +110,7 @@ void modeSlotTrigger(ModeSlot *slot, s32 silent) {
     CopyVectorMemOut(&request.from, &slot->position);
     CopyVectorMemOut(&request.to, &slot->target);
     StoreOffsetVector(&request.offset, modeTimer->scale);
-    func_001E9888(&request);
+    sefSpawnEffectFromRequest(&request);
     seVoiceStartDefault(0x18);
     if (slot->foundSlotKind != 0) {
         foundSlot = RgDispModelFindByKey(slot->foundSlotKind);

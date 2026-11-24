@@ -134,7 +134,7 @@ typedef struct EffectListEntry {
 
 void *RgDispModelNextByKind(int kind, void *previous);
 float MMathCalcDist(Vector4 *a, Vector4 *b);
-void func_001E9500(struct SefEffectObject *effectObject, int timer, float remaining, float value);
+void sefRunEffectFrames(struct SefEffectObject *effectObject, int timer, float remaining, float value);
 void slotEffectStartOnce(void *entry, int mode);
 void sbNativeHandlerMessagePost(int kind, int value, int extra);
 void RgDispModelSetLocal(EffectActor *self, int timer);
@@ -159,7 +159,7 @@ void func_001C7E08(EffectActor *self) {
         self->flags = (self->flags & 0xFFEFFFFF) | 0x400000;
         if (remaining > 0) {
             progress->timer = timer - remaining;
-            func_001E9500(progress->effectObject, timer, (float) remaining, 10.0f);
+            sefRunEffectFrames(progress->effectObject, timer, (float) remaining, 10.0f);
             oldTimer = progress->timer;
         } else {
             oldTimer = timer;

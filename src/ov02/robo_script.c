@@ -39,7 +39,7 @@ s32 roboScriptLoadImage(void) {
 extern const char D_00ABB6C0[];
 void assertFailed(const char *message, const char *file, int line);
 s32 sbRunThreads();
-s32 func_001D1A50(s32);
+s32 sbImageLinkImports(s32);
 s32 sbStartImage(s32);
 
 void roboScriptStart(void) {
@@ -47,7 +47,7 @@ void roboScriptStart(void) {
     s32 imageId;
 
     imageId = roboScriptLoadImage();
-    if (func_001D1A50(imageId) == 0) {
+    if (sbImageLinkImports(imageId) == 0) {
         assertFailed(D_00ABB6C0, D_00ABB6D0, 0x3B);
     }
     sbStartImage(imageId);

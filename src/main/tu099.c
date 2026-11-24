@@ -5,14 +5,14 @@ typedef int s32;
 typedef signed char s8;
 
 void sbNativeSlotsClear(void);
-s32 func_001D1250();
+s32 sbClearVmTables();
 s32 memset(s32 *, s32, s32);
 
 void sbNativeOwnersReset(void) {
     extern s32 gSbNativeOwnerFlags;
     memset(&gSbNativeOwnerFlags, 0, 8);
     sbNativeSlotsClear();
-    func_001D1250();
+    sbClearVmTables();
 }
 
 extern s32 gSbCfmapNativeTable;
@@ -31,7 +31,7 @@ s32 sbNativeOwnerAdd(s32 *, s32 *);
 
 void sbNativeOwnersInit(void) {
     sbNativeSlotsClear();
-    func_001D1250();
+    sbClearVmTables();
     sbNativeOwnerAdd(&gSbDebugModuleName, &gSbDebugNativeTable);
     sbNativeOwnerAdd(&gSbRuntimeModuleName, &gSbRuntimeNativeTable);
     sbNativeOwnerAdd(&gSbObjxModuleName, &gSbObjxNativeTable);

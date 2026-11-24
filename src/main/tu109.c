@@ -653,7 +653,7 @@ s32 slotEntryMotionFinish(SpawnerSlot *slot) {
     return result;
 }
 
-/* Effect query filled by sefObjectSetStatePlay and started by func_001E9888. */
+/* Effect query filled by sefObjectSetStatePlay and started by sefSpawnEffectFromRequest. */
 typedef struct {
     s32 resourceId;                  /* +0x00 */
     u8 unk_04[0x28];
@@ -676,7 +676,7 @@ typedef struct {
 } EffectSource;
 
 void sefObjectSetStatePlay();
-s32 func_001E9888();
+s32 sefSpawnEffectFromRequest();
 void playbackSetLocalIfIdle(SpawnerSlot *slot);
 void playbackReleaseHandle(SpawnerSlot *slot);
 
@@ -711,7 +711,7 @@ int effectSlotCreate(EffectSlotRequest *request) {
                 }
             }
         }
-        lookup = func_001E9888(&query);
+        lookup = sefSpawnEffectFromRequest(&query);
         channel->playingHandle = lookup;
         if (lookup == 0) {
             RgDispModelSetLocal(slot);
@@ -1061,5 +1061,5 @@ int slotEffectQueryStart(SpawnerSlot *slot) {
     query.effectCode = (slot->flags & SLOT_FLAG_LARGE) ? 0x1006401D : 0x1006401C;
     vectorCopyToQuery(&query.position, &slot->position);
     QuadwordCopyT0(&query.rotation, &slot->rotation);
-    func_001E9888(&query);
+    sefSpawnEffectFromRequest(&query);
 }

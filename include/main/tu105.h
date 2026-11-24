@@ -114,9 +114,9 @@ typedef struct SbNativeOwner {
     int count;                          /* +0x08 */
 } SbNativeOwner;
 
-extern SbNativeOwner D_00616CC0[];
+extern SbNativeOwner sbNativeOwners[];
 /* The methods words of the owner records, one 12-byte record per row (label 0x616CC4). */
 extern SbNativeMethod *D_00616CC4[][3];
-extern int D_00551504;
+extern int sbNativeOwnerCount;
 
 #endif

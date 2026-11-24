@@ -1476,25 +1476,25 @@ extern unsigned char sefEffectOwner[];
 extern unsigned char sefSetupArg[];
 extern s32 sefSetupPending;
 void func_001936F0(void *owner, s32 message, void *argument);
-void func_001E8CB8(s32 mode);
+void sefSetSceneMode(s32 mode);
 
 void sefFlushPendingEffectSetup(void) {
     if (sefSetupPending != 0) {
         func_001936F0(sefEffectOwner, 0x1709, sefSetupArg);
     }
-    func_001E8CB8(1);
+    sefSetSceneMode(1);
 }
 
 extern unsigned char sefTeardownArg[];
 extern s32 sefTeardownPending;
-void func_001E8E70(void);
+void sefResetEffectWorld(void);
 
 void sefFlushPendingEffectTeardown(void) {
     if (sefTeardownPending != 0) {
         func_001936F0(sefEffectOwner, 0x1719, sefTeardownArg);
         sefTeardownPending = 0;
     }
-    func_001E8E70();
+    sefResetEffectWorld();
 }
 
 void sefAdvanceStepCounter(void);

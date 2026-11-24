@@ -115,9 +115,9 @@ void eventViewerResetStart(s32 mode) {
 extern unsigned char D_004C83F0[];
 #define gStateFrameCallback (*(u8 **) D_004C83F0)
 s32 func_0019AC80();
-s32 func_001E8AF0();
-s32 func_001E8CB8();
-s32 func_001E8E70();
+s32 sefResetEffectSystem();
+s32 sefSetSceneMode();
+s32 sefResetEffectWorld();
 extern unsigned char func_00244C38[];
 s32 soundSlotSetVolume();
 
@@ -125,9 +125,9 @@ void eventViewerInit(void) {
     func_0019AC80(0);
     gStateFrameCallback = func_00244C38;
     gifStateResetTimings();
-    func_001E8E70();
-    func_001E8AF0();
-    func_001E8CB8(2);
+    sefResetEffectWorld();
+    sefResetEffectSystem();
+    sefSetSceneMode(2);
     soundSlotSetVolume(1, 0x7F, 0);
 }
 

@@ -61,8 +61,8 @@ s32 unitTblEntryGet();
 u32 func_00AA1300(void);
 s32 roboCurrentIsPlayer(void);
 s32 battleActorHasUnitHandle(void *unit);
-void func_001E8E70();
-void func_001E9100();
+void sefResetEffectWorld();
+void sefReleaseUnlistedOwnerRecords();
 
 void roboSceneHookCall(void) {
     func_00A9DD70();
@@ -277,10 +277,10 @@ void roboCurrentPercentRatio(s32 unused_arg0, f32 *ratio, f32 *limit) {
 
 void roboSetActive(s32 active) {
     if (active != 0) {
-        func_001E8E70();
+        sefResetEffectWorld();
         return;
     }
-    func_001E9100();
+    sefReleaseUnlistedOwnerRecords();
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/robo_battle", func_00AA1810);

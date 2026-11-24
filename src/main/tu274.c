@@ -15,7 +15,7 @@ typedef struct FollowedObject {
     u32 startTime;           /* 0x50 */
     u8 unk_54[4];
     u32 endTime;             /* 0x58 */
-    s32 handle;              /* 0x5C: passed to func_001D0660 */
+    s32 handle;              /* 0x5C: passed to rgDispModelSetAuxVector */
     u8 unk_60[0x10];
     f32 position[4];         /* 0x70 */
     f32 scaleX;              /* 0x80 */
@@ -49,7 +49,7 @@ void followSlotsClear(void) {
     memset(gFollowSlots, 0, 0x200);
 }
 
-s32 func_001D0660();
+s32 rgDispModelSetAuxVector();
 s32 func_00268710(f32 *, f32, f32);
 s32 func_00269A78();
 
@@ -66,7 +66,7 @@ void followSlotsUpdate(void) {
             followedObject = followSlot->owner;
             func_00269A78(&followSlot->blend);
             if (followedObject->progress < 1.0f) {
-                func_001D0660(followedObject->handle, 0);
+                rgDispModelSetAuxVector(followedObject->handle, 0);
             } else {
                 func_00268710(&scaledOffset[0], followedObject->scaleX * followSlot->anchorOffset.xy.x, -(followedObject->scaleY * followSlot->anchorOffset.xy.y));
                 screenPosition = followSlot->screenPosition;
@@ -74,7 +74,7 @@ void followSlotsUpdate(void) {
                 __asm__ __volatile__("lqc2 vf21, 0(%0)" : : "r"(scaledOffset) : "memory");
                 __asm__ __volatile__("vadd.xyzw vf20, vf20, vf21" : : : "memory");
                 __asm__ __volatile__("sqc2 vf20, 0(%0)" : : "r"(screenPosition) : "memory");
-                func_001D0660(followedObject->handle, screenPosition);
+                rgDispModelSetAuxVector(followedObject->handle, screenPosition);
             }
         }
         followSlot++;
@@ -129,7 +129,7 @@ void slotReleaseOwner(FollowedObject *owner) {
                 endTime = owner->endTime;
                 if (endTime >= bindTime) {
                     if (followSlot->active != 0) {
-                        func_001D0660(owner->handle, 0);
+                        rgDispModelSetAuxVector(owner->handle, 0);
                     }
                     memset(followSlot, 0, 0x40);
                 }

@@ -1,14 +1,10 @@
 #include "common.h"
 #include "shared.h"
-
 #include "main/tu105.h"
-
-
-
+#include "main/xgl_2.h"
+#include "quadword.h"
 /* Messages in a thread's queue (sbQueueReset: first 0, last 0xF). */
 #define SB_QUEUE_LAST 0xF
-
-
 
 struct SbThread;
 void sbFatal(struct SbThread *thread);
@@ -91,7 +87,17 @@ int vmArgGetOrDefault(SbThread *thread, int argumentNumber, int fallbackValue)
     return argumentValue;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D41E0);
+/* Float form of vmArgGetOrDefault: argument argumentNumber as a scaled float when its tag is nonzero, else fallbackValue. */
+f32 vmArgFloatGetOrDefault(SbThread *thread, int argumentNumber, f32 fallbackValue)
+{
+    f32 argumentValue;
+
+    argumentValue = fallbackValue;
+    if (vmArgTagIsZero(thread, argumentNumber) == 0) {
+        argumentValue = vmArgFloatGet(thread, argumentNumber);
+    }
+    return argumentValue;
+}
 
 /* A keyed table: the words of its index array start keyIndexOffset bytes from the table, count entries long; the
  * entry data follows the count index words. */
@@ -139,13 +145,23 @@ int *sbGlobalSection(struct SbImageHeader *image);
 /* Address of global word `index` of the thread's image, as vmEntryGet computes it. */
 int sbGlobalEntryGet(SbThread *thread, int globalWordNumber)
 {
-    int globalTableAddress;
+    int globalSectionAddress;
 
-    globalTableAddress = (int)sbGlobalSection(thread->image);
-    return globalTableAddress + sbGlobalSection(thread->image)[0] + globalWordNumber * 4;
+    globalSectionAddress = (int)sbGlobalSection(thread->image);
+    return globalSectionAddress + sbGlobalSection(thread->image)[0] + globalWordNumber * 4;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4330);
+/* Address of entry word entryWordNumber of the global section entry sectionWordNumber (each word is 4 bytes). */
+int sbGlobalSectionWordAddress(SbThread *thread, int sectionWordNumber, int entryWordNumber)
+{
+    int globalSectionBase;
+    int *indexedGlobalEntry;
+
+    globalSectionBase = (int) sbGlobalSection(thread->image);
+    globalSectionBase += sbGlobalSection(thread->image)[0];
+    indexedGlobalEntry = (int *) (globalSectionBase + sectionWordNumber * 4);
+    return globalSectionBase + indexedGlobalEntry[entryWordNumber] * 4;
+}
 
 /* Empty in this build: sbFatal passes the thread and its pc, as for a debug report. */
 void sbFatalReport(SbThread *thread, int pc)
@@ -157,12 +173,6 @@ void cameraTablesReset();
 void cameraPendingClear();
 void cameraSlotsReset();
 struct XglCamera *xglStudioGetCamera2(int camera_index);
-
-/* The xgl camera fields this file touches (the full struct is in main/xgl_2.h, not included here). */
-struct XglCamera {
-    unsigned int active;
-    unsigned int cameraState;
-};
 
 /* The block at gSbStudioBlock; its 64-bit word at +0x10 has bit 0 cleared by sbStudioCameraReset. */
 typedef struct SbStudioBlock {
@@ -195,4 +205,35 @@ void sbStudioCameraResetIfFlagged(void) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_natives", func_001D4448);
+void func_0025C240(void);
+
+static inline int studioFlagBit(unsigned long long studioFlags, int flagBit)
+{
+    return (studioFlags >> flagBit) & 1;
+}
+
+/* Studio camera step: flag bit 5 selects the held camera (state 2, travel cleared on entry) or the stepped one. */
+void sbStudioCameraStep(void)
+{
+    struct XglCamera *camera;
+
+    camera = xglStudioGetCamera2(0);
+    if (!studioFlagBit(SB_STUDIO_BLOCK.studioFlags, 5)) {
+        if (camera->cameraState != 2) {
+            QuadwordZero(&camera->travel.place_velocity);
+            QuadwordZero(&camera->travel.place_delta);
+            QuadwordZero(&camera->travel.angle_velocity);
+            QuadwordZero(&camera->travel.angle_delta);
+            camera->travel.fov_velocity = camera->travel.scale = 0.0f;
+        }
+        camera->cameraState = 2;
+    } else {
+        if (studioFlagBit(SB_STUDIO_BLOCK.studioFlags, 6)) {
+            camera->cameraState = 4;
+        }
+        func_0025C240();
+        if (studioFlagBit(SB_STUDIO_BLOCK.studioFlags, 6)) {
+            camera->cameraState = 2;
+        }
+    }
+}

@@ -50,7 +50,7 @@ s32 padStartAndSoftResetHeld(void);
 void valueSlotChangeRequest(s16 slotId, s16 slotIndex);
 void sefFlagSetBit26(void);
 void func_002D3890(s32 flag);
-void func_001E87D0(s32 mode);
+void slotSetAllEnableBits(s32 mode);
 void xglClockSampleDayTime(void);
 void soundDriverSendOpcode2(void);
 void soundDriverSetOutputMode(s32 mode);
@@ -58,7 +58,7 @@ void soundSlotSetLevelIfStill(s32 slot, s32 level);
 void gameClearRuntimeFlag(void);
 void func_00225B90(void);
 void soundDriverSetMode(s32 mode);
-void func_001E8498(void);
+void slotReleaseFixedSlots(void);
 void func_001B7B98(s32 arg);
 void slotReleaseSlot1(void);
 void seVoiceStartDefault(unsigned int handle);
@@ -88,7 +88,7 @@ void gameLoopStartMenuUpdate(void) {
             gGameLoopRuntime.loopFlags |= LOOP_FLAG_START_MENU_OPEN;
             gGameLoopRuntime.stepCount = 0;
             func_002D3890(gGameLoopRuntime.slotId > 0);
-            func_001E87D0(1);
+            slotSetAllEnableBits(1);
             xglClockSampleDayTime();
             soundDriverSendOpcode2();
             soundDriverSetOutputMode(1);
@@ -101,7 +101,7 @@ void gameLoopStartMenuUpdate(void) {
         }
         gGameLoopRuntime.loopFlags &= ~LOOP_FLAG_START_MENU_OPEN;
         gameClearRuntimeFlag();
-        func_001E87D0(0);
+        slotSetAllEnableBits(0);
         func_00225B90();
         soundDriverSetMode(16);
         soundDriverSetOutputMode(0);
@@ -116,8 +116,8 @@ void gameLoopStartMenuUpdate(void) {
     if (padStartAndSoftResetHeld() != 0) {
         gGameLoopRuntime.loopFlags &= ~LOOP_FLAG_START_MENU_OPEN;
         gameClearRuntimeFlag();
-        func_001E87D0(0);
-        func_001E8498();
+        slotSetAllEnableBits(0);
+        slotReleaseFixedSlots();
         func_00225B90();
         func_001B7B98(0);
         soundDriverSetOutputMode(0);
@@ -132,7 +132,7 @@ void gameLoopStartMenuUpdate(void) {
     }
     gGameLoopRuntime.loopFlags &= ~(LOOP_FLAG_START_MENU_OPEN | 0x10);
     gameClearRuntimeFlag();
-    func_001E87D0(0);
+    slotSetAllEnableBits(0);
     slotReleaseSlot1();
     func_00225B90();
     soundDriverSetMode(32);
@@ -351,7 +351,7 @@ s32 padStartAndSoftResetHeld(void) {
     return 0;
 }
 
-s32 func_001E9888(void *setup);
+s32 sefSpawnEffectFromRequest(void *setup);
 void sefEffectHandleRelease(s32);
 s32 sceneBit8Get(void);
 void sefObjectSetStatePlay(void *setup);
@@ -368,7 +368,7 @@ void func_001BBBB8(void) {
         if (gGameLoopRuntime.effectHandle == 0) {
             sefObjectSetStatePlay(effectSetup);
             effectSetup[11] = 0x10064024;
-            gGameLoopRuntime.effectHandle = func_001E9888(effectSetup);
+            gGameLoopRuntime.effectHandle = sefSpawnEffectFromRequest(effectSetup);
         }
     } else if (gGameLoopRuntime.effectHandle != 0) {
         sefEffectHandleRelease(gGameLoopRuntime.effectHandle);
@@ -501,7 +501,7 @@ void xglRenderClearDepth(void);
 void xglRenderLockClear(void);
 void xglPacketSetSendMode(s32 mode);
 void Vibration_Stop(void);
-void func_001E8AF0(void);
+void sefResetEffectSystem(void);
 void gameOverCopyRecord(void);
 void func_A859A0(void);
 void func_A9FF28(void);
@@ -547,7 +547,7 @@ s32 gameRuntimeFullReset(void) {
     xglRenderLockClear();
     xglPacketSetSendMode(0);
     Vibration_Stop();
-    func_001E8AF0();
+    sefResetEffectSystem();
     gameOverCopyRecord();
     func_A859A0();
     func_A9FF28();

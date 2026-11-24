@@ -1408,9 +1408,9 @@ s32 func_001CA560(s32 thread) {
     return 1;
 }
 
-void func_001E9500(s32 value, f32 x, f32 y);
+void sefRunEffectFrames(s32 value, f32 x, f32 y);
 
-/* Script native: call func_001E9500 with x and y on the effect handle of one kind-0x4000 slot, or of all of them when the index is negative. */
+/* Script native: call sefRunEffectFrames with x and y on the effect handle of one kind-0x4000 slot, or of all of them when the index is negative. */
 s32 func_001CA618(s32 thread) {
     s32 index;
     f32 x;
@@ -1435,7 +1435,7 @@ s32 func_001CA618(s32 thread) {
     if (index < 0) {
         slotObject = 0;
         while ((slotObject = RgDispModelNextByKind(16384, slotObject)) != 0) {
-            func_001E9500(slotObject->state.value.handle, x, y);
+            sefRunEffectFrames(slotObject->state.value.handle, x, y);
         }
         return 1;
     }
@@ -1446,7 +1446,7 @@ s32 func_001CA618(s32 thread) {
     if (slotObject->kind != 16384) {
         return 0;
     }
-    func_001E9500(slotObject->state.value.handle, x, y);
+    sefRunEffectFrames(slotObject->state.value.handle, x, y);
     return 1;
 }
 

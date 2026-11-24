@@ -151,7 +151,7 @@ s32 soundStateReset();
 s32 sbNativeValueSlotPop();
 s32 soundCueSnapshotSave();
 s32 subsystemResetClearState();
-s32 func_001E8498();
+s32 slotReleaseFixedSlots();
 s32 sefResetBattleWinState();
 s32 func_00265E68();
 s32 movieShutdown();
@@ -165,7 +165,7 @@ s32 xglRenderClearFrame();
 void gameResetRuntimeState(void) {
     gGameLoopRuntime.loopFlags &= ~0x110;
     sefResetBattleWinState();
-    func_001E8498();
+    slotReleaseFixedSlots();
     njPlaneSetHook(0);
     gameClearRuntimeFlag();
     func_00265E68();
@@ -701,7 +701,7 @@ void hwStatusReady();
 void func_001B9438();
 void func_001B8FA0();
 void memset();
-s32 func_001E8CB8();
+s32 sefSetSceneMode();
 
 /* Initializes the scene subsystems (camera, culling map, actor pool, map flags) and clears the runtime handles. */
 void func_001BCCA0(void) {
@@ -717,7 +717,7 @@ void func_001BCCA0(void) {
     XenoActorPoolInitDefault();
     func_00296528();
     sceneInitSubsystems();
-    func_001E8CB8(1);
+    sefSetSceneMode(1);
     mapFlagTableReset();
     func_0027A4D0(20);
     func_001B8DB8();
@@ -909,7 +909,7 @@ void func_001BCF08(void) {
 void func_001BD1F8(void);
 s32 sbNativeOwnerGetValue();
 s32 sbNativeBufferGet();
-s32 func_001D1A50();
+s32 sbImageLinkImports();
 s32 slotRecord1CountDiff();
 s32 sbStartImage();
 
@@ -918,11 +918,11 @@ void gameStartSbImage(void) {
     s32 imageId;
 
     if ((gGameLoopRuntime.loopFlags & 0x10000000) || (slotRecord1CountDiff() == 0)) {
-        func_001E8498();
+        slotReleaseFixedSlots();
         if (sbNativeOwnerGetValue(0) != 0) {
             imageId = sbNativeBufferGet(0);
             gGameLoopRuntime.loopFlags |= 0x10;
-            func_001D1A50(imageId);
+            sbImageLinkImports(imageId);
             sbStartImage(imageId);
         }
         sbNativeValueSlotSet(func_001BD1F8, 0);
@@ -986,7 +986,7 @@ void func_001BD378(void) {
     s32 imageId;
 
     if (func_001B60B8(0) == 0 && slotRecord1CountDiff() == 0) {
-        ((void (*)()) func_001E8498)();
+        ((void (*)()) slotReleaseFixedSlots)();
         gGameLoopRuntime.colorBlue = 0;
         gGameLoopRuntime.colorGreen = 0;
         gGameLoopRuntime.colorRed = 0;
@@ -998,7 +998,7 @@ void func_001BD378(void) {
         sbNativeValueSlotSet(func_001BD450, 0);
         if (sbNativeOwnerGetValue(0) != 0) {
             imageId = sbNativeBufferGet(0);
-            func_001D1A50(imageId);
+            sbImageLinkImports(imageId);
             ((void (*)()) sbStartImage)(imageId);
             gGameLoopRuntime.loopFlags |= 0x10;
         }
@@ -1314,7 +1314,7 @@ void gameActorSetupStep(void) {
     func_001BBC68();
     xenoActorSetAttrBit8(1);
     func_001EA6B0();
-    func_001E8CB8(0);
+    sefSetSceneMode(0);
     Vibration_Stop();
     gGameLoopRuntime.loopFlags &= ~0x100;
     sbNativeValueSlotSet(gameEnterPlayState, 1);
@@ -1431,7 +1431,7 @@ void func_001BDEC8(void) {
         }
         break;
     }
-    func_001E8CB8(1);
+    sefSetSceneMode(1);
     func_001EA798();
     if (sceneStateBlock->fogBlock != 0) {
         sefSetFogOverride(sceneStateBlock->fogBlock + 704, sceneStateBlock->fogBlock + 720);
@@ -1488,7 +1488,7 @@ void func_001BE060() {
     sbNativeValueSlotSet(gameResetFlagsAndAdvance, 0);
 }
 
-s32 func_001E8F78();
+s32 sefResetSceneEffects();
 
 /* Clears the scene loop flags and goes back to func_001BC918. */
 void gameResetFlagsAndAdvance(void) {
@@ -1499,7 +1499,7 @@ void gameResetFlagsAndAdvance(void) {
     newLoopFlagsHigh = gGameLoopRuntime.loopFlagsHigh & 0xFFFF0000;
     gGameLoopRuntime.loopFlags = newLoopFlags;
     gGameLoopRuntime.loopFlagsHigh = newLoopFlagsHigh;
-    func_001E8F78();
+    sefResetSceneEffects();
     njPlaneSetHook(0);
     soundCueReset();
     sbNativeValueSlotSet(func_001BC918, 1);
@@ -1529,7 +1529,7 @@ void func_001BE1E0(void) {
 }
 
 void gameWaitSceneDone(void);
-s32 func_001E8E70();
+s32 sefResetEffectWorld();
 
 /* Clears the scene loop flags and waits for the scene to finish. */
 void gameResetFlagsAndWait(void) {
@@ -1540,7 +1540,7 @@ void gameResetFlagsAndWait(void) {
     newLoopFlagsHigh = gGameLoopRuntime.loopFlagsHigh & 0xFFFF0000;
     gGameLoopRuntime.loopFlags = newLoopFlags;
     gGameLoopRuntime.loopFlagsHigh = newLoopFlagsHigh;
-    func_001E8E70();
+    sefResetEffectWorld();
     njPlaneSetHook(0);
     sbNativeValueSlotSet(gameWaitSceneDone, 1);
 }
@@ -1585,7 +1585,7 @@ void gameResetFlagsAndFinish(void) {
     newLoopFlagsHigh = gGameLoopRuntime.loopFlagsHigh & 0xFFFF0000;
     gGameLoopRuntime.loopFlags = newLoopFlags;
     gGameLoopRuntime.loopFlagsHigh = newLoopFlagsHigh;
-    func_001E8E70();
+    sefResetEffectWorld();
     njPlaneSetHook(0);
     sbNativeValueSlotSet(gameFinishSceneReset, 1);
 }

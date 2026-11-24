@@ -45,11 +45,11 @@ void xglCdSetupControlRecords(void) {
 
 extern s16 D_00475628[];
 s32 eBattleWinInit();
-s32 func_001E9300();
+s32 sefReleaseOwnerEffects();
 
 void eBattleWinReset(void) {
     if (D_00475628[0] != 0) {
-        func_001E9300(-1);
+        sefReleaseOwnerEffects(-1);
     }
     eBattleWinInit(0);
     gCdPrimaryCommandSent = 0;

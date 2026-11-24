@@ -38574,7 +38574,7 @@
      2
     ],
     [
-     "func_001D05B8",
+     "keyedWordTableFind",
      1902008,
      92,
      2
@@ -38592,79 +38592,79 @@
      2
     ],
     [
-     "func_001D0660",
+     "rgDispModelSetAuxVector",
      1902176,
      108,
      2
     ],
     [
-     "func_001D06D0",
+     "rgDispModelGetMatchedEntryFlags",
      1902288,
      140,
      2
     ],
     [
-     "func_001D0760",
+     "rgDispModelSetTurnToward",
      1902432,
      168,
      2
     ],
     [
-     "func_001D0808",
+     "rgDispModelEventFrame",
      1902600,
      300,
      2
     ],
     [
-     "func_001D0938",
+     "distanceModelTestEvent",
      1902904,
      416,
      2
     ],
     [
-     "func_001D0AD8",
+     "distanceModelOcclusionClear",
      1903320,
      376,
      2
     ],
     [
-     "func_001D0C50",
+     "distanceModelPushEvent",
      1903696,
      104,
      2
     ],
     [
-     "func_001D0CB8",
+     "eventSlotPush",
      1903800,
      88,
      2
     ],
     [
-     "func_001D0D10",
+     "eventSlotSortPending",
      1903888,
      228,
      2
     ],
     [
-     "globalCounterGet",
+     "eventCountGet",
      1904120,
      8,
      2
     ],
     [
-     "func_001D0E00",
+     "eventSlotFind",
      1904128,
      452,
      2
     ],
     [
-     "func_001D0FC8",
+     "eventKeyApplyToRecord",
      1904584,
      136,
      2
     ],
     [
-     "func_001D1050",
+     "distanceModelFrameDriver",
      1904720,
      160,
      2
@@ -38688,13 +38688,19 @@
      2
     ],
     [
-     "func_001D1250",
+     "sbClearVmTables",
      1905232,
-     188,
+     172,
      2
     ],
     [
-     "func_001D1310",
+     "sbNativeTablesReset",
+     1905408,
+     12,
+     2
+    ],
+    [
+     "sbImageCodeTableGet",
      1905424,
      24,
      2
@@ -38718,13 +38724,13 @@
      2
     ],
     [
-     "func_001D1370",
+     "sbLinkedLibraryGet",
      1905520,
      24,
      2
     ],
     [
-     "func_001D1388",
+     "sbImageKeyedEntryFind",
      1905544,
      88,
      2
@@ -38736,7 +38742,7 @@
      2
     ],
     [
-     "func_001D1460",
+     "sbThreadRingRebuild",
      1905760,
      108,
      2
@@ -38826,7 +38832,7 @@
      2
     ],
     [
-     "func_001D1A50",
+     "sbImageLinkImports",
      1907280,
      272,
      2
@@ -38844,13 +38850,13 @@
      2
     ],
     [
-     "func_001D1C88",
+     "sbVmStateBitsSet",
      1907848,
      20,
      2
     ],
     [
-     "func_001D1CA0",
+     "sbVmStateBitsClear",
      1907872,
      24,
      2
@@ -39066,7 +39072,7 @@
      2
     ],
     [
-     "func_001D2A38",
+     "sbOpPushSmallConstant",
      1911352,
      284,
      2
@@ -39102,7 +39108,7 @@
      2
     ],
     [
-     "func_001D2DC8",
+     "sbOpPushGlobalVariable",
      1912264,
      348,
      2
@@ -39162,7 +39168,7 @@
      2
     ],
     [
-     "func_001D3468",
+     "sbOpCallNamed",
      1913960,
      176,
      2
@@ -39180,7 +39186,7 @@
      2
     ],
     [
-     "func_001D3610",
+     "sbOpCallNative",
      1914384,
      348,
      2
@@ -39210,7 +39216,7 @@
      2
     ],
     [
-     "func_001D3908",
+     "sbOpPushGlobalFromStack",
      1915144,
      212,
      2
@@ -39318,7 +39324,7 @@
      2
     ],
     [
-     "func_001D41E0",
+     "vmArgFloatGetOrDefault",
      1917408,
      88,
      2
@@ -39342,7 +39348,7 @@
      2
     ],
     [
-     "func_001D4330",
+     "sbGlobalSectionWordAddress",
      1917744,
      120,
      2
@@ -39366,7 +39372,7 @@
      2
     ],
     [
-     "func_001D4448",
+     "sbStudioCameraStep",
      1918024,
      216,
      2
@@ -39456,7 +39462,7 @@
      2
     ],
     [
-     "func_001D4C40",
+     "drawEnvSendRecordPacket",
      1920064,
      1880,
      2
@@ -39474,7 +39480,7 @@
      2
     ],
     [
-     "func_001D5440",
+     "drawEnvSetFieldArea",
      1922112,
      132,
      2
@@ -39594,7 +39600,7 @@
      2
     ],
     [
-     "func_001D5B28",
+     "drawRectOnPage",
      1923880,
      420,
      2
@@ -39612,13 +39618,13 @@
      2
     ],
     [
-     "func_001D5FF8",
+     "drawRectOnPageDepth",
      1925112,
      428,
      2
     ],
     [
-     "func_001D61A8",
+     "drawRectOnPageColour",
      1925544,
      452,
      2
@@ -39702,7 +39708,7 @@
      2
     ],
     [
-     "func_001D66C0",
+     "drawEnvSetCameraScissor",
      1926848,
      192,
      2
@@ -39738,19 +39744,19 @@
      2
     ],
     [
-     "func_001D6928",
+     "drawEnvCopyWindow",
      1927464,
      2132,
      2
     ],
     [
-     "func_001D7180",
+     "xglDefocusFilterDraw",
      1929600,
      700,
      2
     ],
     [
-     "func_001D7440",
+     "xglScreenQuadDraw",
      1930304,
      504,
      2
@@ -39762,37 +39768,37 @@
      2
     ],
     [
-     "func_001D87F8",
+     "xglWipePassUpdate",
      1935352,
      1340,
      2
     ],
     [
-     "func_001D8D38",
+     "xglWaveFilterDraw",
      1936696,
      1576,
      2
     ],
     [
-     "func_001D9360",
+     "xglScreenWarpDraw",
      1938272,
      3308,
      2
     ],
     [
-     "func_001DA050",
+     "xglRadialBlurDraw",
      1941584,
      2056,
      2
     ],
     [
-     "func_001DA858",
+     "xglFrameCopyQuadDraw",
      1943640,
      1020,
      2
     ],
     [
-     "func_001DAC58",
+     "xglTwistRingFilterDraw",
      1944664,
      2492,
      2
@@ -39810,19 +39816,19 @@
      2
     ],
     [
-     "func_001DB658",
+     "xglObjectRippleDraw",
      1947224,
      2712,
      2
     ],
     [
-     "func_001DC0F0",
+     "xglScrollWaveFilterDraw",
      1949936,
      1568,
      2
     ],
     [
-     "func_001DC710",
+     "xglGlobalScrollWaveFilterDraw",
      1951504,
      1500,
      2
@@ -39834,43 +39840,43 @@
      2
     ],
     [
-     "func_001DCF70",
+     "xglNoiseFilterDraw",
      1953648,
      2600,
      2
     ],
     [
-     "func_001DD998",
+     "xglLineJitterFilterDraw",
      1956248,
      2968,
      2
     ],
     [
-     "func_001DE530",
+     "xglDisplayCopyPassDraw",
      1959216,
      1224,
      2
     ],
     [
-     "func_001DE9F8",
+     "xglEffectSlotAlloc",
      1960440,
      76,
      2
     ],
     [
-     "func_001DEA48",
+     "xglEffectSlotRelease",
      1960520,
      124,
      2
     ],
     [
-     "func_001DEAC8",
+     "xglParticleEmitterDraw",
      1960648,
      3340,
      2
     ],
     [
-     "func_001DF7D8",
+     "xglMistEmitterDraw",
      1963992,
      3668,
      2
@@ -39924,43 +39930,43 @@
      2
     ],
     [
-     "func_001E4348",
+     "blurDrawTintedWindow",
      1983304,
      1228,
      2
     ],
     [
-     "func_001E4818",
+     "xglTrackNodeWipeUpdate",
      1984536,
      1780,
      2
     ],
     [
-     "func_001E4F10",
+     "xglScreenWipeDraw",
      1986320,
      2768,
      2
     ],
     [
-     "func_001E59E0",
+     "xglFadeSpriteDraw",
      1989088,
      352,
      2
     ],
     [
-     "func_001E5B40",
+     "xglFadeUpdate",
      1989440,
      772,
      2
     ],
     [
-     "func_001E5E48",
+     "xglScreenBlurDraw",
      1990216,
      672,
      2
     ],
     [
-     "func_001E60E8",
+     "xglDissolveUpdate",
      1990888,
      3328,
      2
@@ -39990,13 +39996,13 @@
      2
     ],
     [
-     "func_001E7010",
+     "drawEnvSetWindow256x224",
      1994768,
      92,
      2
     ],
     [
-     "func_001E7070",
+     "xglPacketScreenCopyPass",
      1994864,
      492,
      2
@@ -40032,7 +40038,7 @@
      2
     ],
     [
-     "func_001E7518",
+     "slotSendFrame",
      1996056,
      884,
      2
@@ -40044,7 +40050,7 @@
      2
     ],
     [
-     "func_001E78E8",
+     "slotClaimRecord",
      1997032,
      164,
      2
@@ -40056,13 +40062,13 @@
      2
     ],
     [
-     "func_001E7A28",
+     "slotFindFreeId",
      1997352,
      96,
      2
     ],
     [
-     "func_001E7A88",
+     "slotSetupRecord",
      1997448,
      404,
      2
@@ -40104,13 +40110,13 @@
      2
     ],
     [
-     "func_001E7EC8",
+     "slotReleaseAllPools",
      1998536,
      188,
      2
     ],
     [
-     "func_001E7F88",
+     "slotSendPoolRecord",
      1998728,
      336,
      2
@@ -40184,7 +40190,13 @@
     [
      "func_001E82E8",
      1999592,
-     324,
+     48,
+     2
+    ],
+    [
+     "slotSendCommand",
+     1999640,
+     276,
      2
     ],
     [
@@ -40200,7 +40212,7 @@
      2
     ],
     [
-     "func_001E8498",
+     "slotReleaseFixedSlots",
      2000024,
      60,
      2
@@ -40218,13 +40230,13 @@
      2
     ],
     [
-     "func_001E8610",
+     "slotFixedRecordSetHead",
      2000400,
      116,
      2
     ],
     [
-     "func_001E8688",
+     "slotFixedRecordSetPayload",
      2000520,
      84,
      2
@@ -40266,7 +40278,7 @@
      2
     ],
     [
-     "func_001E87D0",
+     "slotSetAllEnableBits",
      2000848,
      116,
      2
@@ -40290,13 +40302,13 @@
      2
     ],
     [
-     "func_001E89E0",
+     "drawAreaSetExtendedWide",
      2001376,
      268,
      2
     ],
     [
-     "func_001E8AF0",
+     "sefResetEffectSystem",
      2001648,
      260,
      2
@@ -40308,7 +40320,7 @@
      2
     ],
     [
-     "func_001E8CB8",
+     "sefSetSceneMode",
      2002104,
      268,
      2
@@ -40326,37 +40338,37 @@
      2
     ],
     [
-     "func_001E8E70",
+     "sefResetEffectWorld",
      2002544,
      264,
      2
     ],
     [
-     "func_001E8F78",
+     "sefResetSceneEffects",
      2002808,
      256,
      2
     ],
     [
-     "func_001E9078",
+     "sefReleaseUnflaggedRecords",
      2003064,
      132,
      2
     ],
     [
-     "func_001E9100",
+     "sefReleaseUnlistedOwnerRecords",
      2003200,
      228,
      2
     ],
     [
-     "func_001E91E8",
+     "sefReleaseByPendingCount",
      2003432,
      280,
      2
     ],
     [
-     "func_001E9300",
+     "sefReleaseOwnerEffects",
      2003712,
      292,
      2
@@ -40374,13 +40386,13 @@
      2
     ],
     [
-     "func_001E9500",
+     "sefRunEffectFrames",
      2004224,
      352,
      2
     ],
     [
-     "func_001E9660",
+     "sefRunGroupEffectFrames",
      2004576,
      272,
      2
@@ -40392,7 +40404,7 @@
      2
     ],
     [
-     "func_001E9790",
+     "sefEffectObjectReset",
      2004880,
      112,
      2
@@ -40416,7 +40428,7 @@
      2
     ],
     [
-     "func_001E9888",
+     "sefSpawnEffectFromRequest",
      2005128,
      1728,
      2

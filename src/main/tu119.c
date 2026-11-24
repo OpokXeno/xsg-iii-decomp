@@ -94,11 +94,11 @@ void sceneTickSubsystem(void) {
     func_001F6698();
 }
 
-s32 func_001E8E70();
+s32 sefResetEffectWorld();
 void srsSetEffectFlag(s32, s32);
 
 void sceneInitSubsystems(void) {
-    func_001E8E70();
+    sefResetEffectWorld();
     srsSetEffectFlag(0, 1);
 }
 
@@ -210,12 +210,12 @@ INCLUDE_ASM("asm/main/nonmatchings/tu119", func_001EACA8);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu119", func_001EADA0);
 
-s32 func_001E9300(s32);
+s32 sefReleaseOwnerEffects(s32);
 s32 func_002002C8();
 
 void checkResultReport(s32 errorCode) {
     if (errorCode < 0) {
-        func_001E9300(0x1006402A);
+        sefReleaseOwnerEffects(0x1006402A);
         return;
     }
     func_002002C8();
@@ -228,12 +228,12 @@ s32 stateIsReady(void) {
 }
 
 extern u8 *D_004C83F0[];
-void func_001E8498();
+void slotReleaseFixedSlots();
 void sceneShatterTransitionUpdate(void);
 
 void sceneCallbackReset(void) {
     gSceneLoadState = 0;
-    func_001E8498();
+    slotReleaseFixedSlots();
     D_004C83F0[0] = sceneShatterTransitionUpdate;
 }
 
@@ -300,13 +300,13 @@ Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *ve
 void MMathRotTransPers(Vector4 *outVector, const struct XglCamera *camera, const Matrix4 *matrix,
                        const Vector4 *point);
 struct XglCamera *xglStudioGetActiveCamera(void);
-void func_001D61A8(s32 page, s32 x, s32 y, s32 z, s32 width, s32 height);
+void drawRectOnPageColour(s32 page, s32 x, s32 y, s32 z, s32 width, s32 height);
 void drawAreaSetExtended(s32 word_00, s32 word_3C, s32 word_44, s32 word_04, s32 word_40, s32 word_48, s32 frameBase,
                          s32 drawMode, s32 origin_x, s32 origin_y, s32 width, s32 height, s32 clip_x, s32 clip_y,
                          s32 draw_width, s32 draw_height);
 void drawAreaSetWindow(s32 frameBase, s32 drawMode, s32 origin_x, s32 origin_y, s32 width, s32 height, s32 clip_x,
                        s32 clip_y, s32 draw_width, s32 draw_height);
-void func_001D4C40(void);
+void drawEnvSendRecordPacket(void);
 void func_001D55E8(void);
 
 /* The GS vertex of one projected hexagon corner. */
@@ -709,32 +709,32 @@ void sceneShatterTransitionUpdate(void)
     if (gSceneLoadState != 2) {
         return;
     }
-    func_001D61A8(D_004C8390.glowSourcePage, 0, 0, 0, 0x100, 0xE0);
+    drawRectOnPageColour(D_004C8390.glowSourcePage, 0, 0, 0, 0x100, 0xE0);
     drawAreaSetExtended(D_004C8390.outlinePage, 8, 0, D_004C8390.glowPage, 4, 0, 0x80, 3, 0, 0, 0x200, 0x1C0, 0, 0,
                         0x100, 0xE0);
-    func_001D4C40();
+    drawEnvSendRecordPacket();
     glowStep = 4.0f;
     for (row = 0; row < 5; row++) {
         int alpha = glowStep * (5 - row);
         drawAreaSetExtended(D_004C8390.glowPage, 4, 0, D_004C8390.glowSourcePage, 4, 0, alpha, 1, 1, 1, 0x100, 0xE0,
                             row + 1, row + 1, row + 0x100, row + 0xE0);
-        func_001D4C40();
+        drawEnvSendRecordPacket();
         drawAreaSetExtended(D_004C8390.glowPage, 4, 0, D_004C8390.glowSourcePage, 4, 0, alpha, 1, 0, 1, 0xFF, 0xE0,
                             -row, row + 1, 0xFF - row, row + 0xE0);
-        func_001D4C40();
+        drawEnvSendRecordPacket();
         drawAreaSetExtended(D_004C8390.glowPage, 4, 0, D_004C8390.glowSourcePage, 4, 0, alpha, 1, 1, 0, 0x100, 0xDF,
                             row + 1, -row, row + 0x100, 0xDF - row);
-        func_001D4C40();
+        drawEnvSendRecordPacket();
         drawAreaSetExtended(D_004C8390.glowPage, 4, 0, D_004C8390.glowSourcePage, 4, 0, alpha, 1, 0, 0, 0xFF, 0xDF,
                             -row, -row, 0xFF - row, 0xDF - row);
-        func_001D4C40();
+        drawEnvSendRecordPacket();
     }
     drawAreaSetExtended(D_004C8390.glowSourcePage, 4, 0, D_004C8390.screenPage, 8, 0, 0x80, 1, 1, 1, 0xFF, 0xDF, 1, 1,
                         0x1FF, 0x1BF);
-    func_001D4C40();
+    drawEnvSendRecordPacket();
     drawAreaSetExtended(D_004C8390.glowSourcePage, 4, 0, D_004C8390.screenPage, 8, 0, 0x80, 1, 0, 0, 0xFF, 0xDF, -1, -1,
                         0x1FF, 0x1BF);
-    func_001D4C40();
+    drawEnvSendRecordPacket();
     drawAreaSetWindow(0x80, 1, 0, 0, 0x200, 0x1C0, 0, 0, 0x200, 0x1C0);
     func_001D55E8();
 }

@@ -1897,44 +1897,58 @@
     }
    ]
   },
-  "main/tu105": {
-   ".rodata": [
+  "main/tu104": {
+   ".lit4": [
     {
      "range": [
-      "0x0053e2b0",
-      "0x0053e300"
+      "0x0054f4a8",
+      "0x0054f4b0"
      ],
      "generated": [
-      "0x0053e2b0",
-      "0x0053e300"
+      "0x0054f4a8",
+      "0x0054f4b0"
      ],
      "generated_by": [
-      "sbOpBinary"
+      "distanceModelTestEvent",
+      "distanceModelOcclusionClear"
      ],
      "c_owned_symbols": [
-      "jtbl_0053E2B0"
+      "D_0054F4A8",
+      "D_0054F4AC"
      ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/sb_vm.o"
+      "object": "build/main/build/c/tu104.o"
      }
-    },
+    }
+   ]
+  },
+  "main/tu105": {
+   ".rodata": [
     {
      "range": [
-      "0x0053e370",
-      "0x0053e3a0"
+      "0x0053e2b0",
+      "0x0053e3b8"
      ],
      "generated": [
-      "0x0053e370",
-      "0x0053e398"
+      "0x0053e2b0",
+      "0x0053e3b4"
      ],
      "generated_by": [
+      "sbOpPushSmallConstant",
+      "sbOpPushGlobalVariable",
+      "sbOpPushGlobalFromStack",
+      "sbOpBinary",
       "sbOpPushLocalVariable"
      ],
      "c_owned_symbols": [
-      "jtbl_0053E370"
+      "jtbl_0053E2B0",
+      "jtbl_0053E300",
+      "jtbl_0053E340",
+      "jtbl_0053E370",
+      "jtbl_0053E3A0"
      ],
      "also_referenced_by_c": [],
      "basis": {
@@ -1950,14 +1964,29 @@
     {
      "range": [
       "0x0054fb88",
-      "0x0054fbb4"
+      "0x0054fc2c"
      ],
      "generated": [
       "0x0054fb88",
-      "0x0054fbb4"
+      "0x0054fc2c"
      ],
      "generated_by": [
-      "xglColorFilterApplyClut"
+      "xglWaveFilterDraw",
+      "xglScreenWarpDraw",
+      "xglRadialBlurDraw",
+      "xglTwistRingFilterDraw",
+      "xglObjectRippleDraw",
+      "xglScrollWaveFilterDraw",
+      "xglGlobalScrollWaveFilterDraw",
+      "xglNoiseFilterDraw",
+      "xglParticleEmitterDraw",
+      "xglMistEmitterDraw",
+      "func_001E0630",
+      "func_001E0E10",
+      "xglScreenWipeDraw",
+      "xglDissolveUpdate",
+      "xglColorFilterApplyClut",
+      "xglRadialBlurApply"
      ],
      "c_owned_symbols": [
       "D_0054FB88",
@@ -1970,7 +1999,37 @@
       "D_0054FBA4",
       "D_0054FBA8",
       "D_0054FBAC",
-      "D_0054FBB0"
+      "D_0054FBB0",
+      "D_0054FBB4",
+      "D_0054FBB8",
+      "D_0054FBBC",
+      "D_0054FBC0",
+      "D_0054FBC4",
+      "D_0054FBC8",
+      "D_0054FBCC",
+      "D_0054FBD0",
+      "D_0054FBD4",
+      "D_0054FBD8",
+      "D_0054FBDC",
+      "D_0054FBE0",
+      "D_0054FBE4",
+      "D_0054FBE8",
+      "D_0054FBEC",
+      "D_0054FBF0",
+      "D_0054FBF4",
+      "D_0054FBF8",
+      "D_0054FBFC",
+      "D_0054FC00",
+      "D_0054FC04",
+      "D_0054FC08",
+      "D_0054FC0C",
+      "D_0054FC10",
+      "D_0054FC14",
+      "D_0054FC18",
+      "D_0054FC1C",
+      "D_0054FC20",
+      "D_0054FC24",
+      "D_0054FC28"
      ],
      "also_referenced_by_c": [],
      "basis": {
@@ -1983,18 +2042,35 @@
    ".rodata": [
     {
      "range": [
-      "0x0053e760",
-      "0x0053e778"
+      "0x0053e740",
+      "0x0053e838"
      ],
      "generated": [
-      "0x0053e760",
-      "0x0053e778"
+      "0x0053e740",
+      "0x0053e838"
      ],
      "generated_by": [
-      "colorHsvToRgb"
+      "colorHsvToRgb",
+      "drawEnvSendRecordPacket",
+      "xglScreenWarpDraw",
+      "xglParticleEmitterDraw",
+      "xglMistEmitterDraw",
+      "xglTrackNodeWipeUpdate",
+      "xglScreenWipeDraw",
+      "xglScreenBlurDraw"
      ],
      "c_owned_symbols": [
-      "jtbl_0053E760"
+      "jtbl_0053E740",
+      "jtbl_0053E760",
+      "D_0053E778",
+      "D_0053E780",
+      "D_0053E788",
+      "D_0053E790",
+      "D_0053E798",
+      "jtbl_0053E7A0",
+      "jtbl_0053E7D0",
+      "jtbl_0053E800",
+      "D_0053E818"
      ],
      "also_referenced_by_c": [],
      "basis": {
@@ -2035,28 +2111,78 @@
     }
    ]
   },
-  "main/tu111": {
+  "main/tu115": {
    ".lit4": [
     {
      "range": [
-      "0x0054fc1c",
-      "0x0054fc20"
+      "0x0054fc2c",
+      "0x0054fc30"
      ],
      "generated": [
-      "0x0054fc1c",
-      "0x0054fc20"
+      "0x0054fc2c",
+      "0x0054fc30"
      ],
      "generated_by": [
-      "xglRadialBlurApply"
+      "slotFixedRecordSetHead"
      ],
      "c_owned_symbols": [
-      "D_0054FC1C"
+      "D_0054FC2C"
      ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu111.o"
+      "object": "build/main/build/c/tu115.o"
+     }
+    }
+   ],
+   ".rodata": [
+    {
+     "range": [
+      "0x0053e870",
+      "0x0053e8f0"
+     ],
+     "generated": [
+      "0x0053e870",
+      "0x0053e8f0"
+     ],
+     "generated_by": [
+      "slotSendCommand"
+     ],
+     "c_owned_symbols": [
+      "jtbl_0053E870"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu115.o"
+     }
+    }
+   ]
+  },
+  "main/tu118": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fc30",
+      "0x0054fc34"
+     ],
+     "generated": [
+      "0x0054fc30",
+      "0x0054fc34"
+     ],
+     "generated_by": [
+      "sefRunEffectFrames"
+     ],
+     "c_owned_symbols": [
+      "D_0054FC30"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu118.o"
      }
     }
    ]

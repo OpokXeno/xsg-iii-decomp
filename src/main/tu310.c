@@ -81,7 +81,7 @@ s32 xglStudioSelectGetActiveCamera();
 s32 fptodp(f32);
 s32 func_00287848();
 s32 XenoActorReleaseAll();
-s32 func_001E7EC8();
+s32 slotReleaseAllPools();
 
 void moviePlayFromStateTable(void) {
     unsigned char *formatString;
@@ -594,7 +594,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu310", func_00288D78);
 
 s32 movieReleaseActors(void) {
     XenoActorReleaseAll();
-    func_001E7EC8();
+    slotReleaseAllPools();
     return 1;
 }
 

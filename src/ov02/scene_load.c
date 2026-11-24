@@ -339,7 +339,7 @@ s32 battleSceneIsDone(void) {
     return battleSceneDone;
 }
 
-s32 func_001E8CB8(s32);
+s32 sefSetSceneMode(s32);
 s32 gifStateResetTimings();
 s32 battleEnterModeZero();
 s32 sceneSystemsInit();
@@ -362,7 +362,7 @@ s32 unitInit();
 void battleSceneInit(void) {
     battleEnterModeZero();
     sceneSystemsInit();
-    func_001E8CB8(0);
+    sefSetSceneMode(0);
     gifStateResetTimings();
     battleResetCallbacksAndTables();
     monsReadyCountReset();
@@ -397,7 +397,7 @@ s32 monsActiveSlotsGet(struct MonsActorRecord ***table);
 s32 monsterRelease(struct MonsActorRecord *slot);
 s32 battleClearTaskAndSlotTables();
 s32 sbThreadsRelease(void *);
-s32 sefSetFogOverride(s32, s32);
+void sefSetFogOverride(Vector4 *fogParams, Vector4 *fogColor);
 s32 unitTblGet(s32, BattleUnit ***table);
 s32 xglSleep();
 
@@ -494,7 +494,7 @@ void battleStepWaitFrames(struct SaveStack *saveStack) {
 void func_00A92CB0(void);
 void func_00A9D8E0(void);
 void func_00A9DD70(void);
-int func_001D1A50(void *key);
+int sbImageLinkImports(void *key);
 void func_00A85E10(struct SaveStack *saveStack);
 extern SceneScriptBlock gSceneScriptHandlerBlock[];
 
@@ -506,7 +506,7 @@ void battleStepSceneScript(struct SaveStack *saveStack)
     func_00A9D8E0();
     gSceneScriptHandlerBlock->scriptHandler = func_00A9DD70;
     script_key = sbScriptImageGet();
-    if (func_001D1A50(script_key) == 0) {
+    if (sbImageLinkImports(script_key) == 0) {
         for (;;) {
         }
     }

@@ -17,7 +17,8 @@ typedef struct SbNameEntry {
 /* Messages in a thread's queue (sbQueueReset: first 0, last 0xF). */
 #define SB_QUEUE_LAST 0xF
 /* The suspended bit of a thread's status word (sbThreadSuspend sets it). */
-#define SB_THREAD_SUSPENDED 0x80000000
+#define SB_IMAGE_LINKED 0x80000000
+
 /* Image headers start with these magic words: "SB  " and "SBL ". */
 #define SB_IMAGE_MAGIC 0x20204253
 #define SBL_IMAGE_MAGIC 0x204C4253
@@ -51,8 +52,8 @@ int sbQueuePop(SbThread *thread);
 int sbQueueCountGet(SbThread *thread);
 int sbNameTableFind(struct SbImageHeader *image, const char *name);
 SbMessage *sbThreadDequeue(struct SbImageHeader *key, int entryPc);
-int func_001D1A50(struct SbImageHeader *image, struct SbImageHeader *library);
-int *func_001D1310(struct SbImageHeader *image);
+int sbImageLinkImports(struct SbImageHeader *image, struct SbImageHeader *library);
+int *sbImageCodeTableGet(struct SbImageHeader *image);
 /*
  * Creates a thread on the first free record of sbThreadTable for this image and entry: the record
  * takes the image, the entry and the stack, tag, slot and queue of its index; returns 1, or 0 when all
@@ -60,25 +61,138 @@ int *func_001D1310(struct SbImageHeader *image);
  * of the free-slot list); when no word is free it is not stored.
  */
 int sbThreadStart(struct SbImageHeader *image, int entry);
-int func_001D1388(struct SbImageHeader *image, int index);
-void *func_001D1370(struct SbImageHeader *image);
+int *sbImageKeyedEntryFind(struct SbImageHeader *image, int key);
+void *sbLinkedLibraryGet(struct SbImageHeader *image);
 int sbStackPop(SbThread *thread);
 void sbGlobalVariableSet(SbThread *thread, int index, int globalVarContents);
 int sbGlobalVariableGet(SbThread *thread, int index);
 int sbOpLength(unsigned char opcode, int count);
+extern void xglRenderClearFrame(void);
+extern void xglCullingEnable(void);
+extern void xglCullingDisable(void);
+extern void soundSlotStop(int slot);
+extern void soundSlotSetPause(int slot, int pause);
+extern void soundSlotSetVolume(int slot, int volume, int unk);
+extern void soundSlotSetDriverParam(int slot, int param);
+extern void soundDriverSetEnable(int enable, int unk);
+extern void func_A8E160(void);
+extern void func_AB1A38(void);
+extern void func_A9FF88(void);
+extern void func_AA00F8(void);
+extern void func_AA0910(void);
+extern void func_AA0088(void);
+extern void func_A85A88(void);
+extern void func_A8E2F0(void);
+extern void func_A85B38(void);
+extern void func_A85B50(void);
+extern void func_A96EA8(int mode);
+extern void func_A85C68(void);
+extern void runWithStateBlockOnce(int mode);
+extern int D_00551304;
+extern int D_004C83D0[];
+extern int gSbThreadBlockStorage[];
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1108);
+/* Resets the render, sound and VM block state, then runs the state block once unless D_00551304 is set. */
+void func_001D1108(void)
+{
+    int blockMode;
+    int stateMode;
+    int blockStatusWord;
 
-typedef int s32;
-extern unsigned char D_008E6000[];
-
-u8 *sbBaseBlockIdGet(void) {
-    return D_008E6000;
+    xglRenderClearFrame();
+    xglCullingEnable();
+    soundSlotStop(1);
+    soundSlotSetPause(1, 0);
+    soundSlotSetVolume(1, 127, 0);
+    soundSlotSetDriverParam(1, 0);
+    func_A8E160();
+    func_AB1A38();
+    D_00551304 = 0;
+    if (gSbThreadBlockStorage[6] & 1) {
+        func_A9FF88();
+        func_AA00F8();
+        func_AA0910();
+        func_AA0088();
+        blockMode = 1;
+    } else {
+        func_A85A88();
+        func_A8E2F0();
+        func_A85B38();
+        func_A85B50();
+        blockMode = 0;
+    }
+    func_A96EA8(blockMode);
+    soundSlotStop(1);
+    soundDriverSetEnable(0, 0);
+    soundSlotSetDriverParam(1, 1);
+    func_A85C68();
+    D_004C83D0[0] = 0;
+    blockStatusWord = gSbThreadBlockStorage[6];
+    stateMode = 0;
+    if (blockStatusWord & 1) {
+        stateMode = 1;
+    }
+    if (blockStatusWord & 0x10) {
+        stateMode |= 4;
+    }
+    if (D_00551304 == 0) {
+        runWithStateBlockOnce(stateMode);
+    }
+    xglCullingDisable();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1250);
+typedef int s32;
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1310);
+extern unsigned char sbBaseBlockStorage[];
+
+u8 *sbBaseBlockIdGet(void) {
+    return sbBaseBlockStorage;
+}
+
+extern SbThread D_0060E140[32];
+void sbNativeTablesReset(void);
+extern SbThread *sbThreadRing[32];
+extern s32 sbVmStateWord;
+extern unsigned char sbThreadTagBytes[];
+void *memset(void *dest, int value, unsigned int count);
+
+/* Clears the VM tables: the state word, every thread record, the ring, the operand stacks, tags, slots and queues. */
+void sbClearVmTables(void)
+{
+    int threadIndex;
+
+    sbVmStateWord = 0;
+    for (threadIndex = SB_THREAD_COUNT - 1; threadIndex >= 0; threadIndex--) {
+        D_0060E140[threadIndex].image = 0;
+    }
+    memset(sbThreadRing, 0, sizeof(sbThreadRing));
+    memset(sbStacks, 0, sizeof(sbStacks));
+    memset(sbThreadTagBytes, 0, 0x1000);
+    memset(sbThreadSlotTables, 0, sizeof(sbThreadSlotTables));
+    memset(sbChains, 0, sizeof(sbChains));
+    sbNativeTablesReset();
+}
+
+extern int sbNativeMethodCount;
+
+/* Empties the native method table and the owner table (sbNativeOwnerAdd appends to both). */
+void sbNativeTablesReset(void)
+{
+    sbNativeMethodCount = 0;
+    sbNativeOwnerCount = 0;
+}
+
+/* Address of the image's code table (the header's entry offset), or 0 when the image has none. */
+int *sbImageCodeTableGet(struct SbImageHeader *image)
+{
+    int imageOffset;
+
+    imageOffset = image->entry;
+    if (imageOffset == 0) {
+        return 0;
+    }
+    return (int *) ((u8 *) image + imageOffset);
+}
 
 /* A table offset in an image header is a byte offset from the header itself (read at runtime). */
 #define BYTE_OFFSET(headerBase, tableOffset) ((u8 *) (headerBase) + (tableOffset))
@@ -120,33 +234,72 @@ int *sbNameTable(struct SbImageHeader *image)
     return (int *) BYTE_OFFSET(image, imageOffset);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1370);
+/* Address of the library image whose offset sits in the header's unmodeled_18 word, or 0 when there is none. */
+void *sbLinkedLibraryGet(struct SbImageHeader *image)
+{
+    int libraryOffset;
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1388);
+    libraryOffset = *(int *) image->unmodeled_18;
+    if (libraryOffset == 0) {
+        return 0;
+    }
+    return (char *) image + libraryOffset;
+}
 
-extern SbThread *sbThreadRing[32];
-void func_001D1460();
+/* Finds the keyed entry with this key in the image's keyed table. Each entry is a key word, a byte size word and
+ * size bytes of data; a zero key ends the table. Returns 0 when there is none. */
+int *sbImageKeyedEntryFind(struct SbImageHeader *image, int key)
+{
+    int *keyedEntry;
+
+    if (image->keyed_table == 0) {
+        return 0;
+    }
+    keyedEntry = (int *) ((u8 *) image + image->keyed_table);
+    while (keyedEntry[0] != 0) {
+        if (keyedEntry[0] == key) {
+            return keyedEntry;
+        }
+        keyedEntry = (int *) ((u8 *) keyedEntry + keyedEntry[1] + 8);
+    }
+    return 0;
+}
+
+void sbThreadRingRebuild();
 void sbRunThread();
 
 void sbRunThreads(void) {
     int threadIndex;
     SbThread *thread;
 
-    func_001D1460();
+    sbThreadRingRebuild();
     for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
         thread = sbThreadRing[threadIndex];
-        if ((thread != 0) && (thread->image != 0) && !(thread->status & SB_THREAD_SUSPENDED)) {
+        if ((thread != 0) && (thread->image != 0) && !(thread->status & SB_IMAGE_LINKED)) {
             sbRunThread(thread);
         }
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1460);
+/* Rebuilds sbThreadRing from the thread records that have an image, in table order. */
+void sbThreadRingRebuild(void)
+{
+    int ringCount;
+    int threadIndex;
+
+    ringCount = 0;
+    memset(sbThreadRing, 0, sizeof(sbThreadRing));
+    for (threadIndex = 0; threadIndex < SB_THREAD_COUNT; threadIndex++) {
+        if (D_0060E140[threadIndex].image != 0) {
+            sbThreadRing[ringCount++] = &D_0060E140[threadIndex];
+        }
+    }
+}
 
 void sbRunThread(SbThread *thread) {
     s32 codeLimit;
 
-    codeLimit = func_001D1310(thread->image)[2];
+    codeLimit = sbImageCodeTableGet(thread->image)[2];
     do {
         if (codeLimit < thread->pc) {
             sbFatal(thread);
@@ -161,9 +314,9 @@ void sbStartImage(struct SbImageHeader *image)
     if (!sbIsSbImage(image)) {
         for (;;) { }
     }
-    sbThreadStart(image, func_001D1310(image)[1]);
+    sbThreadStart(image, sbImageCodeTableGet(image)[1]);
     do {
-        func_001D1388(image, 1);
+        sbImageKeyedEntryFind(image, 1);
     } while (0);
 }
 
@@ -275,8 +428,8 @@ void sbSlotJumpUnhandledKey(SbThread *thread)
         opcode = sbCodeReadUnsigned(thread, thread->jumpPosition, 1);
         length = sbOpLength(opcode, 0);
         sbCodeReadUnsigned(thread, thread->jumpPosition + 1, length - 1);
-        func_001D1370(thread->image);
-        func_001D1370(thread->image);
+        sbLinkedLibraryGet(thread->image);
+        sbLinkedLibraryGet(thread->image);
     }
 }
 
@@ -288,7 +441,32 @@ void sbFatal(SbThread *thread)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", sbNativeOwnerAdd);
+extern SbNativeMethod sbNativeMethodTable[];
+
+/*
+ * Registers a native owner: appends its methods (a table ending with a null name) to sbNativeMethodTable and
+ * the owner to sbNativeOwners. Returns 0 when there are 128 owners or 1024 methods already.
+ */
+int sbNativeOwnerAdd(const char *name, SbNativeMethod *methods)
+{
+    int methodCount;
+
+    if (sbNativeOwnerCount >= 128) {
+        return 0;
+    }
+    sbNativeOwners[sbNativeOwnerCount].name = name;
+    sbNativeOwners[sbNativeOwnerCount].methods = &sbNativeMethodTable[sbNativeMethodCount];
+    for (methodCount = 0; methods[methodCount].name != 0; methodCount++) {
+        if (sbNativeMethodCount >= 1024) {
+            return 0;
+        }
+        sbNativeMethodTable[sbNativeMethodCount] = methods[methodCount];
+        sbNativeMethodCount++;
+    }
+    sbNativeOwners[sbNativeOwnerCount].count = methodCount;
+    sbNativeOwnerCount = sbNativeOwnerCount + 1;
+    return 1;
+}
 
 int sbIsSbImage(struct SbImageHeader *image) {
     if (image == 0) {
@@ -310,7 +488,7 @@ int sbIsSblImage(struct SbImageHeader *image) {
  */
 int sbLibraryLink(struct SbImageHeader *image, struct SbImageHeader *library)
 {
-    if (func_001D1A50(image, library) == 0) {
+    if (sbImageLinkImports(image, library) == 0) {
         return 0;
     }
     if (!sbIsSblImage(library)) {
@@ -321,7 +499,63 @@ int sbLibraryLink(struct SbImageHeader *image, struct SbImageHeader *library)
     return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1A50);
+int sbIsSbImage(struct SbImageHeader *image);
+int sbFindNative(const char *ownerName, const char *methodName);
+s32 sbStateWordGet(void);
+
+struct SbImportTable {
+    int imports_offset;
+    int import_count;
+};
+
+static inline int sbImportCountGet(struct SbImageHeader *image) {
+    return ((struct SbImportTable *) sbLinkedLibraryGet(image))->import_count;
+}
+
+static inline int *sbImportsGet(struct SbImageHeader *image) {
+    return (int *) ((char *) sbLinkedLibraryGet(image) +
+                    ((struct SbImportTable *) sbLinkedLibraryGet(image))->imports_offset);
+}
+
+/*
+ * Resolves each import of the image to a native id, stored in place of the import word: the high half of the
+ * word is the owner name offset, the low half the method name offset. An unknown native is kept as -1 when
+ * the state word has bit 0; otherwise the link fails. Hangs on an image that is not an SB image.
+ */
+int sbImageLinkImports(struct SbImageHeader *image, struct SbImageHeader *library)
+{
+    int importCount;
+    int *imports;
+    char *names;
+    int importIndex;
+    int importWord;
+    int nativeId;
+
+    if (sbIsSbImage(image) == 0) {
+        for (;;) {
+        }
+    }
+    if (image->flags < 0) {
+        return 1;
+    }
+    image->flags = image->flags | SB_IMAGE_LINKED;
+    importCount = sbImportCountGet(image);
+    imports = sbImportsGet(image);
+    names = (char *) (imports + importCount);
+    for (importIndex = 0; importIndex < importCount; importIndex++) {
+        importWord = imports[importIndex];
+        nativeId = sbFindNative(names + (importWord >> 16), names + (importWord & 0xFFFF));
+        if (nativeId < 0) {
+            if (sbStateWordGet() & 1) {
+                nativeId = -1;
+            } else {
+                return 0;
+            }
+        }
+        imports[importIndex] = nativeId;
+    }
+    return 1;
+}
 
 int func_0030E68C(const char *a, const char *b);
 
@@ -331,9 +565,9 @@ int sbFindNative(const char *ownerName, const char *methodName)
     int owner;
     int method;
 
-    for (owner = 0; owner < D_00551504; owner++) {
-        if (func_0030E68C(ownerName, D_00616CC0[owner].name) == 0) {
-            for (method = 0; method < D_00616CC0[owner].count; method++) {
+    for (owner = 0; owner < sbNativeOwnerCount; owner++) {
+        if (func_0030E68C(ownerName, sbNativeOwners[owner].name) == 0) {
+            for (method = 0; method < sbNativeOwners[owner].count; method++) {
                 if (func_0030E68C(methodName, D_00616CC4[owner][0][method].name) == 0) {
                     return (owner << 16) + method;
                 }
@@ -343,17 +577,27 @@ int sbFindNative(const char *ownerName, const char *methodName)
     return -1;
 }
 
-extern s32 D_00551500;
-
 s32 sbStateWordGet(void) {
-    return D_00551500;
+    return sbVmStateWord;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1C88);
+/* Sets the bits of the VM state word (sbVmStateWord). */
+void sbVmStateBitsSet(s32 stateBits)
+{
+    s32 *vmStateWord;
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D1CA0);
+    vmStateWord = &sbVmStateWord;
+    *vmStateWord |= stateBits;
+}
 
-extern SbThread D_0060E140[32];
+/* Clears the bits of the VM state word (sbVmStateWord) that are set in clearMask. */
+void sbVmStateBitsClear(s32 clearMask)
+{
+    s32 *vmStateWord;
+
+    vmStateWord = &sbVmStateWord;
+    *vmStateWord &= ~clearMask;
+}
 
 SbThread *sbThreadTableGet(void) {
     return D_0060E140;
@@ -361,7 +605,6 @@ SbThread *sbThreadTableGet(void) {
 
 extern SbThread D_0060E140[SB_THREAD_COUNT];
 extern SbThread *sbThreadRing[SB_THREAD_COUNT];
-void *memset(void *dest, int value, unsigned int count);
 unsigned char *sbTagsGet(int index);
 void sbQueueReset(SbThread *thread);
 
@@ -429,9 +672,6 @@ int sbThreadRelease(struct SbImageHeader *key, int entryPc)
     return 1;
 }
 
-/* Pushes one index onto the thread's cursor ring; -1 when the ring is full. */
-int sbQueuePush(SbThread *thread);
-
 int sbThreadEnqueue(struct SbImageHeader *key, int entryPc, SbMessage *message, SbThread *sender)
 {
     SbThread *thread;
@@ -472,9 +712,6 @@ SbMessage *sbThreadDequeue(struct SbImageHeader *key, int entryPc)
     messageIndex = sbQueuePop(thread);
     return sbQueueEntryGet(thread, messageIndex);
 }
-
-extern SbNativeMethod sbNativeMethodTable[];
-extern int D_00551508;
 
 int sbNameTableFind(struct SbImageHeader *image, const char *name)
 {
@@ -547,7 +784,7 @@ int sbThreadSuspend(struct SbImageHeader *key, int entryPc)
     if (thread == 0) {
         return 0;
     }
-    thread->status |= SB_THREAD_SUSPENDED;
+    thread->status |= SB_IMAGE_LINKED;
     return 1;
 }
 
@@ -570,7 +807,7 @@ int sbThreadResume(struct SbImageHeader *key, int entryPc)
     if (thread == 0) {
         return 0;
     }
-    thread->status &= ~SB_THREAD_SUSPENDED;
+    thread->status &= ~SB_IMAGE_LINKED;
     return 1;
 }
 
@@ -653,8 +890,6 @@ int *sbStackGet(int threadIndex) {
     return sbStacks[threadIndex];
 }
 
-extern unsigned char sbThreadTagBytes[];
-
 unsigned char * sbTagsGet(int threadIndex) {
     return sbThreadTagBytes + (threadIndex << 7);
 }
@@ -666,14 +901,14 @@ unsigned char sbImageByteAt(SbThread *thread, int codePosition)
 {
     unsigned char *codeStream;
 
-    codeStream = (unsigned char *) func_001D1310(thread->image);
-    codeStream += *func_001D1310(thread->image);
+    codeStream = (unsigned char *) sbImageCodeTableGet(thread->image);
+    codeStream += *sbImageCodeTableGet(thread->image);
     return codeStream[codePosition];
 }
 
 /*
  * Reads count code bytes, big-endian, from byte offset of the code stream: the code base is the code table
- * (func_001D1310) plus the code offset stored in its first word.
+ * (sbImageCodeTableGet) plus the code offset stored in its first word.
  */
 int sbCodeReadUnsigned(SbThread *thread, int codePosition, int readWidth)
 {
@@ -681,7 +916,7 @@ int sbCodeReadUnsigned(SbThread *thread, int codePosition, int readWidth)
     int bigEndianValue;
     int i;
 
-    codeStream = (unsigned char *) func_001D1310(thread->image) + *func_001D1310(thread->image);
+    codeStream = (unsigned char *) sbImageCodeTableGet(thread->image) + *sbImageCodeTableGet(thread->image);
     bigEndianValue = 0;
     if (readWidth > 0) {
         for (i = readWidth; i != 0; i--) {
@@ -890,7 +1125,58 @@ int sbOpBinary(SbThread *thread, int opcode)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D2A38);
+int sbOpLength(unsigned char opcode, int operandCount);
+int sbCodeReadUnsigned(SbThread *thread, int codePosition, int readWidth);
+
+/*
+ * Pushes the immediate of opcodes 19 to 31: a 4-byte word (19), a sign-extended byte (20), a sign-extended
+ * half word (21), -1 (22) or the small constant opcode - 23 (23 to 31). Then advances pc. Other opcodes are fatal.
+ */
+int sbOpPushSmallConstant(SbThread *thread, int opcode)
+{
+    unsigned char opcodeByte;
+    int operandValue;
+
+    opcodeByte = opcode & 0xff;
+    switch (opcodeByte) {
+    case 19:
+        operandValue = sbCodeReadUnsigned(thread, thread->pc + 1, 4);
+        break;
+    case 20:
+        operandValue = sbCodeReadUnsigned(thread, thread->pc + 1, 1);
+        if (operandValue & 0x80) {
+            operandValue |= 0xffffff00;
+        }
+        break;
+    case 21:
+        operandValue = sbCodeReadUnsigned(thread, thread->pc + 1, 2);
+        if (operandValue & 0x8000) {
+            operandValue |= 0xffff0000;
+        }
+        break;
+    case 22:
+        operandValue = -1;
+        break;
+    case 23:
+    case 24:
+    case 25:
+    case 26:
+    case 27:
+    case 28:
+    case 29:
+    case 30:
+    case 31:
+        operandValue = opcodeByte - 23;
+        break;
+    default:
+        operandValue = 0;
+        sbFatal(thread);
+        break;
+    }
+    sbStackPush(thread, operandValue, 1);
+    thread->pc += sbOpLength(opcodeByte, 0);
+    return 0;
+}
 
 /* Pushes a word operand: a count of one byte, or two for opcode 0x20; then advances pc past the operation. */
 int sbOpPushImmediate(SbThread *thread, unsigned char opcode)
@@ -949,7 +1235,74 @@ int sbOpPushGlobalId(SbThread *thread, unsigned char opcode)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D2DC8);
+int sbGlobalVariableGet(SbThread *thread, int globalVarId);
+
+/*
+ * Pushes a global variable: opcodes 41 to 45 read a 2-byte id, 46 to 50 a 1-byte id; the tag is 1 to 5 by
+ * opcode. Then advances pc. Other opcodes are fatal.
+ */
+int sbOpPushGlobalVariable(SbThread *thread, unsigned char opcode)
+{
+    unsigned char opcodeByte;
+    int operandSize;
+    int tag;
+    int globalVarId;
+    int globalValue;
+
+    opcodeByte = opcode & 0xff;
+    switch (opcodeByte) {
+    case 41:
+        operandSize = 2;
+        tag = 1;
+        break;
+    case 42:
+        operandSize = 2;
+        tag = 2;
+        break;
+    case 43:
+        operandSize = 2;
+        tag = 3;
+        break;
+    case 44:
+        operandSize = 2;
+        tag = 4;
+        break;
+    case 45:
+        operandSize = 2;
+        tag = 5;
+        break;
+    case 46:
+        operandSize = 1;
+        tag = 1;
+        break;
+    case 47:
+        operandSize = 1;
+        tag = 2;
+        break;
+    case 48:
+        operandSize = 1;
+        tag = 3;
+        break;
+    case 49:
+        operandSize = 1;
+        tag = 4;
+        break;
+    case 50:
+        operandSize = 1;
+        tag = 5;
+        break;
+    default:
+        operandSize = 0;
+        tag = 0;
+        sbFatal(thread);
+        break;
+    }
+    globalVarId = sbCodeReadUnsigned(thread, thread->pc + 1, operandSize);
+    globalValue = sbGlobalVariableGet(thread, globalVarId);
+    sbStackPush(thread, globalValue, tag);
+    thread->pc += sbOpLength(opcodeByte, 0);
+    return 0;
+}
 
 /* Load opcode (51 to 60): reads an operand of 2 bytes (opcodes 51 to 55) or 1 byte (56 to 60),
  * resolves it through sbLocalVariableGet and pushes it with the tag 1 to 5 of the opcode; an unknown
@@ -959,7 +1312,7 @@ int sbOpPushLocalVariable(SbThread *thread, int opcode)
     unsigned char opcodeByte;
     int operandSize;
     int tag;
-    int localIndexOrValue;
+    int localVarId;
 
     opcodeByte = opcode & 0xff;
     switch (opcodeByte) {
@@ -1009,9 +1362,9 @@ int sbOpPushLocalVariable(SbThread *thread, int opcode)
         sbFatal(thread);
         break;
     }
-    localIndexOrValue = sbCodeReadUnsigned(thread, thread->pc + 1, operandSize);
-    localIndexOrValue = sbLocalVariableGet(thread, localIndexOrValue);
-    sbStackPush(thread, localIndexOrValue, tag);
+    localVarId = sbCodeReadUnsigned(thread, thread->pc + 1, operandSize);
+    localVarId = sbLocalVariableGet(thread, localVarId);
+    sbStackPush(thread, localVarId, tag);
     thread->pc += sbOpLength(opcodeByte, 0);
     return 0;
 }
@@ -1127,7 +1480,32 @@ int sbOpEnterFrame(SbThread *thread, unsigned char opcode)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D3468);
+/*
+ * Calls a named entry: opcode 0x45 reads a 2-byte name index, the others 1 byte. Takes the frame saved at
+ * local -1 (sbOpEnterFrame), stores the return pc in local -3, then jumps to the entry's pc.
+ */
+int sbOpCallNamed(SbThread *thread, int opcode)
+{
+    int width;
+    int savedFrame;
+    int returnPc;
+    int nameEntryIndex;
+    int nameBase;
+    SbNameEntry *nameEntry;
+
+    width = ((opcode & 0xff) == 0x45) ? 2 : 1;
+    savedFrame = sbLocalVariableGet(thread, -1);
+    returnPc = thread->pc;
+    thread->frame = savedFrame;
+    sbLocalVariableSet(thread, -3, returnPc + width + 1);
+    nameEntryIndex = sbCodeReadUnsigned(thread, thread->pc + 1, width);
+    nameBase = (int) sbNameTable(thread->image);
+    nameBase = nameBase + sbNameTable(thread->image)[0];
+    nameEntry = (SbNameEntry *) (nameEntryIndex * 8 + nameBase);
+    nameEntryIndex = nameEntry->entryPc;
+    thread->pc = nameEntryIndex;
+    return 0;
+}
 
 int sbOpReturn(SbThread *thread)
 {
@@ -1159,7 +1537,42 @@ int sbOpReturnValue(SbThread *thread)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D3610);
+/*
+ * Calls a native: the operand (1 byte, or 2 for 0x49) indexes the native id table of the linked library image
+ * (sbLinkedLibraryGet). The id's owner and method select the function, which runs with the status word; its result
+ * goes to the thread's result word and the argument words are dropped. A status of 1 returns 1 to the caller.
+ */
+int sbOpCallNative(SbThread *thread, unsigned char opcode)
+{
+    int operandSize;
+    int nativeIndex;
+    unsigned char *linkedImageBase;
+    int nativeIdTableOffset;
+    int *stackTop;
+    int nativeStatus;
+    int nativeResult;
+    int droppedWordCount;
+
+    operandSize = opcode != 0x49 ? 1 : 2;
+    nativeIndex = sbCodeReadUnsigned(thread, thread->pc + 1, operandSize);
+    linkedImageBase = sbLinkedLibraryGet(thread->image);
+    nativeIdTableOffset = *(int *) sbLinkedLibraryGet(thread->image);
+    nativeIndex = ((int *) (linkedImageBase + nativeIdTableOffset))[nativeIndex];
+    stackTop = thread->stack + thread->sp;
+    if (stackTop[-1] < *(int *) sbNativeOwners[nativeIndex >> 16].methods[nativeIndex & 0xFFFF].unmodeled_08) {
+        sbSlotJumpRequest(thread, 2);
+    }
+    nativeStatus = 0;
+    nativeResult = sbNativeOwners[nativeIndex >> 16].methods[nativeIndex & 0xFFFF].func(thread, &nativeStatus);
+    if (nativeStatus == 1) {
+        return 1;
+    }
+    droppedWordCount = stackTop[-1] + 1;
+    *(int *) thread->unmodeled_0C = nativeResult;
+    thread->sp -= droppedWordCount;
+    thread->pc += sbOpLength(opcode, 0);
+    return 0;
+}
 
 s32 sbOpPushIndirect(SbThread *thread, s32 opcode) {
     u8 opcodeByte;
@@ -1201,7 +1614,45 @@ int sbOpDrop(SbThread *thread, int opcode)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sb_vm", func_001D3908);
+/*
+ * Pops a global variable id and pushes that global with tag 1 to 5 (opcodes 79 to 83); other opcodes are fatal.
+ * Then advances pc.
+ */
+int sbOpPushGlobalFromStack(SbThread *thread, int opcode)
+{
+    unsigned char opcodeByte;
+    int globalVarId;
+    int tag;
+    int globalValue;
+
+    globalVarId = sbStackPop(thread);
+    opcodeByte = opcode & 0xff;
+    switch (opcodeByte) {
+    case 79:
+        tag = 1;
+        break;
+    case 80:
+        tag = 2;
+        break;
+    case 81:
+        tag = 3;
+        break;
+    case 82:
+        tag = 4;
+        break;
+    case 83:
+        tag = 5;
+        break;
+    default:
+        tag = 0;
+        sbFatal(thread);
+        break;
+    }
+    globalValue = sbGlobalVariableGet(thread, globalVarId);
+    sbStackPush(thread, globalValue, tag);
+    thread->pc += sbOpLength(opcodeByte, 0);
+    return 0;
+}
 
 /* Loads the local at the popped index and pushes it; the operation is one of the five load opcodes 84 to 88, anything else is fatal. */
 int sbOpLoadLocalFromStack(SbThread *thread, unsigned char opcode)

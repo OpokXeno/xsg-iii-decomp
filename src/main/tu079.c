@@ -24,7 +24,7 @@ typedef struct ActorModel ActorModel;
  * (inputMagnitude) drives the walk animation mode, the footstep sound and the movement vector.
  */
 typedef struct ActorSoundState {
-    s32 checkKey; /* +0x00: first argument of func_001D05B8 */
+    s32 checkKey; /* +0x00: first argument of keyedWordTableFind */
     unsigned char unmodeled_04[0x08 - 0x04];
     s32 mode; /* +0x08: movement mode, the switch value of playerFrameUpdate */
     u16 countdown; /* +0x0C: frames until the action ends */
@@ -42,7 +42,7 @@ typedef struct ActorSoundState {
     Matrix4Rows cameraMatrix; /* +0x50: yaw rotation of the camera */
     s16 requestedMode; /* +0x90: 0xC when the wait ends, 0 when it is cleared */
     s16 appliedMode; /* +0x92 */
-    XenoActor *linkedA; /* +0x94: first linked actor, also copied into the func_001E9888 argument block */
+    XenoActor *linkedA; /* +0x94: first linked actor, also copied into the sefSpawnEffectFromRequest argument block */
     XenoActor *linkedB; /* +0x98: second linked actor */
     XenoActor *linkedNode; /* +0x9C: actor whose draw flags and position playerLinkedActorAimUpdate edits */
     union {
@@ -68,14 +68,14 @@ typedef struct SoundActor {
     ActorSoundState sound; /* +0x150 */
 } SoundActor;
 
-/* Argument block of the sound effect start calls (sefObjectSetStatePlay fills the defaults, func_001E9888 starts it). */
+/* Argument block of the sound effect start calls (sefObjectSetStatePlay fills the defaults, sefSpawnEffectFromRequest starts it). */
 typedef struct SefObjectPlayArgs {
     ActorModel *ownerModel;
     ActorModel *otherModel;
     XenoActor *linkedA;
     XenoActor *linkedB;
     s32 unmodeled_10[7];
-    s32 effectId; /* +0x2C: effect id; for playerSoundEffectStart the result of func_001D05B8 */
+    s32 effectId; /* +0x2C: effect id; for playerSoundEffectStart the result of keyedWordTableFind */
     s32 unmodeled_30[20];
 } SefObjectPlayArgs;
 
@@ -86,7 +86,7 @@ typedef struct FootstepEffectEntry {
 
 extern FootstepEffectEntry D_00531560[4];
 void sefObjectSetStatePlay(SefObjectPlayArgs *args);
-struct SefEffectObject *func_001E9888(SefObjectPlayArgs *args);
+struct SefEffectObject *sefSpawnEffectFromRequest(SefObjectPlayArgs *args);
 void linkedObjectSetFloat(struct SefEffectObject *object, f32 value);
 
 /* Starts the footstep effect of the surface type in checkKey (table D_00531560), silent until faded in. */
@@ -114,7 +114,7 @@ void func_001C5180(SoundActor *actor) {
     sefObjectSetStatePlay(&effectArgs);
     effectArgs.ownerModel = actor->model;
     effectArgs.effectId = footstepEffectId;
-    sound->effectObject = func_001E9888(&effectArgs);
+    sound->effectObject = sefSpawnEffectFromRequest(&effectArgs);
     linkedObjectSetFloat(sound->effectObject, 0.0f);
 }
 
@@ -141,7 +141,7 @@ void func_001C5250(SoundActor *actor) {
             sefObjectSetStatePlay(&effectArgs);
             effectArgs.effectId = 0x10064033;
             effectArgs.ownerModel = actor->model;
-            func_001E9888(&effectArgs);
+            sefSpawnEffectFromRequest(&effectArgs);
         }
     }
     if (sound->effectObject == 0) {
@@ -389,22 +389,22 @@ void playerProbeForwardPoint(SoundActor *actor) {
     collision->attribute = savedAttribute;
 }
 
-s32 func_001D05B8(s32 checkKey, s16 waitState);
+s32 keyedWordTableFind(s32 checkKey, s16 waitState);
 
-/* Starts the effect that func_001D05B8 selects from the sound key, between the actor and the other actor. */
+/* Starts the effect that keyedWordTableFind selects from the sound key, between the actor and the other actor. */
 void playerSoundEffectStart(SoundActor *actor, SoundActor *partner) {
     ActorSoundState *sound;
     SefObjectPlayArgs effectArgs;
 
     sound = &actor->sound;
     sefObjectSetStatePlay(&effectArgs);
-    effectArgs.effectId = func_001D05B8(sound->checkKey, sound->requestedMode);
+    effectArgs.effectId = keyedWordTableFind(sound->checkKey, sound->requestedMode);
     if (effectArgs.effectId != 0) {
         effectArgs.ownerModel = actor->model;
         effectArgs.otherModel = partner->model;
         effectArgs.linkedA = sound->linkedA;
         effectArgs.linkedB = sound->linkedB;
-        func_001E9888(&effectArgs);
+        sefSpawnEffectFromRequest(&effectArgs);
     }
 }
 
@@ -659,7 +659,7 @@ void actorSoundTickWait(SoundActor *actor) {
     }
 }
 
-s32 *func_001D0E00();
+s32 *eventSlotFind();
 SoundActor *RgDispModelFindByKey();
 s32 func_001C1890();
 f32 MMathCalcDir();
@@ -691,7 +691,7 @@ void playerCueSelectUpdate(SoundActor *actor) {
         return;
     }
     if (padPressed & 0xC) {
-        cueEntry = func_001D0E00(sound->cue, (padPressed & 4) ? 1 : 2);
+        cueEntry = eventSlotFind(sound->cue, (padPressed & 4) ? 1 : 2);
         cueId = cueEntry ? *cueEntry : 0;
         sound->cue = cueId;
         if (cueId) {
@@ -702,7 +702,7 @@ void playerCueSelectUpdate(SoundActor *actor) {
     if (!(padPressed & 0x80) || sound->cue == 0 || (sound->cue & 0x20000000)) {
         return;
     }
-    cueEntry = func_001D0E00(sound->cue, 0);
+    cueEntry = eventSlotFind(sound->cue, 0);
     if (cueEntry == 0) {
         return;
     }

@@ -130,7 +130,7 @@ typedef struct EffectSpawn {
 
 extern unsigned char D_00531600[];
 void sefObjectSetStatePlay(EffectSpawn *effectObject);
-void func_001E9888(EffectSpawn *effectObject);
+void sefSpawnEffectFromRequest(EffectSpawn *effectObject);
 
 /* Spawns one effect record from the owner's position, rotation and scale. */
 void emitterSpawnEffectRecord(EmitterOwner *owner) {
@@ -155,7 +155,7 @@ void emitterSpawnEffectRecord(EmitterOwner *owner) {
                          : "r"(&spawn.scaleVector), "f"(params->scale)
                          : "$8", "memory");
     QuadwordCopyT0(&spawn.tableRow, &D_00531600[params->soundTableRow << 4]);
-    func_001E9888(&spawn);
+    sefSpawnEffectFromRequest(&spawn);
 }
 
 typedef struct PlayerObject {

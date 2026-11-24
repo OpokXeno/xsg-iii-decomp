@@ -166,8 +166,8 @@ void decodeNoop(void) {
 
 }
 
-s32 func_001E8AF0();
-s32 func_001E8CB8(s32);
+s32 sefResetEffectSystem();
+s32 sefSetSceneMode(s32);
 s32 func_0028D670();
 void decodeCounterSetFlagA(DecodeCounter *counter, s32 value);
 void decodeCounterSetFlagB(DecodeCounter *counter, s32 value);
@@ -191,8 +191,8 @@ void decodeStateInit(void)
     func_002E0EE0();
     decodeCounterSetFlagA(&gDecodeState.decodeProgress, 2);
     decodeCounterSetFlagB(&gDecodeState.decodeProgress, 0);
-    func_001E8AF0();
-    func_001E8CB8(2);
+    sefResetEffectSystem();
+    sefSetSceneMode(2);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu398", func_002E0B68);

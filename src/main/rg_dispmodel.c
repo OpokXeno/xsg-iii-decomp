@@ -6,7 +6,7 @@
 extern float D_003E481C[];
 extern const AlignedVector4 MMathUnitVector;
 void sefObjectSetStatePlay(void *effectObject);
-void func_001E9888(void *request);
+void sefSpawnEffectFromRequest(void *request);
 
 typedef int s32;
 
@@ -39,7 +39,7 @@ static inline void RgVu0SplatScalarXyz(AlignedVector4 *splatTarget, float splatS
                          : "$8");
 }
 
-/* Starts an effect at the position (unit vector when null) with the scale constant D_003E481C[0]; returns through func_001E9888. */
+/* Starts an effect at the position (unit vector when null) with the scale constant D_003E481C[0]; returns through sefSpawnEffectFromRequest. */
 void func_001BF848(s32 effectId, AlignedVector4 *spawnPosition) {
     RgEffectRequest effectRequest;
     const AlignedVector4 *effectPosition;
@@ -52,7 +52,7 @@ void func_001BF848(s32 effectId, AlignedVector4 *spawnPosition) {
     }
     RgCopyQuadword(&effectRequest.position, effectPosition);
     RgVu0SplatScalarXyz(&effectRequest.scale, D_003E481C[0]);
-    func_001E9888(&effectRequest);
+    sefSpawnEffectFromRequest(&effectRequest);
 }
 
 typedef unsigned char u8;
@@ -249,7 +249,7 @@ void func_001BF970(void) {
                 RgDispCopyVector(&spawn.position, &model->position);
                 RgDispZeroVector(&spawn.zeroVector);
                 RgDispScaleVector(&spawn.scale, gGameLoopRuntimeStorage.scale16C);
-                model->effectHandle = ((s32 (*)(RgEffectRequest *spawn)) func_001E9888)(&spawn);
+                model->effectHandle = ((s32 (*)(RgEffectRequest *spawn)) sefSpawnEffectFromRequest)(&spawn);
             }
         }
         if (model->effectHandle != 0) {
