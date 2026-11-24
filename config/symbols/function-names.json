@@ -381,6 +381,7 @@
    "0x002e97a8": "sceClose",
    "0x002ed9d0": "DIntr",
    "0x002eda20": "EIntr",
+   "0x002f33d0": "sceGsSetDefDispEnv",
    "0x002f38f0": "sceGsSyncV",
    "0x002f3988": "sceGsSyncPath",
    "0x002f3ca0": "sceGsSetDefLoadImage",

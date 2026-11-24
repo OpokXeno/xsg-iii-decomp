@@ -138379,9 +138379,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F33D0",
+     "name": "sceGsSetDefDispEnv",
      "size": 884,
-     "splat_name": "func_002F33D0",
+     "splat_name": "sceGsSetDefDispEnv",
      "va": "0x002f33d0",
      "name_basis": "address",
      "provenance": "estimated"

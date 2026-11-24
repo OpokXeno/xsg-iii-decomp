@@ -134,6 +134,9 @@ typedef struct GsDispEnv {
     u64 extbuf;                        /* +0x38 */
     GsExtdataRegister extdata;         /* +0x40 */
     u64 extwrite;                      /* +0x48 */
+    /* +0x50: the first circuit's DISPLAY as set up, the base the display offset works from
+     * (X2 keeps it in dispEnvTailWork[0], right after the block). */
+    GsDisplayRegister baseDisplay;
 } GsDispEnv;
 
 extern GsDispEnv DispEnv;
@@ -605,10 +608,50 @@ void xglRenderDrawEnvMove(void)
     func_002F3808(&gXglRenderDrawPacket.env);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A280);
-
 /* The display environment block (0x004c81c0). */
 extern GsDispEnv xglRenderDispEnvBlock;
+
+void sceGsSetDefDispEnv(GsDispEnv *env, short psm, short width, short height, int dx, int dy);
+
+/* The movie display mode: 640x448 (NTSC) or 640x512 (PAL) in PSMCT16. */
+#define RENDER_MOVIE_DISPLAY_PSM 2
+#define RENDER_MOVIE_DISPLAY_WIDTH 0x280
+#define RENDER_MOVIE_DISPLAY_HEIGHT_NTSC 0x1C0
+#define RENDER_MOVIE_DISPLAY_HEIGHT_PAL 0x200
+/* PMODE bits cleared after the default setup: the second circuit and the blend source (ALP from PMODE). */
+#define RENDER_PMODE_SECOND_CIRCUIT 0x2
+#define RENDER_PMODE_ALPHA_FROM_PMODE 0x40
+/* 480p moves the picture down by 16 scan lines. */
+#define RENDER_PROGRESSIVE_DISPLAY_DY 0x10
+
+/* X2 xglRenderDispEnvInit: sets up the display environment from the render state (or the movie mode),
+ * enables only the first circuit, and copies its DISPFB/DISPLAY into the second circuit and the base display. */
+void func_0019A280(void)
+{
+    if (D_004C8390.movieMode) {
+        if (D_004C8390.palMode == 0) {
+            sceGsSetDefDispEnv(&xglRenderDispEnvBlock, RENDER_MOVIE_DISPLAY_PSM, RENDER_MOVIE_DISPLAY_WIDTH,
+                               RENDER_MOVIE_DISPLAY_HEIGHT_NTSC, 0, 0);
+        } else {
+            sceGsSetDefDispEnv(&xglRenderDispEnvBlock, RENDER_MOVIE_DISPLAY_PSM, RENDER_MOVIE_DISPLAY_WIDTH,
+                               RENDER_MOVIE_DISPLAY_HEIGHT_PAL, 0, 0);
+        }
+    } else {
+        sceGsSetDefDispEnv(&xglRenderDispEnvBlock, D_004C8390.psm, D_004C8390.frame_width, D_004C8390.frame_height,
+                           0, 0);
+    }
+    xglRenderDispEnvBlock.pmodeWord &= ~RENDER_PMODE_SECOND_CIRCUIT;
+    xglRenderDispEnvBlock.pmodeWord &= ~RENDER_PMODE_ALPHA_FROM_PMODE;
+    if (D_004C8390.progressiveMode) {
+        xglRenderDispEnvBlock.firstDisplay.displayFields.dy += RENDER_PROGRESSIVE_DISPLAY_DY;
+    }
+    xglRenderDispEnvBlock.baseDisplay.packed = xglRenderDispEnvBlock.firstDisplay.packed;
+    xglRenderDispEnvBlock.secondDispfb.packed = xglRenderDispEnvBlock.firstDispfb.packed;
+    xglRenderDispEnvBlock.secondDisplay.packed = xglRenderDispEnvBlock.firstDisplay.packed;
+    xglRenderDispEnvBlock.extbuf = 0;
+    xglRenderDispEnvBlock.extdata.packed = 0;
+    xglRenderDispEnvBlock.extwrite = 0;
+}
 
 void func_002F3748(GsDispEnv *env);
 
@@ -686,8 +729,6 @@ void xglRenderScanLineInit(void)
 }
 
 extern unsigned char xglRenderStartFlag[];
-
-s32 func_0019A280();
 
 void xglRenderScanLineInit();
 
