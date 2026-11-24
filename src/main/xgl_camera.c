@@ -178,7 +178,44 @@ void func_00193A78(XglCamera *camera)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193BD0);
+/* Cross (PS2 pad bit 0x40): the travel runs four times as fast. */
+#define CAMERA_TRAVEL_BTN_FAST 0x0040
+/* From focus 10 on the angle delta keeps the factor of focus 9 (episode II's largest focus). */
+#define CAMERA_TRAVEL_ANGLE_FOCUS_MAX 9.0f
+
+void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
+
+/* Scales the travel scale and deltas by focus-dependent factors, x4 while cross is held. From focus 10 on the
+ * angle delta keeps the factor of focus 9 and the place delta uses ten times the focus. */
+void func_00193BD0(XglCamera *camera)
+{
+    CameraTravel *travel = &camera->travel;
+    unsigned short held;
+
+    held = PadData[1].held | PadData[camera->padPort].held;
+    if (sdvSpecialBuf.active) {
+        held = sdvSpecialBuf.held;
+    }
+    if (held & CAMERA_TRAVEL_BTN_FAST) {
+        travel->scale = travel->scale * 4.0f;
+        xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, 4.0f);
+        xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta, 4.0f);
+        travel->unknown_78 = travel->unknown_78 + 1;
+    } else {
+        travel->unknown_78 = 0;
+    }
+    travel->scale = travel->scale * ((travel->focus - 5.0f) * 0.08f + 1.0f);
+    if (travel->focus >= 10.0f) {
+        xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta,
+                          (CAMERA_TRAVEL_ANGLE_FOCUS_MAX - 5.0f) * 0.08f + 1.0f);
+        xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta,
+                          (travel->focus * 10.0f - 5.0f) * 0.24f + 1.0f + travel->unknown_78 * 0.01f);
+    } else {
+        xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta,
+                          (travel->focus - 5.0f) * 0.24f + 1.0f + travel->unknown_78 * 0.01f);
+        xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, (travel->focus - 5.0f) * 0.08f + 1.0f);
+    }
+}
 
 void func_00193A40(XglCamera *camera);
 
