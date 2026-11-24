@@ -61,6 +61,7 @@ struct FontImage {
 extern unsigned char spCodeParameterSizeTable[];
 extern unsigned char spcode_0[32];
 int xglFontGetStringWidth2(const char *text, int delimiter);
+int func_00185770(int glyph, int *leftBound);
 /* Defined here, not with the data above: moving it before the functions that use it changes the original code or data order. */
 extern unsigned char spCodeParameterSizeTable[8];
 
@@ -126,7 +127,7 @@ void xglFontSetTextureFilter(FontDrawCursor *cursor, int useCursorScale);
 /* Advance of each printable ASCII character (32..127) in the debug font. */
 extern int fontAsciiWidthTable[];
 int xglFontParseNumber(const char **cursor, int *parsedNumber);
-unsigned short xglFontCharToEuc(signed char character, unsigned char **text);
+unsigned short xglFontCharToEuc(signed char character);
 unsigned int xglFontGetDebugCell(unsigned char eucRow, unsigned char eucColumn);
 int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn);
 /* * Reads a hex number up to ';' or ',' and moves the text cursor past the delimiter; returns 0 on any * other character. */
@@ -187,7 +188,7 @@ extern unsigned short asciiEucTable[128];
 extern int fontAsciiWidthTable[98];
 extern struct FontInlineCommand fontInlineCommands[20];
 
-unsigned short xglFontCharToEuc(signed char character, unsigned char **text)
+unsigned short xglFontCharToEuc(signed char character)
 {
     if (character < 0x20) {
         return EUC_SPACE;
@@ -278,7 +279,7 @@ int xglFontIsTextureGlyphCode(unsigned char eucRow, unsigned char eucColumn)
     return 0;
 }
 
-struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07; unsigned short unmodeled_08; unsigned char unmodeled_0a[2]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; unsigned char unmodeled_10; unsigned char unmodeled_11[3]; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; unsigned char unmodeled_20[6]; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { unsigned char compact_width; unsigned char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
+struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07; unsigned short unmodeled_08; unsigned char unmodeled_0a[2]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; /* FONT_CONFIG_DEFAULT_WIDTH, "$xx1,N;". */ unsigned char glyph_default_width; /* FONT_MODE_* bits, set by $prop/$han and the ruby annotation. */ unsigned char text_mode; /* FONT_CONFIG_PROPORTIONAL_MODE, "$xx3,N;". */ unsigned char proportional_mode; unsigned char unmodeled_13; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; /* "$rubyb;" marks where the base text of a ruby annotation starts. */ const unsigned char *ruby_base; /* From the end of the annotation back to the end of its base text; set by "$rubys;". */ unsigned short ruby_advance; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { signed char compact_width; signed char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
 
 extern struct FontStateQueue xglFontState;
 void sceVif1PkRef();
@@ -719,7 +720,145 @@ void xglFontDebugPrintf(int x, int y, const char *format, ...)
     xglFontPrintSub(arguments);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", xglFontGetStringWidth2);
+/* Advance of an ASCII glyph drawn with the narrow font, before the glyph scale. */
+#define FONT_ASCII_ADVANCE 16
+
+/*
+ * Width of `text` in pixels up to its end or, when `delimiter` is set, up to the next space after the
+ * first character. Inline "$...;" commands and control codes update the text mode, the glyph scale and
+ * the character spacing on the way, as the drawing code would.
+ */
+int xglFontGetStringWidth2(const char *text, int delimiter)
+{
+    int compact = 0;
+    int width = 0;
+    int scale = FONT_SCALE_ONE;
+    int first = 1;
+    unsigned char high;
+
+    while (*text != 0 && (high = *text, !(!first && delimiter != 0 && high == ' '))) {
+        if (high == '$') {
+            if (text[1] == 'p' && text[2] == 'r' && text[3] == 'o' && text[4] == 'p') {
+                xglFontState.text_mode &= ~FONT_MODE_PROP;
+                xglFontState.text_mode |= text[5] & FONT_MODE_PROP;
+            } else if (text[1] == 'h' && text[2] == 'a' && text[3] == 'n') {
+                xglFontState.text_mode &= ~FONT_MODE_HAN;
+                xglFontState.text_mode |= (text[4] & 1) << 1;
+            } else if (text[1] == 'x' && text[2] == 'x') {
+                if (text[3] == '1' && text[4] == ',') {
+                    const char *number = text + 5;
+                    int value;
+
+                    xglFontParseNumber(&number, &value);
+                    xglFontState.glyph_default_width = value;
+                }
+                if (text[3] == '3' && text[4] == ',') {
+                    const char *number = text + 5;
+                    int value;
+
+                    xglFontParseNumber(&number, &value);
+                    xglFontState.proportional_mode = value;
+                }
+                if (text[3] == '7' && text[4] == ',') {
+                    const char *number = text + 5;
+                    int value;
+
+                    xglFontParseNumber(&number, &value);
+                    xglFontState.debug_mode = value;
+                }
+            } else if (text[1] == 'r' && text[2] == 'u' && text[3] == 'b' && text[4] == 'y' &&
+                       text[5] == 's' && text[6] == ';') {
+                const unsigned char *scan = (const unsigned char *) text + 7;
+
+                while (*scan != 0) {
+                    if (scan[0] == '$' && scan[1] == 'r' && scan[2] == 'u' && scan[3] == 'b' &&
+                        scan[4] == 'y' && scan[5] == 'e' && scan[6] == ';') {
+                        text = (const char *) scan;
+                        break;
+                    }
+                    if (*scan < 0x20) {
+                        scan += xglFontGetSPcodeSize(*scan, scan + 1);
+                    }
+                    scan++;
+                }
+            } else if (text[1] == 'z' && text[2] == 'o' && text[3] == 'o' && text[4] == 'm') {
+                const char *number = text + 5;
+                int value;
+
+                xglFontParseNumber(&number, &value);
+                scale = value;
+            }
+            do {
+                high = *text++;
+            } while (high != ';');
+        } else if (high < 0x20) {
+            switch (high) {
+            case FONT_OP_SCALE:
+                scale = text[1];
+                break;
+            case FONT_OP_CONFIG:
+                switch (text[2]) {
+                case FONT_CONFIG_DEFAULT_WIDTH:
+                    xglFontState.glyph_default_width = text[3];
+                    break;
+                case FONT_CONFIG_PROPORTIONAL_MODE:
+                    xglFontState.proportional_mode = text[3];
+                    break;
+                }
+                break;
+            case FONT_OP_COMPACT:
+                compact = text[1];
+                break;
+            case FONT_OP_STYLE:
+                xglFontState.text_mode = text[1];
+                break;
+            }
+            text += xglFontGetSPcodeSize(high, (const unsigned char *) text) + 1;
+        } else {
+            unsigned char low;
+            /* The glyph index, then its advance. */
+            int glyph;
+
+            if (high < 0xa0) {
+                if ((signed char) high >= 0) {
+                    if (!(xglFontState.text_mode & FONT_MODE_HAN)) {
+                        text++;
+                        width += (FONT_ASCII_ADVANCE * scale) >> 4;
+                        first = 0;
+                        continue;
+                    }
+                }
+            }
+            if ((signed char) high >= 0) {
+                unsigned short code = xglFontCharToEuc(high);
+
+                text++;
+                low = code;
+                high = code >> 8;
+            } else {
+                low = text[1];
+                if (xglFontIsTextureGlyphCode(high, low)) {
+                    text += 2;
+                } else {
+                    text++;
+                    low = high + 0x80;
+                    high = EUC_ROW_HALF_WIDTH;
+                }
+            }
+            glyph = xglFontGetGlyphIndex(high, low);
+            if (compact) {
+                glyph = func_00185770(xglFontGetProportionalSize(glyph), 0);
+            } else if ((xglFontState.text_mode & FONT_MODE_PROP) && glyph < FONT_PROPORTIONAL_GLYPHS) {
+                glyph = func_00185770(glyph, 0);
+            } else {
+                glyph = FONT_GLYPH_ADVANCE;
+            }
+            width += ((glyph + (signed char) xglFontState.debug_mode) * scale) >> 4;
+        }
+        first = 0;
+    }
+    return width;
+}
 
 int xglFontGetStringWidth(const char *text)
 {
@@ -994,10 +1133,10 @@ int xglFontCmdInit(FontDrawCursor *cursor, const char **text)
     xglFontState.unmodeled_14 = 1;
     xglFontState.compact_width = FONT_SCALE_ONE;
     xglFontState.compact_height = FONT_SCALE_ONE;
-    xglFontState.unmodeled_10 = 4;
+    xglFontState.glyph_default_width = 4;
     xglFontState.debug_mode = 0;
-    xglFontState.unmodeled_11[1] = 0;
-    xglFontState.unmodeled_11[2] = 0;
+    xglFontState.proportional_mode = 0;
+    xglFontState.unmodeled_13 = 0;
     (*text)++;
     xglFontState.ruby_offset_y = 2;
     xglFontState.unmodeled_0e = 0;
@@ -1335,7 +1474,7 @@ void xglFontBufferReset(void)
 {
     struct FontStateQueue *queue_end;
 
-    xglFontState.unmodeled_11[0] = 0;
+    xglFontState.text_mode = 0;
     queue_end = (&xglFontState) + 1;
     xglFontState.queue_cursor = (u8 *) queue_end;
     xglFontState.debug_prefix = 0;
