@@ -1326,7 +1326,10 @@
    "0x00550d2c": "gMovieFixedSlot",
    "0x00550d30": "gMovieTestMode",
    "0x00550d34": "gMovieMenuCursor",
-   "0x003eb860": "gMovieMenuItems"
+   "0x003eb860": "gMovieMenuItems",
+   "0x008e0630": "pxyCircleShadowTexture",
+   "0x008e1650": "pxyCircleShadowClut",
+   "0x00551248": "pxyShadowTexturesReady"
   },
   "ov04": {
    "0x00abe458": "$LC1",

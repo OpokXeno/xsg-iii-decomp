@@ -1631,79 +1631,6 @@
    ]
   },
   "main/tu040": {
-   ".lit4": [
-    {
-     "range": [
-      "0x0054ffec",
-      "0x0054fff0"
-     ],
-     "generated": [
-      "0x0054ffec",
-      "0x0054fff0"
-     ],
-     "generated_by": [
-      "pxyBuildFadeRamp"
-     ],
-     "c_owned_symbols": [
-      "D_0054FFEC"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/nml_model_set.o"
-     }
-    },
-    {
-     "range": [
-      "0x0054fff8",
-      "0x00550060"
-     ],
-     "generated": [
-      "0x0054fff8",
-      "0x00550060"
-     ],
-     "generated_by": [
-      "pxySetupShadowProjector",
-      "pxySubmitModel",
-      "pxyCalcFadeMetric"
-     ],
-     "c_owned_symbols": [
-      "D_0054FFF8",
-      "D_0054FFFC",
-      "D_00550000",
-      "D_00550004",
-      "D_00550008",
-      "D_0055000C",
-      "D_00550010",
-      "D_00550014",
-      "D_00550018",
-      "D_0055001C",
-      "D_00550020",
-      "D_00550024",
-      "D_00550028",
-      "D_0055002C",
-      "D_00550030",
-      "D_00550034",
-      "D_00550038",
-      "D_0055003C",
-      "D_00550040",
-      "D_00550044",
-      "D_00550048",
-      "D_0055004C",
-      "D_00550050",
-      "D_00550054",
-      "D_00550058",
-      "D_0055005C"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/nml_model_set.o"
-     }
-    }
-   ],
    ".rodata": [
     {
      "range": [
@@ -1758,6 +1685,81 @@
      }
     }
    ],
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffec",
+      "0x0054fff4"
+     ],
+     "generated": [
+      "0x0054ffec",
+      "0x0054fff4"
+     ],
+     "generated_by": [
+      "func_0019E5B0",
+      "pxyBuildFadeRamp"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFEC",
+      "D_0054FFF0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/nml_model_set.o"
+     }
+    },
+    {
+     "range": [
+      "0x0054fff8",
+      "0x00550060"
+     ],
+     "generated": [
+      "0x0054fff8",
+      "0x00550060"
+     ],
+     "generated_by": [
+      "pxyCalcFadeMetric",
+      "pxySetupShadowProjector",
+      "pxySubmitModel"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFF8",
+      "D_0054FFFC",
+      "D_00550000",
+      "D_00550004",
+      "D_00550008",
+      "D_0055000C",
+      "D_00550010",
+      "D_00550014",
+      "D_00550018",
+      "D_0055001C",
+      "D_00550020",
+      "D_00550024",
+      "D_00550028",
+      "D_0055002C",
+      "D_00550030",
+      "D_00550034",
+      "D_00550038",
+      "D_0055003C",
+      "D_00550040",
+      "D_00550044",
+      "D_00550048",
+      "D_0055004C",
+      "D_00550050",
+      "D_00550054",
+      "D_00550058",
+      "D_0055005C"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/nml_model_set.o"
+     }
+    }
+   ],
    ".sdata": [
     {
      "range": [
@@ -1775,7 +1777,8 @@
       "D_0055124C"
      ],
      "also_referenced_by_c": [
-      "gPxyDirtyFlag"
+      "gPxyDirtyFlag",
+      "pxyShadowTexturesReady"
      ],
      "basis": {
       "kind": "derived",
