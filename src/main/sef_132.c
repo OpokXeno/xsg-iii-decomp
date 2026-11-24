@@ -72,7 +72,7 @@ void sefMemZero(void *dest, int size);
 void *memset(void *destination, int value, unsigned int size);
 void func_0025A000(Vector4 *value, SefHermiteKey *key, SefHermiteKey *nextKey, float fraction);
 float MMathCalcLength(const Vector4 *vector);
-void func_0020F2E8(void *output, void *input);
+void rotationMatrixToQuaternion(void *output, void *input);
 extern s32 sefVectorMode;
 extern SefMotionObject *D_005510A4;
 extern const Vector4 sefDefaultPoint;
@@ -81,8 +81,8 @@ Matrix4 *MMathScaleMatrixRotS(Matrix4 destination, const Matrix4 source, float s
 int sefDirectionToAngles(Vector4 *destination, const Vector4 *from, const Vector4 *to);
 void sefGetSourceMatrix(void *matrix, const void *source);
 Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs);
-void func_0020EEC8(Vector4 *destination, Vector4 *source, float scale);
-void func_0020EC78(Vector4 *destination, float scale);
+void vu0RotateVectorAboutX(Vector4 *destination, Vector4 *source, float scale);
+void quaternionFromAngleY(Vector4 *destination, float scale);
 short func_00206A50(SefRunEntry *entries);
 void func_00206AA8(Matrix4 *destination, Vector4 *pointAOut, Vector4 *pointBOut, int kindA, int kindB);
 extern SefEffectEntryRecord *sefCurrentEffectRecord;
@@ -380,8 +380,8 @@ int sefDirectionToAngles(Vector4 *outVector, const Vector4 *from, const Vector4 
         __asm__ __volatile__("sqc2 vf0, 0(%0)" : : "r"(outVector) : "memory");
     } else {
         vu0DirectionToAngles(&angles, &diff);
-        func_0020EC78(outVector, angles.y);
-        func_0020EEC8(outVector, outVector, angles.x);
+        quaternionFromAngleY(outVector, angles.y);
+        vu0RotateVectorAboutX(outVector, outVector, angles.x);
         result = 1;
     }
     return result;
@@ -443,7 +443,7 @@ void sefApplySourceMatrix(void *transformedOutput, const void *sourceMatrixBlock
     Matrix4 matrix;
 
     sefGetSourceMatrix(matrix, sourceMatrixBlock);
-    func_0020F2E8(transformedOutput, matrix);
+    rotationMatrixToQuaternion(transformedOutput, matrix);
 }
 
 /* A point as a vector or as four floats. */

@@ -109,7 +109,7 @@ extern s32 gSoundFlagB;
 extern s32 gSoundFlagC;
 extern SoundDriver gSoundDriver[];
 s32 memPoolAlloc(s32);
-s32 func_00213700(s32);
+s32 messageTextGet(s32);
 s32 seVoiceStatusReset();
 s32 sineWavesReset();
 s32 func_002D6180();
@@ -142,7 +142,7 @@ void soundDriverInit(void) {
     gSoundDriver[0].unk_20 = 4;
     gSoundDriver[0].unk_28 = 2;
     gSoundDriver[0].unk_24 = 0;
-    gSoundDriver[0].unk_2C = func_00213700(0x23);
+    gSoundDriver[0].unk_2C = messageTextGet(0x23);
     gSoundDriver[0].unk_30 = 1;
     gSoundDriver[0].unk_34 = 0;
     func_002D67C0();

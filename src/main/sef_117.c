@@ -127,12 +127,12 @@ void sefResetEffectWorld(void);
 void eBattleWinInit(s32 value);
 void svSceneFlagsSet(s32 flags);
 s32 xglDebFileBufferSize(char *path);
-void func_00209C88(s32 value, s32 *buffer);
+void svRegisterResourceFile(s32 value, s32 *buffer);
 
 /*
  * Scene setup by sceneMode: 0 clears scene flag 1 and takes the file at
  * D_003935C0, 1 sets it and takes the file at D_003635C0, 2 only sets it.
- * A file, when chosen, is passed to func_00209C88 with its size.
+ * A file, when chosen, is passed to svRegisterResourceFile with its size.
  */
 void sefSetSceneMode(s32 sceneMode) {
     s32 fileLoadParams[4];
@@ -170,7 +170,7 @@ void sefSetSceneMode(s32 sceneMode) {
         fileLoadParams[1] = xglDebFileBufferSize(filePath);
         fileLoadParams[2] = 0;
         fileLoadParams[3] = 0;
-        func_00209C88(0, fileLoadParams);
+        svRegisterResourceFile(0, fileLoadParams);
     }
 }
 

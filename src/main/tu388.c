@@ -194,7 +194,7 @@ s8 runFrameCallbackAndGetFlag(void)
   return tuState->frameCallbackFlag;
 }
 
-s32 func_002146C0(s32);
+s32 fontQueueColorState(s32);
 s32 xglFontSetColorIndex();
 s32 xglFontGetColorIndex();
 s32 xglFontGetStateMask();
@@ -208,7 +208,7 @@ void xglFontRunWithSavedColor(s32 stateEntryId) {
     previousState = xglFontGetStateMask();
     xglFontSetColorIndex(0xFFFF01);
     mcStateSeekEntry(stateEntryId);
-    func_002146C0(previousState);
+    fontQueueColorState(previousState);
     xglFontSetColorIndex(previousMode);
 }
 
@@ -222,31 +222,31 @@ extern s32 D_005FA580[];
 s32 xcClearPayloadSections();
 s32 xcLoadPayloadSections();
 s32 blockStatusBitsSet();
-s32 func_002169A0();
+s32 shardFieldInit();
 
 void xcBlockPointersReload(void) {
     blockStatusBitsSet(0);
     xcClearPayloadSections();
     xcLoadPayloadSections();
-    func_002169A0(D_005FA580);
+    shardFieldInit(D_005FA580);
     D_005FA580[0x340 / 4] = 0;
 }
 
-s32 func_00213E10();
+s32 blockStatusAdvance();
 
 void advanceCounter(void)
 {
   TuState *tuState;
   s32 nextFadeInFrame;
 
-  func_00213E10();
+  blockStatusAdvance();
   tuState = TU_STATE;
   nextFadeInFrame = tuState->fadeInFrame + 1;
   tuState->fadeInFrame = nextFadeInFrame;
 }
 
 s32 xglFontSetAlphaScale();
-s32 func_00217570();
+s32 shardFieldUpdate();
 
 void blockFadeInDraw(void)
 {
@@ -260,7 +260,7 @@ void blockFadeInDraw(void)
     alphaScale = (fade * 8) & 0xFF;
   }
   xglFontSetAlphaScale(alphaScale);
-  func_00217570(D_005FA580);
+  shardFieldUpdate(D_005FA580);
   xglFontSetAlphaScale(0x80);
   xglFontSetColorIndex(0xFFFF01);
 }

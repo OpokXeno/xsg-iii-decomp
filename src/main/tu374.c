@@ -342,8 +342,8 @@ typedef struct SeVoiceCharacterInfo {
     u16 flags;                          /* +0x1A */
 } SeVoiceCharacterInfo;
 
-void func_00215250(s16 *frame, s32 colorTop, s32 colorBottom, s32 mode);
-void func_002146C0(s32 color);
+void fontQueueRectTwoColors(s16 *frame, s32 colorTop, s32 colorBottom, s32 mode);
+void fontQueueColorState(s32 color);
 void func_0023C588(s32 x, s32 y, u8 *text, s32 size);
 void func_0023CE40(s32 x, s32 y, s32 size);
 void xglFontDrawDigits(s32 x, s32 y, s32 value, s32 size);
@@ -500,12 +500,12 @@ void seVoiceCursorDrawStatusPanel(s8 compact)
     frame[1] = seVoiceGsY((s32) seVoiceCursor->y);
     frame[2] = seVoiceGsX((s32) seVoiceCursor->x + 256);
     frame[3] = seVoiceGsY((s32) seVoiceCursor->y + 239);
-    func_00215250(frame, alpha << 24, 0, 0x101);
+    fontQueueRectTwoColors(frame, alpha << 24, 0, 0x101);
     frame[0] = seVoiceGsX((s32) seVoiceCursor->x + 256);
     frame[1] = seVoiceGsY((s32) seVoiceCursor->y);
     frame[2] = seVoiceGsX((s32) seVoiceCursor->x + 512);
     frame[3] = seVoiceGsY((s32) seVoiceCursor->y + 239);
-    func_00215250(frame, alpha << 24, 0, 0x1010);
+    fontQueueRectTwoColors(frame, alpha << 24, 0, 0x1010);
 
     njStringSetPosition(valueText, SE_VOICE_LAYOUT_X(1), SE_VOICE_LAYOUT_Y(1));
     func_002D6AA8(valueText, SE_VOICE_COLOR(0x808080));
@@ -604,7 +604,7 @@ void seVoiceCursorDrawStatusPanel(s8 compact)
     }
 
     xglFontFreeBuffer();
-    func_002146C0(SE_VOICE_COLOR(0x545934));
+    fontQueueColorState(SE_VOICE_COLOR(0x545934));
     func_0023C588(SE_VOICE_TEXT_X(3), SE_VOICE_TEXT_Y(3), sceneLinkLookupEntry(0), 13);
     if (compact == 0) {
         func_0023C588(SE_VOICE_TEXT_X(4), SE_VOICE_TEXT_Y(4), sceneLinkLookupEntry(1), 13);
@@ -616,14 +616,14 @@ void seVoiceCursorDrawStatusPanel(s8 compact)
     func_0023C588(SE_VOICE_TEXT_X(9), SE_VOICE_TEXT_Y_BELOW(9, lineOffset), sceneLinkLookupEntry(0x22), 13);
     func_0023C588(SE_VOICE_TEXT_X(10), SE_VOICE_TEXT_Y_BELOW(10, lineOffset), sceneLinkLookupEntry(0x23), 13);
     func_0023C588(SE_VOICE_TEXT_X(25), SE_VOICE_TEXT_Y(25), sceneLinkLookupEntry(0x24), 13);
-    func_002146C0(SE_VOICE_COLOR(0x562E2D));
+    fontQueueColorState(SE_VOICE_COLOR(0x562E2D));
     func_0023C588(SE_VOICE_TEXT_X(26), SE_VOICE_TEXT_Y(26), sceneLinkLookupEntry(0x25), 13);
     func_0023C588(SE_VOICE_TEXT_X(27), SE_VOICE_TEXT_Y(27), sceneLinkLookupEntry(0x26), 13);
     if (compact == 0) {
         func_0023C588(SE_VOICE_TEXT_X(28), SE_VOICE_TEXT_Y(28), sceneLinkLookupEntry(0x27), 13);
     }
 
-    func_002146C0(SE_VOICE_COLOR(0x545934));
+    fontQueueColorState(SE_VOICE_COLOR(0x545934));
     func_0023C588(SE_VOICE_TEXT_X_SHIFTED(3, seVoiceCursorStartPos[4]), SE_VOICE_TEXT_Y(3), ":", 13);
     if (compact == 0) {
         func_0023C588(SE_VOICE_TEXT_X_SHIFTED(4, seVoiceCursorStartPos[4]), SE_VOICE_TEXT_Y(4), ":", 13);
@@ -638,7 +638,7 @@ void seVoiceCursorDrawStatusPanel(s8 compact)
     func_0023C588(SE_VOICE_GS_X((s32) (SE_VOICE_LAYOUT_X(29) + func_002D6BA0(labelText) + 4.0f)), SE_VOICE_TEXT_Y_BELOW(29, 6), ":", 13);
     func_0023C588(SE_VOICE_TEXT_X_SHIFTED(31, seVoiceCursorStartPos[4]), SE_VOICE_TEXT_Y_BELOW(31, 6), ":", 13);
 
-    func_002146C0(SE_VOICE_COLOR(0x808080));
+    fontQueueColorState(SE_VOICE_COLOR(0x808080));
     xglFontSetDigitStep(10);
     xglFontDrawDigits(SE_VOICE_TEXT_X(12), SE_VOICE_TEXT_Y(12), gFallbackSlotRecord.gaugeA, 16);
     func_0023CE40(SE_VOICE_TEXT_X(13), SE_VOICE_TEXT_Y(13), 16);
@@ -663,7 +663,7 @@ void seVoiceCursorDrawStatusPanel(s8 compact)
         xglFontDrawUnsignedNumber(SE_VOICE_TEXT_X(24), SE_VOICE_TEXT_Y_BELOW(24, lineOffset), characterStats->valueB, 16);
     }
 
-    func_002146C0(SE_VOICE_COLOR(0x808080));
+    fontQueueColorState(SE_VOICE_COLOR(0x808080));
     njPlaneSetOffset(&arrows[0].plane, SE_VOICE_LAYOUT_X(32) - 24.0f, SE_VOICE_LAYOUT_Y(32) + 4.0f);
     njPlaneSetOffset(&arrows[1].plane, SE_VOICE_LAYOUT_X(33) - 24.0f, SE_VOICE_LAYOUT_Y(32) + 4.0f);
     njPlaneSetOffset(&arrows[2].plane, SE_VOICE_LAYOUT_X(32) - 24.0f, SE_VOICE_LAYOUT_Y(33) + 4.0f);
@@ -678,7 +678,7 @@ void seVoiceCursorDrawStatusPanel(s8 compact)
     func_0023C588(SE_VOICE_TEXT_X_SHIFTED_INT(33, -8), SE_VOICE_TEXT_Y_BELOW(33, 6), ":", 13);
     seVoiceEntrySetName((struct SeVoiceEntry *) seVoiceCursor->subBlock, gFallbackSlotRecord.name);
     func_002C6840((struct SeVoiceEntry *) seVoiceCursor->subBlock);
-    func_002146C0(savedStateMask);
+    fontQueueColorState(savedStateMask);
     xglFontSetColorIndex(savedColorIndex);
 }
 

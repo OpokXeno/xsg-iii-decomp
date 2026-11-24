@@ -1131,7 +1131,7 @@ void *vu0NormalizeXyzwTo(void *normalizedVector, void *inputVector);
 float MMathCalcLength(const Vector4 *vector);
 void MMathEvalHermiteKeys(Vector4 *destination, SefHermiteKey *keys, float time);
 float func_0025A910(const Vector4 *a, const Vector4 *b);
-void func_0020F2E8(void *output, void *input);
+void rotationMatrixToQuaternion(void *output, void *input);
 extern s32 sefVectorMode;
 extern SefMotionObject *D_005510A4;
 extern Vector4 sefDefaultAxis;
@@ -1213,7 +1213,7 @@ int sefComputeMotionStep(Vector4 *out, SefMotionObject *object, int kind, float 
             SefSubVectorXYZ4(out, hermitePoint, &object->previousTarget);
             SefCopyVector4(&object->delta, out);
             QuadwordCopyT0(&object->previousTarget, hermitePoint);
-            func_0020F2E8(quaternion, rotation);
+            rotationMatrixToQuaternion(quaternion, rotation);
             vu0NormalizeXyzwTo(quaternion, quaternion);
         done:
             return 0;
@@ -1611,7 +1611,7 @@ typedef struct SefLinkedBlock {
     AlignedVector4 ve0;
 } SefLinkedBlock;
 
-extern void func_0020ECF8(AlignedVector4*,AlignedVector4*,AlignedVector4*);
+extern void quaternionFromToRotation(AlignedVector4*,AlignedVector4*,AlignedVector4*);
 int sefDirectionToAngles(Vector4 *destination, const Vector4 *from, const Vector4 *to);
 extern void vu0CrossWithWeights(AlignedVector4*,AlignedVector4*,AlignedVector4*);
 
@@ -1646,13 +1646,13 @@ static inline int SefIsZeroVector(AlignedVector4 *vector) {
 static inline void SefSetAxisFromDirection(AlignedVector4 *out, AlignedVector4 *direction) {
     AlignedVector4 normalized;
     M_MATH_NORMALIZE_VECTOR2(&normalized, direction);
-    func_0020ECF8(out, &sefDefaultAxis, &normalized);
+    quaternionFromToRotation(out, &sefDefaultAxis, &normalized);
 }
 
 #define SefCopyMatrixVf26To28(dest,source) do { M4 *sourceMatrix=(source); M4 *destMatrix=(dest); __asm__ __volatile__("lqc2 vf26,0(%0)\n lqc2 vf27,16(%0)\n lqc2 vf28,32(%0)" : : "r"(sourceMatrix) ); __asm__ __volatile__("sqc2 vf26,0(%0)\n sqc2 vf27,16(%0)\n sqc2 vf28,32(%0)\n sqc2 vf0,48(%0)" : : "r"(destMatrix) ); } while(0)
 #define SefDirectionTempVector (&SEF_SCRATCHPAD(AlignedVector4, 0x1E0))
 
-extern void func_0020F598(AlignedVector4*,M4*);
+extern void rotationMatrixNormalizedToQuaternion(AlignedVector4*,M4*);
 extern void vu0QuatToMatrix(M4*,AlignedVector4*);
 void sefGetSourceMatrix(void *matrix, const void *source);
 Matrix4 *MMathMulMatrix(Matrix4 *out, Matrix4 *rhs, Matrix4 *lhs);
@@ -1687,7 +1687,7 @@ void func_001FB8A0(SefDirectionState *state, int selector, int kind, int flags) 
         } else if (kind == 0x3000) {
             if ((SEF_SCRATCHPAD(SefCurrentRecord *, 0x0))->flags & 0x40000) {
                 ((void (*)(M4 *)) sefGetSourceMatrix)(&deltaMatrix);
-                func_0020F598(&direction, &deltaMatrix);
+                rotationMatrixNormalizedToQuaternion(&direction, &deltaMatrix);
             } else if (sefVectorMode == 0) {
                 state->flags |= 0x8000;
                 ((void (*)(M4 *)) sefGetSourceMatrix)(&deltaMatrix);
@@ -1730,9 +1730,9 @@ void func_001FB8A0(SefDirectionState *state, int selector, int kind, int flags) 
             SefCopyMatrixVf26To28(&deltaMatrix, &keyBlock->m70);
             useDeltaMatrix = 1;
         } else if (selector == 0x200 && kind == selector) {
-            func_0020F2E8(&direction, &keyBlock->mb0);
+            rotationMatrixToQuaternion(&direction, &keyBlock->mb0);
         } else if (selector == 0x241 && kind == selector) {
-            func_0020F2E8(&direction, &keyBlock->m1f0);
+            rotationMatrixToQuaternion(&direction, &keyBlock->m1f0);
         } else if (selector >= 0x20) {
             AlignedVector4 *anchor = &state->va0;
             if (!first) {
@@ -1763,7 +1763,7 @@ void func_001FB8A0(SefDirectionState *state, int selector, int kind, int flags) 
         if (useDeltaMatrix) {
             vu0QuatToMatrix(&quatMatrix, &state->quaternion);
             MMathMulMatrix(&state->matrix, &deltaMatrix, &quatMatrix);
-            func_0020F2E8(&direction, &deltaMatrix);
+            rotationMatrixToQuaternion(&direction, &deltaMatrix);
             vu0NormalizeXyzwTo(&state->direction, &direction);
         } else {
             vu0NormalizeXyzwTo(&state->direction, &direction);
@@ -1774,10 +1774,10 @@ void func_001FB8A0(SefDirectionState *state, int selector, int kind, int flags) 
 }
 
 extern Vector4 *D_00454170[];
-void func_0020EF38(Vector4 *destination, Vector4 *source, float scale);
-void func_0020EEC8(Vector4 *destination, Vector4 *source, float scale);
-void func_0020EFA8(Vector4 *destination, Vector4 *source, float scale);
-void func_0020EC78(Vector4 *destination, float scale);
+void vu0RotateVectorAboutY(Vector4 *destination, Vector4 *source, float scale);
+void vu0RotateVectorAboutX(Vector4 *destination, Vector4 *source, float scale);
+void vu0RotateVectorAboutZ(Vector4 *destination, Vector4 *source, float scale);
+void quaternionFromAngleY(Vector4 *destination, float scale);
 void vu0SetCurrentRotationZ(float angle);
 
 /* Rotates the block's source vector by its Y, X and Z angles and stores the normalized result. With
@@ -1793,18 +1793,18 @@ void sefRotateBlockUpdate(SefRotateBlock *rotateBlock, int computeNormalized) {
             if (D_00454170[0] != 0) {
                 vu0CrossWithWeights(&rotated, &rotated, D_00454170[0]);
             }
-            func_0020EF38(&rotated, &rotated, angles->y);
-            func_0020EEC8(&rotated, &rotated, angles->x);
-            func_0020EFA8(&rotated, &rotated, angles->z);
+            vu0RotateVectorAboutY(&rotated, &rotated, angles->y);
+            vu0RotateVectorAboutX(&rotated, &rotated, angles->x);
+            vu0RotateVectorAboutZ(&rotated, &rotated, angles->z);
         } else {
             if (D_00454170[0] != 0) {
-                func_0020EF38(&rotated, D_00454170[0], angles->y);
-                func_0020EEC8(&rotated, &rotated, angles->x);
-                func_0020EFA8(&rotated, &rotated, angles->z);
+                vu0RotateVectorAboutY(&rotated, D_00454170[0], angles->y);
+                vu0RotateVectorAboutX(&rotated, &rotated, angles->x);
+                vu0RotateVectorAboutZ(&rotated, &rotated, angles->z);
             } else {
-                func_0020EC78(&rotated, angles->y);
-                func_0020EEC8(&rotated, &rotated, angles->x);
-                func_0020EFA8(&rotated, &rotated, angles->z);
+                quaternionFromAngleY(&rotated, angles->y);
+                vu0RotateVectorAboutX(&rotated, &rotated, angles->x);
+                vu0RotateVectorAboutZ(&rotated, &rotated, angles->z);
             }
         }
         vu0NormalizeXyzwTo(&rotateBlock->normalized, &rotated);
@@ -2141,7 +2141,7 @@ void sefSwLoadParameterBlock(SwLd *swLoad) {
     }
     if (SwS(0x2B4)) {
         sefGetSourceMatrix(SwSV(0xD0), (const void *) (s32) SwS(0x288));
-        func_0020F598(&quat, SwSV(0xD0));
+        rotationMatrixNormalizedToQuaternion(&quat, SwSV(0xD0));
         vu0QuatToMatrix(SwSV(0xD0), &quat);
         SwCopyM(SwSV(0x150), SwSV(0xD0));
         func_002046F8(SwSV(0x100), 0, keyTable[0][-2]);
@@ -2700,7 +2700,7 @@ extern DoublewordAlignedVector4 D_0053EF10;
 extern DoublewordAlignedVector4 D_0053EF20;
 int scGetImmAdrImmIdx2(int scriptBase, unsigned short *immediateTable, int immediateIndex);
 int MMathIsVectorEqual(const Vector4 *first, const Vector4 *second);
-void func_0020ECB8(SefLineData *line, f32 angle);
+void quaternionFromAngleZ(SefLineData *line, f32 angle);
 void sefMemFillWords(void *fillMemory, int fillPattern, int fillByteLength);
 void sefNoiseNextVector(Vector4 *pos);
 void sefGetPosition(Vector4 *resultPoint, const Vector4 *sourcePoint, int pointKind);
@@ -2860,13 +2860,13 @@ void sefInitLine(SefLineData *line, s32 startTime, s32 startFrame, SefLineScript
             if (MMathIsVectorEqual(origin, &positiveDirection)) {
                 axisAngle = SEF_QUARTER_PI;
                 line->inUse |= 0x40;
-                func_0020ECB8(line, axisAngle);
+                quaternionFromAngleZ(line, axisAngle);
             } else if (MMathIsVectorEqual(origin, &negativeDirection)) {
                 axisAngle = -SEF_QUARTER_PI;
                 line->inUse |= 0x40;
-                func_0020ECB8(line, axisAngle);
+                quaternionFromAngleZ(line, axisAngle);
             } else if (((int (*)(SefLineData *line, const Vector4 *axes, const Vector4 *origin))
-                            func_0020ECF8)(line, &sefDefaultAxis, (Vector4 *) &line->angleKeys[-2]) != 0) {
+                            quaternionFromToRotation)(line, &sefDefaultAxis, (Vector4 *) &line->angleKeys[-2]) != 0) {
                 line->inUse |= 0x40;
             }
             vu0NormalizeXyzwTo(line, line);
@@ -4778,7 +4778,7 @@ extern void sdvReleaseOwnerSpecials(void*);
 extern void sdvDestroyOwnerAlters(s32);
 extern void sefReleaseSlotsByKey(s32,s32);
 extern void sdvReleaseShadowBlock(void*);
-extern void func_002107B8(s32,s32);
+extern void srsReleaseEffectRecordsByResource(s32,s32);
 extern SefEffectRecordOwner *sefEffectRecords_2002C8[1];
 void sefClearEntryTableSlot(s8 slotNumber);
 
@@ -4825,7 +4825,7 @@ void sefReleaseEffectRecord(s32 recordIndex) {
         svResourceTypeLists[sefEffectRecords_2002C8[0][recordIndex].model].cnt = 0;
         if (gSbStudioBlock.mode == 0) {
             if (svResourceTypeLists[sefEffectRecords_2002C8[0][recordIndex].model].fl != 0) {
-                func_002107B8(svResourceTypeLists[sefEffectRecords_2002C8[0][recordIndex].model].res, 1);
+                srsReleaseEffectRecordsByResource(svResourceTypeLists[sefEffectRecords_2002C8[0][recordIndex].model].res, 1);
             }
         }
     }
@@ -7154,7 +7154,7 @@ void sefSetSlotDirectionDefaultAxis(f32 (*directionMatrix)[4][4], Vector4 *direc
     sefSetSlotDirection(directionMatrix, direction, &sefDefaultAxis);
 }
 
-/* Writes into directionMatrix the rotation from sefDefaultAxis to the normalized direction (func_0020ECF8) and returns 1;
+/* Writes into directionMatrix the rotation from sefDefaultAxis to the normalized direction (quaternionFromToRotation) and returns 1;
  * a zero direction leaves the matrix alone and returns 0. */
 int sefSetSlotDirectionFromVector(Matrix4 *directionMatrix, const Vector4 *direction) {
     Vector4 normalized;
@@ -7163,7 +7163,7 @@ int sefSetSlotDirectionFromVector(Matrix4 *directionMatrix, const Vector4 *direc
     isZeroDirection = ((*(int *) &direction->z | *(u64 *) direction) == 0);
     if (isZeroDirection == 0) {
         MMathNormalizeVector2(&normalized, direction);
-        func_0020ECF8(directionMatrix, &sefDefaultAxis, &normalized);
+        quaternionFromToRotation(directionMatrix, &sefDefaultAxis, &normalized);
         return 1;
     }
     return 0;

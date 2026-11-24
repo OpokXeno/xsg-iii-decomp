@@ -43,7 +43,7 @@ void mcStateSeekEntry(s32 seekMode) {
     }
 }
 
-s32 func_00213700(s32 textId);
+s32 messageTextGet(s32 textId);
 void func_00220B90(s32 field, s32 value);
 void mcClearSetupStatus(void);
 void func_00220D28(void);
@@ -52,32 +52,32 @@ void mcStateSetupRequest(s32 setupFlags, s32 id) {
     s32 resolvedText;
     mcClearSetupStatus();
     if (setupFlags & 1) {
-        resolvedText = func_00213700(0x20);
+        resolvedText = messageTextGet(0x20);
         func_00220B90(0x10, resolvedText);
     }
     if (id != 0) {
         func_00220B90(0x80, id);
     }
     if (setupFlags & 2) {
-        resolvedText = func_00213700(0x1F);
+        resolvedText = messageTextGet(0x1F);
         func_00220B90(0x40, resolvedText);
     }
     if (setupFlags & 4) {
-        resolvedText = func_00213700(0x1E);
+        resolvedText = messageTextGet(0x1E);
         func_00220B90(0x20, resolvedText);
     }
     if (setupFlags & 8) {
-        resolvedText = func_00213700(0x22);
+        resolvedText = messageTextGet(0x22);
         func_00220B90(8, resolvedText);
         func_00220B90(4, 0);
     }
     if (setupFlags & 0x10) {
-        resolvedText = func_00213700(0x23);
+        resolvedText = messageTextGet(0x23);
         func_00220B90(2, resolvedText);
         func_00220B90(1, 0);
     }
     if (setupFlags & 0x20) {
-        resolvedText = func_00213700(0x2C);
+        resolvedText = messageTextGet(0x2C);
         func_00220B90(2, resolvedText);
         func_00220B90(1, 0);
     }

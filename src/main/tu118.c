@@ -326,7 +326,7 @@ extern void sefRegisterGroupCenter();
 extern s32 countFlaggedSefEntries();
 extern s32 func_001F6590();
 extern s32 sefScheduleEffectRecord();
-extern s32 func_0020F790();
+extern s32 srsParseEffectFileName();
 extern void svSceneFlagsSet();
 
 typedef long long s64;
@@ -360,7 +360,7 @@ typedef struct SefSpawnRequest {
     s32 unk_1C;
     s32 unk_20;
     s32 earlyMode;                  /* +0x24: nonzero takes the vector copy path */
-    s32 groupLookupKey;             /* +0x28: when nonzero the group is func_0020F790(groupLookupKey) */
+    s32 groupLookupKey;             /* +0x28: when nonzero the group is srsParseEffectFileName(groupLookupKey) */
     s32 groupId;                    /* +0x2C */
     f32 scale;                      /* +0x30 */
     s32 schedulerArg;               /* +0x34 */
@@ -501,7 +501,7 @@ void *sefSpawnEffectFromRequest(SefSpawnRequest *spawnRequest) {
     actor = 0;
     ownerGroupSlot = 0;
     if (spawnRequest->groupLookupKey) {
-        groupId = func_0020F790(spawnRequest->groupLookupKey);
+        groupId = srsParseEffectFileName(spawnRequest->groupLookupKey);
     } else {
         groupId = spawnRequest->groupId;
     }

@@ -24,7 +24,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu369", func_002BDEA8);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu369", func_002BE2E0);
 
-s32 func_002146C0(s32);
+s32 fontQueueColorState(s32);
 s32 xglFontSetColorIndex(s32);
 s32 xglFontGetColorIndex();
 s32 xglFontGetStateMask();
@@ -38,9 +38,9 @@ void xglFontDrawMaskedDefault(void) {
     savedColorIndex = xglFontGetColorIndex();
     savedStateMask = xglFontGetStateMask();
     xglFontSetColorIndex(0xFFFF01);
-    func_002146C0(0x80808080);
+    fontQueueColorState(0x80808080);
     sheetDrawFrame(0x19F);
-    func_002146C0(savedStateMask);
+    fontQueueColorState(savedStateMask);
     xglFontSetColorIndex(savedColorIndex);
 }
 
@@ -54,8 +54,8 @@ void xglFontDrawMaskedWith(s32 seekMode) {
     savedColorIndex = xglFontGetColorIndex();
     savedStateMask = xglFontGetStateMask();
     xglFontSetColorIndex(0xFFFF01);
-    func_002146C0(0x80808080);
+    fontQueueColorState(0x80808080);
     mcStateSeekEntry(seekMode);
-    func_002146C0(savedStateMask);
+    fontQueueColorState(savedStateMask);
     xglFontSetColorIndex(savedColorIndex);
 }

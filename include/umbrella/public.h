@@ -9,6 +9,8 @@ void *sefLightSetActiveGet(void);
 
 void sefReplayBufferedEffects(void);
 
+void fontQueueSpriteBlack(void);
+
 void advanceState(void);
 
 void xcBlockClear(void *clearedBlock);

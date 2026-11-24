@@ -1,8 +1,8 @@
 #include "common.h"
 #include "shared.h"
 
+#include "quadword.h"
 /* Row-major 4x4 float matrix. */
-
 void vu0NormalizeVf20(void);
 void vu0CurMatrixMul(Matrix4 matrix);
 void vu0CurMatrixMulRight(Vector4 *rows);
@@ -48,7 +48,11 @@ s32 countFlaggedSefEntries(SefEffectOwner *owner) {
     return flaggedCount;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/vu0_vector", func_00207BA0);
+/* Copies the vector source into destination as one quadword, then sets its w to w. */
+void vu0CopyVectorSetW(Vector4 *destinationVector, Vector4 *sourceVector, float w) {
+    QuadwordCopyT0(destinationVector, sourceVector);
+    destinationVector->w = w;
+}
 
 /* Normalizes vf20 in place (xyz divided by its length) and sets w to 1. */
 void vu0NormalizeVf20(void) {

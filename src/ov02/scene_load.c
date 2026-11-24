@@ -389,7 +389,7 @@ void sceneStartSubsystem(void) {
 }
 
 s32 calcPara2Org();
-s32 func_002105B8(s32, s32);
+s32 srsReleaseEffectRecordsByKey(s32, s32);
 s32 sceneHookClear();
 s32 func_00A815B0();
 void unitReleaseResources(BattleUnit *unit);
@@ -413,7 +413,7 @@ void battleSceneTeardown(void) {
     void *thread_table;
 
     activeIndex = 0;
-    func_002105B8(0x1003200A, 1);
+    srsReleaseEffectRecordsByKey(0x1003200A, 1);
     sefSetFogOverride(0, 0);
     thread_table = sbScriptImageGet();
     sbThreadsRelease(thread_table);

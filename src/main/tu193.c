@@ -31,7 +31,7 @@ s32 xglCdSetReadTag(s32 slot);
 typedef struct StreamPlayer {
     u8 unmodeled_000[0x70000];
     u8 cdSectorBuffer[0x7E000 - 0x70000];  /* the buffer address passed to xglCdReadFile */
-    u8 decodeBlock[0x7E37C - 0x7E000];  /* the block whose address func_002169A0 takes */
+    u8 decodeBlock[0x7E37C - 0x7E000];  /* the block whose address shardFieldInit takes */
     u8 sheetControlBlock[0x7E394 - 0x7E37C];  /* the block whose address setStreamActive passes on */
     u16 channelBaseOffset;                         /* +0x7E394 */
     u8 unmodeled_7e396[0x7E39D - 0x7E396];
@@ -58,7 +58,7 @@ void startTaggedCdRead(s32 streamSlot) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu193", func_0023FF00);
 
-s32 func_00213700(s32);
+s32 messageTextGet(s32);
 void sheetSetIndex(s32);
 void mcStateSetupRequest(s32, s32);
 void func_002213A8(void *, s32, s32, s32);
@@ -69,9 +69,9 @@ void setStreamActive(s32 enableStream) {
     s32 stopSheetHandle;
     if (enableStream != 0) {
         mcStateSetupRequest(6, 0);
-        primarySheetHandle = func_00213700(0x30F);
+        primarySheetHandle = messageTextGet(0x30F);
         sheetSetIndex(primarySheetHandle);
-        secondarySheetHandle = func_00213700(0x30D);
+        secondarySheetHandle = messageTextGet(0x30D);
         func_002213A8(&gStreamPlayer.sheetControlBlock, secondarySheetHandle, 1, 0);
         gStreamPlayer.active = 1;
         gStreamPlayer.playState = 1;
@@ -80,7 +80,7 @@ void setStreamActive(s32 enableStream) {
         return;
     }
     mcStateSetupRequest(7, 0);
-    stopSheetHandle = func_00213700(0x30E);
+    stopSheetHandle = messageTextGet(0x30E);
     sheetSetIndex(stopSheetHandle);
     gStreamPlayer.active = 0;
     if ((gStreamPlayer.stopLatch >= 0) && (gStreamPlayer.playState == 1)) {
@@ -92,14 +92,14 @@ void setStreamActive(s32 enableStream) {
 
 void *memPoolAlloc(s32 size);
 s32 bufferPointersRewind();
-s32 func_00213C18();
+s32 completionBlockClear();
 s32 pagedTablePoolInit();
 
 /* Allocates and zeroes the 0x7E3C0-byte stream state at gStreamPlayerBlock. Returns 1 on success. */
 s32 allocStreamState(void) {
     StreamPlayer *newStreamPlayer;
 
-    func_00213C18();
+    completionBlockClear();
     pagedTablePoolInit();
     newStreamPlayer = memPoolAlloc(0x7E3C0);
     gStreamPlayerBlock = newStreamPlayer;
@@ -125,7 +125,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu193", func_002417E8);
 extern unsigned char gStreamTrackTable[];
 extern u8 gStreamTrackIndex;
 extern s8 gVsyncsPerFrame;
-void func_00213490(s32 base, s32 size);
+void memPoolInit(s32 base, s32 size);
 void memPoolReset();
 void func_00225938(s32 a, s16 b, s32 c);
 void pagedTablePoolShutdown();
@@ -139,7 +139,7 @@ s32 runStreamPlayback(void) {
 
     savedPipelineGuard = gVsyncsPerFrame;
     gVsyncsPerFrame = 1;
-    func_00213490(0x980000, 0x100000);
+    memPoolInit(0x980000, 0x100000);
     gStreamTrackIndex = -1;
     pipelineResult = runDecodePipeline();
     pagedTablePoolShutdown();
@@ -153,7 +153,7 @@ s32 runStreamPlayback(void) {
     return pipelineResult;
 }
 
-s32 func_002169A0(void *block);
+s32 shardFieldInit(void *block);
 s32 allocStreamState();
 s32 func_00240300();
 s32 func_00240360();
@@ -166,7 +166,7 @@ s32 runDecodePipeline(void) {
     if (allocStreamState() == 0) {
         return -1;
     }
-    func_002169A0(&gStreamPlayer.decodeBlock);
+    shardFieldInit(&gStreamPlayer.decodeBlock);
     seVoiceStartDefault(0xB);
     func_00240360();
     pipelineResult = func_002417E8();

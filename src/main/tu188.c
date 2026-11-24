@@ -19,14 +19,14 @@ INCLUDE_ASM("asm/main/nonmatchings/tu188", func_0023BC20);
 INCLUDE_ASM("asm/main/nonmatchings/tu188", func_0023BCE0);
 
 s32 func_00185A20();
-s32 func_002147D0(s32);
+s32 fontQueueDepthTest(s32);
 s32 xglFontColorIndexAdd(s32);
 void xglFontFreeBuffer();
 
 void xglFontResetState(void) {
     func_00185A20();
     xglFontFreeBuffer();
-    func_002147D0(0);
+    fontQueueDepthTest(0);
     xglFontColorIndexAdd(2);
 }
 

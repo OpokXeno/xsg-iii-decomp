@@ -73,7 +73,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu187", func_00237CD0);
 
 s32 xglPadSetDefaults();
 s32 memPoolFree(void *);
-s32 func_00213C50();
+s32 statusBlockFrameUpdate();
 s32 xcBlockFlagsReset(void *);
 s32 xglCdServiceIfPending();
 
@@ -81,7 +81,7 @@ s32 xglCdServiceIfPending();
 void cdStateDestroy(void) {
     xglPadSetDefaults();
     while (xglCdServiceIfPending() != 0) {
-        func_00213C50();
+        statusBlockFrameUpdate();
     }
     xcBlockFlagsReset(gSeVoiceState);
     memPoolFree(gSeVoiceState);
@@ -101,7 +101,7 @@ void seVoiceStartEntry(s32 entryId) {
 extern u8 gSeVoiceCallbackFlag;
 extern s8 gVsyncsPerFrame;
 s32 func_001B9228();
-s32 func_00213490(s32, s32);
+s32 memPoolInit(s32, s32);
 s32 memPoolReset();
 s32 pagedTablePoolShutdown();
 s32 startSeVoiceAndWait();
@@ -113,7 +113,7 @@ s32 seVoiceStartGuarded(s32 voiceArg) {
 
     savedFlag = gVsyncsPerFrame;
     gVsyncsPerFrame = 1;
-    func_00213490(0x980000, 0x100000);
+    memPoolInit(0x980000, 0x100000);
     voiceResult = startSeVoiceAndWait(voiceArg);
     pagedTablePoolShutdown();
     memPoolReset();

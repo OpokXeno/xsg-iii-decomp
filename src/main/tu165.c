@@ -1,13 +1,17 @@
 #include "common.h"
 
 typedef signed char s8;
+
 typedef unsigned char u8;
+
 typedef int s32;
+
 extern unsigned char gOptionalBlocksBlob[];
 extern u8 *gOptionalBlocksSource;
 extern void *gOptionalSecondaryBlock;
 extern void *gOptionalPrimaryBlock;
 extern s8 gOptionalBlocksLoadState;
+
 /* Optional sub-block offsets that xcLocatePayload returns for gOptionalBlocksBlob. */
 typedef struct XcOptionalSubBlocks {
     s32 primaryOffset;   /* +0x00 */
@@ -57,4 +61,44 @@ s32 recordIsLoaded(void) {
     return gOptionalBlocksLoadState >= 3;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu165", func_002184E0);
+typedef long s64;
+
+typedef struct Position8 {
+    s64 xy;
+    s64 zw;
+} Position8;
+
+extern Position8 D_00538EF0;
+void xglMatrixStackUnit(void);
+void xglMatrixStackTrans(Position8 *translation);
+void xglMatrixStackRotX(float angle);
+void xglMatrixStackSave(float *matrix);
+void nmlModelSetDrawMatrix(float *matrix);
+void nmlModelSetStencil(s32 stencil);
+s32 xglFontGetAlphaScale(void);
+void nmlModelSetTransparency(float transparency);
+void nmlModelSetTexture(void *texture);
+void pxySubmitModel(void *model);
+void func_001AA580(void);
+void fontQueueSpriteBlack(void);
+
+/* Draws the optional model when the blocks are loaded: the primary block is the model, the secondary block its
+ * texture, drawn with a half-turn spin of -0.6283 rad and alpha from the font fade. fontQueueSpriteBlack ends the frame. */
+void optionalBlocksDraw(void) {
+    float matrix[16];
+    Position8 position = D_00538EF0;
+
+    if (gOptionalBlocksLoadState == 3) {
+        xglMatrixStackUnit();
+        xglMatrixStackTrans(&position);
+        xglMatrixStackRotX(-0.62831855f);
+        xglMatrixStackSave(matrix);
+        nmlModelSetDrawMatrix(matrix);
+        nmlModelSetStencil(1);
+        nmlModelSetTransparency(xglFontGetAlphaScale() * 0.0078125f);
+        nmlModelSetTexture(gOptionalSecondaryBlock);
+        pxySubmitModel(gOptionalPrimaryBlock);
+        func_001AA580();
+    }
+    fontQueueSpriteBlack();
+}

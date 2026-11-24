@@ -5,13 +5,13 @@ typedef int s32;
 
 void xglMatrixMul(Matrix4 destination, Matrix4 left, Matrix4 right);
 void xglVectorMulMat(Vector4 *destination, Matrix4 matrix, const Vector4 *vector);
-extern const Vector4 D_005412B0[];
+extern const Vector4 gDefaultSpringOffset[];
 
 void xenoActorTransformJointPoint(XenoActor *actor, s32 jointIndex, Vector4 *jointPosition) {
     Matrix4 matrix;
 
     xglMatrixMul(matrix, actor->localMatrix, actor->jointMatrices[jointIndex].m);
-    xglVectorMulMat(jointPosition, matrix, D_005412B0);
+    xglVectorMulMat(jointPosition, matrix, gDefaultSpringOffset);
 }
 
 extern XenoActor **XenoActorActiveTable;

@@ -20,10 +20,10 @@ typedef struct MailboxCommandRecord {
 } MailboxCommandRecord;
 
 s32 poolBlockTagWordSet(s32, s32, s32);
-s32 func_00210480(s32, s32);
+s32 srsStartResourceLoad(s32, s32);
 
 void mailboxSubmitCommandParam(MailboxCommandRecord *commandRecord) {
-    func_00210480(commandRecord->commandTargetId, 0);
+    srsStartResourceLoad(commandRecord->commandTargetId, 0);
     poolBlockTagWordSet(commandRecord->commandTargetId, 1, 0xCF102000);
     poolBlockTagWordSet(commandRecord->commandTargetId, 2, commandRecord->commandParam);
 }
@@ -31,6 +31,6 @@ void mailboxSubmitCommandParam(MailboxCommandRecord *commandRecord) {
 INCLUDE_ASM("asm/main/nonmatchings/tu059", func_001B8960);
 
 void mailboxSubmitCommand(MailboxCommandRecord *commandRecord) {
-    func_00210480(commandRecord->commandTargetId, 0);
+    srsStartResourceLoad(commandRecord->commandTargetId, 0);
     poolBlockTagWordSet(commandRecord->commandTargetId, 1, 0xCF102001);
 }

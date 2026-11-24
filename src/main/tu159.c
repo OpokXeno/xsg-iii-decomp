@@ -1,9 +1,51 @@
 #include "common.h"
+#include "shared.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu159", func_00213740);
+typedef signed char s8;
+
+extern u8 *gFontEscapeBuffer;
 
 typedef int s32;
-typedef unsigned char u8;
+
+s32 unsignedDecimalDigits(u32 number);
+
+/* Copies text into gFontEscapeBuffer (at most 255 characters, then a 0). A byte with the high bit set is a lead byte and
+ * is copied with the byte after it. Each placeholder byte becomes the next digit of number, most significant first; once
+ * the digits are used up it becomes the 7 control byte. */
+u8 *fontFormatPlaceholderNumber(s8 *text, s32 number, s8 placeholder) {
+    u8 *outputCursor = gFontEscapeBuffer;
+    s32 outputLength = 0;
+    s32 digitsLeft = unsignedDecimalDigits(number);
+
+    while (*text != 0 && outputLength < 255) {
+        if (*text & 0x80) {
+            *outputCursor++ = *text++;
+            outputLength++;
+            *outputCursor = *text;
+        } else if (*text == placeholder) {
+            if (digitsLeft != 0) {
+                s32 scaledNumber = number;
+                s32 placeIndex;
+
+                for (placeIndex = 1; placeIndex < digitsLeft; placeIndex++) {
+                    scaledNumber /= 10;
+                }
+                digitsLeft--;
+                *outputCursor = scaledNumber % 10 + '0';
+            } else {
+                *outputCursor = 7;
+            }
+        } else {
+            *outputCursor = *text;
+        }
+        text++;
+        outputCursor++;
+        outputLength++;
+    }
+    *outputCursor = 0;
+    return gFontEscapeBuffer;
+}
+
 extern void *gXcFirstSection;
 extern void *gXcSecondSection;
 

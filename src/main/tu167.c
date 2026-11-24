@@ -38,9 +38,9 @@ void steppedObjectUpdateColors(SteppedObject *steppedObject)
   gEnvFlags.color.blue = scaled_13 >> 6;
 }
 
-s32 func_002184E0();
+s32 optionalBlocksDraw();
 
 void steppedObjectStepSecondary(s32 objectAddress) {
     stepValueTowardTarget(objectAddress + 0x58);
-    func_002184E0();
+    optionalBlocksDraw();
 }

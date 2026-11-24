@@ -1,8 +1,7 @@
 #include "common.h"
+#include "shared.h"
 
 typedef int s32;
-typedef unsigned int u32;
-typedef unsigned char u8;
 
 /* Header of a memory-pool block; it sits 0x0C bytes before the block address handed out to callers. */
 typedef struct MemPoolBlock {
@@ -26,22 +25,36 @@ s32 unsignedDecimalDigits(u32 number) {
     return digits;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu157", func_00213490);
-
-extern s32 D_00550B50;
-extern s32 D_00550B54;
+extern s32 memPoolSize;
+extern s32 memPoolInitialSize;
 extern s32 D_00550B58;
 extern s32 memPoolTop;
 extern s32 memPoolLastBlock;
-extern s32 D_00550B64;
+extern s32 memPoolBase;
+s32 memPoolAlloc(s32 requestedBytes);
+void memPoolInit(s32 address, s32 size);
+
+/* Starts the pool over [address, address + size): the first block sits at the next 0x800 boundary after its 0x0C
+ * header, and one block of one byte is allocated there (memPoolFlush calls this again with the same base and size). */
+void memPoolInit(s32 address, s32 size) {
+    s32 firstBlock = ((u32) address + 0x80B) & ~0x7FF;
+
+    memPoolInitialSize = size;
+    memPoolSize = size;
+    memPoolTop = firstBlock;
+    memPoolLastBlock = firstBlock;
+    D_00550B58 = firstBlock;
+    memPoolBase = address;
+    D_00550B58 = memPoolAlloc(1);
+}
 
 void memPoolReset(void) {
-    D_00550B64 = 0;
+    memPoolBase = 0;
     memPoolLastBlock = 0;
     memPoolTop = 0;
     D_00550B58 = 0;
-    D_00550B54 = 0;
-    D_00550B50 = 0;
+    memPoolInitialSize = 0;
+    memPoolSize = 0;
 }
 
 s32 memPoolAlloc(s32 requestedBytes) {
@@ -66,7 +79,7 @@ s32 memPoolAlloc(s32 requestedBytes) {
     return blockAddress;
 }
 
-void func_002135C0(void);
+void memPoolRestoreTop(void);
 
 void memPoolFree(s32 address) {
     s32 mergedSize;
@@ -90,17 +103,30 @@ void memPoolFree(s32 address) {
             ((s32 *) freedBlockEnd)[-1] = nextAddress;
         }
         memPoolHeader->previousBlock = address;
-        func_002135C0();
+        memPoolRestoreTop();
     }
 }
 
-void func_00213490(s32, s32);
-
 void memPoolFlush(void) {
-    func_00213490(D_00550B64, D_00550B54);
+    memPoolInit(memPoolBase, memPoolInitialSize);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu157", func_002135C0);
+/* Repairs the top of the pool after a free: walks the blocks from D_00550B58 up to memPoolTop, and when the last
+ * block footprint differs from its saved copy, restores that footprint and the top and last-block values. */
+void memPoolRestoreTop(void) {
+    s32 blockAddress = D_00550B58;
+    MemPoolBlock *blockHeader = (MemPoolBlock *) blockAddress - 1;
+
+    while ((u32) (blockAddress + blockHeader->footprintBytes) < (u32) memPoolTop) {
+        blockAddress += blockHeader->footprintBytes;
+        blockHeader = (MemPoolBlock *) blockAddress - 1;
+    }
+    if (blockHeader->footprintBytes != blockHeader->blockSizeCopy) {
+        blockHeader->footprintBytes = blockHeader->blockSizeCopy;
+        memPoolTop = blockAddress + blockHeader->blockSizeCopy;
+        memPoolLastBlock = blockAddress;
+    }
+}
 
 extern s32 completionDoneFlags;
 

@@ -137,9 +137,9 @@ s32 payloadSectionsLocate(SectionOwner *self, s32 handle) {
     return 1;
 }
 
-void func_00210480(void *payload, s32 zero);
+void srsStartResourceLoad(void *payload, s32 zero);
 
-/* Loads the first payload section as sectionE and, when flag is set, passes the second section to func_00210480. */
+/* Loads the first payload section as sectionE and, when flag is set, passes the second section to srsStartResourceLoad. */
 s32 func_001C0A48(SectionOwner *self, s32 blockValue, s32 flag) {
     PayloadBlock *sectionTable;
     void *handle;
@@ -168,7 +168,7 @@ s32 func_001C0A48(SectionOwner *self, s32 blockValue, s32 flag) {
         return 1;
     }
     if (sectionTable->section[1].present != 0) {
-        func_00210480((u8 *) sectionTable + sectionTable->section[1].sectionOffset, 0);
+        srsStartResourceLoad((u8 *) sectionTable + sectionTable->section[1].sectionOffset, 0);
     }
     return 1;
 }

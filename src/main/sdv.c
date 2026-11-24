@@ -2369,7 +2369,7 @@ typedef struct KeyframeStepBlock {
 extern KeyframeStepBlock sefKeyframeStepBlock;
 void sefMergeMatrixPos(Matrix4 *destination, Matrix4 *source, AlignedVector4 *position);
 void func_002018E8(int a, int b, int c, int d, int e, int f);
-void func_0020F140(AlignedVector4 *destination, AlignedVector4 *source, AlignedVector4 *delta, float scale);
+void vu0VectorSlerp(AlignedVector4 *destination, AlignedVector4 *source, AlignedVector4 *delta, float scale);
 void MMathQuatToMatrix(Matrix4 *destination, AlignedVector4 *quaternion);
 float MMathCalcLength(AlignedVector4 *vector);
 float MMathVectorDotProduct(AlignedVector4 *first, AlignedVector4 *second);
@@ -2574,7 +2574,7 @@ void sdvStepAlter(SdvAlterBody *alter) {
                 } else {
                     QuadwordCopyT0(&alter->lastDelta, &delta);
                 }
-                func_0020F140(&alter->heading, &alter->heading, &delta, (float) alterRequest->parts[1] * 0.01f);
+                vu0VectorSlerp(&alter->heading, &alter->heading, &delta, (float) alterRequest->parts[1] * 0.01f);
                 for (i = 32; i > 0; i--) {
                     QuadwordCopyT0(&alter->quats[i], &alter->quats[i - 1]);
                 }

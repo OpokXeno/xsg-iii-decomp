@@ -410,9 +410,9 @@ struct GameStateView {
 
 void *vmKeyedEntryGet(int thread, int key);
 
-int func_0020F790(void *dest);
+int srsParseEffectFileName(void *dest);
 
-/* Script native: stores func_0020F790 of the keyed entry (arg 2) at gameState->slotValue[arg 1] (index below 100). */
+/* Script native: stores srsParseEffectFileName of the keyed entry (arg 2) at gameState->slotValue[arg 1] (index below 100). */
 int func_001C87B0(int thread) {
     struct GameStateView *gameState;
     unsigned int slotIndex;
@@ -423,7 +423,7 @@ int func_001C87B0(int thread) {
         return 0;
     }
     slotIndex = vmArgGet(thread, 1);
-    slotValue = func_0020F790(vmKeyedEntryGet(thread, vmArgGet(thread, 2)));
+    slotValue = srsParseEffectFileName(vmKeyedEntryGet(thread, vmArgGet(thread, 2)));
     if (slotIndex >= 100) {
         return 0;
     }
@@ -1092,7 +1092,7 @@ s32 func_001C99F8(s32 thread) {
         func_001C1A58(slotObject, vmArgGet(thread, 3));
         break;
     case 4:
-        func_001C1A88(slotObject, func_0020F790(vmKeyedEntryGet(thread, vmArgGet(thread, 3))));
+        func_001C1A88(slotObject, srsParseEffectFileName(vmKeyedEntryGet(thread, vmArgGet(thread, 3))));
         break;
     case 5:
         func_001C1AB8(slotObject, vmArgGet(thread, 3));
@@ -1887,14 +1887,14 @@ s32 nativeInvokeTripleVia27C0(s32 firstNativeArg, s32 secondNativeArg, s32 third
 
 s32 effectSlotCreate();
 
-s32 func_0020F790();
+s32 srsParseEffectFileName();
 
 s32 nativeInvokeTripleLookupVia2670(s32 firstNativeArg, s32 secondNativeArg, s32 thirdNativeArg) {
     NativeArgTriple nativeArgs;
 
     nativeArgs.firstNativeArg = firstNativeArg;
     nativeArgs.secondNativeArg = thirdNativeArg;
-    nativeArgs.thirdNativeArg = func_0020F790(secondNativeArg);
+    nativeArgs.thirdNativeArg = srsParseEffectFileName(secondNativeArg);
     return effectSlotCreate(&nativeArgs.firstNativeArg);
 }
 

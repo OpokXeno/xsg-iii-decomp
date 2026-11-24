@@ -18,7 +18,7 @@ typedef struct SaveLoadMenu {
     u8 unk0000[0x720];
     SeVoice voice;          /* 0x720 */
     u8 unk07CE[0xA20 - 0x7CE];
-    u8 voiceStartBlock[0x10CE - 0xA20];  /* 0xA20: record passed to func_002169A0 */
+    u8 voiceStartBlock[0x10CE - 0xA20];  /* 0xA20: record passed to shardFieldInit */
     u16 voiceControlBits;        /* 0x10CE: bit 0x2 set, bit 0x4 cleared on start */
     u8 unk10D0[0xA];
     s8 startPending;        /* 0x10DA */
@@ -35,7 +35,7 @@ typedef struct StatusHeader {
 s32 xglFRandSeed(f32);
 void *memPoolAlloc(s32 size);
 s32 bufferPointersRewind();
-s32 func_00213C18();
+s32 completionBlockClear();
 s32 pagedTablePoolInit();
 s32 memset(void *dst, s32 value, s32 size);
 s32 xglClockReadBcd();
@@ -55,7 +55,7 @@ s32 seEngineAllocate(void) {
     soundTableRecords = battleRosterEntryIdCountGet(0);
     initSucceeded = soundTableRecords;
     if (initSucceeded != 0) {
-        func_00213C18();
+        completionBlockClear();
         pagedTablePoolInit();
         xglPadSetRepeat(0, 0xF000, 0x12C, 3);
         saveLoadMenu = memPoolAlloc(0x10E0);
@@ -84,15 +84,15 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00227A38);
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00227B60);
 
 s32 GameMpeg2Play(s32, s32, s32);
-s32 func_00213700(s32);
+s32 messageTextGet(s32);
 s32 sheetSetIndex(s32);
 
 void movieStartPlayback(s32 movieId, s32 audioTrack) {
     s32 videoStream;
     s32 audioStream;
 
-    videoStream = func_00213700(0xF3);
-    audioStream = func_00213700(audioTrack + 0x7B);
+    videoStream = messageTextGet(0xF3);
+    audioStream = messageTextGet(audioTrack + 0x7B);
     GameMpeg2Play(movieId, videoStream, audioStream);
     sheetSetIndex(0);
     sheetSetIndex(movieId);
@@ -213,11 +213,11 @@ void *seVoiceRestart(void) {
 s32 frameStateUpdate();
 
 void seFontApplyAlpha(s32 rawAlpha) {
-    extern s32 func_00214A00();
+    extern s32 fontQueueSpriteBlack();
     extern s32 xglFontSetAlphaScale(s32);
     xglFontSetAlphaScale(rawAlpha & 0xFF);
     frameStateUpdate();
-    func_00214A00();
+    fontQueueSpriteBlack();
 }
 
 s32 seIsEnabled();
@@ -258,7 +258,7 @@ void seVoiceRefreshState(void)
 void func_002CA198();
 
 void seFontApplyFullAlpha(s32 rawAlpha) {
-    extern void func_00214A00();
+    extern void fontQueueSpriteBlack();
     extern void xglFontSetAlphaScale(s32);
     s32 fontAlpha;
 
@@ -268,7 +268,7 @@ void seFontApplyFullAlpha(s32 rawAlpha) {
         return;
     }
     func_002CA198();
-    func_00214A00();
+    fontQueueSpriteBlack();
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_0022FE10);
@@ -277,7 +277,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00230218);
 
 s32 seEngineAllocate(void);
 extern s8 gSeStartInProgress;
-s32 func_002169A0(void *block);
+s32 shardFieldInit(void *block);
 s32 func_00226190(s32);
 s32 func_00226958();
 s32 func_00230348(s32);
@@ -304,7 +304,7 @@ s32 seStartEngine(s32 requested)
   isStarted = seEngineAllocate(startOptions);
   if (isStarted != 0)
   {
-    func_002169A0(gSaveLoadMenuStorage->voiceStartBlock);
+    shardFieldInit(gSaveLoadMenuStorage->voiceStartBlock);
     seVoiceStartDefault(0xB);
     func_00226190(startOptions);
     sequenceResult = func_00230348(startOptions);

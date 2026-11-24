@@ -1,27 +1,77 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_002138E8);
+#include "main/tu007.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213938);
+void xglPadSetRepeat(int, int, int, int);
+
+typedef int s32;
+
+typedef signed char s8;
+
+typedef short s16;
+
+typedef unsigned char u8;
 
 typedef unsigned short u16;
-typedef int s32;
-typedef signed char s8;
-typedef short s16;
-typedef unsigned char u8;
+
 extern u16 gStatusBitsLow;
 extern u16 gStatusBitsHigh;
+extern unsigned char gPadStatusMasks[];
+
+/* Status header record at gPadStatusMasks: the pad masks of the frame (+0x00 held, +0x02 pressed, +0x04 repeated,
+ * +0x06 pressed in the previous frame) and the two group words at +0x08 and +0x0A. */
+typedef struct PadStatusMasks {
+    unsigned short held;
+    unsigned short pressed;
+    unsigned short repeated;
+    unsigned short previousPressed;
+    unsigned short unk_08;
+    unsigned short unk_0A;
+} PadStatusMasks;
+
+#define gPadStatus (*(PadStatusMasks *) gPadStatusMasks)
+
+/* Resets the pad status words and sets both status masks to all bits. */
+void padStatusMasksClear(void) {
+    xglPadSetRepeat(0, 0xf000, 8, 1);
+    gPadStatus.held = 0;
+    gPadStatus.pressed = 0;
+    gPadStatus.repeated = 0;
+    gStatusBitsHigh = -1;
+    gPadStatus.previousPressed = 0;
+    gStatusBitsLow = -1;
+}
+
+extern PadRecord PadData[];
+
+typedef struct PadGroupHalves {
+    unsigned char unmodeled_00[0x6A];
+    unsigned short unk_6A;
+    unsigned short unk_6C;
+} PadGroupHalves;
+
+#define gPadGroup (*(PadGroupHalves *) &PadData[0])
+
+/* Per-frame pad update: the previous frame's pressed bits move to previousPressed, then the direction bits of
+ * PadData[0] and the two group words are masked into the status record. */
+void padStatusSampleGroups(void) {
+    gPadStatus.previousPressed = gPadStatus.pressed;
+    gPadStatus.held = PadData[0].directionHeld & gStatusBitsLow;
+    gPadStatus.pressed = PadData[0].directionPressed & gStatusBitsLow;
+    gPadStatus.repeated = PadData[0].directionRepeated & gStatusBitsLow;
+    gPadStatus.unk_08 = gPadGroup.unk_6A & gStatusBitsHigh;
+    gPadStatus.unk_0A = gPadGroup.unk_6C & gStatusBitsHigh;
+}
 
 void clearStatusBits(s32 clearLowBits, s32 clearHighBits)
 {
-  s32 lowClearMask;
-  s32 highKeepMask;
-  s32 lowKeepMask;
+    s32 lowKeepMask;
+    s32 highKeepMask;
 
-  lowClearMask = clearLowBits & 0xFFFF;
-  highKeepMask = 0xFFFF;
-  gStatusBitsLow &= (lowKeepMask = ~lowClearMask);
-  gStatusBitsHigh &= (highKeepMask = ~(clearHighBits & highKeepMask));
+    lowKeepMask = ~(clearLowBits & 0xFFFF);
+    highKeepMask = ~(clearHighBits & 0xFFFF);
+    gStatusBitsLow &= lowKeepMask;
+    gStatusBitsHigh &= highKeepMask;
 }
 
 void setStatusBits(s32 setLowBits, s32 setHighBits) {
@@ -29,26 +79,22 @@ void setStatusBits(s32 setLowBits, s32 setHighBits) {
     gStatusBitsHigh |= setHighBits;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_002139E8);
-
-extern unsigned char D_005A6BC0[];
-
-/* Status header record at D_005A6BC0: 16-bit fields at 0x00, 0x02 and 0x06 (0x04 is not read here). */
-typedef struct StatusHeader {
-    u16 flags0;
-    u16 flags2;
-    u8 unk_04[2];
-    u16 unk_06;
-} StatusHeader;
-#define gStatusHeader (*(StatusHeader *) D_005A6BC0)
+/* ORs the low bits into the direction words and the high bits into the group words. */
+void padStatusSetBits(u16 lowBits, u16 highBits) {
+    gPadStatus.held = lowBits | gPadStatus.held;
+    gPadStatus.pressed = lowBits | gPadStatus.pressed;
+    gPadStatus.repeated = lowBits | gPadStatus.repeated;
+    gPadStatus.unk_08 = highBits | gPadStatus.unk_08;
+    gPadStatus.unk_0A = highBits | gPadStatus.unk_0A;
+}
 
 s32 statusHeaderIsReadyMode20(void)
 {
     s32 isModeMatch;
     isModeMatch = 0;
-    if (gStatusHeader.flags2 == 0x20)
+    if (gPadStatus.pressed == 0x20)
     {
-        isModeMatch = gStatusHeader.unk_06 == 0;
+        isModeMatch = gPadStatus.previousPressed == 0;
     }
     return isModeMatch;
 }
@@ -57,9 +103,9 @@ s32 statusHeaderIsReadyMode40(void)
 {
     s32 isModeMatch;
     isModeMatch = 0;
-    if (gStatusHeader.flags2 == 0x40)
+    if (gPadStatus.pressed == 0x40)
     {
-        isModeMatch = gStatusHeader.unk_06 == 0;
+        isModeMatch = gPadStatus.previousPressed == 0;
     }
     return isModeMatch;
 }
@@ -67,11 +113,11 @@ s32 statusHeaderIsReadyMode40(void)
 s32 statusHeaderTestFlags(void)
 {
     s32 isBit11Set;
+
     isBit11Set = 0;
-    if ((gStatusHeader.flags0 & 0x10C) == 0x10C)
+    if ((gPadStatus.held & 0x10C) == 0x10C)
     {
-        isBit11Set = 0;
-        isBit11Set = (gStatusHeader.flags2 & 0x800) != isBit11Set;
+        isBit11Set = (gPadStatus.pressed & 0x800) != isBit11Set;
     }
     return isBit11Set;
 }
@@ -93,6 +139,8 @@ void setSteppedTarget(SteppedValue *stepped, s16 targetLevel) {
 
 extern u8 gVsyncsPerFrame;
 
+/* Moves the level one step toward targetLevel per frame; the step is gVsyncsPerFrame in 1/16 units and the level
+ * stops on the target. */
 void stepValueTowardTarget(SteppedValue *stepped) {
     s32 currentLevel;
     s32 targetLevel;
@@ -120,9 +168,65 @@ void stepValueTowardTarget(SteppedValue *stepped) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213B40);
+/* gSwapWordsFlag is the flag that says the two swapBlock below are exchanged. */
+extern s8 gSwapWordsFlag;
+extern unsigned char D_004C8390[];
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213BA8);
+/* The two 32-bit swapBlock that the swap flag exchanges (fields at +0x38 and +0x44). */
+typedef struct SwapWordBlock {
+    unsigned char unmodeled_00[0x38];
+    s32 swapWordA;
+    unsigned char unmodeled_3C[0x44 - 0x3C];
+    s32 swapWordB;
+} SwapWordBlock;
+
+#define gSwapWordBlock (*(SwapWordBlock *) D_004C8390)
+
+typedef struct Cmd8Block {
+    unsigned char packet[8];
+} Cmd8Block;
+
+extern unsigned char gSwapCommandTemplate[];
+void scratchpadSendCmd0A();
+
+/* kept: the one-byte struct store keeps the flag in its own alias set (a plain store of 1 schedules differently). */
+typedef struct SwapFlag {
+    s8 isSwapped;
+} SwapFlag;
+
+/* Sends scratchpad command 0x0A with the argument, then exchanges the two words and sets the flag. Does nothing
+ * while the flag is already set. */
+void swapWordsSendCommand(s32 argument) {
+    Cmd8Block command = *(Cmd8Block *) gSwapCommandTemplate;
+    SwapWordBlock *swapBlock;
+    SwapFlag swapped;
+    s32 savedWordA;
+
+    if (!gSwapWordsFlag) {
+        *(s32 *) command.packet = argument;
+        scratchpadSendCmd0A(&command);
+        swapBlock = &gSwapWordBlock;
+        swapped.isSwapped = 1;
+        *(SwapFlag *) &gSwapWordsFlag = swapped;
+        savedWordA = swapBlock->swapWordA;
+        swapBlock->swapWordA = swapBlock->swapWordB;
+        swapBlock->swapWordB = savedWordA;
+    }
+}
+
+/* If the flag is set, clears it and exchanges the two swapBlock back. */
+void swapWordsRestore(void) {
+    s32 savedWordA;
+    s32 savedWordB;
+
+    if (gSwapWordsFlag != 0) {
+        gSwapWordsFlag = 0;
+        savedWordA = gSwapWordBlock.swapWordA;
+        savedWordB = gSwapWordBlock.swapWordB;
+        gSwapWordBlock.swapWordB = savedWordA;
+        gSwapWordBlock.swapWordA = savedWordB;
+    }
+}
 
 extern s32 gFontEscapeBuffer;
 extern s32 gFontNumberBuffer;
@@ -140,44 +244,111 @@ void initScratchpadBuffers(void) {
     func_00225780();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213C18);
+extern void (*D_004C83D4[])(void);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213C50);
+void completionFlagsReset(void);
+void completionCallbacksRun(void);
+extern u32 gBlockStatusBits;
 
-u8 *getStatusHeader(void) {
-    return D_005A6BC0;
+/* Resets the completion callbacks, the pad status and the block status counter; the first completionCallback slot becomes
+ * completionCallbacksRun, which runs the completion list. */
+void completionBlockClear(void) {
+    completionFlagsReset();
+    padStatusMasksClear();
+    gBlockStatusBits = 0;
+    D_004C83D4[0] = completionCallbacksRun;
 }
 
-extern s32 gBlockStatusBits;
+float xglSin(float);
+extern u8 D_00550B88;
+extern u8 D_00550B89;
+extern u8 D_00550B8A;
+void pxySetHeaderScanEnabled(int enabled);
+void xglSleep(void);
+void VibrationEngine(void);
+
+/* One block status step: the 16-bit counter moves on, and the three status bytes follow sine waves of 64, 128 and
+ * 256 steps, each mapped to 0..128. BLOCK_STATUS_WAVE takes the counter mask and the angle scale of its wave. */
+#define BLOCK_STATUS_WAVE(mask, scale) \
+    ((int) (xglSin((gBlockStatusBits & (mask)) * 3.14159265f * (scale)) * 64.0f) + 64)
+
+#define BLOCK_STATUS_ADVANCE() \
+    gBlockStatusBits = (gBlockStatusBits + 1) & 0xFFFF; \
+    D_00550B88 = BLOCK_STATUS_WAVE(0x3F, 0.03125f); \
+    D_00550B89 = BLOCK_STATUS_WAVE(0x7F, 0.015625f); \
+    D_00550B8A = BLOCK_STATUS_WAVE(0xFF, 0.0078125f)
+
+/* Frame step of the block status: the pad update, then one block status step. */
+void statusBlockFrameUpdate(void) {
+    pxySetHeaderScanEnabled(1);
+    xglSleep();
+    VibrationEngine();
+    padStatusSampleGroups();
+    BLOCK_STATUS_ADVANCE();
+}
+
+/* Pointer to the status header record at gPadStatusMasks. */
+u8 *getStatusHeader(void) {
+    return gPadStatusMasks;
+}
 
 void blockStatusBitsSet(s32 newStatusBits) {
     gBlockStatusBits = newStatusBits;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213E10);
+/* One block status step without the pad update (same statements as statusBlockFrameUpdate after padStatusSampleGroups). */
+void blockStatusAdvance(void) {
+    BLOCK_STATUS_ADVANCE();
+}
 
 s32 blockStatusBitsGet(void) {
     return gBlockStatusBits;
 }
 
-extern u8 D_00550B88;
-
 u8 statusByte0Get(void) {
     return D_00550B88;
 }
-
-extern u8 D_00550B89;
 
 u8 statusByte1Get(void) {
     return D_00550B89;
 }
 
-extern u8 D_00550B8A;
-
 u8 statusByte2Get(void) {
     return D_00550B8A;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00213FB8);
+typedef void (*CompletionCallback)(void);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu160", func_00214008);
+extern CompletionCallback gCompletionCallbacks[];
+extern int gCompletionCallbackCount;
+
+/* kept: the one-member struct view of gCompletionCallbackCount decides the emitted order of the count accesses. */
+typedef struct CompletionCount {
+    int queuedCallbacks;
+} CompletionCount;
+
+#define CALLBACK_COUNT (((CompletionCount *) &gCompletionCallbackCount)->queuedCallbacks)
+
+/* Appends a completionCallback to the completion list and keeps it null-terminated; a null completionCallback clears the list. */
+void completionCallbackAdd(CompletionCallback completionCallback) {
+    if (completionCallback) {
+        gCompletionCallbacks[CALLBACK_COUNT++] = completionCallback;
+        gCompletionCallbacks[gCompletionCallbackCount] = 0;
+    } else {
+        gCompletionCallbackCount = 0;
+        gCompletionCallbacks[0] = 0;
+    }
+}
+
+void func_00185A20(void);
+
+/* Runs the completion callbacks in order until the null terminator, then clears the list and calls func_00185A20. */
+void completionCallbacksRun(void) {
+    int callbackIndex = 0;
+
+    while (gCompletionCallbacks[callbackIndex]) {
+        gCompletionCallbacks[callbackIndex++]();
+    }
+    completionCallbackAdd(0);
+    func_00185A20();
+}

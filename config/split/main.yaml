@@ -177,7 +177,6 @@ segments:
       - [0xEFEC8, c, tu149]
       - [0xF0278, c, tu150]
       - [0xF0618, c, srs]
-      - [0xF0CB8, c, tu153]
       - [0xF18E8, c, tu154]
       - [0xF19D0, c, tu155]
       - [0xF4220, c, tu156]
@@ -1015,7 +1014,7 @@ segments:
       - { type: sbss, vram: 0x00551510, name: sc_get }
       - { type: sbss, vram: 0x00551514, name: sef }
       - { type: sbss, vram: 0x00551518, name: sv_get_image_item }
-      - { type: sbss, vram: 0x00551550, name: tu153 }
+      - { type: sbss, vram: 0x00551550, name: srs }
       - { type: sbss, vram: 0x00551554, name: game_movie }
       - { type: sbss, vram: 0x0055155C, name: xgl_dma }
       - { type: sbss, vram: 0x00551560, name: tu011 }
@@ -1113,7 +1112,6 @@ segments:
       - { type: bss, vram: 0x0076D4D0, name: sv_get_image_item }
       - { type: bss, vram: 0x00771184, name: draw_list }
       - { type: bss, vram: 0x00771198, name: srs }
-      - { type: bss, vram: 0x007711F0, name: tu153 }
       - { type: bss, vram: 0x00771240, name: game_movie }
       - { type: bss, vram: 0x00771280, name: xenoActor }
       - { type: bss, vram: 0x007E7C80, name: tu330 }

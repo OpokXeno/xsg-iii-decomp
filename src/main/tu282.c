@@ -410,7 +410,7 @@ extern unsigned char moviePathBuffer[];
 
 s32 GameMpeg2Play();
 
-s32 func_00213700();
+s32 messageTextGet();
 
 s32 func_0026CD38();
 
@@ -418,8 +418,8 @@ void moviePlayLocalized(s32 movieId, s32 variant) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0x17);
-    secondTextId = func_00213700(0x18);
+    firstTextId = messageTextGet(0x17);
+    secondTextId = messageTextGet(0x18);
     GameMpeg2Play(moviePathBuffer, D_00531028, D_00530FE0, movieId, firstTextId, D_00530FF0, variant, secondTextId);
     func_0026CD38(moviePathBuffer);
 }

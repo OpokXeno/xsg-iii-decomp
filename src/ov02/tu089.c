@@ -130,10 +130,10 @@ void battleResultReset(void) {
     memset(&gBattleResultBuffer, 0, 0x50);
 }
 
-s32 func_00210480();
+s32 srsStartResourceLoad();
 
 void battleResultActivate(s32 battleResultSlot) {
-    func_00210480(battleResultSlot, 1);
+    srsStartResourceLoad(battleResultSlot, 1);
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu089", func_00AB17B0);

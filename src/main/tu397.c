@@ -200,7 +200,7 @@ void panelLayoutInit(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu397", func_002DFA28);
 
-void func_00215250();
+void fontQueueRectTwoColors();
 void func_002D0D88();
 void func_002DE788();
 void func_002DF018();
@@ -228,7 +228,7 @@ void panelDrawFrame(void)
     rect.top = (((s32) y) * 0x10) + 0x71F8;
     rect.right = right;
     rect.bottom = bottom;
-    func_00215250(&rect.left, 0x5A402C2C, 0x402C2C, 0x101);
+    fontQueueRectTwoColors(&rect.left, 0x5A402C2C, 0x402C2C, 0x101);
     if (panel->frame.collapsed != 0)
     {
         func_002DE788(&panel->lead.x);

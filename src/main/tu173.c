@@ -77,7 +77,7 @@ void sheetFrameDrawText(TiFrameSheet *sheet, s32 animationTick, u32 color, s32 t
   }
 }
 
-s32 func_002146C0();
+s32 fontQueueColorState();
 s32 xglFontDrawDigitsAlt();
 
 void sheetFrameDrawValue(TiFrameSheet *sheet, s32 animationTick, s32 mask, s32 displayValue)
@@ -88,7 +88,7 @@ void sheetFrameDrawValue(TiFrameSheet *sheet, s32 animationTick, s32 mask, s32 d
 
   if (sheetFramePosition(&pos, sheet, animationTick) != 0)
   {
-    func_002146C0(mask);
+    fontQueueColorState(mask);
     middleCellWidth = sheet->cellWidthB;
     shift = 1;
     xglFontDrawDigitsAlt((((pos.x + ((sheet->valueColumn) * 0x50)) + (sheet->cellWidthA + (middleCellWidth >> shift))) - 0x40) & 0xFFFF, (pos.y + 0x20) & 0xFFFF, displayValue, 0x10);

@@ -8,7 +8,7 @@ extern s32 gCdSecondaryCommandSent;
 void xcBlockClear(void *block);
 void func_001B7190();
 void xglCdWaitControl();
-extern unsigned char func_0020FD50[];
+extern unsigned char srsBattleWinReadComplete[];
 
 struct CdCommandRecord {
     /* 0x00 */ s32 commandStatus;
@@ -25,7 +25,7 @@ void xglCdSetupControlRecords(void) {
     if (gCdPrimaryCommandSent == 0) {
         xcBlockClear(&primaryRecord.commandStatus);
         primaryRecord.command = 0x04000001;
-        primaryRecord.commandData = func_0020FD50;
+        primaryRecord.commandData = srsBattleWinReadComplete;
         primaryRecord.commandStatus = 0;
         primaryRecord.unk08 = 0;
         primaryRecord.commandMode = 0;
@@ -34,7 +34,7 @@ void xglCdSetupControlRecords(void) {
     if (gCdSecondaryCommandSent == 0) {
         xcBlockClear(&secondaryRecord.commandStatus);
         secondaryRecord.command = 0x04000002;
-        secondaryRecord.commandData = func_0020FD50;
+        secondaryRecord.commandData = srsBattleWinReadComplete;
         secondaryRecord.commandMode = 1;
         secondaryRecord.commandStatus = 0;
         secondaryRecord.unk08 = 0;

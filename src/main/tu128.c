@@ -185,7 +185,7 @@ typedef struct TypeList {
 } TypeList;
 
 extern TypeList svResourceTypeLists[];
-void func_002107B8(s32 used, s32 flag);
+void srsReleaseEffectRecordsByResource(s32 used, s32 flag);
 /* Zeroes record number recordNumber (0x40 bytes); numbers past the 40 records are ignored. */
 void sefEffectTransformClear(u32 index);
 void sefEffectPoolRelease(u32 i);
@@ -205,7 +205,7 @@ void sefEffectInstanceRelease(SefSlot *effectSlot) {
         if (svResourceTypeLists[effectSlot->result].s.refs <= 0) {
             svResourceTypeLists[effectSlot->result].s.refs = 0;
             if (svResourceTypeLists[effectSlot->result].s.on != 0) {
-                func_002107B8(svResourceTypeLists[effectSlot->result].used, 1);
+                srsReleaseEffectRecordsByResource(svResourceTypeLists[effectSlot->result].used, 1);
             }
         }
         memset(effectSlot, 0, sizeof(SefSlot));
@@ -671,7 +671,7 @@ typedef struct Ob2 {
 
 extern M4 sefCameraMatrixBlock;
 Cam *xglStudioGetActiveCamera(void);
-EffectPoolRecord *func_0020F2E8(EffectPoolRecord *, M4 *);
+EffectPoolRecord *rotationMatrixToQuaternion(EffectPoolRecord *, M4 *);
 void sefGetBattlePoint(V4 *, s32, s32);
 void *scGetImmAdrImmIdx2(u8 *tag, void *table, s32 index);
 SvTypeListEntry *svGetImageListItem(int type, unsigned int flags);
@@ -685,9 +685,9 @@ typedef struct SpecEntry {
     u8 unmodeled_09[1];
 } SpecEntry;
 
-/* Loads matrix m into pool entry n through func_0020F2E8, then copies its row 3 into translation. */
+/* Loads matrix m into pool entry n through rotationMatrixToQuaternion, then copies its row 3 into translation. */
 static inline void setMatrix(EffectPoolRecord *entry, M4 *matrix) {
-    func_0020F2E8(entry, matrix);
+    rotationMatrixToQuaternion(entry, matrix);
     CopyVector(&entry->translation, &matrix->r[3]);
 }
 
@@ -804,7 +804,7 @@ Ent *sefBuildSpecEntries(Ent *effect, s32 effectFlagBits, s32 specWord, u8 *tag,
         }
         /* keys[-2] is the matrix source: 4 and 5 copy the camera matrix, 6 the active camera, the object list the Ob2 matrix. */
         if (claimedPoolEntry->keys[-2] == 4 || claimedPoolEntry->keys[-2] == 5) {
-            func_0020F2E8(claimedPoolEntry, cameraMatrix);
+            rotationMatrixToQuaternion(claimedPoolEntry, cameraMatrix);
             CopyVector(&claimedPoolEntry->translation, cameraPosition);
         } else if (claimedPoolEntry->keys[-2] == 6) {
             setMatrix(claimedPoolEntry, &xglStudioGetActiveCamera()->m);
@@ -815,7 +815,7 @@ Ent *sefBuildSpecEntries(Ent *effect, s32 effectFlagBits, s32 specWord, u8 *tag,
                 M4 objectMatrixCopy;
 
                 CpM(&objectMatrixCopy, &objectMatrix->m);
-                func_0020F2E8(claimedPoolEntry, &objectMatrixCopy);
+                rotationMatrixToQuaternion(claimedPoolEntry, &objectMatrixCopy);
                 if (claimedPoolEntry->keys[-2] == 324) {
                     sefGetBattlePoint(&claimedPoolEntry->translation, 3, 1);
                     claimedPoolEntry->translation.y = 0.0f;
@@ -871,12 +871,12 @@ static inline Node *sefEffectNodeAt(u32 effectNodeIndex) {
     return 0;
 }
 
-/* Signature of func_0020F2E8: called with a node and a matrix, returns the node. */
+/* Signature of rotationMatrixToQuaternion: called with a node and a matrix, returns the node. */
 typedef Node *(*SefNodeTransformFn)(Node *, M4 *);
 
-/* Sets node n from matrix m: calls func_0020F2E8, then copies the matrix translation row (r[3]) into n->b. */
+/* Sets node n from matrix m: calls rotationMatrixToQuaternion, then copies the matrix translation row (r[3]) into n->b. */
 static inline void sefNodeSetMatrix(Node *normal, M4 *matrix) {
-    ((SefNodeTransformFn) func_0020F2E8)(normal, matrix);
+    ((SefNodeTransformFn) rotationMatrixToQuaternion)(normal, matrix);
     QuadwordCopyT0(&normal->b, &matrix->r[3]);
 }
 
@@ -923,7 +923,7 @@ void func_001F62F8(Pool *p) {
                 M4 matrix;
 
                 CpM(&matrix, &effectObjectRecord->m);
-                ((SefNodeTransformFn) func_0020F2E8)(attachedNode, &matrix);
+                ((SefNodeTransformFn) rotationMatrixToQuaternion)(attachedNode, &matrix);
                 if (p->ptr[-2] == 0x144) {
                     sefGetBattlePoint(&attachedNode->b, 3, 1);
                     attachedNode->b.y = 0.0f;

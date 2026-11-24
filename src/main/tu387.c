@@ -118,7 +118,7 @@ void seSystemInit(void)
     func_002CA268();
 }
 
-s32 func_00213700(s32);
+s32 messageTextGet(s32);
 
 void seInitChannels(void) {
     extern unsigned char gSeChannelPoolStorage[];
@@ -153,7 +153,7 @@ void seInitChannels(void) {
     channelEightHandle = seGetChannelHandle(0x1E);
     gSeChannelPool.channels[9].capacity = 2;
     gSeChannelPool.channels[8].channelHandle = channelEightHandle;
-    channelNineHandle = func_00213700(0x23);
+    channelNineHandle = messageTextGet(0x23);
     gSeChannelPool.channels[9].channelHandle = channelNineHandle;
     gSeChannelPool.channels[10].capacity = 1;
     gSeChannelPool.channels[10].channelHandle = 0;

@@ -2570,33 +2570,6 @@
     "-g"
    ]
   },
-  "tu153": {
-   "id": "main/tu153",
-   "ordinal": 153,
-   "path": "src/main/tu153.c",
-   "kind": "gcc",
-   "category": "game",
-   "in_scope": true,
-   "mode": "asm",
-   "language": "c",
-   "compiler_profile": "ee-gcc2_96-realconv-lp7",
-   "flags": [
-    "-O2",
-    "-G4"
-   ],
-   "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-   "owners": {
-    ".text": "asm",
-    ".sbss": "asm",
-    ".bss": "asm"
-   },
-   "evidence": "reports/x3-compiler-calibration.md",
-   "all_functions_accepted": false,
-   "accepted_functions": "0/18",
-   "assembler_options": [
-    "-g"
-   ]
-  },
   "tu154": {
    "id": "main/tu154",
    "ordinal": 154,
@@ -8531,35 +8504,6 @@
     "-g"
    ]
   },
-  "srs": {
-   "id": "main/tu151",
-   "ordinal": 151,
-   "path": "src/main/srs.c",
-   "kind": "gcc",
-   "category": "game",
-   "in_scope": true,
-   "mode": "asm",
-   "language": "c",
-   "compiler_profile": "ee-gcc2_96-realconv-lp7",
-   "flags": [
-    "-O2",
-    "-G4"
-   ],
-   "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-   "owners": {
-    ".text": "c",
-    ".data": "asm",
-    ".rodata": "asm",
-    ".sdata": "asm",
-    ".bss": "asm"
-   },
-   "evidence": "reports/x3-compiler-calibration.md",
-   "all_functions_accepted": false,
-   "accepted_functions": "0/10",
-   "assembler_options": [
-    "-g"
-   ]
-  },
   "tu178": {
    "id": "main/tu178",
    "ordinal": 178,
@@ -9080,6 +9024,36 @@
    "evidence": "reports/x3-compiler-calibration.md",
    "all_functions_accepted": false,
    "accepted_functions": "0/40",
+   "assembler_options": [
+    "-g"
+   ]
+  },
+  "srs": {
+   "id": "main/tu151",
+   "ordinal": 151,
+   "path": "src/main/srs.c",
+   "kind": "gcc",
+   "category": "game",
+   "in_scope": true,
+   "mode": "asm",
+   "language": "c",
+   "compiler_profile": "ee-gcc2_96-realconv-lp7",
+   "flags": [
+    "-O2",
+    "-G4"
+   ],
+   "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
+   "owners": {
+    ".text": "c",
+    ".data": "asm",
+    ".rodata": "asm",
+    ".sdata": "asm",
+    ".bss": "asm",
+    ".sbss": "asm"
+   },
+   "evidence": "reports/x3-compiler-calibration.md",
+   "all_functions_accepted": false,
+   "accepted_functions": "0/28",
    "assembler_options": [
     "-g"
    ]

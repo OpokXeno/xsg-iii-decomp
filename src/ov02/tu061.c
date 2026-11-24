@@ -58,7 +58,7 @@ typedef int s32;
 /* Fields of a BattleUnitLookupKeyView (ov02/tu060.h names only lookupKey) that this file reads; the offsets are measured here. */
 typedef struct UnitPoolRow {
     unsigned char unmodeled_00[0x1C];
-    short gridX;                            /* +0x1C: shifted left by 12 before func_002105B8 */
+    short gridX;                            /* +0x1C: shifted left by 12 before srsReleaseEffectRecordsByKey */
     unsigned char unmodeled_1E[0x3E - 0x1E];
     short lookupKey;                        /* +0x3E: the unit filter is lookupKey < 0x12 */
     unsigned char unmodeled_40[0x72 - 0x40];
@@ -109,7 +109,7 @@ typedef struct UnitCommandState {
 void unitReleaseResources(BattleUnit *battleUnit);
 s32 unitSoundSlotRelease();
 void XenoActorRelease(XenoActor *actor);
-s32 func_002105B8(s32 gridX, s32 flag);
+s32 srsReleaseEffectRecordsByKey(s32 gridX, s32 flag);
 void func_00A857F0(BattleUnit *battleUnit);
 void unitSideRelease(BattleUnit *battleUnit);
 int unitTblRemove(BattleUnit *battleUnit);
@@ -154,7 +154,7 @@ void unitReleaseResources(BattleUnit *battleUnit) {
     XenoActorRelease(battleUnit->motionActor);
     poolRow = (UnitPoolRow *) battleUnit->lookupKeyRecord;
     if (poolRow->lookupKey < 0x12) {
-        func_002105B8(poolRow->gridX << 0xC, 1);
+        srsReleaseEffectRecordsByKey(poolRow->gridX << 0xC, 1);
     }
     unitSideRelease(battleUnit);
     unitTblRemove(battleUnit);

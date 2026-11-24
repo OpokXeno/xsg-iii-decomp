@@ -91,8 +91,8 @@ void sceneReset(void) {
     func_00225780();
 }
 
-s32 func_002146C0(s32 value);
-s32 func_00214FA8(s32 left, s32 top, s32 right, s32 bottom);
+s32 fontQueueColorState(s32 value);
+s32 fontQueueSprite(s32 left, s32 top, s32 right, s32 bottom);
 s32 xglFontSetAlphaScale(s32 alpha);
 s32 func_0021A7E0(s32 x, s32 y, s32 secondTextId, s32 firstTextId);
 void xglFontResetState(void);
@@ -100,19 +100,19 @@ void xglFontResetState(void);
 void sceneShowMessagePair(s32 firstTextId, s32 secondTextId) {
     xglFontSetAlphaScale(0x80);
     xglFontResetState();
-    func_002146C0(0x40000000);
-    func_00214FA8(0x6FF8, 0x71F8, 0x8FF8, 0x8DF8);
+    fontQueueColorState(0x40000000);
+    fontQueueSprite(0x6FF8, 0x71F8, 0x8FF8, 0x8DF8);
     func_0021A7E0(0x100, 0xA0, secondTextId, firstTextId);
 }
 
-s32 func_00213700(s32 messageId);
+s32 messageTextGet(s32 messageId);
 
 void sceneShowMsgPair139(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0x139);
-    secondTextId = func_00213700(0x5A);
+    firstTextId = messageTextGet(0x139);
+    secondTextId = messageTextGet(0x5A);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -120,8 +120,8 @@ void sceneShowMsgPair1D1(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0x1D1);
-    secondTextId = func_00213700(0x5A);
+    firstTextId = messageTextGet(0x1D1);
+    secondTextId = messageTextGet(0x5A);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -129,8 +129,8 @@ void sceneShowMsgPairD7(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0xD7);
-    secondTextId = func_00213700(0x5A);
+    firstTextId = messageTextGet(0xD7);
+    secondTextId = messageTextGet(0x5A);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -138,8 +138,8 @@ void sceneShowMsgPairE5(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0xE5);
-    secondTextId = func_00213700(0xE4);
+    firstTextId = messageTextGet(0xE5);
+    secondTextId = messageTextGet(0xE4);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -147,8 +147,8 @@ void sceneShowMsgPairE7(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0xE7);
-    secondTextId = func_00213700(0xE4);
+    firstTextId = messageTextGet(0xE7);
+    secondTextId = messageTextGet(0xE4);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -156,8 +156,8 @@ void sceneShowMsgPairE8(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0xE8);
-    secondTextId = func_00213700(0xE9);
+    firstTextId = messageTextGet(0xE8);
+    secondTextId = messageTextGet(0xE9);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -165,8 +165,8 @@ void sceneShowMsgPair166(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0x166);
-    secondTextId = func_00213700(0xE4);
+    firstTextId = messageTextGet(0x166);
+    secondTextId = messageTextGet(0xE4);
     sceneShowMessagePair(firstTextId, secondTextId);
 }
 
@@ -174,7 +174,7 @@ void sceneShowMsgPair167(void) {
     s32 firstTextId;
     s32 secondTextId;
 
-    firstTextId = func_00213700(0x167);
-    secondTextId = func_00213700(0xE4);
+    firstTextId = messageTextGet(0x167);
+    secondTextId = messageTextGet(0xE4);
     sceneShowMessagePair(firstTextId, secondTextId);
 }

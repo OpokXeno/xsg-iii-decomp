@@ -6,7 +6,7 @@ typedef int s32;
 typedef short s16;
 typedef unsigned short u16;
 typedef unsigned int u32;
-s32 func_002146C0();
+s32 fontQueueColorState();
 s32 func_0021EA68(s32, s32, s32, s32);
 s32 func_00A84A90(s32, s32);
 s32 func_00A84B08(s32, s32);
@@ -31,7 +31,7 @@ void lookupEntryByKind(s32 context, s32 tag, s32 lookupTableId, s32 lookupEntryK
         foundEntryId = func_00A84B78(lookupEntryKey, 1);
         break;
     }
-    func_002146C0(0x80626262);
+    fontQueueColorState(0x80626262);
     func_0021EA68(context, tag, foundEntryId, 0xE0);
 }
 
@@ -59,9 +59,9 @@ void flushPendingValue(void) {
     }
 }
 
-s32 func_00214FA8();
-s32 func_00215E60();
-s32 func_00215FD0();
+s32 fontQueueSprite();
+s32 xglFontDrawBoxBlend();
+s32 xglFontDrawFramedRect();
 s32 func_0023DA40();
 
 /* A screen rectangle in 16-bit units: origin x/y and size. */
@@ -92,16 +92,16 @@ void rectDrawLevelFrame(ScreenRect *rect, s32 level, s32 mode)
   rectCopy.y = rectY;
   rectCopy.width = rectWidth;
   rectCopy.height = rectHeight;
-  func_00215FD0(&rectCopy, levelByte >> 1, ((mode != 0) ? (0xF98980) : (0xA8B234)));
+  xglFontDrawFramedRect(&rectCopy, levelByte >> 1, ((mode != 0) ? (0xF98980) : (0xA8B234)));
   rectX = rect->x;
   rectCopy.x = rectX;
   rectCopy.width = rectX + 0xB0;
-  func_002146C0(0x73514442);
-  func_00215E60(&rectCopy, 2, 0x734B3E3E, 1);
-  func_002146C0(0x80000000);
+  fontQueueColorState(0x73514442);
+  xglFontDrawBoxBlend(&rectCopy, 2, 0x734B3E3E, 1);
+  fontQueueColorState(0x80000000);
   left = rect->x;
   top = rect->y;
-  func_00214FA8((left + 0xB0) & 0xFFFF, top, (left + 0x110) & 0xFFFF, (top + 0x190) & 0xFFFF);
+  fontQueueSprite((left + 0xB0) & 0xFFFF, top, (left + 0x110) & 0xFFFF, (top + 0x190) & 0xFFFF);
   func_0023DA40((rect->x + 0xC0) & 0xFFFF, (rect->y + 0x30) & 0xFFFF, mode, levelByte);
 }
 
@@ -125,16 +125,16 @@ void rectDrawLevelFrameFixed(ScreenRect *rect, s32 level, s32 mode)
   rectCopy.y = rectY;
   rectCopy.width = rectWidth;
   rectCopy.height = rectHeight;
-  func_00215FD0(&rectCopy, levelByte >> 1, ((mode != 0) ? (0xF98980) : (0xA8B234)));
+  xglFontDrawFramedRect(&rectCopy, levelByte >> 1, ((mode != 0) ? (0xF98980) : (0xA8B234)));
   rectX = rect->x;
   rectCopy.x = rectX;
   rectCopy.width = rectX + 0xB0;
-  func_002146C0(0x73514442);
-  func_00215E60(&rectCopy, 2, 0x734B3E3E, 1);
-  func_002146C0(0x80000000);
+  fontQueueColorState(0x73514442);
+  xglFontDrawBoxBlend(&rectCopy, 2, 0x734B3E3E, 1);
+  fontQueueColorState(0x80000000);
   left = rect->x;
   top = rect->y;
-  func_00214FA8((left + 0xB0) & 0xFFFF, top, (left + 0x110) & 0xFFFF, (top + 0x190) & 0xFFFF);
+  fontQueueSprite((left + 0xB0) & 0xFFFF, top, (left + 0x110) & 0xFFFF, (top + 0x190) & 0xFFFF);
   func_0023DA40((rect->x + 0xC0) & 0xFFFF, (rect->y + 0x30) & 0xFFFF, mode, 0x80);
 }
 

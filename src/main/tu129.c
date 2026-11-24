@@ -835,8 +835,8 @@ typedef struct EntryHit {
     float depth;
 } EntryHit;
 
-extern EntryHit D_004AC030[];
-extern int D_005510D8;
+extern EntryHit svVisibleSlots[];
+extern int svVisibleEntryCount;
 void sefTransformClipPoint(AlignedVector4 *outPoint, EntryRecord *inPoint);
 
 /* The entry at index when it is active, read through the flag-bit table view. */
@@ -856,7 +856,7 @@ static inline EntryRecord *RecordAtSlot(unsigned int slot) {
 
 /*
  * Appends one hit per active entry with flag 0x100 whose sprite record is set: the hit gets the entry
- * index and the clipped depth of the record. The count continues from D_005510D8.
+ * index and the clipped depth of the record. The count continues from svVisibleEntryCount.
  */
 void func_001F8860(void) {
     AlignedVector4 clipPoint;
@@ -869,8 +869,8 @@ void func_001F8860(void) {
 
     table = &gSefEffectTable;
     if (table->gate != 0) {
-        hitCount = D_005510D8;
-        nextHit = &D_004AC030[hitCount];
+        hitCount = svVisibleEntryCount;
+        nextHit = &svVisibleSlots[hitCount];
         for (i = 0; i < 40; i++) {
             entry = EntryAtIndexBits(i);
             if (entry != 0 && entry->key.active != 0 && (entry->flags.word & 0x100) != 0) {
@@ -885,7 +885,7 @@ void func_001F8860(void) {
                 }
             }
         }
-        D_005510D8 = hitCount;
+        svVisibleEntryCount = hitCount;
     }
 }
 

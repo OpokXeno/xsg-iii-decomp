@@ -42456,7 +42456,7 @@
      2
     ],
     [
-     "func_00207BA0",
+     "vu0CopyVectorSetW",
      2128800,
      16,
      2
@@ -42636,7 +42636,7 @@
      2
     ],
     [
-     "func_002087F0",
+     "svDepthListInsert",
      2131952,
      352,
      2
@@ -42678,7 +42678,7 @@
      2
     ],
     [
-     "func_00208E78",
+     "svUploadViewFrame",
      2133624,
      644,
      2
@@ -42798,7 +42798,7 @@
      2
     ],
     [
-     "func_00209C88",
+     "svRegisterResourceFile",
      2137224,
      408,
      2
@@ -42834,13 +42834,13 @@
      2
     ],
     [
-     "func_0020A038",
+     "svDrawListAppendSpriteRecord",
      2138168,
      340,
      2
     ],
     [
-     "func_0020A190",
+     "svDrawListAppendSpriteRecordPair",
      2138512,
      396,
      2
@@ -42882,43 +42882,43 @@
      2
     ],
     [
-     "func_0020AD78",
+     "svDrawPolygonItem",
      2141560,
      1216,
      2
     ],
     [
-     "func_0020B238",
+     "svDrawListAppendRecordB",
      2142776,
      568,
      2
     ],
     [
-     "func_0020B470",
+     "svDrawListAppendRecordBPair",
      2143344,
      632,
      2
     ],
     [
-     "func_0020B6E8",
+     "svDrawListAppendRecordA",
      2143976,
      804,
      2
     ],
     [
-     "func_0020BA10",
+     "svDrawListAppendRecordAPair",
      2144784,
      860,
      2
     ],
     [
-     "func_0020BD70",
+     "svDrawListAppendPart",
      2145648,
      476,
      2
     ],
     [
-     "func_0020BF50",
+     "svDrawListAppendStatePair",
      2146128,
      492,
      2
@@ -42936,13 +42936,13 @@
      2
     ],
     [
-     "func_0020C298",
+     "svDrawImageItem",
      2146968,
      3204,
      2
     ],
     [
-     "func_0020CF20",
+     "svDrawSortedLines",
      2150176,
      2136,
      2
@@ -42954,7 +42954,7 @@
      2
     ],
     [
-     "func_0020D910",
+     "svCollectSortedLines",
      2152720,
      528,
      2
@@ -42972,7 +42972,7 @@
      2
     ],
     [
-     "func_0020DBD8",
+     "svDrawEntry",
      2153432,
      856,
      2
@@ -42984,13 +42984,13 @@
      2
     ],
     [
-     "func_0020DF68",
+     "sefCullSchedulerEntries",
      2154344,
      648,
      2
     ],
     [
-     "func_0020E1F0",
+     "svDrawEntriesByKind",
      2154992,
      260,
      2
@@ -43122,43 +43122,43 @@
      2
     ],
     [
-     "func_0020EAE0",
+     "vu0AxisAngleToQuaternion",
      2157280,
      64,
      2
     ],
     [
-     "func_0020EB20",
+     "quaternionToAxisAngle",
      2157344,
      280,
      2
     ],
     [
-     "func_0020EC38",
+     "quaternionFromAngleX",
      2157624,
      64,
      2
     ],
     [
-     "func_0020EC78",
+     "quaternionFromAngleY",
      2157688,
      64,
      2
     ],
     [
-     "func_0020ECB8",
+     "quaternionFromAngleZ",
      2157752,
      64,
      2
     ],
     [
-     "func_0020ECF8",
+     "quaternionFromToRotation",
      2157816,
      156,
      2
     ],
     [
-     "func_0020ED98",
+     "quaternionMulAxisAngle",
      2157976,
      108,
      2
@@ -43182,31 +43182,31 @@
      2
     ],
     [
-     "func_0020EEC8",
+     "vu0RotateVectorAboutX",
      2158280,
      112,
      2
     ],
     [
-     "func_0020EF38",
+     "vu0RotateVectorAboutY",
      2158392,
      112,
      2
     ],
     [
-     "func_0020EFA8",
+     "vu0RotateVectorAboutZ",
      2158504,
      112,
      2
     ],
     [
-     "func_0020F018",
+     "vu0QuaternionSlerp",
      2158616,
      292,
      2
     ],
     [
-     "func_0020F140",
+     "vu0VectorSlerp",
      2158912,
      308,
      2
@@ -43218,13 +43218,13 @@
      2
     ],
     [
-     "func_0020F2E8",
+     "rotationMatrixToQuaternion",
      2159336,
      684,
      2
     ],
     [
-     "func_0020F598",
+     "rotationMatrixNormalizedToQuaternion",
      2160024,
      124,
      2
@@ -43254,7 +43254,7 @@
      2
     ],
     [
-     "func_0020F790",
+     "srsParseEffectFileName",
      2160528,
      592,
      2
@@ -43302,13 +43302,13 @@
      2
     ],
     [
-     "func_0020FD50",
+     "srsBattleWinReadComplete",
      2162000,
      188,
      2
     ],
     [
-     "func_0020FE10",
+     "srsClassifyEffectKey",
      2162192,
      164,
      2
@@ -43326,7 +43326,7 @@
      2
     ],
     [
-     "func_00210098",
+     "srsStartEffectLoad",
      2162840,
      408,
      2
@@ -43338,19 +43338,19 @@
      2
     ],
     [
-     "func_00210260",
+     "srsGetEffectLoadStateByName",
      2163296,
      96,
      2
     ],
     [
-     "func_002102C0",
+     "srsBattleWinRecordClear",
      2163392,
      56,
      2
     ],
     [
-     "func_002102F8",
+     "srsReleaseBattleWinEffects",
      2163448,
      332,
      2
@@ -43362,7 +43362,7 @@
      2
     ],
     [
-     "func_00210480",
+     "srsStartResourceLoad",
      2163840,
      264,
      2
@@ -43380,7 +43380,7 @@
      2
     ],
     [
-     "func_002105B8",
+     "srsReleaseEffectRecordsByKey",
      2164152,
      456,
      2
@@ -43392,7 +43392,7 @@
      2
     ],
     [
-     "func_002107B8",
+     "srsReleaseEffectRecordsByResource",
      2164664,
      300,
      2
@@ -43428,25 +43428,25 @@
      2
     ],
     [
-     "func_00210A98",
+     "budgetDisplayDrawRow",
      2165400,
      1572,
      2
     ],
     [
-     "func_002110C0",
+     "budgetDisplayDrawPage",
      2166976,
      2260,
      2
     ],
     [
-     "func_00211998",
+     "budgetTakeAmounts",
      2169240,
      500,
      2
     ],
     [
-     "func_00211B90",
+     "scaledAmountsDecay",
      2169744,
      100,
      2
@@ -43458,49 +43458,49 @@
      2
     ],
     [
-     "func_00211C38",
+     "budgetDisplaySetMode",
      2169912,
      284,
      2
     ],
     [
-     "func_00211D58",
+     "budgetDisplayIsIdle",
      2170200,
      104,
      2
     ],
     [
-     "func_00211DC0",
+     "entryLevelStep",
      2170304,
      304,
      2
     ],
     [
-     "func_00211EF0",
+     "entryLevelStepAll",
      2170608,
      84,
      2
     ],
     [
-     "func_00211F48",
+     "entryMessageStartNext",
      2170696,
      156,
      2
     ],
     [
-     "func_00211FE8",
+     "entryMessageFade",
      2170856,
      276,
      2
     ],
     [
-     "func_00212100",
+     "entryMessageReset",
      2171136,
      112,
      2
     ],
     [
-     "func_00212170",
+     "budgetDisplayUpdate",
      2171248,
      2568,
      2
@@ -43518,19 +43518,19 @@
      2
     ],
     [
-     "func_00212C50",
+     "budgetRecordsTally",
      2174032,
      460,
      2
     ],
     [
-     "func_00212E20",
+     "entryLevelsApplyAll",
      2174496,
      280,
      2
     ],
     [
-     "func_00212F38",
+     "budgetDisplayRun",
      2174776,
      744,
      2
@@ -43542,13 +43542,13 @@
      2
     ],
     [
-     "func_00213268",
+     "xglFontCountLines",
      2175592,
      96,
      2
     ],
     [
-     "func_002132C8",
+     "xglFontGetMultilineWidth",
      2175688,
      388,
      2
@@ -43560,7 +43560,7 @@
      2
     ],
     [
-     "func_00213490",
+     "memPoolInit",
      2176144,
      72,
      2
@@ -43590,7 +43590,7 @@
      2
     ],
     [
-     "func_002135C0",
+     "memPoolRestoreTop",
      2176448,
      76,
      2
@@ -43644,13 +43644,13 @@
      2
     ],
     [
-     "func_00213700",
+     "messageTextGet",
      2176768,
      64,
      2
     ],
     [
-     "func_00213740",
+     "fontFormatPlaceholderNumber",
      2176832,
      316,
      2
@@ -43668,13 +43668,13 @@
      2
     ],
     [
-     "func_002138E8",
+     "padStatusMasksClear",
      2177256,
      76,
      2
     ],
     [
-     "func_00213938",
+     "padStatusSampleGroups",
      2177336,
      96,
      2
@@ -43692,7 +43692,7 @@
      2
     ],
     [
-     "func_002139E8",
+     "padStatusSetBits",
      2177512,
      80,
      2
@@ -43734,13 +43734,13 @@
      2
     ],
     [
-     "func_00213B40",
+     "swapWordsSendCommand",
      2177856,
      100,
      2
     ],
     [
-     "func_00213BA8",
+     "swapWordsRestore",
      2177960,
      44,
      2
@@ -43752,13 +43752,13 @@
      2
     ],
     [
-     "func_00213C18",
+     "completionBlockClear",
      2178072,
      56,
      2
     ],
     [
-     "func_00213C50",
+     "statusBlockFrameUpdate",
      2178128,
      420,
      2
@@ -43776,7 +43776,7 @@
      2
     ],
     [
-     "func_00213E10",
+     "blockStatusAdvance",
      2178576,
      388,
      2
@@ -43806,25 +43806,25 @@
      2
     ],
     [
-     "func_00213FB8",
+     "completionCallbackAdd",
      2179000,
      80,
      2
     ],
     [
-     "func_00214008",
+     "completionCallbacksRun",
      2179080,
      88,
      2
     ],
     [
-     "func_00214060",
+     "fontColorModulateRgb",
      2179168,
      144,
      2
     ],
     [
-     "func_002140F0",
+     "fontColorModulateRgba",
      2179312,
      156,
      2
@@ -43842,7 +43842,7 @@
      2
     ],
     [
-     "func_002141F0",
+     "colorAddSaturated",
      2179568,
      128,
      2
@@ -43872,7 +43872,7 @@
      2
     ],
     [
-     "func_00214448",
+     "xglFontPrintExtendedColorByte",
      2180168,
      200,
      2
@@ -43908,139 +43908,139 @@
      2
     ],
     [
-     "func_002146C0",
+     "fontQueueColorState",
      2180800,
      136,
      2
     ],
     [
-     "func_00214748",
+     "fontQueueColorStateRaw",
      2180936,
      132,
      2
     ],
     [
-     "func_002147D0",
+     "fontQueueDepthTest",
      2181072,
      168,
      2
     ],
     [
-     "func_00214878",
+     "fontQueueAlphaBlend",
      2181240,
      132,
      2
     ],
     [
-     "func_00214900",
+     "fontQueueSpriteReset",
      2181376,
      252,
      2
     ],
     [
-     "func_00214A00",
+     "fontQueueSpriteBlack",
      2181632,
      236,
      2
     ],
     [
-     "func_00214AF0",
+     "fontQueueFrameBuffer",
      2181872,
      116,
      2
     ],
     [
-     "func_00214B68",
+     "fontQueueMovieFrameBuffer",
      2181992,
      96,
      2
     ],
     [
-     "func_00214BC8",
+     "fontQueueScissor",
      2182088,
      228,
      2
     ],
     [
-     "func_00214CB0",
+     "fontQueueFullScissor",
      2182320,
      96,
      2
     ],
     [
-     "func_00214D10",
+     "fontQueueLine",
      2182416,
      184,
      2
     ],
     [
-     "func_00214DC8",
+     "fontQueuePoints",
      2182600,
      176,
      2
     ],
     [
-     "func_00214E78",
+     "fontQueueColoredPoints",
      2182776,
      300,
      2
     ],
     [
-     "func_00214FA8",
+     "fontQueueSprite",
      2183080,
      184,
      2
     ],
     [
-     "func_00215060",
+     "fontQueueRectFourColors",
      2183264,
      496,
      2
     ],
     [
-     "func_00215250",
+     "fontQueueRectTwoColors",
      2183760,
      496,
      2
     ],
     [
-     "func_00215440",
+     "fontQueueFanPoints",
      2184256,
      300,
      2
     ],
     [
-     "func_00215570",
+     "fontQueueOutline",
      2184560,
      576,
      2
     ],
     [
-     "func_002157B0",
+     "fontQueueBevelFrame",
      2185136,
      672,
      2
     ],
     [
-     "func_00215A50",
+     "fontDrawFramedRect",
      2185808,
      364,
      2
     ],
     [
-     "func_00215BC0",
+     "fontQueueBevelFrameReversed",
      2186176,
      672,
      2
     ],
     [
-     "func_00215E60",
+     "xglFontDrawBoxBlend",
      2186848,
      364,
      2
     ],
     [
-     "func_00215FD0",
+     "xglFontDrawFramedRect",
      2187216,
      888,
      2
@@ -44136,37 +44136,37 @@
      2
     ],
     [
-     "func_00216478",
+     "xglFontQueueButtonGlyph",
      2188408,
      80,
      2
     ],
     [
-     "func_002164C8",
+     "xglFontExpandButtonEscapes",
      2188488,
      284,
      2
     ],
     [
-     "func_002165E8",
+     "xglFontCopyWithLineBreaks",
      2188776,
      268,
      2
     ],
     [
-     "func_002166F8",
+     "xglFontCopyWithSpaceBreaks",
      2189048,
      268,
      2
     ],
     [
-     "func_00216808",
+     "xglFontPrintTitledText",
      2189320,
      408,
      2
     ],
     [
-     "func_002169A0",
+     "shardFieldInit",
      2189728,
      560,
      2
@@ -44184,19 +44184,19 @@
      2
     ],
     [
-     "func_00216C08",
+     "xglDirectQueueAppendTexQuad",
      2190344,
      812,
      2
     ],
     [
-     "func_00216F38",
+     "shardFieldDrawPatch",
      2191160,
      980,
      2
     ],
     [
-     "func_00217310",
+     "shardFieldDrawShard",
      2192144,
      560,
      2
@@ -44208,7 +44208,7 @@
      2
     ],
     [
-     "func_00217570",
+     "shardFieldUpdate",
      2192752,
      2016,
      2
@@ -44226,7 +44226,7 @@
      2
     ],
     [
-     "func_00217E28",
+     "xglCdPreloadPoll",
      2194984,
      76,
      2
@@ -44238,13 +44238,13 @@
      2
     ],
     [
-     "func_00217ED8",
+     "loadingCardDraw",
      2195160,
      464,
      2
     ],
     [
-     "func_002180A8",
+     "loadingScreenDraw",
      2195624,
      944,
      2
@@ -44274,13 +44274,13 @@
      2
     ],
     [
-     "func_002184E0",
+     "optionalBlocksDraw",
      2196704,
      176,
      2
     ],
     [
-     "func_00218590",
+     "cameraSlotPosition",
      2196880,
      176,
      2
@@ -44292,7 +44292,7 @@
      2
     ],
     [
-     "func_00218660",
+     "cameraActorAttach",
      2197088,
      316,
      2
@@ -44322,43 +44322,43 @@
      2
     ],
     [
-     "func_00218898",
+     "fontObjectCellsDraw",
      2197656,
      472,
      2
     ],
     [
-     "func_00218A70",
+     "xglFontGlyphQuadDraw",
      2198128,
      984,
      2
     ],
     [
-     "func_00218E48",
+     "xglFontLineSegmentDraw",
      2199112,
      1368,
      2
     ],
     [
-     "func_002193A0",
+     "xglFontGridSegmentDraw",
      2200480,
      472,
      2
     ],
     [
-     "func_00219578",
+     "xglFontGridCellsDraw",
      2200952,
      1032,
      2
     ],
     [
-     "func_00219980",
+     "xglFontSpringStep",
      2201984,
      316,
      2
     ],
     [
-     "func_00219AC0",
+     "xglFontDrawRecordAnchorUpdate",
      2202304,
      244,
      2
@@ -50412,25 +50412,25 @@
      2
     ],
     [
-     "func_00260988",
+     "xglSegmentSelectAxis",
      2492808,
      100,
      2
     ],
     [
-     "func_002609F0",
+     "xglSegmentSphereHit",
      2492912,
      936,
      2
     ],
     [
-     "func_00260D98",
+     "xglPointListFindDistance",
      2493848,
      320,
      2
     ],
     [
-     "func_00260ED8",
+     "xglPointListFindAxisExtreme",
      2494168,
      148,
      2
@@ -54396,43 +54396,43 @@
      2
     ],
     [
-     "func_00281D08",
+     "slotInstancePresetsReset",
      2628872,
      128,
      2
     ],
     [
-     "func_00281D88",
+     "slotStreamEmitInitial",
      2629000,
      672,
      2
     ],
     [
-     "func_00282028",
+     "slotPresetApplySetup",
      2629672,
      1580,
      2
     ],
     [
-     "func_00282658",
+     "slotSetupRecordSize",
      2631256,
      80,
      2
     ],
     [
-     "func_002826A8",
+     "slotPlaybackApplyRecord",
      2631336,
      324,
      2
     ],
     [
-     "func_002827F0",
+     "slotPlaybackApplyIndexedByte",
      2631664,
      116,
      2
     ],
     [
-     "func_00282868",
+     "slotDrawStateFromSpec",
      2631784,
      436,
      2

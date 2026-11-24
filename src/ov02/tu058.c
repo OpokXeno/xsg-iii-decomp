@@ -93,7 +93,7 @@ u8 *ov02FindEntryOrDefaultG(s32 id) {
 }
 
 extern s32 gEmptyMessageRecord;
-s32 *func_00213700();
+s32 *messageTextGet();
 
 /* Message id 0 selects the shared empty message record; any other id goes to the message table. */
 s32 *messageGetOrEmpty(s32 messageId) {
@@ -102,7 +102,7 @@ s32 *messageGetOrEmpty(s32 messageId) {
     if (messageId == 0) {
         return &gEmptyMessageRecord;
     }
-    return messageRecord = func_00213700();
+    return messageRecord = messageTextGet();
 }
 
 s32 func_002E9DD0(s32, s32, s32);

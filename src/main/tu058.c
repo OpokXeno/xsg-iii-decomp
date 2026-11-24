@@ -61,7 +61,7 @@ void lookupListsAddMatch(EffectLookupLists *effectLists, s32 id)
   }
 }
 
-s32 func_0020F790(void *dest);
+s32 srsParseEffectFileName(void *dest);
 
 void effectListsAddEffectIndex(EffectLookupLists *effectLists, s32 id)
 {
@@ -73,7 +73,7 @@ void effectListsAddEffectIndex(EffectLookupLists *effectLists, s32 id)
   func_0030E250(id, gEffectRecordTable, gEffectScratchBase, gEffectScratchBase + EFFECT_RECORD_BUFFER_OFFSET);
   if (effectLists->effectIndexCount < 0x20)
   {
-    effectIndex = func_0020F790(gEffectScratchBase + EFFECT_RECORD_BUFFER_OFFSET);
+    effectIndex = srsParseEffectFileName(gEffectScratchBase + EFFECT_RECORD_BUFFER_OFFSET);
     appendIndex = *(effectIndexCountSlot = &effectLists->effectIndexCount);
     nextEffectIndexCount = appendIndex + 1;
     effectLists->effectIndexes[appendIndex] = effectIndex;

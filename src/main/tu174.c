@@ -6,11 +6,11 @@ typedef signed char s8;
 typedef short s16;
 typedef int s32;
 typedef unsigned char u8;
-extern s8 D_0055143C;
-extern s8 D_0055143D;
-extern s8 D_0055143E;
-extern s16 D_00551440;
-extern s16 D_00551442;
+extern s8 gPendingGlyphActive;
+extern s8 gPendingGlyphKind;
+extern s8 gPendingGlyphFade;
+extern s16 gPendingGlyphX;
+extern s16 gPendingGlyphY;
 extern s32 gSheetIndex;
 extern s16 gSheetDrawLimit;
 extern s8 D_0055144A;
@@ -27,16 +27,16 @@ void sheetStateReset(void) {
     gSheetPanOffset = 0;
     gSheetWidth = 0;
     gSheetNeedsScroll = 0;
-    D_00551440 = 0;
-    D_00551442 = 0;
-    D_0055143D = 0;
-    D_0055143E = 0;
-    D_0055143C = 0;
+    gPendingGlyphX = 0;
+    gPendingGlyphY = 0;
+    gPendingGlyphKind = 0;
+    gPendingGlyphFade = 0;
+    gPendingGlyphActive = 0;
 }
 
-s32 func_00213268(s32);
-s32 func_002132C8(s32);
-s32 func_002164C8();
+s32 xglFontCountLines(s32);
+s32 xglFontGetMultilineWidth(s32);
+s32 xglFontExpandButtonEscapes();
 
 void sheetSetIndex(s32 newSheetIndex) {
     if (gSheetIndex != newSheetIndex) {
@@ -45,11 +45,11 @@ void sheetSetIndex(s32 newSheetIndex) {
             gSheetDrawLimit = 0x320;
         }
         if (newSheetIndex != 0) {
-            func_002164C8();
-            gSheetTargetOffset = func_00213268(newSheetIndex) * 0x14;
-            gSheetWidth = func_002132C8(newSheetIndex);
+            xglFontExpandButtonEscapes();
+            gSheetTargetOffset = xglFontCountLines(newSheetIndex) * 0x14;
+            gSheetWidth = xglFontGetMultilineWidth(newSheetIndex);
         } else {
-            D_0055143C = 0;
+            gPendingGlyphActive = 0;
             gSheetWidth = 0;
             gSheetTargetOffset = -0x18;
         }

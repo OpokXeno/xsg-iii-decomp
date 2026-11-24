@@ -595,13 +595,13 @@ INCLUDE_ASM("asm/main/nonmatchings/res_get_path", func_00234118);
 
 struct McScreen * memPoolAlloc();
 s32 bufferPointersRewind();
-s32 func_00213C18();
+s32 completionBlockClear();
 s32 pagedTablePoolInit();
 
 s32 saveScreenCreate(void) {
     struct McScreen *screen;
 
-    func_00213C18();
+    completionBlockClear();
     pagedTablePoolInit();
     screen = memPoolAlloc(0x5BB40);
     gSaveScreen = screen;
@@ -703,7 +703,7 @@ void func_00221B40(void *obj, int value);
 void mcStateSetupRequest(int a, int b);
 void seVoiceStartDefault(unsigned int handle);
 void saveScreenHandleError(struct McScreen *screen, unsigned short cardResult);
-int func_00213700(int id);
+int messageTextGet(int id);
 int func_002306C0(int a, int b, int c);
 void saveScreenSetMessage(int sheetIndex);
 void func_00230818(int a, int b, void *c, void *d);
@@ -716,7 +716,7 @@ void saveSlotListUpdate(int listLoadRequested)
 
     if (listLoadRequested != 0) {
         gSaveScreen->uiState = 0;
-        saveScreenSetMessage(func_002306C0(func_00213700(0x291), gSaveScreen->port + 1, 0));
+        saveScreenSetMessage(func_002306C0(messageTextGet(0x291), gSaveScreen->port + 1, 0));
         mcStateSetupRequest(0, 0);
         gSaveScreen->cardBusy = 1;
         func_00221A88(&gSaveScreen->fileList, 198, 8);
@@ -743,7 +743,7 @@ void saveSlotListUpdate(int listLoadRequested)
             saveScreenHandleError(screen, cardResult);
             gSaveScreen->flagC = 0;
             xglMcReset();
-            func_00230818(func_002306C0(func_00213700(0x28C), gSaveScreen->port + 1, 0), 1,
+            func_00230818(func_002306C0(messageTextGet(0x28C), gSaveScreen->port + 1, 0), 1,
                           func_00235220, func_00235480);
         }
         break;
@@ -755,13 +755,13 @@ void saveSlotListUpdate(int listLoadRequested)
                 seVoiceStartDefault(9);
                 attackHitsShowAndWait(func_002357F8, func_002358D0);
             } else {
-                func_00230818(func_00213700(0x33C), 1, func_00235220, func_00235480);
+                func_00230818(messageTextGet(0x33C), 1, func_00235220, func_00235480);
             }
         }
         break;
     case 2:
         gSaveScreen->cardBusy = 0;
-        func_00230818(func_002306C0(func_00213700(0x28C), gSaveScreen->port + 1, 0), 1,
+        func_00230818(func_002306C0(messageTextGet(0x28C), gSaveScreen->port + 1, 0), 1,
                       func_00235220, func_00235480);
         break;
     }

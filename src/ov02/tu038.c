@@ -17,9 +17,9 @@ s32 cdChannelPollFlag(s32 unused, s32 *channelBusyFlag) {
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu038", func_00A8DE58);
 
-s32 func_002107B8(s32 address, s32 enable);
+s32 srsReleaseEffectRecordsByResource(s32 address, s32 enable);
 
 s32 overlayBlockEnable(void) {
-    func_002107B8(0xA7C000, 1);
+    srsReleaseEffectRecordsByResource(0xA7C000, 1);
     return 1;
 }

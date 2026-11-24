@@ -22,7 +22,7 @@ void testOverlayEntryCall(int menuIndex)
 typedef int s32;
 extern char gHeapOverviewTitle[];
 void func_001997D0(void *);
-const char *func_00213700(int id);
+const char *messageTextGet(int id);
 void sceVif1PkAddDataN(s32, void *, s32);
 void sceVif1PkCnt(s32, unsigned int);
 void xglFontPrint(int x, int y, unsigned int color, const char *text);
@@ -59,15 +59,15 @@ void heapOverviewMenuDraw(HeapOverviewRecord *overview) {
     sceVif1PkCnt(packet, 0);
     sceVif1PkAddDataN(packet, packetData, (packetData->quadwordCount * 4) + 4);
     xglFontPrint(0, 0, -1, gHeapOverviewTitle);
-    message140 = func_00213700(0x140);
+    message140 = messageTextGet(0x140);
     xglFontPrint(0x56, 0x13D, -1, message140);
-    message1E = func_00213700(0x1E);
+    message1E = messageTextGet(0x1E);
     xglFontPrint(0x56, 0x159, -1, message1E);
-    message142 = func_00213700(0x142);
+    message142 = messageTextGet(0x142);
     xglFontPrint(0x56, 0x172, -1, message142);
-    message143 = func_00213700(0x143);
+    message143 = messageTextGet(0x143);
     xglFontPrint(0x56, 0x18B, -1, message143);
-    message144 = func_00213700(0x144);
+    message144 = messageTextGet(0x144);
     xglFontPrint(0x28, 0x60, -1, message144);
 }
 
