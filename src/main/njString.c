@@ -83,7 +83,7 @@ INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D6B28);
 INCLUDE_ASM("asm/main/nonmatchings/njString", func_002D6BA0);
 
 /* FONT_OP_SCALE 16 16; njStringTextTooWide replaces the scale. */
-extern NjStringScaleCode gNjStringMeasureScale;
+extern NjStringScaleCode gNjStringMeasureScale[];
 char *func_0030E3D0(char *destination, const char *source);
 void *memset(void *destination, int value, unsigned int count);
 char *strcpy(char *destination, const char *source);
@@ -97,7 +97,7 @@ s32 njStringTextTooWide(const char *text, s32 maxWidth, s32 scale)
   NjStringScaleCode scaleCode;
   if (text != 0)
   {
-    scaleCode = gNjStringMeasureScale;
+    scaleCode = gNjStringMeasureScale[0];
     scaleCode.bytes[1] = scale;
     scaleCode.bytes[2] = scale;
     memset(&measured[0], 0, 0x400);
@@ -135,10 +135,10 @@ typedef struct NjStringWidthCode {
     char bytes[5];
 } NjStringWidthCode;
 
-extern NjStringProportionalStyle gNjStringProportionalStyle;
-extern NjStringFixedStyle gNjStringFixedStyle;
-extern NjStringLineStartX gNjStringLineStartX;
-extern NjStringScaleCode gNjStringDefaultScale;            /* FONT_OP_SCALE 15 15 */
+extern NjStringProportionalStyle gNjStringProportionalStyle[];
+extern NjStringFixedStyle gNjStringFixedStyle[];
+extern NjStringLineStartX gNjStringLineStartX[];
+extern NjStringScaleCode gNjStringDefaultScale[];            /* FONT_OP_SCALE 15 15 */
 extern NjStringWidthCode gNjStringWidthCode;            /* width NJ_TEXT_WIDTH */
 extern char gNjStringHighlightRgb[];                       /* "f24040": highlight color, RRGGBB hex */
 
@@ -261,10 +261,10 @@ s32 njStringLayoutLine(NjString *string, char *markupLine, char *display)
     char colorSpanTag[NJ_COLOR_COMMAND_LENGTH];
     char defaultZoomDigits[4];
     char zoomSpanDigits[4];
-    NjStringProportionalStyle proportionalStyle = gNjStringProportionalStyle;
-    NjStringFixedStyle fixedStyle = gNjStringFixedStyle;
-    NjStringLineStartX lineStartX = gNjStringLineStartX;
-    NjStringScaleCode defaultScale = gNjStringDefaultScale;
+    NjStringProportionalStyle proportionalStyle = gNjStringProportionalStyle[0];
+    NjStringFixedStyle fixedStyle = gNjStringFixedStyle[0];
+    NjStringLineStartX lineStartX = gNjStringLineStartX[0];
+    NjStringScaleCode defaultScale = gNjStringDefaultScale[0];
     char textUnit[16];
     char penXDigits[3];
     int unitLength;
@@ -667,10 +667,10 @@ void njStringLayoutText(NjString *string, char *display)
     char colorSpanTag[NJ_COLOR_COMMAND_LENGTH];
     char defaultZoomDigits[4];
     char zoomSpanDigits[4];
-    NjStringProportionalStyle proportionalStyle = gNjStringProportionalStyle;
-    NjStringFixedStyle fixedStyle = gNjStringFixedStyle;
-    NjStringLineStartX lineStartX = gNjStringLineStartX;
-    NjStringScaleCode defaultScale = gNjStringDefaultScale;
+    NjStringProportionalStyle proportionalStyle = gNjStringProportionalStyle[0];
+    NjStringFixedStyle fixedStyle = gNjStringFixedStyle[0];
+    NjStringLineStartX lineStartX = gNjStringLineStartX[0];
+    NjStringScaleCode defaultScale = gNjStringDefaultScale[0];
     char textUnit[16];
     int unitLength;
     unsigned char *text;

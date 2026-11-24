@@ -731,7 +731,7 @@ void heapWindowRefresh(int window)
 
 extern char *heapWindowTitles[HEAP_MAX];
 extern struct HeapWindowRowTemplate heapWindowRowTemplate;
-extern char heapWindowEmptyModuleName[8];
+extern char heapWindowEmptyModuleName[4];
 extern const char heapWindowIdAssertText[];
 
 void assertFailed(const char *pText, const char *pSourceFile, int line);

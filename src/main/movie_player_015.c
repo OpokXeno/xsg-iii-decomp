@@ -1,20 +1,33 @@
 #include "common.h"
 #include "shared.h"
 #include "gs.h"
+
 /* DMA chain tags (EE DMAC packet words) and the GIF tag bits of the image block. */
 #define DMA_TAG_ID_RET 0x60000000U
+
 #define DMA_TAG_ID_CNT 0x10000000U
+
 #define DMA_TAG_ID_REF 0x30000000U
+
 #define DMA_TAG_VIF_DIRECT(count) ((0x51000000ULL | (count)) << 32)
+
 #define GIF_TAG_NREG_1 0x1000000000000000ULL
+
 #define GIF_TAG_FLG_IMAGE 0x0800000000000000ULL
+
 #define MOVIE_MACROBLOCK 16
+
 #define MOVIE_MACROBLOCK_BYTES 0x400
+
 #define MOVIE_MACROBLOCK_QWORDS 0x40
+
 #define MOVIE_GIF_TAG_AD_2 (GIF_TAG_NREG_1 | GIF_TAG_EOP | 2)
+
 #define MOVIE_GIF_TAG_IMAGE_BLOCK (GIF_TAG_FLG_IMAGE | GIF_TAG_EOP | MOVIE_MACROBLOCK_QWORDS)
+
 /* BITBLTBUF destination: 896 pixels wide, placeholder until moviePlayerUpdate sets it. */
 #define MOVIE_BITBLTBUF_DBW_896 (0xe000ULL << 36)
+
 #define MOVIE_TRXREG_MACROBLOCK GS_SET_TRXREG(MOVIE_MACROBLOCK, MOVIE_MACROBLOCK)
 
 /* A DMA REF tag: the tag word, the source address, then the VIF direct word. */
@@ -107,11 +120,17 @@ typedef struct CdFilePositionRecord {
 } CdFilePositionRecord;
 
 extern const char *gMoviePathPrefix;
+
 extern const char gMovieKeyFormat[];
+
 int seVolumeCurve(unsigned int volume);
+
 void func_001344A0(int playerHandle, int value);
+
 void func_001329D0(int playerHandle, const char *name);
+
 int xglCdCheckFile(const char *path, void *record);
+
 int GameMpeg2Play(char *destination, const char *format, unsigned int lbn, unsigned int sectors);
 
 /* Starts the movie file `name` on the player record: sets the volume (unless the record has the
@@ -162,8 +181,11 @@ int moviePlayerStartFile(MoviePlayerRecord *player, const char *name)
 INCLUDE_ASM("asm/main/nonmatchings/movie_player_015", func_0018BB08);
 
 extern unsigned char gMovieFrameWidth[];
+
 void func_00132E10(int playerHandle, int value);
+
 void func_002F49F8(int packet, int dma_address, int flags);
+
 int xglPacketGetCurrent(void);
 
 /* Forwards `value` to func_00132E10 for the player's handle. When `value` is 0 and the player
@@ -184,4 +206,174 @@ int moviePlayerUpdate(MoviePlayerRecord *player, int value)
         func_002F49F8(packet, dma_address, 0);
     }
     return 0;
+}
+
+void moviePlayerInit(void);
+
+void *memset(void *dest, int value, unsigned int size);
+
+typedef struct MoviePlayerInitParams {
+    float frameRate;
+    int flag_a;
+    int flag_b;
+    int flag_c;
+    unsigned char unmodeled_10[0x10];
+} MoviePlayerInitParams;
+
+int mwPlyInitSfdFx(MoviePlayerInitParams *sfdInitParams);
+
+extern float movieFrameRate;
+
+typedef int s32;
+
+s32 func_00130158(s32 value);
+
+s32 func_00132D90(s32 value);
+
+s32 moviePlayerReleaseHandle(s32 *playerHandle) {
+    func_00132D90(*playerHandle);
+    func_00130158(*playerHandle);
+    return 0;
+}
+
+typedef struct MoviePlayerParams {
+    int file_type;
+    int max_bit_rate;
+    int max_width;
+    int max_height;
+    int frame_pool_count;
+    int stream_count;
+    int movieWorkAreaBase;
+    int movieWorkAreaSize;
+    int composition_mode;
+    unsigned char unmodeled_24[0xC];
+} MoviePlayerParams;
+
+#define MOVIE_FILE_TYPE 1
+
+#define MOVIE_MAX_BIT_RATE 7000000
+
+#define MOVIE_FRAME_POOL_COUNT 3
+
+#define MOVIE_STREAM_COUNT 1
+
+#define MOVIE_COMPOSITION_MODE 17
+
+int func_0012EC60(MoviePlayerParams *creationParams);
+
+/* Two halfwords in the .sdata of this TU (no symbol name): the movie width and height. */
+extern unsigned short moviePlayerWidth;
+
+extern unsigned short moviePlayerHeight;
+
+void func_002FB030(void);
+
+void func_002F47D8(int value);
+
+void func_00132140(void);
+
+void func_00167790(void);
+
+void func_0015DF18(void);
+
+void moviePlayerParamsInit(MoviePlayerParams *creationParams)
+{
+    unsigned short width;
+    unsigned short height;
+    memset(creationParams, 0, sizeof(*creationParams));
+    width = moviePlayerWidth;
+    height = moviePlayerHeight;
+    creationParams->file_type = MOVIE_FILE_TYPE;
+    creationParams->composition_mode = MOVIE_COMPOSITION_MODE;
+    creationParams->max_bit_rate = MOVIE_MAX_BIT_RATE;
+    creationParams->max_width = width;
+    creationParams->max_height = height;
+    creationParams->frame_pool_count = MOVIE_FRAME_POOL_COUNT;
+    creationParams->stream_count = MOVIE_STREAM_COUNT;
+    creationParams->movieWorkAreaSize = func_0012EC60(creationParams);
+}
+
+void moviePlayerSetDimensions(u16 width, u16 height) {
+    moviePlayerWidth = width;
+    moviePlayerHeight = height;
+}
+
+/* Layout of the movie player object that moviePlayerSetupObject fills in (0x17 bytes used). */
+typedef struct MoviePlayerObject {
+    s32 playerHandle;                     /* +0x00, returned by func_0012FBB8 */
+    s32 chainBase;                  /* +0x04 */
+    unsigned char unk_08[0x4];
+    s16 unk_0C;                     /* +0x0C, cleared */
+    s16 unk_0E;                     /* +0x0E, cleared */
+    s16 maxWidth;                   /* +0x10, from MoviePlayerParams.max_width */
+    s16 maxHeight;                  /* +0x12, from MoviePlayerParams.max_height */
+    unsigned char unk_14;           /* +0x14, cleared */
+    unsigned char unk_15;           /* +0x15, cleared */
+    unsigned char unk_16;           /* +0x16, set to 0x7F */
+} MoviePlayerObject;
+
+/* The bytes moviePlayerSetupObject uses: the work area and the GS transfer chain, each rounded up to 64. */
+s32 func_0018BD50(void)
+{
+    MoviePlayerObject player;
+    MoviePlayerParams creationParams;
+    s32 workAreaBytes;
+    s32 alignMask;
+
+    alignMask = ~0x3F;
+    moviePlayerParamsInit(&creationParams);
+    player.maxWidth = creationParams.max_width;
+    player.maxHeight = creationParams.max_height;
+    workAreaBytes = (creationParams.movieWorkAreaSize + 0x3F) & alignMask;
+    return workAreaBytes + (((makeGstransChain(0, 0, (const MovieFrame *) &player) * 0x10) + 0x3F) & alignMask);
+}
+
+s32 func_0012FBB8();
+
+s32 moviePlayerSetupObject(MoviePlayerObject *player, s32 movieWorkAreaBase)
+{
+  MoviePlayerParams creationParams;
+  s32 chainBase;
+  s32 movieWorkAreaSize;
+
+  player->unk_16 = 0x7F;
+  player->unk_0E = 0;
+  player->unk_0C = 0;
+  player->unk_14 = 0;
+  player->unk_15 = 0;
+  moviePlayerParamsInit(&creationParams);
+  movieWorkAreaSize = creationParams.movieWorkAreaSize;
+  creationParams.movieWorkAreaBase = movieWorkAreaBase;
+  chainBase = movieWorkAreaBase + ((movieWorkAreaSize + 0x3F) & (~0x3F));
+  player->playerHandle = func_0012FBB8(&creationParams);
+  player->maxWidth = creationParams.max_width;
+  player->maxHeight = creationParams.max_height;
+  player->chainBase = chainBase;
+  return chainBase + (((makeGstransChain(chainBase, 0, (const MovieFrame *) player) * 0x10) + 0x3F) & (~0x3F));
+}
+
+void moviePlayerSetSize(void)
+{
+    func_002FB030();
+    moviePlayerWidth = 512;
+    moviePlayerHeight = 448;
+}
+
+void moviePlayerInit(void)
+{
+    MoviePlayerInitParams sfdInitParams;
+
+    memset(&sfdInitParams, 0, sizeof(sfdInitParams));
+    sfdInitParams.flag_c = 0;
+    sfdInitParams.frameRate = movieFrameRate;
+    sfdInitParams.flag_b = (sfdInitParams.flag_a = 1);
+    mwPlyInitSfdFx(&sfdInitParams);
+}
+
+void moviePlayerTerminate(void)
+{
+    func_002F47D8(0);
+    func_00132140();
+    func_00167790();
+    func_0015DF18();
 }

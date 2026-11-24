@@ -1,9 +1,42 @@
 #include "common.h"
+#include "shared.h"
+#include "main/sdv.h"
 #include "main/xgl_2.h"
 #include "main/xgl_render.h"
 #include "quadword.h"
+#include "vu0_macro.h"
+#include "main/tu007.h"
+
+void sdvInitSpecialWork(void);
+
+void *memset(void *destination, int value, unsigned int count);
 
 typedef int s32;
+
+extern s32 D_005511EC;
+
+void sdvStoreValue(s32 storedValue) {
+    D_005511EC = storedValue;
+}
+
+void sdvInitSpecialWork(void)
+{
+    memset(&sdvSpecialBuf, 0, sizeof(sdvSpecialBuf));
+}
+
+/* Sets the camera pad override: the buttons and the four stick axes the camera pad updates read
+ * instead of the pads; active is stored last. */
+void func_00193850(int held, int pressed, int repeated, int rightX, int rightY, int leftX, int leftY)
+{
+    sdvSpecialBuf.held = held;
+    sdvSpecialBuf.pressed = pressed;
+    sdvSpecialBuf.repeated = repeated;
+    sdvSpecialBuf.rightX = rightX;
+    sdvSpecialBuf.rightY = rightY;
+    sdvSpecialBuf.leftX = leftX;
+    sdvSpecialBuf.leftY = leftY;
+    sdvSpecialBuf.active = 1;
+}
 
 typedef float f32;
 
@@ -14,9 +47,10 @@ void xglCameraResetState(XglCamera *camera)
   camera->active = 0;
 }
 
-
 extern Vector4 gCameraDefaultClipRange;
+
 extern Vector4 gCameraDefaultPortEffect;
+
 /* The render state; the camera screen takes its frame size. */
 extern XglRenderStateBlock D_004C8390;
 
@@ -40,12 +74,19 @@ void xglCameraScreenInit(XglCamera *camera)
 }
 
 extern Vector4 gCameraDefaultRotation;
+
 extern Vector4 gCameraDefaultAngleVelocity;
+
 extern Vector4 gCameraDefaultAngleDelta;
+
 extern Vector4 gCameraDefaultPosition;
+
 extern Vector4 gCameraDefaultPlaceVelocity;
+
 extern Vector4 gCameraDefaultPlaceDelta;
+
 extern Vector4 gCameraDefaultChaseReference;
+
 extern Vector4 gCameraDefaultChasePosition;
 
 /* Fills the CameraTravel block at camera+0x90 with the default travel view. */
@@ -70,6 +111,7 @@ void xglCameraTravelDefaultInit(XglCamera *camera) {
 }
 
 extern Vector4 gCameraResetAngleDelta;
+
 extern Vector4 gCameraResetPlaceDelta;
 
 /* Clears the travel scale and resets the angle and place deltas. */
@@ -84,18 +126,22 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193A78);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193BD0);
 
-#include "vu0_macro.h"
-#include "main/tu007.h"
-#include "main/sdv.h"
-
 extern PadRecord PadData[2];
+
 void func_00193A40(XglCamera *camera);
+
 void func_00193A78(XglCamera *camera);
+
 void func_00193BD0(XglCamera *camera);
+
 void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
+
 void xglVectorScaleAddXYZ(Vector4 *destination, const Vector4 *source, float scale, const Vector4 *addend);
+
 void xglMatrixStackUnit(void);
+
 void xglMatrixStackRotY(float angle);
+
 void xglMatrixStackSave(Matrix4 matrix);
 
 /* Pad update, free (manual) travel mode (camera state 2). */
@@ -198,23 +244,34 @@ void xglCameraPadUpdateFree(XglCamera *camera) {
 }
 
 float xglSin(float angle);
+
 float xglCos(float angle);
+
 float xglPointLengthXZ(const Vector4 *first, const Vector4 *second);
+
 void xglVectorLength(float *destination, const Vector4 *source);
+
 void xglVectorNormal(Vector4 *destination, const Vector4 *source);
+
 extern float atan2f(float y, float x);
 
 /* Pad button bits of PadRecord.held and pressed that the chase camera reads. */
 #define CAMERA_BTN_DOWN 0x0001
+
 #define CAMERA_BTN_UP 0x0004
+
 #define CAMERA_BTN_ORBIT 0x0040
+
 #define CAMERA_BTN_MOVE_FOCUS 0x0080
+
 #define CAMERA_BTN_LOCK 0x0800
 
 extern float gCameraHalfPi;
 
 #define STICK_SCALE 0.0002f /* stick units past the dead zone to camera units */
+
 #define PAN_STEP 0.032f     /* height step per frame, as a fraction of the distance to the focus */
+
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
 /* Pad update, chase travel mode (camera state 3). */
@@ -357,22 +414,30 @@ void xglCameraSetPadPort(XglCamera *camera, s32 port) {
     }
 }
 
-void sdvInitSpecialWork(void);
-
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001947F0);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001948E0);
 
 float tanf(float angle);
+
 void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
+
 void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
+
 void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b, const Vector4 *c);
+
 void xglMatrixStackMul(Matrix4 matrix);
+
 void xglMatrixStackInverse(void);
+
 void xglMatrixStackTrans(const Vector4 *vector);
+
 void xglMatrixStackRotX(float angle);
+
 void xglMatrixStackRotZ(float angle);
+
 void xglMatrixStackFrustum(float left, float right, float bottom, float top, float nearPlane, float farPlane);
+
 extern signed char aaiVertexIndex[6][3];
 
 /* Builds the frustum corners and the view/inverse transforms from the screen and travel state, then saves them into
@@ -470,12 +535,16 @@ void xglCameraViewVolume(XglCamera *camera, Vector4 *offset) {
 }
 
 void xglCameraResetState(XglCamera *camera);
+
 /* Fills the CameraTravel block at camera+0x90 with the default travel view. */
 void xglCameraTravelDefaultInit(XglCamera *camera);
+
 void xglCameraScreenInit(XglCamera *camera);
 
 void func_001948E0();
+
 void xglCameraViewTravel(XglCamera *camera, Vector4 *cameraShift);
+
 void xglCameraViewVolume(XglCamera *camera, Vector4 *cameraShift);
 
 void xglCameraInit(XglCamera *camera) {
@@ -551,6 +620,7 @@ void xglCameraSetWindow(XglCamera *camera, int left, int top, int right, int bot
 }
 
 extern f32 gCameraDefaultNearClip;
+
 extern f32 gCameraDefaultFarClip;
 
 void xglCameraResetClipRange(XglCamera *camera) {

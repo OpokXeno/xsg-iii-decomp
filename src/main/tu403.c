@@ -3,11 +3,11 @@
 INCLUDE_ASM("asm/main/nonmatchings/tu403", func_002E63B0);
 
 typedef int s32;
-extern s32 gPendingCounterValue;
+extern s32 gPendingCounterValue[];
 s32 counterSet(void);
 
 void pendingValueCommit(s32 pendingCounterValue) {
-    gPendingCounterValue = pendingCounterValue;
+    gPendingCounterValue[0] = pendingCounterValue;
     counterSet();
 }
 

@@ -15,11 +15,11 @@ void xglFontDebugPrintfCell(s32 column, s32 row, const char *format, ...) {
     xglFontDebugPrintf(column * 4, row * 0xA, formattedText);
 }
 
-extern s32 gXglFontDebugPrefixDefault;
+extern s32 gXglFontDebugPrefixDefault[];
 void xglFontDebugPrefixSet(s32 *);
 
 void xglFontDebugPrefixReset(void) {
-    xglFontDebugPrefixSet(&gXglFontDebugPrefixDefault);
+    xglFontDebugPrefixSet(gXglFontDebugPrefixDefault);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu355", func_002AB418);

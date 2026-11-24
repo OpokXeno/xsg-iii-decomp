@@ -32,22 +32,22 @@ typedef signed char s8;
 typedef int s32;
 typedef unsigned char u8;
 typedef unsigned int u32;
-extern s32 gSrsEffectFileSuffixKindThree;
-extern s32 gSrsEffectFileSuffixKindBelowThree;
-extern s8 gSrsEffectNameBuffer;
+extern s32 gSrsEffectFileSuffixKindThree[];
+extern s32 gSrsEffectFileSuffixKindBelowThree[];
+extern s8 gSrsEffectNameBuffer[];
 s32 func_0030E3D0(s8 *stemBuffer, s32 *format);
 
 s8 *srsEffectNameGet(s32 effectNo) {
     if (!(effectNo > 0)) {
         return 0;
     }
-    srsFormatEffectStem(effectNo, &gSrsEffectNameBuffer, 1);
+    srsFormatEffectStem(effectNo, gSrsEffectNameBuffer, 1);
     if (((effectNo >> 0x1C) & 3) == 3) {
-        func_0030E3D0(&gSrsEffectNameBuffer, &gSrsEffectFileSuffixKindThree);
+        func_0030E3D0(gSrsEffectNameBuffer, gSrsEffectFileSuffixKindThree);
     } else {
-        func_0030E3D0(&gSrsEffectNameBuffer, &gSrsEffectFileSuffixKindBelowThree);
+        func_0030E3D0(gSrsEffectNameBuffer, gSrsEffectFileSuffixKindBelowThree);
     }
-    return &gSrsEffectNameBuffer;
+    return gSrsEffectNameBuffer;
 }
 
 extern const s8 gSrsAssetFormatCeRepeatTag[];

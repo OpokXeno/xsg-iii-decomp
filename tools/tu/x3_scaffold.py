@@ -23,8 +23,8 @@ X3 has no symbol table, so three things are estimates, and the output says so:
   its own `rodata` subsegment, cut as main's data pieces.
 
 The compile contract of a TU comes from reports/x3-compiler-calibration.md: `-O2` (X3 has no
-unoptimized zone; a map TU that carries `optimization` would get it), and `-G8` when the code has
-a gp-relative reference, otherwise `-G0`, which cannot add one.
+unoptimized zone; a map TU that carries `optimization` would get it), and `-G4`
+(reports/x3-g4-threshold.md); the overlays are `-G0`.
 """
 import argparse
 import hashlib
@@ -173,19 +173,11 @@ def asm_contract():
                 language="asm", source_class="hand-asm")
 
 
-# TUs with no gp-relative instruction that are -G8 all the same, keyed by text start: their code loads the
-# address of string literals of 8 bytes or less that sit in .sdata. GCC 2.96 puts such a literal in .sdata only
-# under -G8 (mips_select_section) and still addresses it with lui/addiu, because only variables get the
-# gp-relative flag (ENCODE_SECTION_INFO); a -G0 file emits nothing into .sdata (data pass, 2026-11-16).
-SMALL_DATA_LITERAL_TUS = {}  # X3: none yet; text start -> which literals
-
-
+# Every game TU of main is -G4 (reports/x3-g4-threshold.md); the overlays are -G0.
 def g_evidence(gp_count, optimization, start=None):
-    g_flag = "-G8" if gp_count or start in SMALL_DATA_LITERAL_TUS else "-G0"
+    g_flag = "-G4"
     basis = (f"{gp_count} gp-relative instructions in the code" if gp_count else
-             f"string literals in .sdata reached with lui/addiu: {SMALL_DATA_LITERAL_TUS[start]}"
-             if start in SMALL_DATA_LITERAL_TUS else
-             "no gp-relative instruction in the code; -G0 cannot add one")
+             "one threshold for main (reports/x3-g4-threshold.md); the TU has no gp-relative instruction")
     return g_flag, dict(compiler="2.96", compiler_confidence="medium", assembler_class="LA29",
                         assembler_confidence="medium", g_flag=g_flag, g_basis=basis,
                         g_confidence="high" if gp_count else "medium",

@@ -27,11 +27,11 @@ typedef struct NjPlaneRegistry {
     s32 enabled;                        /* +0x116A4 */
 } NjPlaneRegistry;
 
-extern s32 mrPackModeAActive;
-extern s32 mrPackPendingFlag;
-extern s32 mrPackStatusLatch;
-extern s32 mrPackModeBActive;
-extern u16 D_004B34A2;
+extern s32 mrPackModeAActive[];
+extern s32 mrPackPendingFlag[];
+extern s32 mrPackStatusLatch[];
+extern s32 mrPackModeBActive[];
+extern u16 D_004B34A2[];
 extern s32 D_005D0670[];
 extern s32 gNjPlaneRegistryStorage[];
 #define gMrPackModeAState (*(MrPackModeAState *) D_005D0670)
@@ -53,10 +53,10 @@ s32 func_002B4A10();
 s32 func_002B6078();
 
 void mrPackUpdateModes(void) {
-    if (mrPackModeAActive != 0) {
+    if (mrPackModeAActive[0] != 0) {
         func_002B4A10();
     }
-    if (mrPackModeBActive != 0) {
+    if (mrPackModeBActive[0] != 0) {
         func_002B6078();
     }
 }
@@ -64,7 +64,7 @@ void mrPackUpdateModes(void) {
 s32 func_002B4C58();
 
 void mrPackTickModeBOff(void) {
-    if (mrPackModeBActive == 0) {
+    if (mrPackModeBActive[0] == 0) {
         func_002B4C58();
     }
 }
@@ -72,19 +72,19 @@ void mrPackTickModeBOff(void) {
 s32 func_002B6A80();
 
 void mrPackTickModeB(void) {
-    if (mrPackModeBActive != 0) {
+    if (mrPackModeBActive[0] != 0) {
         func_002B6A80();
     }
 }
 
 void mrPackClearPendingFlag(void) {
-    mrPackPendingFlag = 0;
+    mrPackPendingFlag[0] = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu364", func_002B3E70);
 
 void mrPackClearStatusLatch(void) {
-    mrPackStatusLatch = 0;
+    mrPackStatusLatch[0] = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu364", func_002B3F28);
@@ -98,7 +98,7 @@ void mrPackArmModeA(void)
     if (gNjPlaneRegistry.enabled != 0)
     {
         gNjPlaneRegistry.enabled = 0;
-        mrPackModeAActive = 1;
+        mrPackModeAActive[0] = 1;
         memset(gNjPlaneRegistry.packEntries, 0, 0xC00);
     }
 }
@@ -130,12 +130,12 @@ s32 func_002B4FE0();
 
 void mrPackStepCurrent(void)
 {
-    if (mrPackModeAActive != 0)
+    if (mrPackModeAActive[0] != 0)
     {
         func_002B47A0();
         return;
     }
-    if (!(mrPackModeBActive != 0))
+    if (!(mrPackModeBActive[0] != 0))
     {
         return;
     }
@@ -148,9 +148,9 @@ s32 mrPackGetCurrentId(void) {
     s32 currentPackId;
 
     currentPackId = 0;
-    if (mrPackModeAActive != 0) {
+    if (mrPackModeAActive[0] != 0) {
         currentPackId = mrPackStateAIndexGet();
-    } else if (mrPackModeBActive != 0) {
+    } else if (mrPackModeBActive[0] != 0) {
         currentPackId = njPlaneCurrentGet();
     }
     return currentPackId;
@@ -163,9 +163,9 @@ s32 mrPackGetCurrentField(void) {
     s32 currentPackField;
 
     currentPackField = 0;
-    if (mrPackModeAActive != 0) {
+    if (mrPackModeAActive[0] != 0) {
         currentPackField = stateATailValueGet();
-    } else if (mrPackModeBActive != 0) {
+    } else if (mrPackModeBActive[0] != 0) {
         currentPackField = func_002B52A0();
     }
     return currentPackField;
@@ -200,12 +200,12 @@ s32 func_002B5480();
 
 void mrPackFinishCurrent(void)
 {
-    if (mrPackModeAActive != 0)
+    if (mrPackModeAActive[0] != 0)
     {
         func_002B4848();
         return;
     }
-    if (!(mrPackModeBActive != 0))
+    if (!(mrPackModeBActive[0] != 0))
     {
         return;
     }
@@ -219,12 +219,12 @@ s32 func_002B55E0();
 
 void mrPackFlushCurrent(void)
 {
-    if (mrPackModeAActive != 0)
+    if (mrPackModeAActive[0] != 0)
     {
         func_002B48C8();
         return;
     }
-    if (!(mrPackModeBActive != 0))
+    if (!(mrPackModeBActive[0] != 0))
     {
         return;
     }
@@ -236,24 +236,24 @@ void mrPackFlushCurrent(void)
 INCLUDE_ASM("asm/main/nonmatchings/tu364", func_002B4370);
 
 s32 mrPackGetCurrentId(void);
-extern u16 D_004B34A2;
+extern u16 D_004B34A2[];
 s32 func_002B4370();
 s32 func_002B4928();
 s32 func_002B56A8();
 
 void mrPackUpdateByState(void) {
     if (mrPackGetCurrentId() == 0) {
-        if (D_004B34A2 & 0x1000) {
+        if (D_004B34A2[0] & 0x1000) {
             func_002B4370();
             return;
         }
         return;
     }
-    if (mrPackModeAActive != 0) {
+    if (mrPackModeAActive[0] != 0) {
         func_002B4928();
         return;
     }
-    if (mrPackModeBActive == 0) {
+    if (mrPackModeBActive[0] == 0) {
         return;
     }
     func_002B56A8();
@@ -264,7 +264,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu364", func_002B4468);
 s32 func_002B5D00();
 
 void mrPackUpdateModeB(void) {
-    if (mrPackModeBActive != 0) {
+    if (mrPackModeBActive[0] != 0) {
         func_002B5D00();
     }
 }
@@ -272,7 +272,7 @@ void mrPackUpdateModeB(void) {
 s32 func_002B5EC0();
 
 void mrPackRefreshModeB(void) {
-    if (mrPackModeBActive != 0) {
+    if (mrPackModeBActive[0] != 0) {
         func_002B5EC0();
     }
 }

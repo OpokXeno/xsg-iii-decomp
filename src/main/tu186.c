@@ -91,7 +91,7 @@ s32 vmRunNativeFlushOnResult(void) {
 s32 func_00221FA0();
 
 s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
-    extern u8 gBattleCurrentRosterIndex;
+    extern u8 gBattleCurrentRosterIndex[];
     extern s32 VM_PLUGIN_CNT_GET();
     extern s32 vmArgGet(s32, s32);
     s32 vmArgValue;
@@ -100,7 +100,7 @@ s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
         vmArgValue = vmArgGet(vmThread, 1);
         func_00221FA0(vmArgValue > 0);
     } else {
-        func_00221FA0(gBattleCurrentRosterIndex == 0, 1);
+        func_00221FA0(gBattleCurrentRosterIndex[0] == 0, 1);
     }
     return 1;
 }
@@ -117,8 +117,8 @@ s32 vmSetFlagFromArgWithFlush(void) {
 }
 
 s32 vmIsFlagSet(void) {
-    extern u8 gBattleCurrentRosterIndex;
-    return gBattleCurrentRosterIndex != 0;
+    extern u8 gBattleCurrentRosterIndex[];
+    return gBattleCurrentRosterIndex[0] != 0;
 }
 
 s32 func_00222120(s32, s32, s32);

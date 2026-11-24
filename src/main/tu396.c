@@ -68,7 +68,7 @@ extern EnvelopeState gSeVoiceEnvelopeState;
 extern WindowCursor gEnvelopeCursor;
 extern WindowCursor gCapturedEnvelopeCursor;
 extern EnvelopeObject gEnvelopeObject;
-extern s32 gSeVoiceFlag;
+extern s32 gSeVoiceFlag[];
 extern unsigned char D_00402858[];
 
 /* The state block as seen from its cursor symbol gEnvelopeCursor (the cursor is at +0x141C). */
@@ -111,7 +111,7 @@ void counterRangeClearBounds(void) {
 }
 
 s32 seVoiceGetFlag(void) {
-    return gSeVoiceFlag;
+    return gSeVoiceFlag[0];
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu396", func_002DBD80);

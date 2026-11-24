@@ -6,7 +6,7 @@
 
 
 extern DrawList svDrawList;
-extern int svDrawListFlushCode;
+extern int svDrawListFlushCode[];
 
 /* A slot seen as its two doublewords. */
 typedef union DrawSlot {
@@ -37,7 +37,7 @@ void xglRenderClearFrame(void);
 
 void drawListSetFlushCode(int flushCode)
 {
-    svDrawListFlushCode = flushCode;
+    svDrawListFlushCode[0] = flushCode;
 }
 
 /* Base of the slot table. */

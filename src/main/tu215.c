@@ -3,11 +3,11 @@
 INCLUDE_ASM("asm/main/nonmatchings/tu215", func_00252358);
 
 typedef int s32;
-extern s32 D_003E8B10;
+extern s32 D_003E8B10[];
 s32 func_00252358(s32 *);
 
 void xenoActorEventTableInit(void) {
-    func_00252358(&D_003E8B10);
+    func_00252358(D_003E8B10);
 }
 
 s32 soundSlotStop(s32);

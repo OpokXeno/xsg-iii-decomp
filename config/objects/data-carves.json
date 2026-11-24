@@ -512,7 +512,7 @@
     }
    ]
   },
-  "main/tu028": {
+  "main/tu027": {
    ".lit4": [
     {
      "range": [
@@ -546,8 +546,8 @@
       "0x0054ff14"
      ],
      "generated_by": [
-      "xglCameraPadUpdateFree",
-      "xglCameraPadUpdateChase"
+      "xglCameraPadUpdateChase",
+      "xglCameraPadUpdateFree"
      ],
      "c_owned_symbols": [
       "D_0054FEC8",
@@ -1539,21 +1539,21 @@
      "generated_by": [
       "func_001C7F68",
       "func_001C8100",
-      "sbNativeSetLight",
       "func_001C85C8",
       "func_001C8BC0",
       "func_001C8CD0",
       "func_001C8DC0",
-      "sbNativeCosine",
-      "sbNativeSine",
-      "sbNativeSetModelSize",
       "func_001C91F0",
       "func_001C99F8",
-      "sbNativeSetEffectVector",
       "func_001C9F68",
       "func_001CA0D8",
       "func_001CA260",
-      "func_001CA3E8"
+      "func_001CA3E8",
+      "sbNativeCosine",
+      "sbNativeSetEffectVector",
+      "sbNativeSetLight",
+      "sbNativeSetModelSize",
+      "sbNativeSine"
      ],
      "c_owned_symbols": [
       "D_0054F4B4",
@@ -1613,7 +1613,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu086.o"
+      "object": "build/main/build/c/find_native_method.o"
      }
     },
     {
@@ -1637,7 +1637,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu086.o"
+      "object": "build/main/build/c/find_native_method.o"
      }
     }
    ],
@@ -1652,8 +1652,8 @@
       "0x00537884"
      ],
      "generated_by": [
-      "sbNativeGetObjectTransform",
-      "func_001C99F8"
+      "func_001C99F8",
+      "sbNativeGetObjectTransform"
      ],
      "c_owned_symbols": [
       "jtbl_00537820",
@@ -1663,7 +1663,7 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu086.o"
+      "object": "build/main/build/c/find_native_method.o"
      }
     }
    ]
@@ -1796,49 +1796,25 @@
     {
      "range": [
       "0x0054f5dc",
-      "0x0054f5e0"
+      "0x0054f5e4"
      ],
      "generated": [
       "0x0054f5dc",
-      "0x0054f5e0"
-     ],
-     "generated_by": [
-      "func_001CD490"
-     ],
-     "c_owned_symbols": [
-      "D_0054F5DC"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu091.o"
-     }
-    }
-   ]
-  },
-  "main/tu093": {
-   ".lit4": [
-    {
-     "range": [
-      "0x0054f5e0",
-      "0x0054f5e4"
-     ],
-     "generated": [
-      "0x0054f5e0",
       "0x0054f5e4"
      ],
      "generated_by": [
+      "func_001CD490",
       "sbNativeActorPartsHide"
      ],
      "c_owned_symbols": [
+      "D_0054F5DC",
       "D_0054F5E0"
      ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu093.o"
+      "object": "build/main/build/c/tu091.o"
      }
     }
    ]
@@ -1964,29 +1940,30 @@
     {
      "range": [
       "0x0054fb88",
-      "0x0054fc2c"
+      "0x0054fc30"
      ],
      "generated": [
       "0x0054fb88",
-      "0x0054fc2c"
+      "0x0054fc30"
      ],
      "generated_by": [
-      "xglWaveFilterDraw",
-      "xglScreenWarpDraw",
-      "xglRadialBlurDraw",
-      "xglTwistRingFilterDraw",
-      "xglObjectRippleDraw",
-      "xglScrollWaveFilterDraw",
-      "xglGlobalScrollWaveFilterDraw",
-      "xglNoiseFilterDraw",
-      "xglParticleEmitterDraw",
-      "xglMistEmitterDraw",
-      "func_001E0630",
+      "filterCutInDraw",
+      "filterDistortDraw",
+      "filterGradationDraw",
+      "filterMonotoneDraw",
+      "filterNoiseDraw",
+      "filterRefractDraw",
+      "filterShimmerDraw",
+      "filterSoftFocusDraw",
+      "filterSwell2Draw",
+      "filterSwellDraw",
+      "filterTorusDraw",
+      "filterWavyBlur2Draw",
+      "filterWavyBlurDraw",
       "func_001E0E10",
-      "xglScreenWipeDraw",
-      "xglDissolveUpdate",
-      "xglColorFilterApplyClut",
-      "xglRadialBlurApply"
+      "slotFixedRecordSetHead",
+      "xglMistEmitterDraw",
+      "xglObjectRippleDraw"
      ],
      "c_owned_symbols": [
       "D_0054FB88",
@@ -2029,13 +2006,14 @@
       "D_0054FC1C",
       "D_0054FC20",
       "D_0054FC24",
-      "D_0054FC28"
+      "D_0054FC28",
+      "D_0054FC2C"
      ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu108.o"
+      "object": "build/main/build/c/filter.o"
      }
     }
    ],
@@ -2052,12 +2030,12 @@
      "generated_by": [
       "colorHsvToRgb",
       "drawEnvSendRecordPacket",
-      "xglScreenWarpDraw",
-      "xglParticleEmitterDraw",
-      "xglMistEmitterDraw",
-      "xglTrackNodeWipeUpdate",
-      "xglScreenWipeDraw",
-      "xglScreenBlurDraw"
+      "filterDof2Draw",
+      "filterGradationDraw",
+      "filterShimmerDraw",
+      "filterWavyBlurDraw",
+      "filterWipeDraw",
+      "xglMistEmitterDraw"
      ],
      "c_owned_symbols": [
       "jtbl_0053E740",
@@ -2076,7 +2054,52 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu108.o"
+      "object": "build/main/build/c/filter.o"
+     }
+    },
+    {
+     "range": [
+      "0x0053e860",
+      "0x0053e870"
+     ],
+     "generated": [
+      "0x0053e860",
+      "0x0053e870"
+     ],
+     "generated_by": [
+      "filterTest3Draw"
+     ],
+     "c_owned_symbols": [
+      "D_0053E860",
+      "D_0053E868"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/filter.o"
+     }
+    },
+    {
+     "range": [
+      "0x0053e870",
+      "0x0053e8f0"
+     ],
+     "generated": [
+      "0x0053e870",
+      "0x0053e8f0"
+     ],
+     "generated_by": [
+      "slotSendCommand"
+     ],
+     "c_owned_symbols": [
+      "jtbl_0053E870"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/filter.o"
      }
     }
    ]
@@ -2107,56 +2130,6 @@
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/tu109.o"
-     }
-    }
-   ]
-  },
-  "main/tu115": {
-   ".lit4": [
-    {
-     "range": [
-      "0x0054fc2c",
-      "0x0054fc30"
-     ],
-     "generated": [
-      "0x0054fc2c",
-      "0x0054fc30"
-     ],
-     "generated_by": [
-      "slotFixedRecordSetHead"
-     ],
-     "c_owned_symbols": [
-      "D_0054FC2C"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu115.o"
-     }
-    }
-   ],
-   ".rodata": [
-    {
-     "range": [
-      "0x0053e870",
-      "0x0053e8f0"
-     ],
-     "generated": [
-      "0x0053e870",
-      "0x0053e8f0"
-     ],
-     "generated_by": [
-      "slotSendCommand"
-     ],
-     "c_owned_symbols": [
-      "jtbl_0053E870"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu115.o"
      }
     }
    ]

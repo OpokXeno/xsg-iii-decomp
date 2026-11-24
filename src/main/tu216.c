@@ -42,10 +42,10 @@ void xglCdSetReadBuffers(XglCdFileBlock *ringSlotZeroBlock, XglCdFileBlock *ring
   gXglCdBlockStream.slotBuffers[3] = ringSlotThreeBlock;
 }
 
-extern s32 xglCdPendingReadStage;
+extern s32 xglCdPendingReadStage[];
 
 void xglCdQueueSlotRead(void) {
-    xglCdPendingReadStage = 2;
+    xglCdPendingReadStage[0] = 2;
 }
 
 void xglCdRingReadNoNotify(void);

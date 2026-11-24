@@ -343,7 +343,7 @@ def _source_context(root, unit_dir, tu, apis, require_complete=True):
     _require(not require_complete or not carve.source_scaffold_names(source)[0],
              'complete-C alignment owner retains function scaffolding')
     contract = record['contract']
-    _require(contract.get('flags') in (['-O2', '-G0'], ['-O2', '-G8']), 'unsupported TU flags')
+    _require(contract.get('flags') in (['-O2', '-G0'], ['-O2', '-G4'], ['-O2', '-G8']), 'unsupported TU flags')
     directory, tool_paths = _contract_tools(root, contract, Toolchain)
     base = [str(directory / 'ee-gcc'), '-B' + str(directory) + '/', '-nostdinc', '-fno-builtin']
     original = Path(unit_dir) / 'orig' / json.loads(

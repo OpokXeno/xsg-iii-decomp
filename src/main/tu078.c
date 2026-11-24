@@ -104,7 +104,7 @@ XenoActor *func_0028D670(void);
 s32 func_001B93C0(s32 kind);
 s32 payloadSectionsLocate(XenoActor *actor, s32 effectHandle);
 void XenoActorRelease(s32 actor);
-extern float D_003E481C;
+extern float D_003E481C[];
 
 /* Allocates an actor bound to effect kind 0x16 with zero position and rotation and a uniform scale from D_003E481C; releases it on failure. */
 XenoActor *func_001C5070(void) {
@@ -125,7 +125,7 @@ XenoActor *func_001C5070(void) {
                          "vmove.w vf2, vf0\n"
                          "sqc2 vf2, 0(%1)\n"
                          :
-                         : "f"(D_003E481C), "r"(&actor->scale)
+                         : "f"(D_003E481C[0]), "r"(&actor->scale)
                          : "$8", "memory");
     actor->drawFlags |= 4;
     return actor;

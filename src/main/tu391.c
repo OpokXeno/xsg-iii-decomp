@@ -4,10 +4,10 @@ INCLUDE_ASM("asm/main/nonmatchings/tu391", func_002D3890);
 
 typedef int s32;
 typedef unsigned char u8;
-extern s32 D_004C83F8;
+extern s32 D_004C83F8[];
 
 void gameClearRuntimeFlag(void) {
-    D_004C83F8 = 0;
+    D_004C83F8[0] = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu391", func_002D3900);
@@ -22,10 +22,10 @@ void sbNativeTableByteRead(s32 vm) {
     soundTableByteGet(byteRow - 1);
 }
 
-extern u8 D_00402858;
+extern u8 D_00402858[];
 
 s32 sbStatusFlag10Test(void) {
-    if ((D_00402858 & 0x10) != 0) {
+    if ((D_00402858[0] & 0x10) != 0) {
         return 1;
     }
     return 0;
@@ -48,10 +48,10 @@ s32 sbNativeIndexedCall(s32 vm) {
 }
 
 s32 sbStatusLevelGet(void) {
-    if (!(!(D_00402858 & 4))) {
+    if (!(!(D_00402858[0] & 4))) {
         return 2;
     }
-    if ((D_00402858 & 2) != 0) {
+    if ((D_00402858[0] & 2) != 0) {
         return 1;
     }
     return 0;

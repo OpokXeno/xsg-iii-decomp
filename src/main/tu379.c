@@ -3,7 +3,7 @@
 INCLUDE_ASM("asm/main/nonmatchings/tu379", func_002C7A98);
 
 typedef int s32;
-extern s32 gGameLoopRuntimeStorage;
+extern s32 gGameLoopRuntimeStorage[];
 s32 bitmapTestBit(s32 bit);
 
 s32 masterFlagTest(void)
@@ -11,7 +11,7 @@ s32 masterFlagTest(void)
   s32 masterFlagBit;
   s32 isEnabled;
   int overrideBitSet;
-  masterFlagBit = gGameLoopRuntimeStorage;
+  masterFlagBit = gGameLoopRuntimeStorage[0];
   isEnabled = 1;
   masterFlagBit &= 0x08000000;
   masterFlagBit = masterFlagBit != 0;

@@ -1149,7 +1149,7 @@ def objdiff_scope(root, tus, report, unit, code_complete, ledger_complete=False,
             if only_tus is not None and key not in only_tus:
                 continue
             flags = (tus[key].get('contract') or {}).get('flags')
-            if flags not in (['-O2', '-G0'], ['-O2', '-G8']):
+            if flags not in (['-O2', '-G0'], ['-O2', '-G4'], ['-O2', '-G8']):
                 skipped[key] = 'compile contract %s: the automatic probe supports -O2 only' % ' '.join(flags or [])
                 continue
             path = root / 'config' / 'tu' / (key + '.json')
@@ -1234,7 +1234,7 @@ def compiler_sizeof(root, tu, ctype):
             try:
                 out = Path(folder) / 'o.s'
                 result = subprocess.run(['timeout', '-k', '5', '30', str(cc / 'ee-gcc'), '-B' + str(cc) + '/',
-                                         '-nostdinc', '-fno-builtin', '-S', '-O2', '-G8', '-Iinclude', '-I.',
+                                         '-nostdinc', '-fno-builtin', '-S', '-O2', '-G4', '-Iinclude', '-I.',
                                          '-I' + str(source.parent), str(probe), '-o', str(out)],
                                         cwd=root, capture_output=True, text=True)
                 if result.returncode == 0:
@@ -1816,7 +1816,7 @@ def check_compiler(plan, output, lease):
     for tu_id, rows in grouped(plan).items():
         facts = plan['tus'][tu_id]
         flags = facts['contract']['flags']
-        require(flags in (['-O2', '-G0'], ['-O2', '-G8']), 'automatic probe refuses an unsupported compile contract')
+        require(flags in (['-O2', '-G0'], ['-O2', '-G4'], ['-O2', '-G8']), 'automatic probe refuses an unsupported compile contract')
         assembler = tc.file(assemblers.get(facts['contract'].get('assembler_sha256'), 'ee-as-la29-vsqrt'))
         as_options = ' '.join(facts['contract'].get('assembler_options') or [])
         require(facts['contract']['compiler_profile'] in ('ee-gcc2_96-realconv', 'ee-gcc2_96-realconv-lp7') and

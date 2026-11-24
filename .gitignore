@@ -43,6 +43,9 @@
 !/config/iop-tools.lock.json
 !/config/targets.json
 !/config/tu-map-model.json
+!/config/tu-limits-model.json
+!/config/tu-map-solved-model.json
+!/config/tu-compile-evidence.json
 
 
 /config/toolchain-local.json

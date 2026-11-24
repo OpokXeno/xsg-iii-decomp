@@ -19,9 +19,9 @@ typedef struct BattleModeState {
 } BattleModeState;
 
 extern BattleModeState gBattleModeActors;
-extern s8 D_003E0173;
-extern s8 D_003E0174;
-extern s8 gBattlePendingFlag;
+extern s8 D_003E0173[];
+extern s8 D_003E0174[];
+extern s8 gBattlePendingFlag[];
 extern s8 gBattleRecord[0xA0];
 extern s32 D_003E3350[];
 
@@ -91,7 +91,7 @@ struct XglCamera *xglStudioGetCamera2(s32);
 
 /* Common reset of the battle state, called by the battleEnterModeZero/0C130/0C180 entries. */
 void battleResetState(void) {
-    D_003E0174 = -1;
+    D_003E0174[0] = -1;
     xglStudioGetCamera2(0)->cameraState = 4;
     func_0025F3C0();
     battleResultReset();
@@ -107,7 +107,7 @@ void battleResetState(void) {
 INCLUDE_ASM("asm/main/nonmatchings/tu237", func_0025C240);
 
 void battleSetPendingFlag(s8 isPending) {
-    gBattlePendingFlag = isPending;
+    gBattlePendingFlag[0] = isPending;
 }
 
 void actorSlotsClearFlags();
@@ -121,7 +121,7 @@ void textStateSuspend();
 void textStateReset();
 
 void battleSetPhase(s32 nextBattlePhase) {
-    D_003E0173 = nextBattlePhase;
+    D_003E0173[0] = nextBattlePhase;
     actorSlotsSetReady();
     if (nextBattlePhase != 1) {
         return;

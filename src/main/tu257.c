@@ -16,10 +16,10 @@ s32 cameraStateIsDone(void) {
     return 1;
 }
 
-extern s32 gCameraNativeTable;
-extern s32 gCameraModuleName;
+extern s32 gCameraNativeTable[];
+extern s32 gCameraModuleName[];
 s32 sbNativeOwnerAdd(s32 *, s32 *);
 
 void cameraRegisterNativeOwner(void) {
-    sbNativeOwnerAdd(&gCameraModuleName, &gCameraNativeTable);
+    sbNativeOwnerAdd(gCameraModuleName, gCameraNativeTable);
 }

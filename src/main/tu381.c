@@ -54,10 +54,10 @@ void jpegBuffersAlloc(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/tu381", func_002C8A50);
 
-extern s32 gJpegDecodeStage;
+extern s32 gJpegDecodeStage[];
 
 s32 jpegDecodeIsDone(void) {
-    return gJpegDecodeStage == 2;
+    return gJpegDecodeStage[0] == 2;
 }
 
 s32 func_001B60B8(s32 mode);

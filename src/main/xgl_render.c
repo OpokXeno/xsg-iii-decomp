@@ -1,9 +1,58 @@
 #include "common.h"
 #include "shared.h"
+#include "main/Packet.h"
+#include "main/xgl_render.h"
+#include "gs.h"
+
+typedef signed char s8;
+
+typedef unsigned char u8;
+
+typedef int s32;
+
+extern u8 gStateExchangeEnabled;
+
+extern s8 gStateExchangeOverride;
+
+u8 stateExchangeOff(void) {
+    s32 wasEnabled;
+
+    wasEnabled = gStateExchangeEnabled;
+    gStateExchangeOverride = 0;
+    gStateExchangeEnabled = 0;
+    return wasEnabled;
+}
+
+u8 stateExchangeOn(void) {
+    s32 wasEnabled;
+
+    wasEnabled = gStateExchangeEnabled;
+    gStateExchangeOverride = 1;
+    gStateExchangeEnabled = 1;
+    return wasEnabled;
+}
+
+void stateExchangeOverrideClear(void) {
+    gStateExchangeOverride = 0;
+}
+
+void stateExchangeOverrideSet(void) {
+    gStateExchangeOverride = 1;
+}
+
+extern unsigned char gXglRenderFadeDisabled[];
+
+s32 xglRenderMovieIsActive(void) {
+    return gXglRenderFadeDisabled[0] != 0;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199BE0);
+
 /* The EE scratchpad (16 KB), where the GS queue and talk packets are built before they are sent. */
 #define SCRATCHPAD_BASE 0x70000000
 
 void soundApplySettings(void);
+
 void xglDmaDirectNormal(unsigned int channel, unsigned int address, unsigned int count);
 
 /* GS PMODE register: display circuit enables and the alpha blend value. */
@@ -67,9 +116,6 @@ typedef union GsExtdataRegister {
     GsExtdata extdataFields;
 } GsExtdataRegister;
 
-#include "main/Packet.h"
-#include "main/xgl_render.h"
-
 /*
  * GS display-environment block (0x004A9000, size 0x50). xglRenderDispOff/On
  * only touch the 8-byte flag word at +0x00 (bit 0x2 gates display output).
@@ -91,57 +137,100 @@ typedef struct GsDispEnv {
 } GsDispEnv;
 
 extern GsDispEnv DispEnv;
+
 /* Small-data scalars of xgl_render.c (.sdata): the pxy tick scale (1 doubles the tick), the VSync interval, the render loop count and
  * the scan line interpolation mode. */
 extern signed char pxyTickScaleDouble;
+
 extern signed char xglRenderVSyncInterval;
+
 extern int LoopCount;
+
 extern int ScanLineInterpolate;
+
 /* Glyph digit strokes of the pxy debug draw (.data after the hooks). */
 extern unsigned char pxyGlyphDigitTable[252];
+
 void xglRenderClearDepth(void);
+
 void xglRenderClearFrame(void);
+
 void xglRenderFrame(void);
+
 struct XglPacket;
+
 extern XglRenderState sRender;
+
 void xglPacketMove(void);
+
 void xglPacketSend(void);
+
 XglPacket *xglPacketGetCurrent(void);
+
 void xglPacketInterpolate(void);
+
 void sceVif1PkCnt(XglPacket *packet, unsigned int count);
+
 void sceVif1PkOpenDirectHLCode(XglPacket *packet, unsigned int count);
+
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int qwc);
+
 void sceVif1PkCloseDirectHLCode(XglPacket *packet);
+
 void xglPadRead(void);
+
 void xglFontFlush(void);
+
 void gifStateUpdateDrawHook(void);
+
 void nmlModelFlushClear(void);
+
 void pxyBeginFrame(void);
+
 void pxyFlush(void);
+
 void xglRenderFrameBeginFlushEIrq(void);
+
 void xglRenderFrameEndFlushEIrq(void);
+
 void sefDrawEffect(void);
 
 typedef unsigned int XglQuadword __attribute__((mode(TI)));
 
 #define GIF_REG_RGBAQ 1
+
 #define GIF_REG_AD 14
+
 #define SCE_GS_TEST_1 0x47
+
 #define XGL_DMA_CHANNEL_GIF 2
+
 /* EE hardware registers (GS privileged, DMAC, VIF). */
 #define GS_DISPFB1 0x12000070
+
 #define GS_DISPLAY1 0x12000080
+
 #define GS_EXTBUF 0x120000B0
+
 #define GS_EXTDATA 0x120000C0
+
 #define GS_EXTWRITE 0x120000D0
+
 #define GS_CSR 0x12001000
+
 /* A 64-bit GS privileged register, written through its address. */
 #define GS_REG(address) (*(volatile u64 *) (address))
+
 #define D1_CHCR ((volatile u32 *) 0x10009000)
+
 #define D2_CHCR ((volatile u32 *) 0x1000A000)
+
 #define D_ENABLEW ((volatile u32 *) 0x1000F590)
+
 #define GS_TEST_CLEAR_DEPTH 0x00032001 /* alpha test never passes but writes Z only */
+
 #define GS_TEST_CLEAR_FRAME 0x00030003
+
 #define RENDER_CLEAR_QWORDS 6
 
 /*
@@ -317,22 +406,36 @@ typedef union GsDrawPacket {
 } GsDrawPacket;
 
 extern GsDrawPacket DrawEnv;
+
 extern void SyncDCache(void *start, void *end);
+
 extern void sceGsPutDrawEnv(GsDrawEnv *env);
+
 extern int xglRenderGlobalFadeColor;
+
 /* 0 by xglRenderCpUDispOff, 1 by xglRenderCpUDispOn */
 extern int xglRenderClearSkip;
+
 extern int xglRenderMoveCount;
+
 /* The GS VSync interrupt callback increments this counter while
  * xglRenderSyncMove polls it on the render thread. */
 extern volatile u32 VSyncCount;
+
 extern s16 sRenderPsm;
+
 extern u16 sRenderDisplayBase;
+
 int FlushCache(int);
+
 extern u16 sRenderFlipBase;
+
 extern int xglRenderVSyncTickCount[];
+
 void xglRenderSyncMove(void);
+
 void xglRenderDrawEnvMove(void);
+
 /*
  * dispEnvDispfb1..dispEnvExtwrite are fields of DispEnv (0x00645740, GsDispEnv above):
  * firstDispfb (+0x10), firstDisplay (+0x18), secondDispfb (+0x28), secondDisplay (+0x30),
@@ -340,41 +443,62 @@ void xglRenderDrawEnvMove(void);
  * the 0x50 bytes of GsDispEnv.
  */
 extern GsDispfbRegister dispEnvDispfb1;
+
 extern GsDisplayRegister dispEnvDisplay1;
+
 extern GsDispfbRegister dispEnvDispfb2;
+
 extern GsDisplayRegister dispEnvDisplay2;
+
 extern u64 dispEnvExtbuf;
+
 extern u64 dispEnvExtdata;
+
 extern u64 dispEnvExtwrite;
+
 extern u64 dispEnvCacheEnd[];
+
 extern u16 sRenderDispfbBase;
+
 void sceGsPutDispEnv(GsDispEnv *env);
+
 void xglRenderDispEnvMove(void);
+
 void xglRenderClearEnvMove(void);
+
 extern s16 sRenderPrevDispfbBase;
+
 extern int xglRenderStatus[];
+
 extern int xglRenderFrameDelta[];
+
 extern int xglRenderFrameCount[];
+
 void xglRenderSwapBase(void);
+
 extern int sceGsResetGraph(int, int, int, int);
+
 extern int xglRenderSkippedFrameCount[];
+
 void sceGsResetPath(void);
+
 void sceGsSyncV(int);
+
 void xglRenderFinalPacket(void);
+
 /* xglRenderGlobalFadeCallback: cleared by xglRenderGlobalFadeInit; referenced by xglRenderGlobalFade (the fade draw). */
 extern int xglRenderGlobalFadeCallback[];
+
 void xglRenderGlobalFade(void);
+
 void xglRenderMove(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 
-
-typedef int s32;
-
-typedef signed char s8;
-
 extern volatile unsigned int gVsyncsSinceFlip;
+
 extern unsigned char func_00199CE0[];
+
 s32 func_002F47D8();
 
 void xglRenderSyncInit(void) {
@@ -384,12 +508,16 @@ void xglRenderSyncInit(void) {
 
 /* X3 scaffold label 0x004c8390: the fields xglRenderSyncWait reads and writes, at their asm offsets. */
 extern XglRenderStateBlock D_004C8390;
+
 extern signed char gVsyncsPerFrame;
+
 /* Scaffold labels of the callees (config has no name for them). */
 void func_001337B8(void);
+
 void func_002F32B8(void);
+
 void func_002F3118(int, int, int, int);
-void sceGsSyncV(int);
+
 int sceGsSyncPath(int, int);
 
 void xglRenderSyncWait(void)
@@ -464,8 +592,10 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199FE8);
 
 /* X3 scaffold label of the draw-environment packet (0x004c80c0); config names it only by address. */
 extern GsDrawPacket gXglRenderDrawPacket;
+
 /* Scaffold labels of the two callees (config has no name for them, and the sync and put calls keep them). */
 void func_002E7348(void *start, void *end);
+
 void func_002F3808(GsDrawEnv *env);
 
 void xglRenderDrawEnvMove(void)
@@ -482,6 +612,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A280);
 
 /* The display environment block (0x004c81c0). */
 extern GsDispEnv xglRenderDispEnvBlock;
+
 void func_002F3748(GsDispEnv *env);
 
 void xglRenderDispEnvMove(void)
@@ -558,9 +689,13 @@ void xglRenderScanLineInit(void)
 }
 
 extern unsigned char xglRenderStartFlag[];
+
 s32 func_0019A280();
+
 void xglRenderScanLineInit();
+
 void xglRenderDispEnvFlagSet();
+
 s32 xglIntcEnable();
 
 void xglRenderStart(s32 renderStartMode) {
@@ -653,6 +788,7 @@ void xglRenderFinalPacket(void)
 }
 
 extern s32 D_004C8400[];
+
 extern s32 xglRenderGlobalFadeValue;
 
 void xglRenderGlobalFadeReset(void) {
@@ -699,11 +835,12 @@ void xglRenderGlobalFadeSet(float red, float green, float blue, float alpha)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019B020);
 
-#include "gs.h"
-
 #define VIF_CODE_FLUSH 0x11000000
+
 void sceVif1PkAddCode(XglPacket *packet, unsigned int code);
+
 void sceVif1PkCloseDirectCode(XglPacket *packet);
+
 /* The packet template func_0019B3C0 sends: four quadwords, the TEX0 slot, then seven more from +0x60. */
 extern u64 xglRenderMovieTex0Packet[][2];
 
@@ -727,8 +864,9 @@ void func_0019B3C0(void)
 }
 
 extern s32 xglRenderFadeGifWord[];
-extern unsigned char gXglRenderFadeDisabled[];
+
 s32 xglRenderFadeAlpha();
+
 s32 sceVif1PkRef();
 
 void xglRenderGlobalFadeSend(void) {
@@ -747,6 +885,7 @@ void xglRenderGlobalFadeSend(void) {
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 
 s32 func_0019ADD8();
+
 s32 moviePlayerInit();
 
 void xglRenderMovieBegin(void) {

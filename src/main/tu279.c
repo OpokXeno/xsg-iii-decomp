@@ -41,7 +41,7 @@ typedef struct PadPort {
 } PadPort;
 
 extern PadPort PadData[2];
-extern u16 gPadDataPressed;     /* PadData[0].pressed, one symbol with the same address */
+extern u16 gPadDataPressed[];     /* PadData[0].pressed, one symbol with the same address */
 
 void textTagTickCountdown(TextTag *tag)
 {
@@ -109,7 +109,7 @@ void textTagUpdateWaitState(TextTag *tag)
         }
         if (tag->inputHandlingBits & 8)
         {
-            if (!(!(gPadDataPressed & 0x20)))
+            if (!(!(gPadDataPressed[0] & 0x20)))
             {
                 stepStateSyncWindow(tag);
                 stepStateMarkStarted(tag, 0);
@@ -151,7 +151,7 @@ void textTagDrainNodes(TextTag *tag) {
     extern s32 stepStateAdvanceText(void *, s32);
     s8 *previousNode;
 
-    if (gPadDataPressed & 0x40) {
+    if (gPadDataPressed[0] & 0x40) {
         tag->unk_62 = 0;
         do {
             previousNode = tag->writeCursor;
@@ -165,12 +165,12 @@ void textTagDrainNodes(TextTag *tag) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu279", func_0026B480);
 
-extern s32 D_00550870;
+extern s32 D_00550870[];
 s32 stepStateUpdateHold(void *);
 s32 func_0030EF98(s32, s32 *);
 
 void textTagTryResolveWait(TextTag *tag) {
-    if (func_0030EF98(tag->unk_4C, &D_00550870) == 0) {
+    if (func_0030EF98(tag->unk_4C, D_00550870) == 0) {
         stepStateUpdateHold(tag);
         return;
     }

@@ -69,10 +69,10 @@ void seVoiceFlagBitsClear(void) {
     memset(&D_00402858, 0, 0x200);
 }
 
-extern s32 gSeEnabled;
+extern s32 gSeEnabled[];
 
 s32 seIsEnabled(void) {
-    return gSeEnabled != 0;
+    return gSeEnabled[0] != 0;
 }
 
 s32 seReturnFalse(void) {
@@ -163,9 +163,9 @@ s32 seSendWorkAreaInit(s32 *);
 s32 func_002C7E88(s32 *);
 
 void seStateRefresh(void) {
-    extern s32 gSeSoundContext;
-    seSendWorkAreaInit(&gSeSoundContext);
-    func_002C7E88(&gSeSoundContext);
+    extern s32 gSeSoundContext[];
+    seSendWorkAreaInit(gSeSoundContext);
+    func_002C7E88(gSeSoundContext);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu387", func_002CA0F8);
@@ -220,7 +220,7 @@ void seChannelsResetBase(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu387", func_002CA3E0);
 
-extern s32 gSeVoiceHandle;
+extern s32 gSeVoiceHandle[];
 SeVoiceState *seVoiceStatusGet();
 void func_002CA5C0();
 s32 seVoiceGetFlag();
@@ -236,7 +236,7 @@ void seUpdateVoiceStart(void)
     seVoiceEnvelopeUpdate();
     voiceHandle = seGetChannelHandle(0x10);
     voiceFlagMask = 1;
-    gSeVoiceHandle = voiceHandle;
+    gSeVoiceHandle[0] = voiceHandle;
     if ((D_00402858[0]) & voiceFlagMask)
     {
         if ((seVoiceStatusGet()->voiceStartFlags) & 0x20)
@@ -299,20 +299,20 @@ void seDriverUpdateStreams(void) {
 }
 
 s32 seIsInitialized(void) {
-    extern s32 gSeChannelPoolStorage;
-    return gSeChannelPoolStorage != 0;
+    extern s32 gSeChannelPoolStorage[];
+    return gSeChannelPoolStorage[0] != 0;
 }
 
-extern s32 gSeStarted;
+extern s32 gSeStarted[];
 
 s32 seIsStarted(void) {
-    return gSeStarted != 0;
+    return gSeStarted[0] != 0;
 }
 
-extern s32 gSeSuspended;
+extern s32 gSeSuspended[];
 
 s32 seIsSuspended(void) {
-    return gSeSuspended != 0;
+    return gSeSuspended[0] != 0;
 }
 
 void seObjectSetSetting31(SeSoundObject *soundObject, s32 pendingSoundSetting31);

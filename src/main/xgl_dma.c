@@ -85,10 +85,9 @@ typedef struct XglDmaBuffer {
     u32 *writeCursor;
 } XglDmaBuffer;
 
-/* The first word is the channel pointer; the second word's role is unknown. */
+/* The drain channel of the memory FIFO. */
 struct MfifoDrainStorage {
     XglDmaChannel *channel;
-    u32 unmodeled_04;
 };
 
 extern void FlushCache(int mode);

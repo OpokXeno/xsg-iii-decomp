@@ -32,6 +32,7 @@ s32 scriptDispModelSlotPairVisibleSet(s32 scriptThread) {
 }
 
 s32 *RgDispModelFindByKey(s32 slotKindSelector);
+
 s32 slotEntryMotionStart(s32 *dispModelSlot, s32 a, s32 b);
 
 s32 scriptDispModelSlotPairHide(s32 scriptThread) {
@@ -54,10 +55,15 @@ s32 sbNativeNoop(void) {
 }
 
 s32 VM_PLUGIN_CNT_GET();
+
 s32 sbSlotJumpRequest();
+
 s32 vmArgGet();
+
 void func_001BE470(s32 value, s32 mode);
+
 s32 vmArgTagIsZero(s32 scriptThread, s32 argIndex);
+
 void sefSetEffectParams(s32 effectIndex, s32 effectPrimaryArg, s32 effectSecondaryArg, s32 effectTertiaryArg, s32 effectOption);
 
 s32 scriptEffectParamsSetDefault(s32 scriptThread) {
@@ -147,7 +153,9 @@ s32 func_001CC678(s32 scriptThread) {
 }
 
 s32 markerPositionGet(s32 *request, s16 value);
+
 s32 SpawnSlotSetPosition(s32 *object, s32 *request);
+
 s32 func_00290548(s32 handle, s32 timeout);
 
 s32 sbNativeQueueObjectRequest(s32 scriptThread)
@@ -233,6 +241,7 @@ s32 sbNativeSetStoredValue(s32 scriptThread) {
 }
 
 s32 bitmapTestBit(s32 bit);
+
 s32 saveFlagByteGet(s32 index);
 
 s32 sbNativeTestBit(s32 scriptThread)
@@ -256,6 +265,7 @@ s32 sbNativeTestBit(s32 scriptThread)
 }
 
 s32 bitmapSetBit(s32 bit, s32 value);
+
 s32 saveFlagByteSet(s32 index, s32 value);
 
 s32 sbNativeSetBit(s32 scriptThread)
@@ -281,8 +291,11 @@ s32 sbNativeSetBit(s32 scriptThread)
 }
 
 extern s16 gSaveTags[];
+
 extern s16 D_003E46BA[];
+
 extern s16 D_003E46BC[];
+
 extern s16 gGameBootMode;
 
 s32 scriptGameStateQuery(s32 scriptThread) {
@@ -348,5 +361,54 @@ s32 scriptRuntimeFlagToggle(s32 scriptThread) {
     default:
         return 0;
     }
+    return 1;
+}
+
+s32 func_00245308();
+
+s32 xglCdAddReadyBits();
+
+s32 vmArgTagGet();
+
+s32 vmKeyedEntryGet();
+
+s32 sbNativeJumpToKeyedEntry(s32 vm) {
+    s32 keyedEntryKey;
+    s32 keyedEntryText;
+
+    if (VM_PLUGIN_CNT_GET(vm) >= 2) {
+        sbSlotJumpRequest(vm, 2);
+        return 0;
+    }
+    if (!((vmArgTagGet(vm, 1) & 0xFF) == 2)) {
+        return 0;
+    }
+    keyedEntryKey = vmArgGet(vm, 1);
+    keyedEntryText = vmKeyedEntryGet(vm, keyedEntryKey);
+    xglCdAddReadyBits(1);
+    func_00245308(keyedEntryText);
+    return 1;
+}
+
+s32 sbNativeAlwaysSucceed(void) {
+    return 1;
+}
+
+s32 func_001B3858();
+
+s32 sbNativeCallKeyedEntry(s32 vm) {
+    s32 keyedEntryKey;
+    s32 keyedEntryText;
+
+    if (VM_PLUGIN_CNT_GET(vm) >= 2) {
+        sbSlotJumpRequest(vm, 2);
+        return 0;
+    }
+    if (!((vmArgTagGet(vm, 1) & 0xFF) == 2)) {
+        return 0;
+    }
+    keyedEntryKey = vmArgGet(vm, 1);
+    keyedEntryText = vmKeyedEntryGet(vm, keyedEntryKey);
+    func_001B3858(keyedEntryText);
     return 1;
 }

@@ -17,10 +17,10 @@ void xglRenderGlobalFadeValueSet(s32);
 void slotReleaseFixedSlots();
 void func_001E8550();
 void sbNativeOwnerAdd(s32 *, s32 *);
-extern s32 D_00407D00;
-extern s32 D_00407D48;
-extern s32 D_0053E418;
-extern s32 D_0053E420;
+extern s32 D_00407D00[];
+extern s32 D_00407D48[];
+extern s32 D_0053E418[];
+extern s32 D_0053E420[];
 
 /* VM native: word 1 is 2, words 0 and 2 are VM args; sent with cmd 0x1F. */
 s32 vmSpadSubmitTypedPair(s32 vm) {
@@ -280,6 +280,6 @@ s32 vmSpadPoll(void) {
 
 /* Registers the two native owners (their data addresses) with sbNativeOwnerAdd. */
 void sbNativeOwnersRegister(void) {
-    sbNativeOwnerAdd(&D_0053E418, &D_00407D00);
-    sbNativeOwnerAdd(&D_0053E420, &D_00407D48);
+    sbNativeOwnerAdd(D_0053E418, D_00407D00);
+    sbNativeOwnerAdd(D_0053E420, D_00407D48);
 }

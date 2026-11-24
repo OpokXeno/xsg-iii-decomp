@@ -14,7 +14,7 @@ s32 sbNativeCdUpdateMaxByte(s32 vm) {
     return 1;
 }
 
-extern s32 gScriptStoredValue;
+extern s32 gScriptStoredValue[];
 s32 vmArgGet(s32 vm, s32 index);
 
 /* Script native: stores argument 1 in the global gScriptStoredValue. */
@@ -22,7 +22,7 @@ s32 sbNativeStoreValueArg(s32 vm) {
     s32 storedArg;
 
     storedArg = vmArgGet(vm, 1);
-    gScriptStoredValue = storedArg;
+    gScriptStoredValue[0] = storedArg;
     return 1;
 }
 
@@ -52,7 +52,7 @@ s32 sbNativeStoreValueAndStartFx(s32 vm) {
     } else {
         thirdArg = 0x7F;
     }
-    gScriptStoredValue = storedArg;
+    gScriptStoredValue[0] = storedArg;
     func_001B7A60(storedArg, thirdArg, secondArg, secondArg);
     return 1;
 }

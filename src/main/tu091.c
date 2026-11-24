@@ -1,15 +1,23 @@
 #include "common.h"
 #include "shared.h"
 #include "main/tu105.h"
+#include "main/xenoActor.h"
+
 /* Messages in a thread's queue (sbQueueReset: first 0, last 0xF). */
 #define SB_QUEUE_LAST 0xF
 
-void sbSlotJumpRequest(SbThread *thread, int key);
+int sbSlotJumpRequest();
+
 struct SbThread;
+
 int VM_PLUGIN_CNT_GET(struct SbThread *thread);
+
 int vmArgGet(struct SbThread *thread, int vmArgPosition);
+
 int Get_Rnd_001B8CD0(int min, int max);
+
 int mathRandom(SbThread *thread);
+
 extern u16 gMovieAutoSelectFlags[];
 
 int scriptMovieAutoSelectFlagGet(SbThread *thread) {
@@ -69,14 +77,19 @@ typedef signed char s8;
 
 typedef int s32;
 
-/* The argument block at gGameLoopRuntimeStorage: the two values sbDeferredCallStore stores (+0x10 and +0x12). */
+/* The part of the game loop runtime these natives use. */
 typedef struct GameLoopRuntime {
-    u8 unk_00[0x10];
-    s16 firstVmArg;               /* +0x10 */
-    s16 secondVmArg;              /* +0x12 */
+    u8 unmodeled_000[0x10];
+    s16 firstVmArg;        /* +0x010: the two values sbDeferredCallStore stores */
+    s16 secondVmArg;       /* +0x012 */
+    u8 unmodeled_014[0x1E8 - 0x14];
+    float loopScaleFirst;  /* +0x1E8 */
+    float loopScaleSecond; /* +0x1EC */
+    s32 partHideFlags;     /* +0x1F0 */
 } GameLoopRuntime;
 
 extern GameLoopRuntime gGameLoopRuntimeStorage[];
+
 s32 vmArgTagIsZero(SbThread *thread, s32 vmArgPosition);
 
 s32 sbDeferredCallStore(SbThread *thread)
@@ -136,11 +149,17 @@ int mathRandom(SbThread *thread)
 }
 
 s32 func_001B8D08(s32 groupId, s32 entryId, s32 scoreBias);
+
 s32 indexedTableGet(s32 groupId, s32 entryId);
+
 s32 indexedCountGet(s32 groupId, s32 entryId);
+
 s32 indexedValueGet(s32 entryIndex);
+
 void movieSetFlagByte(s32 value, s32 movieDataValue, s32 scoreBias);
+
 void movieDecoderReset(s32 value, s32 scoreBias);
+
 void seVoiceStartDefault(unsigned int handle);
 
 s32 func_001CD248(SbThread *thread) {
@@ -203,7 +222,7 @@ typedef struct RgDispModelRecord {
     s32 storedValue; /* +0x210 */
 } RgDispModelRecord;
 
-RgDispModelRecord *RgDispModelFindByKey(s32 handle);
+RgDispModelRecord *RgDispModelFindByKey();
 
 s32 scriptDispModelValueStore(SbThread *thread) {
     RgDispModelRecord *dispModelRecord;
@@ -241,5 +260,265 @@ s32 func_001CD490(SbThread *thread) {
     y = argScaled(thread, 2);
     z = argScaled(thread, 3);
     xenoSpawnerStartAim(x, y, z);
+    return 1;
+}
+
+s32 xenoSpawnerAimAtTarget();
+
+s32 vmShootTrap(void) {
+    xenoSpawnerAimAtTarget();
+    return 1;
+}
+
+s32 flatSlotMarkAll(void);
+
+s32 vmClearTrap(void) {
+    flatSlotMarkAll();
+    return 1;
+}
+
+s32 sceneOverlayReset();
+
+s32 vmMinigame(void) {
+    sceneOverlayReset();
+    return 1;
+}
+
+s32 vmArgGetOrDefault();
+
+s32 func_001B4810();
+
+extern short D_003E4822[];
+
+s32 func_001CD5B0(s32 thread) {
+    s32 storedHalfword;
+    s32 applyImmediately;
+
+    storedHalfword = vmArgGetOrDefault(thread, 1, 0);
+    applyImmediately = vmArgGetOrDefault(thread, 2, 0);
+    D_003E4822[0] = storedHalfword;
+    if (applyImmediately != 0) {
+        func_001B4810();
+    }
+    return 1;
+}
+
+s32 vmArgGet();
+
+s32 vmArgTagIsZero();
+
+s32 padSetLatchedValue();
+
+void Vibration_Set_Strong(unsigned char startValue, unsigned char endValue, int framesTotal);
+
+void Vibration_Stop(void);
+
+s32 sbNativeVibrationStart(s32 thread) {
+    s32 latchedPadValue;
+    s32 durationFrames;
+    s32 startStrength;
+    s32 endStrength;
+
+    if (vmArgTagIsZero(thread, 1) == 0) {
+        latchedPadValue = vmArgGet(thread, 1);
+    } else {
+        latchedPadValue = 0;
+    }
+    if (vmArgTagIsZero(thread, 2) == 0) {
+        durationFrames = vmArgGet(thread, 2);
+    } else {
+        durationFrames = 0;
+    }
+    if (vmArgTagIsZero(thread, 3) == 0) {
+        startStrength = vmArgGet(thread, 3);
+    } else {
+        startStrength = 255;
+    }
+    if (vmArgTagIsZero(thread, 4) == 0) {
+        endStrength = vmArgGet(thread, 4);
+    } else {
+        endStrength = 0;
+    }
+    if ((latchedPadValue | durationFrames) != 0) {
+        padSetLatchedValue(latchedPadValue);
+        Vibration_Set_Strong(startStrength, endStrength, durationFrames);
+    } else {
+        Vibration_Stop();
+    }
+    return 1;
+}
+
+s32 sefFlagSetBit26();
+
+s32 sbNativeSynopsisSkip(void) {
+    sefFlagSetBit26();
+    return 1;
+}
+
+s32 sbNativeArgFlagIsSet(s32 thread) {
+    s32 stateSourceId;
+    stateSourceId = vmArgGet(thread, 1);
+    return RgDispModelFindByKey(stateSourceId) != 0;
+}
+
+s32 VM_PLUGIN_CNT_GET();
+
+s32 sbSlotJumpRequest();
+
+s32 sbNativeLoopScaleSet(s32 thread) {
+    s32 loopScaleFirstPercent;
+    s32 loopScaleSecondPercent;
+
+    if (VM_PLUGIN_CNT_GET(thread) != 2) {
+        sbSlotJumpRequest(thread, 2);
+        return 0;
+    }
+    loopScaleFirstPercent = vmArgGet(thread, 1);
+    loopScaleSecondPercent = vmArgGet(thread, 2);
+    gGameLoopRuntimeStorage->loopScaleSecond = (float) loopScaleSecondPercent / 100.0f;
+    gGameLoopRuntimeStorage->loopScaleFirst = (float) loopScaleFirstPercent / 100.0f;
+    return 1;
+}
+
+typedef struct ActorOwnerBlock {
+    unsigned char unmodeled_000[0x830];
+    XenoActor *actor;
+} ActorOwnerBlock;
+
+typedef struct HidePartNames {
+    const char *names[8];
+} HidePartNames;
+
+extern HidePartNames gActorHidePartNames[];
+
+ActorOwnerBlock *stateBlockGet(void);
+
+s32 XenoActorHidePart(XenoActor *actor, const char *partName);
+
+void func_0028F2C8(float scale);
+
+s32 sbNativeActorPartsHide(s32 thread) {
+    s32 hideFirst;
+    s32 hideSecond;
+    s32 hideThird;
+    s32 hideFourth;
+    s32 hideFifth;
+    s32 modelScalePercent;
+    s32 hideNamedParts;
+    HidePartNames partNames;
+    ActorOwnerBlock *stateBlock;
+    s32 i;
+
+    if (vmArgTagIsZero(thread, 1) == 0) {
+        hideFirst = vmArgGet(thread, 1);
+    } else {
+        hideFirst = 0;
+    }
+    if (vmArgTagIsZero(thread, 2) == 0) {
+        hideSecond = vmArgGet(thread, 2);
+    } else {
+        hideSecond = 0;
+    }
+    if (vmArgTagIsZero(thread, 3) == 0) {
+        hideThird = vmArgGet(thread, 3);
+    } else {
+        hideThird = 0;
+    }
+    if (vmArgTagIsZero(thread, 4) == 0) {
+        hideFourth = vmArgGet(thread, 4);
+    } else {
+        hideFourth = 0;
+    }
+    if (vmArgTagIsZero(thread, 5) == 0) {
+        hideFifth = vmArgGet(thread, 5);
+    } else {
+        hideFifth = 0;
+    }
+    if (vmArgTagIsZero(thread, 6) == 0) {
+        modelScalePercent = vmArgGet(thread, 6);
+    } else {
+        modelScalePercent = 0;
+    }
+    if (vmArgTagIsZero(thread, 7) == 0) {
+        hideNamedParts = vmArgGet(thread, 7);
+    } else {
+        hideNamedParts = 0;
+    }
+
+    if (hideFirst != 0) {
+        gGameLoopRuntimeStorage->partHideFlags |= 0x1;
+    }
+    if (hideSecond != 0) {
+        gGameLoopRuntimeStorage->partHideFlags |= 0x2;
+    }
+    if (hideThird != 0) {
+        gGameLoopRuntimeStorage->partHideFlags |= 0x4;
+    }
+    if (hideFourth != 0) {
+        gGameLoopRuntimeStorage->partHideFlags |= 0x8;
+    }
+    if (hideFifth != 0) {
+        gGameLoopRuntimeStorage->partHideFlags |= 0x10;
+    }
+    if (modelScalePercent != 0) {
+        func_0028F2C8((float) modelScalePercent * 0.01f);
+    }
+    if (hideNamedParts != 0) {
+        partNames = gActorHidePartNames[0];
+        stateBlock = stateBlockGet();
+        for (i = 0; partNames.names[i] != 0; i++) {
+            XenoActorHidePart(stateBlock->actor, partNames.names[i]);
+        }
+    }
+    return 1;
+}
+
+typedef struct RgDispModel {
+    unsigned char unk_00[0x24];
+    s32 actorId;
+} RgDispModel;
+
+RgDispModel *RgDispModelNextByKind();
+
+s32 func_00290548();
+
+s32 sbNativeModelsTimeoutSet(s32 thread) {
+    RgDispModel *model;
+    s32 timeoutFrames;
+
+    model = 0;
+    if (vmArgTagIsZero(thread, 1) == 0) {
+        timeoutFrames = vmArgGet(thread, 1);
+    } else {
+        timeoutFrames = 30;
+    }
+    for (;;) {
+        model = RgDispModelNextByKind(7, model);
+        if (model == 0) {
+            break;
+        }
+        if (model->actorId != 0) {
+            func_00290548(model->actorId, timeoutFrames);
+        }
+    }
+    return 1;
+}
+
+s32 func_001BBC68();
+
+s32 pendingCountSet();
+
+s32 sbNativeWaitArg(s32 thread) {
+    s32 pendingCount;
+
+    if (vmArgTagIsZero(thread, 1) == 0) {
+        pendingCount = vmArgGet(thread, 1);
+    } else {
+        pendingCount = 0;
+    }
+    func_001BBC68();
+    if (pendingCount > 0) {
+        pendingCountSet(pendingCount);
+    }
     return 1;
 }

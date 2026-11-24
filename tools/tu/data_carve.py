@@ -566,7 +566,7 @@ def native_case_vector_provenance(root, unit_dir, tu_id, original=None):
         return []
     record = _character_tu_record(root, tu_id)
     if (record.get('kind') != 'gcc' or record.get('category') != 'game' or record.get('in_scope') is not True or
-            record['contract'].get('source_class') != 'game_c' or record['contract']['flags'] not in (['-O2', '-G0'], ['-O2', '-G8'])):
+            record['contract'].get('source_class') != 'game_c' or record['contract']['flags'] not in (['-O2', '-G0'], ['-O2', '-G4'], ['-O2', '-G8'])):
         return []
     originals = root / 'config/originals.json'
     original_identity = json.loads(originals.read_bytes())['units']['main']
@@ -1084,7 +1084,7 @@ def _character_tu_record(root, tu_id):
     if (tu.get('category') != 'game' or tu.get('in_scope') is not True or
             tu.get('kind') != 'gcc' or
             tu.get('compiler_profile') != 'ee-gcc2_96-realconv-lp7' or
-            flags not in (['-O2', '-G0'], ['-O2', '-G8'], ['-O0', '-G0'], ['-O0', '-G8'])):
+            flags not in (['-O2', '-G0'], ['-O2', '-G4'], ['-O2', '-G8'], ['-O0', '-G0'], ['-O0', '-G4'], ['-O0', '-G8'])):
         raise CarveError('unsupported public typed character TU contract')
     tc = Toolchain(root)
     options = tu_assembler_options(tu)
@@ -1156,7 +1156,7 @@ def _materialize_character_context(item, cut, context):
         raise CarveError('typed character compiler identity is missing/ambiguous')
     directory = tc.dir(compilers[0])
     cc1 = directory / 'cc1'
-    if (contract.get('flags') not in (['-O2', '-G8'], ['-O2', '-G0']) or
+    if (contract.get('flags') not in (['-O2', '-G8'], ['-O2', '-G4'], ['-O2', '-G0']) or
             hashlib.sha256(cc1.read_bytes()).hexdigest() != contract.get('cc1_sha256')):
         raise CarveError('typed character compiler contract/pin differs')
     for kind in ('ee-gcc', 'cpp0', 'cc1'):

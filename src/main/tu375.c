@@ -43,16 +43,16 @@ void sceneLinkStateClearCounters(void)
     gSceneLinkState.enabled = 0;
 }
 
-extern s8 gSceneLinkPhase;
+extern s8 gSceneLinkPhase[];
 
 void sceneLinkSetFlag45(s8 value) {
-    gSceneLinkPhase = value;
+    gSceneLinkPhase[0] = value;
 }
 
-extern s8 gSceneLinkMode;
+extern s8 gSceneLinkMode[];
 
 void sceneLinkSetFlag44(s8 value) {
-    gSceneLinkMode = value;
+    gSceneLinkMode[0] = value;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu375", func_002C6B50);

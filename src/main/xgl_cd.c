@@ -819,7 +819,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_cd", func_00187E28);
 int func_00187E28(CdArchiveEntry *entry, const char *path);
 int func_002E9518(char *path, int mode);
 int func_002F71F0(CdFilePosition *position, char *buffer);
-extern char D_00551188[8];
+extern char D_00551188[4];
 extern CdArchiveStorage D_0089B600;
 extern const char D_005401D0[32];
 /* Unsized: the original addresses these strings absolutely, not through $gp. */

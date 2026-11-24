@@ -36,10 +36,10 @@ void xglCdInitReadRing(void)
   func_00250768();
 }
 
-extern s32 gXglCdDriveStatus;
+extern s32 gXglCdDriveStatus[];
 
 void xglCdSetDriveStatus(s32 driveStatus) {
-    gXglCdDriveStatus = driveStatus;
+    gXglCdDriveStatus[0] = driveStatus;
 }
 
 void xglCdAddReadyBits(s32 bitsToSet)
@@ -62,14 +62,14 @@ void xglCdSetReadyFlag(void)
   func_0024E5A8();
 }
 
-extern s32 gXglCdDriveReadyStatus;
+extern s32 gXglCdDriveReadyStatus[];
 
 s32 xglCdGetReadyStatus(void) {
-    return gXglCdDriveReadyStatus;
+    return gXglCdDriveReadyStatus[0];
 }
 
 s32 xglCdGetDriveStatus(void) {
-    return gXglCdDriveStatus;
+    return gXglCdDriveStatus[0];
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu210", func_0024E5A8);

@@ -39744,73 +39744,73 @@
      2
     ],
     [
-     "drawEnvCopyWindow",
+     "filterBlurDraw",
      1927464,
      2132,
      2
     ],
     [
-     "xglDefocusFilterDraw",
+     "filterMosaicDraw",
      1929600,
      700,
      2
     ],
     [
-     "xglScreenQuadDraw",
+     "filterNegaposiDraw",
      1930304,
      504,
      2
     ],
     [
-     "xglColorFilterApplyClut",
+     "filterMonotoneDraw",
      1930808,
      4540,
      2
     ],
     [
-     "xglWipePassUpdate",
+     "filterCrossFadeDraw",
      1935352,
      1340,
      2
     ],
     [
-     "xglWaveFilterDraw",
+     "filterSwell2Draw",
      1936696,
      1576,
      2
     ],
     [
-     "xglScreenWarpDraw",
+     "filterWavyBlurDraw",
      1938272,
      3308,
      2
     ],
     [
-     "xglRadialBlurDraw",
+     "filterWavyBlur2Draw",
      1941584,
      2056,
      2
     ],
     [
-     "xglFrameCopyQuadDraw",
+     "filterDirBlurDraw",
      1943640,
      1020,
      2
     ],
     [
-     "xglTwistRingFilterDraw",
+     "filterTorusDraw",
      1944664,
      2492,
      2
     ],
     [
-     "xglObjectSetModeOne",
+     "filterRippleDraw",
      1947160,
      28,
      2
     ],
     [
-     "xglObjectSetModeTwo",
+     "filterRipple2Draw",
      1947192,
      28,
      2
@@ -39822,37 +39822,37 @@
      2
     ],
     [
-     "xglScrollWaveFilterDraw",
+     "filterDistortDraw",
      1949936,
      1568,
      2
     ],
     [
-     "xglGlobalScrollWaveFilterDraw",
+     "filterSwellDraw",
      1951504,
      1500,
      2
     ],
     [
-     "func_001DCCF0",
+     "filterDofDraw",
      1953008,
      636,
      2
     ],
     [
-     "xglNoiseFilterDraw",
+     "filterNoiseDraw",
      1953648,
      2600,
      2
     ],
     [
-     "xglLineJitterFilterDraw",
+     "filterNoise2Draw",
      1956248,
      2968,
      2
     ],
     [
-     "xglDisplayCopyPassDraw",
+     "filterSpeculerDraw",
      1959216,
      1224,
      2
@@ -39870,7 +39870,7 @@
      2
     ],
     [
-     "xglParticleEmitterDraw",
+     "filterShimmerDraw",
      1960648,
      3340,
      2
@@ -39882,7 +39882,7 @@
      2
     ],
     [
-     "func_001E0630",
+     "filterRefractDraw",
      1967664,
      2016,
      2
@@ -39894,7 +39894,7 @@
      2
     ],
     [
-     "xglColorFilterApply",
+     "filterCorrectDraw",
      1970472,
      4904,
      2
@@ -39918,97 +39918,97 @@
      2
     ],
     [
-     "xglRadialBlurApply",
+     "filterSoftFocusDraw",
      1975792,
      3824,
      2
     ],
     [
-     "xglDepthFocusBlurApply",
+     "filterScreenBlurDraw",
      1979616,
      3688,
      2
     ],
     [
-     "blurDrawTintedWindow",
+     "filterColorDraw",
      1983304,
      1228,
      2
     ],
     [
-     "xglTrackNodeWipeUpdate",
+     "filterWipeDraw",
      1984536,
      1780,
      2
     ],
     [
-     "xglScreenWipeDraw",
+     "filterGradationDraw",
      1986320,
      2768,
      2
     ],
     [
-     "xglFadeSpriteDraw",
+     "filterPlaneDraw",
      1989088,
      352,
      2
     ],
     [
-     "xglFadeUpdate",
+     "filterFadeDraw",
      1989440,
      772,
      2
     ],
     [
-     "xglScreenBlurDraw",
+     "filterDof2Draw",
      1990216,
      672,
      2
     ],
     [
-     "xglDissolveUpdate",
+     "filterCutInDraw",
      1990888,
      3328,
      2
     ],
     [
-     "xglNoOpHook",
+     "filterTestDraw",
      1994216,
      8,
      2
     ],
     [
-     "xglNoOpHookAlt",
+     "filterTest2Draw",
      1994224,
      8,
      2
     ],
     [
-     "func_001E6DF8",
+     "filterTest3Draw",
      1994232,
      332,
      2
     ],
     [
-     "func_001E6F48",
+     "filterTest4Draw",
      1994568,
      196,
      2
     ],
     [
-     "drawEnvSetWindow256x224",
+     "filterTest5Draw",
      1994768,
      92,
      2
     ],
     [
-     "xglPacketScreenCopyPass",
+     "filterTest6Draw",
      1994864,
      492,
      2
     ],
     [
-     "tu114EmptyStep",
+     "filterTest7Draw",
      1995360,
      8,
      2

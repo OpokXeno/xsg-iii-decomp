@@ -16,8 +16,8 @@ void cameraRegisterBcamNatives(void) {
     sbNativeOwnerAdd(gBcamNativeOwnerName, gBcamNativeMethods);
 }
 
-extern s32 gBattleRecordBufferBaseStorage;
+extern s32 gBattleRecordBufferBaseStorage[];
 
 s32 cameraGetBaseValue(void) {
-    return gBattleRecordBufferBaseStorage;
+    return gBattleRecordBufferBaseStorage[0];
 }

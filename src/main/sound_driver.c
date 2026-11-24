@@ -64,7 +64,7 @@ typedef signed char s8;
 typedef int s32;
 extern unsigned char gSeBankFileExt[];
 extern SoundRecordBlock gSoundRecordBlock;
-extern s32 D_004C7040;
+extern s32 D_004C7040[];
 extern unsigned char gSeBankDirName[];
 void func_001801C0();
 void func_0018EC68();
@@ -76,7 +76,7 @@ void seBankLoadNumbered(s32 id, s32 number) {
     func_0018EC68(id);
     if (number != 0) {
         func_0018E4C0(name, gSeBankDirName, number, gSeBankFileExt);
-        func_001801C0(id, name, D_004C7040, 0x20000, 0, 0);
+        func_001801C0(id, name, D_004C7040[0], 0x20000, 0, 0);
     }
 }
 
@@ -319,7 +319,7 @@ int seVolumeRampSet(VolumeRamp *ramp, int level, int step);
 #define SOUND_LEVEL_MAX 127
 
 /* The default level of a sound slot, a splat label of its own at gSoundSlotDefaultLevel. */
-extern unsigned char gSoundSlotDefaultLevel;
+extern unsigned char gSoundSlotDefaultLevel[];
 
 /* Sets slot index's level and ramp step; a negative extra only reports whether the ramp is moving. */
 int soundSlotSetVolume(int soundSlotNumber, int level, int rampStep)
@@ -334,7 +334,7 @@ int soundSlotSetVolume(int soundSlotNumber, int level, int rampStep)
         return soundSlot->ramp.levelDelta != 0;
     }
     if (level < 0) {
-        level = gSoundSlotDefaultLevel;
+        level = gSoundSlotDefaultLevel[0];
     }
     if (soundSlotNumber == 0) {
         level = level * gSoundRecordBlock.master_volume / SOUND_LEVEL_MAX;

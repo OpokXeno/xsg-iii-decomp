@@ -71,14 +71,14 @@ void heapOverviewMenuDraw(HeapOverviewRecord *overview) {
     xglFontPrint(0x28, 0x60, -1, message144);
 }
 
-extern signed char D_004C8417;
+extern signed char D_004C8417[];
 
 void testStoreScaledLevel(s32 level) {
     if (level < 0) {
-        D_004C8417 = level - 0x80;
+        D_004C8417[0] = level - 0x80;
         return;
     }
-    D_004C8417 = (level * 2) - 0x80;
+    D_004C8417[0] = (level * 2) - 0x80;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu051", func_001B1D28);

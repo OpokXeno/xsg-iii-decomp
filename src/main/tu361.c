@@ -50,10 +50,10 @@ void seVoiceEntriesReset(void) {
     seVoiceSlotsReset();
 }
 
-extern s32 gVPadActor;
+extern s32 gVPadActor[];
 
 void vpadActorSet(s32 actor) {
-    gVPadActor = actor;
+    gVPadActor[0] = actor;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu361", func_002AEBE8);
