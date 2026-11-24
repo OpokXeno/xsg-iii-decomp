@@ -1,33 +1,78 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu186", func_00237188);
-
 typedef int s32;
+
+/* VM native: calls func_00221FB8 with each script argument, from the first to the last. Returns 1. */
+s32 vmCallEachArgument(s32 vmThread) {
+    extern s32 VM_PLUGIN_CNT_GET(s32);
+    extern s32 vmArgGet(s32, s32);
+    extern void func_00221FB8(s32);
+    s32 vmArgCount;
+    s32 vmArgIndex;
+
+    vmArgIndex = 0;
+    vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
+    if (vmArgCount > 0) {
+        do {
+            vmArgIndex += 1;
+            func_00221FB8(vmArgGet(vmThread, vmArgIndex));
+        } while (vmArgIndex < vmArgCount);
+    }
+    return 1;
+}
+
 typedef unsigned char u8;
-typedef signed char s8;
+
 s32 func_001B9228();
-s32 func_00237188();
 
 s32 vmRunNativeWithPluginFlush(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     s32 nativeResult;
 
-    nativeResult = func_00237188();
+    nativeResult = vmCallEachArgument(vmThread);
     if (VM_PLUGIN_CNT_GET(vmThread) != 0) {
         func_001B9228();
     }
     return nativeResult;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu186", func_00237248);
+s32 func_00222120(s32, s32, s32);
+s32 func_00222360(s32);
 
-s32 func_00237248();
+/* VM native with two arguments: func_00221FB8(first) then a loop of func_00222120 over the func_00222360 kind count. */
+s32 vmRaiseEntryKindTo(s32 vmThread) {
+    extern s32 VM_PLUGIN_CNT_GET(s32);
+    extern s32 vmArgGet(s32, s32);
+    extern void func_00221FB8(s32);
+    s32 vmArgCount;
+    s32 vmFirstArg;
+    s32 vmSecondArg;
+    s32 vmKind;
+    s32 vmKindFlag;
+
+    vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
+    if (vmArgCount != 2) {
+        return 0;
+    }
+    vmFirstArg = vmArgGet(vmThread, 1);
+    vmSecondArg = vmArgGet(vmThread, 2);
+    vmKindFlag = vmFirstArg >= 13;
+    func_00221FB8(vmFirstArg);
+    vmKind = func_00222360(vmFirstArg);
+    if (vmKind != -1 && vmSecondArg >= 0 && vmSecondArg < vmKind) {
+        do {
+            func_00222120(vmKind, vmKind - 1, vmKindFlag);
+            vmKind = func_00222360(vmFirstArg);
+        } while (vmSecondArg < vmKind);
+    }
+    return 1;
+}
 
 s32 vmRunSecondNativeWithPluginFlush(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     s32 secondNativeResult;
 
-    secondNativeResult = func_00237248();
+    secondNativeResult = vmRaiseEntryKindTo(vmThread);
     if (VM_PLUGIN_CNT_GET(vmThread) != 0) {
         func_001B9228();
     }
@@ -74,14 +119,57 @@ s32 vmForEachArgCallWithFlush(void) {
     return vmForEachResult;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu186", func_00237428);
+void battleUpdateEntryKinds(s32, s32, s32);
 
-s32 func_00237428();
+/* VM native with three arguments: all nonzero arguments must share one kind class (value >= 13), then battleUpdateEntryKinds runs. */
+s32 vmUpdateEntryKinds(s32 vmThread) {
+    extern s32 VM_PLUGIN_CNT_GET(s32);
+    extern s32 vmArgGet(s32, s32);
+    s32 vmArgCount;
+    s32 vmArgIndex;
+    s32 vmArgValue;
+    s32 vmHaveKindClass;
+    s32 vmKindClass;
+    s32 vmFirstArg;
+    s32 vmSecondArg;
+    s32 vmThirdArg;
 
-s32 vmRunNativeFlushOnResult(void) {
+    vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
+    if (vmArgCount != 3) {
+        return 0;
+    }
+    vmHaveKindClass = 0;
+    vmKindClass = -1;
+    vmArgIndex = 0;
+    do {
+        vmArgIndex += 1;
+        vmArgValue = vmArgGet(vmThread, vmArgIndex);
+        if (vmHaveKindClass != 0) {
+            if (vmArgValue == 0) {
+                continue;
+            }
+            if (vmKindClass != (vmArgValue >= 13)) {
+                return 0;
+            }
+            continue;
+        }
+        if (vmArgValue == 0) {
+            continue;
+        }
+        vmHaveKindClass = 1;
+        vmKindClass = vmArgValue >= 13;
+    } while (vmArgIndex < 3);
+    vmFirstArg = vmArgGet(vmThread, 1);
+    vmSecondArg = vmArgGet(vmThread, 2);
+    vmThirdArg = vmArgGet(vmThread, 3);
+    battleUpdateEntryKinds(vmFirstArg, vmSecondArg, vmThirdArg);
+    return 1;
+}
+
+s32 vmRunNativeFlushOnResult(s32 vmThread) {
     s32 nativeResult;
 
-    nativeResult = func_00237428();
+    nativeResult = vmUpdateEntryKinds(vmThread);
     if (nativeResult != 0) {
         func_001B9228();
     }
@@ -121,9 +209,7 @@ s32 vmIsFlagSet(void) {
     return gBattleCurrentRosterIndex[0] != 0;
 }
 
-s32 func_00222120(s32, s32, s32);
 s32 func_00222238(s32, s32);
-s32 func_00222360(s32);
 
 s32 vmApplyIndexedKindArg(s32 vmThread)
 {
@@ -211,7 +297,25 @@ s32 vmGetRecordSubEntryFromArgs(s32 vmThread)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu186", func_00237808);
+typedef struct BattleRosterWords {
+    s32 rosterEntryWords[8];
+} BattleRosterWords;
+
+typedef struct BattleRosterSnapshot {
+    u8 unmodeled_00[4];
+    BattleRosterWords roster;
+    u8 snapshotFlags;
+} BattleRosterSnapshot;
+
+extern BattleRosterSnapshot D_003E6E30;
+extern unsigned char gBattleRosterTable[];
+
+/* Copies the 8-word battle roster table into the snapshot and sets bit 1 of snapshotFlags. */
+s32 battleRosterSnapshotTake(void) {
+    D_003E6E30.snapshotFlags |= 2;
+    D_003E6E30.roster = *(BattleRosterWords *) gBattleRosterTable;
+    return 1;
+}
 
 s32 battleRosterHeaderPairSet();
 
@@ -226,12 +330,55 @@ s32 vmInvokePairFromArgs(s32 vmThread) {
     return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu186", func_002378C0);
+/* VM native: sets bit 0 of roster table byte 0x27 when its argument is nonzero (default 1), clears it otherwise. */
+s32 vmSetRosterTableFlag(s32 vmThread) {
+    extern s32 VM_PLUGIN_CNT_GET(s32);
+    extern s32 vmArgGet(s32, s32);
+    s32 vmArgCount;
+    s32 vmArgValue;
 
-INCLUDE_ASM("asm/main/nonmatchings/tu186", func_00237930);
+    vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
+    vmArgValue = 1;
+    if (vmArgCount > 0) {
+        vmArgValue = vmArgGet(vmThread, 1);
+    }
+    if (vmArgValue != 0) {
+        gBattleRosterTable[0x27] |= 1;
+    } else {
+        gBattleRosterTable[0x27] &= 0xFE;
+    }
+    return 1;
+}
+
+s32 func_00230218(s32);
+s32 func_0025F5C0(s32);
+
+/* VM native: builds the roster flags from the current roster index and an optional shifted bit, then calls func_00230218 between func_0025F5C0(1) and func_0025F5C0(0). */
+s32 vmSetRosterFlagsFromArgs(s32 vmThread) {
+    extern u8 gBattleCurrentRosterIndex[];
+    extern s32 VM_PLUGIN_CNT_GET(s32);
+    extern s32 vmArgGet(s32, s32);
+    s32 rosterBit;
+    s32 vmArgCount;
+    s32 vmArgValue;
+    s32 rosterFlags;
+
+    rosterBit = 1;
+    rosterFlags = gBattleCurrentRosterIndex[0] == rosterBit;
+    vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
+    if (vmArgCount > 0) {
+        vmArgValue = vmArgGet(vmThread, 1);
+        if (vmArgValue != 0) {
+            rosterFlags |= rosterBit << vmArgValue;
+        }
+    }
+    func_0025F5C0(1);
+    func_00230218(rosterFlags);
+    func_0025F5C0(0);
+    return 1;
+}
 
 s32 seVoiceStartGuarded(s32);
-s32 func_0025F5C0(s32);
 
 s32 vmStartSeVoiceFromArgGuarded(s32 vmThread) {
     extern s32 vmArgGet(s32, s32);

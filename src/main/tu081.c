@@ -176,7 +176,7 @@ void func_00A83760(void);
 s32 func_0025F5C0(s32 flag);
 s32 soundDriverSetOutputMode(s32 mode);
 s32 soundSlotSetLevelIfStill(s32 slot, s32 level);
-s32 func_00234998(s32 mode);
+s32 saveScreenRun(s32 mode);
 void runStreamPlayback(void);
 s32 seVoiceStartGuarded(s32 voice);
 
@@ -227,7 +227,7 @@ void emitterSoundUpdate(EmitterOwner *owner) {
         }
         switch (params->soundTableRow) {
         case 0:
-            func_00234998(0);
+            saveScreenRun(0);
             break;
         case 1:
             runStreamPlayback();

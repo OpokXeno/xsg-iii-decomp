@@ -298,7 +298,7 @@ typedef struct GameLoopResetComboBitsView {
 
 void gameStartSelectedMap(ResetComboBits *combo);
 void sbNativeValueSlotPush();
-s32 func_00234998();
+s32 saveScreenRun();
 s32 GameMpeg2Play();
 s32 xglFontDebugPrintf();
 
@@ -360,7 +360,7 @@ void debugStageMenuStep(DebugSelection *selection) {
         break;
     case DEBUG_MENU_ROW_RESTORE:
         if (pressed & PAD_BUTTON_CIRCLE) {
-            if (func_00234998(1)) {
+            if (saveScreenRun(1)) {
                 ((s32 (*)()) stateRestore)(&gSavedPlacement);
                 gDebugMenuNumber = ((StateRestoreHeader *) &gSavedPlacement)->id;
             }

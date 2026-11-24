@@ -104,7 +104,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu370", func_002C0670);
 INCLUDE_ASM("asm/main/nonmatchings/tu370", func_002C07B0);
 
 s32 fontQueueColorState(s32 value);
-s32 func_0023C588(s32, s32, s32, s32);
+s32 xglFontDrawStringScaled(s32, s32, s32, s32);
 s32 xglFontDrawDigits(s32, s32, s32, s32);
 void drawEntrySetAlpha(DrawEntry *drawEntry, s32 alpha);
 s32 func_002BE480(DrawEntry *drawEntry);
@@ -133,13 +133,13 @@ void drawObjectRefresh(DrawObject *drawObject) {
     func_002BE480(rightEntry);
     fontQueueColorState(0x80322955);
     leftSpriteIndex = sceneLinkLookupEntry(2);
-    func_0023C588((((s32) drawObject->posX * 0x10) + 0x78A8) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7228) & 0xFFF8, leftSpriteIndex, 0xD);
+    xglFontDrawStringScaled((((s32) drawObject->posX * 0x10) + 0x78A8) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7228) & 0xFFF8, leftSpriteIndex, 0xD);
     fontQueueColorState(0x80545934);
     middleSpriteIndex = sceneLinkLookupEntry(0);
-    func_0023C588((((s32) drawObject->posX * 0x10) + 0x7C68) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7228) & 0xFFF8, middleSpriteIndex, 0xD);
+    xglFontDrawStringScaled((((s32) drawObject->posX * 0x10) + 0x7C68) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7228) & 0xFFF8, middleSpriteIndex, 0xD);
     fontQueueColorState(0x80562E2D);
     rightSpriteIndex = sceneLinkLookupEntry(1);
-    func_0023C588((((s32) drawObject->posX * 0x10) + 0x80D8) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7228) & 0xFFF8, rightSpriteIndex, 0xD);
+    xglFontDrawStringScaled((((s32) drawObject->posX * 0x10) + 0x80D8) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7228) & 0xFFF8, rightSpriteIndex, 0xD);
     fontQueueColorState(0x80808080);
     xglFontDrawDigits((((s32) drawObject->posX * 0x10) + 0x8058) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7208) & 0xFFF8, drawObject->spriteIdA, 0xF);
     xglFontDrawDigits((((s32) drawObject->posX * 0x10) + 0x8418) & 0xFFF8, (((s32) drawObject->posY * 0x10) + 0x7208) & 0xFFF8, drawObject->spriteIdB, 0xF);

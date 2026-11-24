@@ -1031,7 +1031,7 @@ void xglFontPrintExtendedColor(s32 a, s32 b, s32 c);
 void xglFontSetColor(s32 r, s32 g, s32 b);
 void xglFontPrintAlphaCommand(s32 a, s32 b, s32 c);
 void xglFontResetState(void);
-void func_0023BF30(s32 x, s32 y, s32 shift);
+void xglFontQueueFlaggedRow(s32 x, s32 y, s32 shift);
 
 /* Prints the title xglFontTitleString at the origin, then text at (x, y) with its escapes. Then it
  * draws the pending pulse glyph (gPendingGlyphActive) when one is set and clears the flag. */
@@ -1064,7 +1064,7 @@ void xglFontPrintTitledText(s32 x, s32 y, char *text, s32 labelValue) {
         fadeLevel = gPendingGlyphFade;
         if (gPendingGlyphActive != 0) {
             fontQueueColorState((unsigned long) fadeLevel << 24 | 0x808080);
-            func_0023BF30(((gPendingGlyphX * 16) + 0x6FF8) & 0xFFF8, ((gPendingGlyphY * 16) + 0x71F8) & 0xFFF8,
+            xglFontQueueFlaggedRow(((gPendingGlyphX * 16) + 0x6FF8) & 0xFFF8, ((gPendingGlyphY * 16) + 0x71F8) & 0xFFF8,
                           1 << gPendingGlyphKind);
             gPendingGlyphActive = 0;
         }

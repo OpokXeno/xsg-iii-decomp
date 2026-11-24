@@ -45750,31 +45750,31 @@
      2
     ],
     [
-     "func_00230430",
+     "saveScreenRecordLookup",
      2294832,
      156,
      2
     ],
     [
-     "func_002304D0",
+     "saveScreenSetFormattedMessage",
      2294992,
      76,
      2
     ],
     [
-     "attackHitsShow",
+     "saveScreenSetMenu",
      2295072,
      124,
      2
     ],
     [
-     "attackEffectsFinished",
+     "saveScreenSetDraw",
      2295200,
      156,
      2
     ],
     [
-     "attackHitsShowAndWait",
+     "saveScreenSetMenuAndDraw",
      2295360,
      40,
      2
@@ -45792,49 +45792,49 @@
      2
     ],
     [
-     "func_002306C0",
+     "saveScreenFormatText",
      2295488,
      52,
      2
     ],
     [
-     "func_002306F8",
+     "saveScreenSetMessageText",
      2295544,
      40,
      2
     ],
     [
-     "func_00230720",
+     "saveScreenHandleCardResult",
      2295584,
      248,
      2
     ],
     [
-     "func_00230818",
+     "saveScreenShowSheet",
      2295832,
      112,
      2
     ],
     [
-     "func_00230888",
+     "saveScreenSetupMenuHandler",
      2295944,
      176,
      2
     ],
     [
-     "func_00230938",
+     "saveScreenPlainMenuHandler",
      2296120,
      144,
      2
     ],
     [
-     "func_002309C8",
+     "saveScreenStartGauge",
      2296264,
      140,
      2
     ],
     [
-     "func_00230A58",
+     "saveScreenGaugeStep",
      2296408,
      264,
      2
@@ -45864,7 +45864,7 @@
      2
     ],
     [
-     "func_00230CA8",
+     "saveScreenStepFade",
      2297000,
      188,
      2
@@ -45882,13 +45882,13 @@
      2
     ],
     [
-     "func_00230DE8",
+     "saveScreenLoadFileRecord",
      2297320,
      288,
      2
     ],
     [
-     "func_00230F08",
+     "saveScreenGrantFileStates",
      2297608,
      116,
      2
@@ -45900,7 +45900,7 @@
      2
     ],
     [
-     "func_00231090",
+     "saveScreenDrawIcon",
      2298000,
      596,
      2
@@ -45912,79 +45912,79 @@
      2
     ],
     [
-     "func_00231338",
+     "saveScreenFileInWindow",
      2298680,
      100,
      2
     ],
     [
-     "func_002313A0",
+     "saveScreenStartSlotLoad",
      2298784,
      340,
      2
     ],
     [
-     "func_002314F8",
+     "saveScreenFinishSlotLoad",
      2299128,
      248,
      2
     ],
     [
-     "func_002315F0",
+     "saveScreenLoadFileIntoFreeSlot",
      2299376,
      156,
      2
     ],
     [
-     "func_00231690",
+     "saveScreenStartPendingLoads",
      2299536,
      288,
      2
     ],
     [
-     "func_002317B0",
+     "saveScreenPortMenuUpdate",
      2299824,
      920,
      2
     ],
     [
-     "func_00231B48",
+     "saveScreenDrawMenu",
      2300744,
      760,
      2
     ],
     [
-     "func_00231E40",
+     "saveScreenFormatCardUpdate",
      2301504,
      468,
      2
     ],
     [
-     "func_00232018",
+     "saveScreenFileListUpdate",
      2301976,
      1284,
      2
     ],
     [
-     "func_00232520",
+     "saveScreenMenuStep",
      2303264,
      1840,
      2
     ],
     [
-     "func_00232C50",
+     "saveScreenDrawGlyphColumn",
      2305104,
      300,
      2
     ],
     [
-     "func_00232D80",
+     "saveScreenDrawFileRow",
      2305408,
      1724,
      2
     ],
     [
-     "func_00233440",
+     "saveScreenDrawFileList",
      2307136,
      676,
      2
@@ -45996,25 +45996,25 @@
      2
     ],
     [
-     "func_00233740",
+     "saveScreenPlayTitleMovie",
      2307904,
      344,
      2
     ],
     [
-     "func_00233898",
+     "saveScreenFileReadState",
      2308248,
      1308,
      2
     ],
     [
-     "func_00233DB8",
+     "saveScreenEntriesReadState",
      2309560,
      864,
      2
     ],
     [
-     "func_00234118",
+     "saveScreenDraw",
      2310424,
      844,
      2
@@ -46026,55 +46026,55 @@
      2
     ],
     [
-     "func_002344C0",
+     "saveFileReadCallback",
      2311360,
      116,
      2
     ],
     [
-     "func_00234538",
+     "saveScreenSetup",
      2311480,
      980,
      2
     ],
     [
-     "func_00234910",
+     "saveScreenDestroy",
      2312464,
      132,
      2
     ],
     [
-     "func_00234998",
+     "saveScreenRun",
      2312600,
      276,
      2
     ],
     [
-     "func_00234AB0",
+     "saveScreenSession",
      2312880,
      372,
      2
     ],
     [
-     "func_00234C28",
+     "saveScreenStepFrame",
      2313256,
      320,
      2
     ],
     [
-     "func_00234D68",
+     "saveScreenLoop",
      2313576,
      460,
      2
     ],
     [
-     "func_00234F38",
+     "saveConfirmMenu",
      2314040,
      292,
      2
     ],
     [
-     "func_00235060",
+     "saveChoiceBoxDraw",
      2314336,
      404,
      2
@@ -46086,19 +46086,19 @@
      2
     ],
     [
-     "func_00235220",
+     "savePortMenuUpdate",
      2314784,
      604,
      2
     ],
     [
-     "func_00235480",
+     "saveDialogAnswer",
      2315392,
      24,
      2
     ],
     [
-     "func_00235498",
+     "saveFileMenuUpdate",
      2315416,
      808,
      2
@@ -46110,19 +46110,19 @@
      2
     ],
     [
-     "func_002357F8",
+     "saveWriteConfirmMenu",
      2316280,
      212,
      2
     ],
     [
-     "func_002358D0",
+     "saveWriteConfirmDraw",
      2316496,
      368,
      2
     ],
     [
-     "func_00235A40",
+     "saveCardRequestCallback",
      2316864,
      128,
      2
@@ -46146,7 +46146,7 @@
      2
     ],
     [
-     "func_00235E58",
+     "pagedTableClampFilledCount",
      2317912,
      64,
      2
@@ -46158,7 +46158,7 @@
      2
     ],
     [
-     "func_00235EB8",
+     "pagedTableSetCursor",
      2318008,
      32,
      2
@@ -46170,13 +46170,13 @@
      2
     ],
     [
-     "func_00235EF0",
+     "pagedTableGetPageIndex",
      2318064,
      48,
      2
     ],
     [
-     "func_00235F20",
+     "pagedTableGetPageStart",
      2318112,
      60,
      2
@@ -46194,13 +46194,13 @@
      2
     ],
     [
-     "func_00235FD0",
+     "pagedTableUpdateCursorFromStatus",
      2318288,
      1040,
      2
     ],
     [
-     "func_002363E0",
+     "pagedTablePoolAlloc",
      2319328,
      52,
      2
@@ -46230,13 +46230,13 @@
      2
     ],
     [
-     "func_00236570",
+     "pagedTableGetPageRelativeIndex",
      2319728,
      72,
      2
     ],
     [
-     "func_002365B8",
+     "pagedTableSetPageSizes",
      2319800,
      136,
      2
@@ -46248,13 +46248,13 @@
      2
     ],
     [
-     "func_002366A0",
+     "pagedTableSetEntry",
      2320032,
      52,
      2
     ],
     [
-     "func_002366D8",
+     "pagedTableSetTextBox",
      2320088,
      444,
      2
@@ -46272,25 +46272,25 @@
      2
     ],
     [
-     "func_00236940",
+     "pagedTableMoveCursor",
      2320704,
      256,
      2
     ],
     [
-     "func_00236A40",
+     "pagedTableStepCursorUnmasked",
      2320960,
      132,
      2
     ],
     [
-     "func_00236AC8",
+     "pagedTableUpdatePending",
      2321096,
      200,
      2
     ],
     [
-     "func_00236B90",
+     "pagedTableAnimateSlots",
      2321296,
      528,
      2
@@ -46302,7 +46302,7 @@
      2
     ],
     [
-     "func_00236DE8",
+     "pagedTableUpdate",
      2321896,
      536,
      2
@@ -46350,7 +46350,7 @@
      2
     ],
     [
-     "func_00237188",
+     "vmCallEachArgument",
      2322824,
      108,
      2
@@ -46362,7 +46362,7 @@
      2
     ],
     [
-     "func_00237248",
+     "vmRaiseEntryKindTo",
      2323016,
      196,
      2
@@ -46386,7 +46386,7 @@
      2
     ],
     [
-     "func_00237428",
+     "vmUpdateEntryKinds",
      2323496,
      228,
      2
@@ -46446,7 +46446,7 @@
      2
     ],
     [
-     "func_00237808",
+     "battleRosterSnapshotTake",
      2324488,
      100,
      2
@@ -46458,13 +46458,13 @@
      2
     ],
     [
-     "func_002378C0",
+     "vmSetRosterTableFlag",
      2324672,
      108,
      2
     ],
     [
-     "func_00237930",
+     "vmSetRosterFlagsFromArgs",
      2324784,
      132,
      2
@@ -46482,7 +46482,7 @@
      2
     ],
     [
-     "func_00237A30",
+     "seMenuBlockClear",
      2325040,
      68,
      2
@@ -46494,25 +46494,25 @@
      2
     ],
     [
-     "func_00237B18",
+     "seVoiceKindCursorSeek",
      2325272,
      124,
      2
     ],
     [
-     "func_00237B98",
+     "seVoiceKindMarkEntries",
      2325400,
      148,
      2
     ],
     [
-     "func_00237C30",
+     "seVoiceBitIsClear",
      2325552,
      60,
      2
     ],
     [
-     "func_00237C70",
+     "seVoiceTemplateBitSet",
      2325616,
      60,
      2
@@ -46524,7 +46524,7 @@
      2
     ],
     [
-     "func_00237CD0",
+     "seVoiceScreenInit",
      2325712,
      1300,
      2
@@ -46536,13 +46536,13 @@
      2
     ],
     [
-     "func_00238238",
+     "seVoiceUnitSetMode",
      2327096,
      1260,
      2
     ],
     [
-     "func_00238728",
+     "seVoiceUnitUpdate",
      2328360,
      2236,
      2
@@ -46566,55 +46566,55 @@
      2
     ],
     [
-     "func_002390E0",
+     "seVoiceInfoBoxDraw",
      2330848,
      228,
      2
     ],
     [
-     "func_002391C8",
+     "seVoiceRecordTableDraw",
      2331080,
      1984,
      2
     ],
     [
-     "func_00239988",
+     "seVoiceScreenDraw",
      2333064,
      756,
      2
     ],
     [
-     "func_00239C80",
+     "seVoicePanelDraw",
      2333824,
      2708,
      2
     ],
     [
-     "func_0023A718",
+     "seVoiceListBuild",
      2336536,
      1132,
      2
     ],
     [
-     "func_0023AB88",
+     "seVoicePlayAndSetup",
      2337672,
      720,
      2
     ],
     [
-     "func_0023AE58",
+     "seVoiceSceneEnter",
      2338392,
      836,
      2
     ],
     [
-     "func_0023B1A0",
+     "seVoiceScreenUpdate",
      2339232,
      2388,
      2
     ],
     [
-     "func_0023BAF8",
+     "seVoiceScreenRun",
      2341624,
      236,
      2
@@ -46626,13 +46626,13 @@
      2
     ],
     [
-     "func_0023BC20",
+     "xglFontQueueTextureBind",
      2341920,
      188,
      2
     ],
     [
-     "func_0023BCE0",
+     "xglFontQueueTextureFlush",
      2342112,
      80,
      2
@@ -46644,43 +46644,43 @@
      2
     ],
     [
-     "func_0023BD60",
+     "xglFontQueueGlyphRect",
      2342240,
      460,
      2
     ],
     [
-     "func_0023BF30",
+     "xglFontQueueFlaggedRow",
      2342704,
      568,
      2
     ],
     [
-     "func_0023C168",
+     "xglFontGlyphIndex",
      2343272,
      164,
      2
     ],
     [
-     "func_0023C210",
+     "xglFontGlyphWidth",
      2343440,
      56,
      2
     ],
     [
-     "func_0023C248",
+     "xglFontTextWidth",
      2343496,
      120,
      2
     ],
     [
-     "func_0023C2C0",
+     "xglFontDrawCharScaled",
      2343616,
      708,
      2
     ],
     [
-     "func_0023C588",
+     "xglFontDrawStringScaled",
      2344328,
      152,
      2
@@ -46704,7 +46704,7 @@
      2
     ],
     [
-     "func_0023C6F8",
+     "xglFontDrawDigitScaled",
      2344696,
      500,
      2
@@ -46722,19 +46722,19 @@
      2
     ],
     [
-     "func_0023CA38",
+     "xglFontDrawSecondDigitScaled",
      2345528,
      500,
      2
     ],
     [
-     "xglFontDrawUnsignedNumberAlt",
+     "xglFontDrawUnsignedNumberLower",
      2346032,
      152,
      2
     ],
     [
-     "xglFontDrawDigitsAlt",
+     "xglFontDrawDigitsLower",
      2346184,
      176,
      2
@@ -46746,49 +46746,49 @@
      2
     ],
     [
-     "func_0023CE40",
+     "xglFontQueueCursorSprite",
      2346560,
      392,
      2
     ],
     [
-     "func_0023CFC8",
+     "xglFontQueueLevelGauge",
      2346952,
      640,
      2
     ],
     [
-     "func_0023D248",
+     "xglFontQueueFrameCapUpper",
      2347592,
      476,
      2
     ],
     [
-     "func_0023D428",
+     "xglFontQueueFrameCapLower",
      2348072,
      476,
      2
     ],
     [
-     "func_0023D608",
+     "xglFontQueueBarRed",
      2348552,
      340,
      2
     ],
     [
-     "func_0023D760",
+     "xglFontQueueBarBlue",
      2348896,
      340,
      2
     ],
     [
-     "func_0023D8B8",
+     "xglFontQueueShadeSprite",
      2349240,
      392,
      2
     ],
     [
-     "func_0023DA40",
+     "xglFontQueueHighlightPanel",
      2349632,
      620,
      2
@@ -46818,7 +46818,7 @@
      2
     ],
     [
-     "func_0023DD18",
+     "fontDrawCell",
      2350360,
      748,
      2
@@ -46848,61 +46848,61 @@
      2
     ],
     [
-     "func_0023E128",
+     "fontDrawAtlasCell",
      2351400,
      456,
      2
     ],
     [
-     "func_0023E2F0",
+     "fontDrawRotatedSpriteU143",
      2351856,
      744,
      2
     ],
     [
-     "func_0023E5D8",
+     "fontDrawRotatedSpriteU160",
      2352600,
      740,
      2
     ],
     [
-     "func_0023E8C0",
+     "fontDrawRotatedSpriteU232",
      2353344,
      744,
      2
     ],
     [
-     "func_0023EBA8",
+     "fontDrawRectCell",
      2354088,
      528,
      2
     ],
     [
-     "func_0023EDB8",
+     "fontDrawRectOfCell",
      2354616,
      108,
      2
     ],
     [
-     "func_0023EE28",
+     "fontDrawSprite16",
      2354728,
      348,
      2
     ],
     [
-     "func_0023EF88",
+     "fontDrawSprite17",
      2355080,
      348,
      2
     ],
     [
-     "func_0023F0E8",
+     "fontDrawPanelFrame",
      2355432,
      1908,
      2
     ],
     [
-     "func_0023F860",
+     "drawRotatedSquare",
      2357344,
      816,
      2
@@ -46914,13 +46914,13 @@
      2
     ],
     [
-     "func_0023FC08",
+     "drawSpinningPointLayers",
      2358280,
      300,
      2
     ],
     [
-     "func_0023FD38",
+     "streamSlotLoadFrame",
      2358584,
      104,
      2
@@ -46932,7 +46932,7 @@
      2
     ],
     [
-     "func_0023FDF0",
+     "streamCdReadCallback",
      2358768,
      168,
      2
@@ -46944,7 +46944,7 @@
      2
     ],
     [
-     "func_0023FF00",
+     "streamFrameSpriteSubmit",
      2359040,
      596,
      2
@@ -46962,43 +46962,43 @@
      2
     ],
     [
-     "func_00240300",
+     "streamPlayerShutdown",
      2360064,
      92,
      2
     ],
     [
-     "func_00240360",
+     "streamPlayerSetup",
      2360160,
      536,
      2
     ],
     [
-     "func_00240578",
+     "streamMessageLinesDraw",
      2360696,
      288,
      2
     ],
     [
-     "func_00240698",
+     "streamSlotPanelDraw",
      2360984,
      784,
      2
     ],
     [
-     "func_002409A8",
+     "streamPlayerDraw",
      2361768,
      1760,
      2
     ],
     [
-     "func_00241088",
+     "streamPlayerUpdate",
      2363528,
      1884,
      2
     ],
     [
-     "func_002417E8",
+     "streamPlayerRunLoop",
      2365416,
      212,
      2
@@ -47034,7 +47034,7 @@
      2
     ],
     [
-     "func_002419F0",
+     "blendTestMain",
      2365936,
      1220,
      2
@@ -47064,19 +47064,19 @@
      2
     ],
     [
-     "func_00242080",
+     "cflLightTestViewLoadPxyTxy",
      2367616,
      352,
      2
     ],
     [
-     "func_002421E0",
+     "cflLightTestViewLoadAll",
      2367968,
      576,
      2
     ],
     [
-     "func_00242420",
+     "cflLightTestViewReloadXap",
      2368544,
      232,
      2
@@ -47094,31 +47094,31 @@
      2
     ],
     [
-     "func_002425D8",
+     "moviePlaybackStartNext",
      2368984,
      204,
      2
     ],
     [
-     "func_002426A8",
+     "moviePlaybackStartSwapIds",
      2369192,
      216,
      2
     ],
     [
-     "func_00242780",
+     "moviePlaybackStepFrame",
      2369408,
      164,
      2
     ],
     [
-     "func_00242828",
+     "moviePlaybackDrawInfo",
      2369576,
      176,
      2
     ],
     [
-     "func_002428D8",
+     "movieFileLoadNext",
      2369752,
      332,
      2
@@ -47136,31 +47136,31 @@
      2
     ],
     [
-     "func_00242B68",
+     "movieSlotMoveCursor",
      2370408,
      88,
      2
     ],
     [
-     "func_00242BC0",
+     "moviePlaybackDrawText",
      2370496,
      308,
      2
     ],
     [
-     "func_00242CF8",
+     "moviePlaybackMoveActor",
      2370808,
      380,
      2
     ],
     [
-     "func_00242E78",
+     "movieTestMainLoop",
      2371192,
      1212,
      2
     ],
     [
-     "func_00243338",
+     "cullingTestMain",
      2372408,
      1124,
      2

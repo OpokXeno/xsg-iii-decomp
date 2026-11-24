@@ -1,9 +1,9 @@
 #ifndef INCLUDE_MAIN_TU278_H
 #define INCLUDE_MAIN_TU278_H
 
-typedef int s32;
-
 typedef unsigned char u8;
+
+typedef int s32;
 
 typedef signed char s8;
 

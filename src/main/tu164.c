@@ -85,7 +85,7 @@ struct Box16 {
 void fontQueueColorState(s32 value);
 void xglFontDrawBoxBlend(struct Box16 *box, s32 mode, s32 a2, s32 a3);
 void fontQueueSprite(s32 x0, s32 y0, s32 x1, s32 y1);
-void func_0023BF30(s32 x, s32 y, void *image);
+void xglFontQueueFlaggedRow(s32 x, s32 y, void *image);
 s32 xglFontGetFormattedWidth(const char *text);
 void xglFontPrintIndexed(s32 x, s32 y, const char *text);
 void xglFontPrintTitle(void);
@@ -118,7 +118,7 @@ void loadingCardDraw(struct Pos16 *origin, const char *title, const char *subtit
         xglFontPrintIndexed(textX + 61, ((origin->y - 29176) >> 4) + 2, title);
         if (icon != 0) {
             fontQueueColorState(0x80808080);
-            func_0023BF30(((textX << 4) + 29352) & 0xFFF8, (origin->y + 80) & 0xFFFF, icon);
+            xglFontQueueFlaggedRow(((textX << 4) + 29352) & 0xFFF8, (origin->y + 80) & 0xFFFF, icon);
         }
     }
     xglFontSetColor(98, 98, 98);
@@ -130,9 +130,9 @@ void loadingCardDraw(struct Pos16 *origin, const char *title, const char *subtit
 }
 
 void func_00185A20(void);
-void func_0023BC20(void *buffer);
+void xglFontQueueTextureBind(void *buffer);
 void fontQueueDepthTest(s32 value);
-void func_0023BD60(unsigned short *frame);
+void xglFontQueueGlyphRect(unsigned short *frame);
 void xglFontFreeBuffer(void);
 void *messageTextGet(s32 id);
 s32 xglFontGetAlphaScale(void);
@@ -161,7 +161,7 @@ void loadingScreenDraw(void) {
     image = xglCdPreloadBuffer;
     func_00185A20();
     if (image != 0) {
-        func_0023BC20(image);
+        xglFontQueueTextureBind(image);
     }
     fontQueueDepthTest(0);
     xglFontColorIndexAdd(2);
@@ -173,7 +173,7 @@ void loadingScreenDraw(void) {
     frame.unk_08 = 0x1000;
     frame.unk_0A = 0xBB0;
     frame.unk_0C = 0x308;
-    func_0023BD60(&frame.x);
+    xglFontQueueGlyphRect(&frame.x);
     xglFontFreeBuffer();
     fontQueueDepthTest(1);
     fontQueueColorState(0x80EC9B9A);

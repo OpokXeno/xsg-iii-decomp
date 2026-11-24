@@ -79980,45 +79980,45 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_00230430",
+     "name": "saveScreenRecordLookup",
      "size": 156,
-     "splat_name": "func_00230430",
+     "splat_name": "saveScreenRecordLookup",
      "va": "0x00230430",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002304D0",
+     "name": "saveScreenSetFormattedMessage",
      "size": 76,
-     "splat_name": "func_002304D0",
+     "splat_name": "saveScreenSetFormattedMessage",
      "va": "0x002304d0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "attackHitsShow",
+     "name": "saveScreenSetMenu",
      "size": 124,
-     "splat_name": "attackHitsShow",
+     "splat_name": "saveScreenSetMenu",
      "va": "0x00230520",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "attackEffectsFinished",
+     "name": "saveScreenSetDraw",
      "size": 156,
-     "splat_name": "attackEffectsFinished",
+     "splat_name": "saveScreenSetDraw",
      "va": "0x002305a0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "attackHitsShowAndWait",
+     "name": "saveScreenSetMenuAndDraw",
      "size": 40,
-     "splat_name": "attackHitsShowAndWait",
+     "splat_name": "saveScreenSetMenuAndDraw",
      "va": "0x00230640",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80043,72 +80043,72 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002306C0",
+     "name": "saveScreenFormatText",
      "size": 52,
-     "splat_name": "func_002306C0",
+     "splat_name": "saveScreenFormatText",
      "va": "0x002306c0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002306F8",
+     "name": "saveScreenSetMessageText",
      "size": 40,
-     "splat_name": "func_002306F8",
+     "splat_name": "saveScreenSetMessageText",
      "va": "0x002306f8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230720",
+     "name": "saveScreenHandleCardResult",
      "size": 248,
-     "splat_name": "func_00230720",
+     "splat_name": "saveScreenHandleCardResult",
      "va": "0x00230720",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230818",
+     "name": "saveScreenShowSheet",
      "size": 112,
-     "splat_name": "func_00230818",
+     "splat_name": "saveScreenShowSheet",
      "va": "0x00230818",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230888",
+     "name": "saveScreenSetupMenuHandler",
      "size": 176,
-     "splat_name": "func_00230888",
+     "splat_name": "saveScreenSetupMenuHandler",
      "va": "0x00230888",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230938",
+     "name": "saveScreenPlainMenuHandler",
      "size": 144,
-     "splat_name": "func_00230938",
+     "splat_name": "saveScreenPlainMenuHandler",
      "va": "0x00230938",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002309C8",
+     "name": "saveScreenStartGauge",
      "size": 140,
-     "splat_name": "func_002309C8",
+     "splat_name": "saveScreenStartGauge",
      "va": "0x002309c8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230A58",
+     "name": "saveScreenGaugeStep",
      "size": 264,
-     "splat_name": "func_00230A58",
+     "splat_name": "saveScreenGaugeStep",
      "va": "0x00230a58",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80151,9 +80151,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230CA8",
+     "name": "saveScreenStepFade",
      "size": 188,
-     "splat_name": "func_00230CA8",
+     "splat_name": "saveScreenStepFade",
      "va": "0x00230ca8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80178,18 +80178,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230DE8",
+     "name": "saveScreenLoadFileRecord",
      "size": 288,
-     "splat_name": "func_00230DE8",
+     "splat_name": "saveScreenLoadFileRecord",
      "va": "0x00230de8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00230F08",
+     "name": "saveScreenGrantFileStates",
      "size": 116,
-     "splat_name": "func_00230F08",
+     "splat_name": "saveScreenGrantFileStates",
      "va": "0x00230f08",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80205,9 +80205,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00231090",
+     "name": "saveScreenDrawIcon",
      "size": 596,
-     "splat_name": "func_00231090",
+     "splat_name": "saveScreenDrawIcon",
      "va": "0x00231090",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80223,117 +80223,117 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00231338",
+     "name": "saveScreenFileInWindow",
      "size": 100,
-     "splat_name": "func_00231338",
+     "splat_name": "saveScreenFileInWindow",
      "va": "0x00231338",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002313A0",
+     "name": "saveScreenStartSlotLoad",
      "size": 340,
-     "splat_name": "func_002313A0",
+     "splat_name": "saveScreenStartSlotLoad",
      "va": "0x002313a0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002314F8",
+     "name": "saveScreenFinishSlotLoad",
      "size": 248,
-     "splat_name": "func_002314F8",
+     "splat_name": "saveScreenFinishSlotLoad",
      "va": "0x002314f8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002315F0",
+     "name": "saveScreenLoadFileIntoFreeSlot",
      "size": 156,
-     "splat_name": "func_002315F0",
+     "splat_name": "saveScreenLoadFileIntoFreeSlot",
      "va": "0x002315f0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00231690",
+     "name": "saveScreenStartPendingLoads",
      "size": 288,
-     "splat_name": "func_00231690",
+     "splat_name": "saveScreenStartPendingLoads",
      "va": "0x00231690",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002317B0",
+     "name": "saveScreenPortMenuUpdate",
      "size": 920,
-     "splat_name": "func_002317B0",
+     "splat_name": "saveScreenPortMenuUpdate",
      "va": "0x002317b0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00231B48",
+     "name": "saveScreenDrawMenu",
      "size": 760,
-     "splat_name": "func_00231B48",
+     "splat_name": "saveScreenDrawMenu",
      "va": "0x00231b48",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00231E40",
+     "name": "saveScreenFormatCardUpdate",
      "size": 468,
-     "splat_name": "func_00231E40",
+     "splat_name": "saveScreenFormatCardUpdate",
      "va": "0x00231e40",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00232018",
+     "name": "saveScreenFileListUpdate",
      "size": 1284,
-     "splat_name": "func_00232018",
+     "splat_name": "saveScreenFileListUpdate",
      "va": "0x00232018",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00232520",
+     "name": "saveScreenMenuStep",
      "size": 1840,
-     "splat_name": "func_00232520",
+     "splat_name": "saveScreenMenuStep",
      "va": "0x00232520",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00232C50",
+     "name": "saveScreenDrawGlyphColumn",
      "size": 300,
-     "splat_name": "func_00232C50",
+     "splat_name": "saveScreenDrawGlyphColumn",
      "va": "0x00232c50",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00232D80",
+     "name": "saveScreenDrawFileRow",
      "size": 1724,
-     "splat_name": "func_00232D80",
+     "splat_name": "saveScreenDrawFileRow",
      "va": "0x00232d80",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00233440",
+     "name": "saveScreenDrawFileList",
      "size": 676,
-     "splat_name": "func_00233440",
+     "splat_name": "saveScreenDrawFileList",
      "va": "0x00233440",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80349,36 +80349,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00233740",
+     "name": "saveScreenPlayTitleMovie",
      "size": 344,
-     "splat_name": "func_00233740",
+     "splat_name": "saveScreenPlayTitleMovie",
      "va": "0x00233740",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00233898",
+     "name": "saveScreenFileReadState",
      "size": 1308,
-     "splat_name": "func_00233898",
+     "splat_name": "saveScreenFileReadState",
      "va": "0x00233898",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00233DB8",
+     "name": "saveScreenEntriesReadState",
      "size": 864,
-     "splat_name": "func_00233DB8",
+     "splat_name": "saveScreenEntriesReadState",
      "va": "0x00233db8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234118",
+     "name": "saveScreenDraw",
      "size": 844,
-     "splat_name": "func_00234118",
+     "splat_name": "saveScreenDraw",
      "va": "0x00234118",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80394,81 +80394,81 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002344C0",
+     "name": "saveFileReadCallback",
      "size": 116,
-     "splat_name": "func_002344C0",
+     "splat_name": "saveFileReadCallback",
      "va": "0x002344c0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234538",
+     "name": "saveScreenSetup",
      "size": 980,
-     "splat_name": "func_00234538",
+     "splat_name": "saveScreenSetup",
      "va": "0x00234538",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234910",
+     "name": "saveScreenDestroy",
      "size": 132,
-     "splat_name": "func_00234910",
+     "splat_name": "saveScreenDestroy",
      "va": "0x00234910",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234998",
+     "name": "saveScreenRun",
      "size": 276,
-     "splat_name": "func_00234998",
+     "splat_name": "saveScreenRun",
      "va": "0x00234998",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234AB0",
+     "name": "saveScreenSession",
      "size": 372,
-     "splat_name": "func_00234AB0",
+     "splat_name": "saveScreenSession",
      "va": "0x00234ab0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234C28",
+     "name": "saveScreenStepFrame",
      "size": 320,
-     "splat_name": "func_00234C28",
+     "splat_name": "saveScreenStepFrame",
      "va": "0x00234c28",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234D68",
+     "name": "saveScreenLoop",
      "size": 460,
-     "splat_name": "func_00234D68",
+     "splat_name": "saveScreenLoop",
      "va": "0x00234d68",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00234F38",
+     "name": "saveConfirmMenu",
      "size": 292,
-     "splat_name": "func_00234F38",
+     "splat_name": "saveConfirmMenu",
      "va": "0x00234f38",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235060",
+     "name": "saveChoiceBoxDraw",
      "size": 404,
-     "splat_name": "func_00235060",
+     "splat_name": "saveChoiceBoxDraw",
      "va": "0x00235060",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80484,27 +80484,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235220",
+     "name": "savePortMenuUpdate",
      "size": 604,
-     "splat_name": "func_00235220",
+     "splat_name": "savePortMenuUpdate",
      "va": "0x00235220",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235480",
+     "name": "saveDialogAnswer",
      "size": 24,
-     "splat_name": "func_00235480",
+     "splat_name": "saveDialogAnswer",
      "va": "0x00235480",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235498",
+     "name": "saveFileMenuUpdate",
      "size": 808,
-     "splat_name": "func_00235498",
+     "splat_name": "saveFileMenuUpdate",
      "va": "0x00235498",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80520,27 +80520,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002357F8",
+     "name": "saveWriteConfirmMenu",
      "size": 212,
-     "splat_name": "func_002357F8",
+     "splat_name": "saveWriteConfirmMenu",
      "va": "0x002357f8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002358D0",
+     "name": "saveWriteConfirmDraw",
      "size": 368,
-     "splat_name": "func_002358D0",
+     "splat_name": "saveWriteConfirmDraw",
      "va": "0x002358d0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235A40",
+     "name": "saveCardRequestCallback",
      "size": 128,
-     "splat_name": "func_00235A40",
+     "splat_name": "saveCardRequestCallback",
      "va": "0x00235a40",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80737,9 +80737,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235E58",
+     "name": "pagedTableClampFilledCount",
      "size": 64,
-     "splat_name": "func_00235E58",
+     "splat_name": "pagedTableClampFilledCount",
      "va": "0x00235e58",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80755,9 +80755,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235EB8",
+     "name": "pagedTableSetCursor",
      "size": 32,
-     "splat_name": "func_00235EB8",
+     "splat_name": "pagedTableSetCursor",
      "va": "0x00235eb8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80773,18 +80773,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235EF0",
+     "name": "pagedTableGetPageIndex",
      "size": 48,
-     "splat_name": "func_00235EF0",
+     "splat_name": "pagedTableGetPageIndex",
      "va": "0x00235ef0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235F20",
+     "name": "pagedTableGetPageStart",
      "size": 60,
-     "splat_name": "func_00235F20",
+     "splat_name": "pagedTableGetPageStart",
      "va": "0x00235f20",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80809,18 +80809,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00235FD0",
+     "name": "pagedTableUpdateCursorFromStatus",
      "size": 1040,
-     "splat_name": "func_00235FD0",
+     "splat_name": "pagedTableUpdateCursorFromStatus",
      "va": "0x00235fd0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002363E0",
+     "name": "pagedTablePoolAlloc",
      "size": 52,
-     "splat_name": "func_002363E0",
+     "splat_name": "pagedTablePoolAlloc",
      "va": "0x002363e0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80863,18 +80863,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00236570",
+     "name": "pagedTableGetPageRelativeIndex",
      "size": 72,
-     "splat_name": "func_00236570",
+     "splat_name": "pagedTableGetPageRelativeIndex",
      "va": "0x00236570",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002365B8",
+     "name": "pagedTableSetPageSizes",
      "size": 136,
-     "splat_name": "func_002365B8",
+     "splat_name": "pagedTableSetPageSizes",
      "va": "0x002365b8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80890,18 +80890,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002366A0",
+     "name": "pagedTableSetEntry",
      "size": 52,
-     "splat_name": "func_002366A0",
+     "splat_name": "pagedTableSetEntry",
      "va": "0x002366a0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002366D8",
+     "name": "pagedTableSetTextBox",
      "size": 444,
-     "splat_name": "func_002366D8",
+     "splat_name": "pagedTableSetTextBox",
      "va": "0x002366d8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80926,36 +80926,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00236940",
+     "name": "pagedTableMoveCursor",
      "size": 256,
-     "splat_name": "func_00236940",
+     "splat_name": "pagedTableMoveCursor",
      "va": "0x00236940",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00236A40",
+     "name": "pagedTableStepCursorUnmasked",
      "size": 132,
-     "splat_name": "func_00236A40",
+     "splat_name": "pagedTableStepCursorUnmasked",
      "va": "0x00236a40",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00236AC8",
+     "name": "pagedTableUpdatePending",
      "size": 200,
-     "splat_name": "func_00236AC8",
+     "splat_name": "pagedTableUpdatePending",
      "va": "0x00236ac8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00236B90",
+     "name": "pagedTableAnimateSlots",
      "size": 528,
-     "splat_name": "func_00236B90",
+     "splat_name": "pagedTableAnimateSlots",
      "va": "0x00236b90",
      "name_basis": "address",
      "provenance": "estimated"
@@ -80971,9 +80971,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00236DE8",
+     "name": "pagedTableUpdate",
      "size": 536,
-     "splat_name": "func_00236DE8",
+     "splat_name": "pagedTableUpdate",
      "va": "0x00236de8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81206,9 +81206,9 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_00237188",
+     "name": "vmCallEachArgument",
      "size": 108,
-     "splat_name": "func_00237188",
+     "splat_name": "vmCallEachArgument",
      "va": "0x00237188",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81224,9 +81224,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237248",
+     "name": "vmRaiseEntryKindTo",
      "size": 196,
-     "splat_name": "func_00237248",
+     "splat_name": "vmRaiseEntryKindTo",
      "va": "0x00237248",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81260,9 +81260,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237428",
+     "name": "vmUpdateEntryKinds",
      "size": 228,
-     "splat_name": "func_00237428",
+     "splat_name": "vmUpdateEntryKinds",
      "va": "0x00237428",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81350,9 +81350,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237808",
+     "name": "battleRosterSnapshotTake",
      "size": 100,
-     "splat_name": "func_00237808",
+     "splat_name": "battleRosterSnapshotTake",
      "va": "0x00237808",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81368,18 +81368,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002378C0",
+     "name": "vmSetRosterTableFlag",
      "size": 108,
-     "splat_name": "func_002378C0",
+     "splat_name": "vmSetRosterTableFlag",
      "va": "0x002378c0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237930",
+     "name": "vmSetRosterFlagsFromArgs",
      "size": 132,
-     "splat_name": "func_00237930",
+     "splat_name": "vmSetRosterFlagsFromArgs",
      "va": "0x00237930",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81491,9 +81491,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237A30",
+     "name": "seMenuBlockClear",
      "size": 68,
-     "splat_name": "func_00237A30",
+     "splat_name": "seMenuBlockClear",
      "va": "0x00237a30",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81509,36 +81509,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237B18",
+     "name": "seVoiceKindCursorSeek",
      "size": 124,
-     "splat_name": "func_00237B18",
+     "splat_name": "seVoiceKindCursorSeek",
      "va": "0x00237b18",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237B98",
+     "name": "seVoiceKindMarkEntries",
      "size": 148,
-     "splat_name": "func_00237B98",
+     "splat_name": "seVoiceKindMarkEntries",
      "va": "0x00237b98",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237C30",
+     "name": "seVoiceBitIsClear",
      "size": 60,
-     "splat_name": "func_00237C30",
+     "splat_name": "seVoiceBitIsClear",
      "va": "0x00237c30",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237C70",
+     "name": "seVoiceTemplateBitSet",
      "size": 60,
-     "splat_name": "func_00237C70",
+     "splat_name": "seVoiceTemplateBitSet",
      "va": "0x00237c70",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81554,9 +81554,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00237CD0",
+     "name": "seVoiceScreenInit",
      "size": 1300,
-     "splat_name": "func_00237CD0",
+     "splat_name": "seVoiceScreenInit",
      "va": "0x00237cd0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81572,18 +81572,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00238238",
+     "name": "seVoiceUnitSetMode",
      "size": 1260,
-     "splat_name": "func_00238238",
+     "splat_name": "seVoiceUnitSetMode",
      "va": "0x00238238",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00238728",
+     "name": "seVoiceUnitUpdate",
      "size": 2236,
-     "splat_name": "func_00238728",
+     "splat_name": "seVoiceUnitUpdate",
      "va": "0x00238728",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81617,81 +81617,81 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002390E0",
+     "name": "seVoiceInfoBoxDraw",
      "size": 228,
-     "splat_name": "func_002390E0",
+     "splat_name": "seVoiceInfoBoxDraw",
      "va": "0x002390e0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002391C8",
+     "name": "seVoiceRecordTableDraw",
      "size": 1984,
-     "splat_name": "func_002391C8",
+     "splat_name": "seVoiceRecordTableDraw",
      "va": "0x002391c8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00239988",
+     "name": "seVoiceScreenDraw",
      "size": 756,
-     "splat_name": "func_00239988",
+     "splat_name": "seVoiceScreenDraw",
      "va": "0x00239988",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00239C80",
+     "name": "seVoicePanelDraw",
      "size": 2708,
-     "splat_name": "func_00239C80",
+     "splat_name": "seVoicePanelDraw",
      "va": "0x00239c80",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023A718",
+     "name": "seVoiceListBuild",
      "size": 1132,
-     "splat_name": "func_0023A718",
+     "splat_name": "seVoiceListBuild",
      "va": "0x0023a718",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023AB88",
+     "name": "seVoicePlayAndSetup",
      "size": 720,
-     "splat_name": "func_0023AB88",
+     "splat_name": "seVoicePlayAndSetup",
      "va": "0x0023ab88",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023AE58",
+     "name": "seVoiceSceneEnter",
      "size": 836,
-     "splat_name": "func_0023AE58",
+     "splat_name": "seVoiceSceneEnter",
      "va": "0x0023ae58",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023B1A0",
+     "name": "seVoiceScreenUpdate",
      "size": 2388,
-     "splat_name": "func_0023B1A0",
+     "splat_name": "seVoiceScreenUpdate",
      "va": "0x0023b1a0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023BAF8",
+     "name": "seVoiceScreenRun",
      "size": 236,
-     "splat_name": "func_0023BAF8",
+     "splat_name": "seVoiceScreenRun",
      "va": "0x0023baf8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81895,18 +81895,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023BC20",
+     "name": "xglFontQueueTextureBind",
      "size": 188,
-     "splat_name": "func_0023BC20",
+     "splat_name": "xglFontQueueTextureBind",
      "va": "0x0023bc20",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023BCE0",
+     "name": "xglFontQueueTextureFlush",
      "size": 80,
-     "splat_name": "func_0023BCE0",
+     "splat_name": "xglFontQueueTextureFlush",
      "va": "0x0023bce0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -81922,63 +81922,63 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023BD60",
+     "name": "xglFontQueueGlyphRect",
      "size": 460,
-     "splat_name": "func_0023BD60",
+     "splat_name": "xglFontQueueGlyphRect",
      "va": "0x0023bd60",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023BF30",
+     "name": "xglFontQueueFlaggedRow",
      "size": 568,
-     "splat_name": "func_0023BF30",
+     "splat_name": "xglFontQueueFlaggedRow",
      "va": "0x0023bf30",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023C168",
+     "name": "xglFontGlyphIndex",
      "size": 164,
-     "splat_name": "func_0023C168",
+     "splat_name": "xglFontGlyphIndex",
      "va": "0x0023c168",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023C210",
+     "name": "xglFontGlyphWidth",
      "size": 56,
-     "splat_name": "func_0023C210",
+     "splat_name": "xglFontGlyphWidth",
      "va": "0x0023c210",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023C248",
+     "name": "xglFontTextWidth",
      "size": 120,
-     "splat_name": "func_0023C248",
+     "splat_name": "xglFontTextWidth",
      "va": "0x0023c248",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023C2C0",
+     "name": "xglFontDrawCharScaled",
      "size": 708,
-     "splat_name": "func_0023C2C0",
+     "splat_name": "xglFontDrawCharScaled",
      "va": "0x0023c2c0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023C588",
+     "name": "xglFontDrawStringScaled",
      "size": 152,
-     "splat_name": "func_0023C588",
+     "splat_name": "xglFontDrawStringScaled",
      "va": "0x0023c588",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82012,9 +82012,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023C6F8",
+     "name": "xglFontDrawDigitScaled",
      "size": 500,
-     "splat_name": "func_0023C6F8",
+     "splat_name": "xglFontDrawDigitScaled",
      "va": "0x0023c6f8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82039,27 +82039,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023CA38",
+     "name": "xglFontDrawSecondDigitScaled",
      "size": 500,
-     "splat_name": "func_0023CA38",
+     "splat_name": "xglFontDrawSecondDigitScaled",
      "va": "0x0023ca38",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "xglFontDrawUnsignedNumberAlt",
+     "name": "xglFontDrawUnsignedNumberLower",
      "size": 152,
-     "splat_name": "xglFontDrawUnsignedNumberAlt",
+     "splat_name": "xglFontDrawUnsignedNumberLower",
      "va": "0x0023cc30",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "xglFontDrawDigitsAlt",
+     "name": "xglFontDrawDigitsLower",
      "size": 176,
-     "splat_name": "xglFontDrawDigitsAlt",
+     "splat_name": "xglFontDrawDigitsLower",
      "va": "0x0023ccc8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82161,7 +82161,7 @@
    "path": "src/main/tu189.c",
    "scaffold_path": "scaffold/src/main/tu189.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -82213,79 +82213,79 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_0023CE40",
+     "name": "xglFontQueueCursorSprite",
      "size": 392,
-     "splat_name": "func_0023CE40",
+     "splat_name": "xglFontQueueCursorSprite",
      "va": "0x0023ce40",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023CFC8",
+     "name": "xglFontQueueLevelGauge",
      "size": 640,
-     "splat_name": "func_0023CFC8",
+     "splat_name": "xglFontQueueLevelGauge",
      "va": "0x0023cfc8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023D248",
+     "name": "xglFontQueueFrameCapUpper",
      "size": 476,
-     "splat_name": "func_0023D248",
+     "splat_name": "xglFontQueueFrameCapUpper",
      "va": "0x0023d248",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023D428",
+     "name": "xglFontQueueFrameCapLower",
      "size": 476,
-     "splat_name": "func_0023D428",
+     "splat_name": "xglFontQueueFrameCapLower",
      "va": "0x0023d428",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023D608",
+     "name": "xglFontQueueBarRed",
      "size": 340,
-     "splat_name": "func_0023D608",
+     "splat_name": "xglFontQueueBarRed",
      "va": "0x0023d608",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023D760",
+     "name": "xglFontQueueBarBlue",
      "size": 340,
-     "splat_name": "func_0023D760",
+     "splat_name": "xglFontQueueBarBlue",
      "va": "0x0023d760",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023D8B8",
+     "name": "xglFontQueueShadeSprite",
      "size": 392,
-     "splat_name": "func_0023D8B8",
+     "splat_name": "xglFontQueueShadeSprite",
      "va": "0x0023d8b8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023DA40",
+     "name": "xglFontQueueHighlightPanel",
      "size": 620,
-     "splat_name": "func_0023DA40",
+     "splat_name": "xglFontQueueHighlightPanel",
      "va": "0x0023da40",
      "name_basis": "address",
      "provenance": "estimated"
     }
    ],
    "owners": {
-    ".text": "asm"
+    ".text": "c"
    },
    "sections": {},
    "text": {
@@ -82299,6 +82299,17 @@
      "0x0023dcb0"
     ],
     "note": null
+   },
+   "import": {
+    "mode": "c",
+    "note": "user 2026-11-24: Integra",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/tu189.c"
+    }
    }
   },
   {
@@ -82397,9 +82408,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023DD18",
+     "name": "fontDrawCell",
      "size": 748,
-     "splat_name": "func_0023DD18",
+     "splat_name": "fontDrawCell",
      "va": "0x0023dd18",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82556,90 +82567,90 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_0023E128",
+     "name": "fontDrawAtlasCell",
      "size": 456,
-     "splat_name": "func_0023E128",
+     "splat_name": "fontDrawAtlasCell",
      "va": "0x0023e128",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023E2F0",
+     "name": "fontDrawRotatedSpriteU143",
      "size": 744,
-     "splat_name": "func_0023E2F0",
+     "splat_name": "fontDrawRotatedSpriteU143",
      "va": "0x0023e2f0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023E5D8",
+     "name": "fontDrawRotatedSpriteU160",
      "size": 740,
-     "splat_name": "func_0023E5D8",
+     "splat_name": "fontDrawRotatedSpriteU160",
      "va": "0x0023e5d8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023E8C0",
+     "name": "fontDrawRotatedSpriteU232",
      "size": 744,
-     "splat_name": "func_0023E8C0",
+     "splat_name": "fontDrawRotatedSpriteU232",
      "va": "0x0023e8c0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023EBA8",
+     "name": "fontDrawRectCell",
      "size": 528,
-     "splat_name": "func_0023EBA8",
+     "splat_name": "fontDrawRectCell",
      "va": "0x0023eba8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023EDB8",
+     "name": "fontDrawRectOfCell",
      "size": 108,
-     "splat_name": "func_0023EDB8",
+     "splat_name": "fontDrawRectOfCell",
      "va": "0x0023edb8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023EE28",
+     "name": "fontDrawSprite16",
      "size": 348,
-     "splat_name": "func_0023EE28",
+     "splat_name": "fontDrawSprite16",
      "va": "0x0023ee28",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023EF88",
+     "name": "fontDrawSprite17",
      "size": 348,
-     "splat_name": "func_0023EF88",
+     "splat_name": "fontDrawSprite17",
      "va": "0x0023ef88",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023F0E8",
+     "name": "fontDrawPanelFrame",
      "size": 1908,
-     "splat_name": "func_0023F0E8",
+     "splat_name": "fontDrawPanelFrame",
      "va": "0x0023f0e8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023F860",
+     "name": "drawRotatedSquare",
      "size": 816,
-     "splat_name": "func_0023F860",
+     "splat_name": "drawRotatedSquare",
      "va": "0x0023f860",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82655,9 +82666,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023FC08",
+     "name": "drawSpinningPointLayers",
      "size": 300,
-     "splat_name": "func_0023FC08",
+     "splat_name": "drawSpinningPointLayers",
      "va": "0x0023fc08",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82804,9 +82815,9 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_0023FD38",
+     "name": "streamSlotLoadFrame",
      "size": 104,
-     "splat_name": "func_0023FD38",
+     "splat_name": "streamSlotLoadFrame",
      "va": "0x0023fd38",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82822,9 +82833,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023FDF0",
+     "name": "streamCdReadCallback",
      "size": 168,
-     "splat_name": "func_0023FDF0",
+     "splat_name": "streamCdReadCallback",
      "va": "0x0023fdf0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82840,9 +82851,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0023FF00",
+     "name": "streamFrameSpriteSubmit",
      "size": 596,
-     "splat_name": "func_0023FF00",
+     "splat_name": "streamFrameSpriteSubmit",
      "va": "0x0023ff00",
      "name_basis": "address",
      "provenance": "estimated"
@@ -82867,63 +82878,63 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00240300",
+     "name": "streamPlayerShutdown",
      "size": 92,
-     "splat_name": "func_00240300",
+     "splat_name": "streamPlayerShutdown",
      "va": "0x00240300",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00240360",
+     "name": "streamPlayerSetup",
      "size": 536,
-     "splat_name": "func_00240360",
+     "splat_name": "streamPlayerSetup",
      "va": "0x00240360",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00240578",
+     "name": "streamMessageLinesDraw",
      "size": 288,
-     "splat_name": "func_00240578",
+     "splat_name": "streamMessageLinesDraw",
      "va": "0x00240578",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00240698",
+     "name": "streamSlotPanelDraw",
      "size": 784,
-     "splat_name": "func_00240698",
+     "splat_name": "streamSlotPanelDraw",
      "va": "0x00240698",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002409A8",
+     "name": "streamPlayerDraw",
      "size": 1760,
-     "splat_name": "func_002409A8",
+     "splat_name": "streamPlayerDraw",
      "va": "0x002409a8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00241088",
+     "name": "streamPlayerUpdate",
      "size": 1884,
-     "splat_name": "func_00241088",
+     "splat_name": "streamPlayerUpdate",
      "va": "0x00241088",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002417E8",
+     "name": "streamPlayerRunLoop",
      "size": 212,
-     "splat_name": "func_002417E8",
+     "splat_name": "streamPlayerRunLoop",
      "va": "0x002417e8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -83163,9 +83174,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002419F0",
+     "name": "blendTestMain",
      "size": 1220,
-     "splat_name": "func_002419F0",
+     "splat_name": "blendTestMain",
      "va": "0x002419f0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -83326,27 +83337,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242080",
+     "name": "cflLightTestViewLoadPxyTxy",
      "size": 352,
-     "splat_name": "func_00242080",
+     "splat_name": "cflLightTestViewLoadPxyTxy",
      "va": "0x00242080",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002421E0",
+     "name": "cflLightTestViewLoadAll",
      "size": 576,
-     "splat_name": "func_002421E0",
+     "splat_name": "cflLightTestViewLoadAll",
      "va": "0x002421e0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242420",
+     "name": "cflLightTestViewReloadXap",
      "size": 232,
-     "splat_name": "func_00242420",
+     "splat_name": "cflLightTestViewReloadXap",
      "va": "0x00242420",
      "name_basis": "address",
      "provenance": "estimated"
@@ -83534,45 +83545,45 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002425D8",
+     "name": "moviePlaybackStartNext",
      "size": 204,
-     "splat_name": "func_002425D8",
+     "splat_name": "moviePlaybackStartNext",
      "va": "0x002425d8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002426A8",
+     "name": "moviePlaybackStartSwapIds",
      "size": 216,
-     "splat_name": "func_002426A8",
+     "splat_name": "moviePlaybackStartSwapIds",
      "va": "0x002426a8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242780",
+     "name": "moviePlaybackStepFrame",
      "size": 164,
-     "splat_name": "func_00242780",
+     "splat_name": "moviePlaybackStepFrame",
      "va": "0x00242780",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242828",
+     "name": "moviePlaybackDrawInfo",
      "size": 176,
-     "splat_name": "func_00242828",
+     "splat_name": "moviePlaybackDrawInfo",
      "va": "0x00242828",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002428D8",
+     "name": "movieFileLoadNext",
      "size": 332,
-     "splat_name": "func_002428D8",
+     "splat_name": "movieFileLoadNext",
      "va": "0x002428d8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -83597,36 +83608,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242B68",
+     "name": "movieSlotMoveCursor",
      "size": 88,
-     "splat_name": "func_00242B68",
+     "splat_name": "movieSlotMoveCursor",
      "va": "0x00242b68",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242BC0",
+     "name": "moviePlaybackDrawText",
      "size": 308,
-     "splat_name": "func_00242BC0",
+     "splat_name": "moviePlaybackDrawText",
      "va": "0x00242bc0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242CF8",
+     "name": "moviePlaybackMoveActor",
      "size": 380,
-     "splat_name": "func_00242CF8",
+     "splat_name": "moviePlaybackMoveActor",
      "va": "0x00242cf8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00242E78",
+     "name": "movieTestMainLoop",
      "size": 1212,
-     "splat_name": "func_00242E78",
+     "splat_name": "movieTestMainLoop",
      "va": "0x00242e78",
      "name_basis": "address",
      "provenance": "estimated"
@@ -83794,7 +83805,7 @@
    "path": "src/main/CullingTest.c",
    "scaffold_path": "scaffold/src/main/CullingTest.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -83867,16 +83878,16 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_00243338",
+     "name": "cullingTestMain",
      "size": 1124,
-     "splat_name": "func_00243338",
+     "splat_name": "cullingTestMain",
      "va": "0x00243338",
      "name_basis": "address",
      "provenance": "estimated"
     }
    ],
    "owners": {
-    ".text": "asm",
+    ".text": "c",
     ".rodata": "asm"
    },
    "sections": {
@@ -83916,6 +83927,17 @@
      "0x002437a0"
     ],
     "note": null
+   },
+   "import": {
+    "mode": "c",
+    "note": "user 2026-11-24: Integra",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/CullingTest.c"
+    }
    }
   },
   {

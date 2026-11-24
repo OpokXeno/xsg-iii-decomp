@@ -78,7 +78,7 @@ void sheetFrameDrawText(TiFrameSheet *sheet, s32 animationTick, u32 color, s32 t
 }
 
 s32 fontQueueColorState();
-s32 xglFontDrawDigitsAlt();
+s32 xglFontDrawDigitsLower();
 
 void sheetFrameDrawValue(TiFrameSheet *sheet, s32 animationTick, s32 mask, s32 displayValue)
 {
@@ -91,7 +91,7 @@ void sheetFrameDrawValue(TiFrameSheet *sheet, s32 animationTick, s32 mask, s32 d
     fontQueueColorState(mask);
     middleCellWidth = sheet->cellWidthB;
     shift = 1;
-    xglFontDrawDigitsAlt((((pos.x + ((sheet->valueColumn) * 0x50)) + (sheet->cellWidthA + (middleCellWidth >> shift))) - 0x40) & 0xFFFF, (pos.y + 0x20) & 0xFFFF, displayValue, 0x10);
+    xglFontDrawDigitsLower((((pos.x + ((sheet->valueColumn) * 0x50)) + (sheet->cellWidthA + (middleCellWidth >> shift))) - 0x40) & 0xFFFF, (pos.y + 0x20) & 0xFFFF, displayValue, 0x10);
   }
 }
 
@@ -122,12 +122,12 @@ void sheetFrameDrawBox(TiFrameSheet *sheet)
 
 INCLUDE_ASM("asm/main/nonmatchings/tu173", func_00220488);
 
-s32 func_0023DA40();
+s32 xglFontQueueHighlightPanel();
 
 void sheetFrameDrawMarker(TiFrameSheet *sheet, s32 animationTick) {
     TiFramePos pos;
 
     if (sheetFramePosition(&pos, sheet, animationTick) != 0) {
-        func_0023DA40((sheet->originX + 0xFFC0) & 0xFFFF, (pos.y + 0x20) & 0xFFFF, 0, 0x80);
+        xglFontQueueHighlightPanel((sheet->originX + 0xFFC0) & 0xFFFF, (pos.y + 0x20) & 0xFFFF, 0, 0x80);
     }
 }

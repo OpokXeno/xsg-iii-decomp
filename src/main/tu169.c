@@ -62,7 +62,7 @@ void flushPendingValue(void) {
 s32 fontQueueSprite();
 s32 xglFontDrawBoxBlend();
 s32 xglFontDrawFramedRect();
-s32 func_0023DA40();
+s32 xglFontQueueHighlightPanel();
 
 /* A screen rectangle in 16-bit units: origin x/y and size. */
 typedef struct ScreenRect {
@@ -102,7 +102,7 @@ void rectDrawLevelFrame(ScreenRect *rect, s32 level, s32 mode)
   left = rect->x;
   top = rect->y;
   fontQueueSprite((left + 0xB0) & 0xFFFF, top, (left + 0x110) & 0xFFFF, (top + 0x190) & 0xFFFF);
-  func_0023DA40((rect->x + 0xC0) & 0xFFFF, (rect->y + 0x30) & 0xFFFF, mode, levelByte);
+  xglFontQueueHighlightPanel((rect->x + 0xC0) & 0xFFFF, (rect->y + 0x30) & 0xFFFF, mode, levelByte);
 }
 
 void rectDrawLevelFrameFixed(ScreenRect *rect, s32 level, s32 mode)
@@ -135,7 +135,7 @@ void rectDrawLevelFrameFixed(ScreenRect *rect, s32 level, s32 mode)
   left = rect->x;
   top = rect->y;
   fontQueueSprite((left + 0xB0) & 0xFFFF, top, (left + 0x110) & 0xFFFF, (top + 0x190) & 0xFFFF);
-  func_0023DA40((rect->x + 0xC0) & 0xFFFF, (rect->y + 0x30) & 0xFFFF, mode, 0x80);
+  xglFontQueueHighlightPanel((rect->x + 0xC0) & 0xFFFF, (rect->y + 0x30) & 0xFFFF, mode, 0x80);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu169", func_0021AF70);

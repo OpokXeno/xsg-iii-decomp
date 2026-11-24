@@ -1,9 +1,9 @@
 #ifndef INCLUDE_OV02_TU075_H
 #define INCLUDE_OV02_TU075_H
 
-typedef int s32;
-
 typedef unsigned char u8;
+
+typedef int s32;
 
 /* The battle actor. The unit record at +0xA0 is its owner (BattleActor.unit_side in ov02/tu071). */
 struct BattleActor {

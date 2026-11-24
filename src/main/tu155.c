@@ -118,8 +118,8 @@ void xglFontPrintAlphaCommand(s32 alphaMode, s32 alphaIndex, s32 alpha);
 void xglFontPrintIndexed(s32 x, s32 y, const char *text);
 void xglFontDrawRightAligned16(s32 baseX, s32 baseY, const char *text, s32 glyphIndex);
 s32 xglFontDrawUnsignedNumber(s32 baseX, s32 baseY, s32 number, s32 scale);
-s32 func_0023C588(s32, s32, const char *, s32);
-void func_0023EDB8(s32, s32, s32);
+s32 xglFontDrawStringScaled(s32, s32, const char *, s32);
+void fontDrawRectOfCell(s32, s32, s32);
 s32 xglFontPrintExtendedColorByte(s32, s32, s32, s32);
 s32 func_00A85160(u8 itemId, u8 quantity);
 s32 *func_A87550(s32 recordNumber);
@@ -195,11 +195,11 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
         if (messageFade >= 113) {
             shade = 128 - messageFade;
             fontQueueColorState((((long long) (shade * 8)) << 24) | 0x808080);
-            func_0023EDB8((((16 - shade) << 6) + 0x8188) & 0xFFF8, (baseX + 0x100) & 0xFFFF, glyph);
+            fontDrawRectOfCell((((16 - shade) << 6) + 0x8188) & 0xFFF8, (baseX + 0x100) & 0xFFFF, glyph);
             return;
         }
         fontQueueColorState(0x80808080);
-        func_0023EDB8(0x8188, (baseX + 0x100) & 0xFFFF, glyph);
+        fontDrawRectOfCell(0x8188, (baseX + 0x100) & 0xFFFF, glyph);
         if (gBudgetDisplayBlock->messageFade[rowIndex] > 64) {
             xglFontPrintAlphaCommand(68, 0,
                                      0xFE & (-128 - ((((u8) gBudgetDisplayBlock->messageFade[rowIndex]) - 64) << 1)));
@@ -213,7 +213,7 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
 
     if (gBudgetDisplayBlock->mode == 3) {
         fontQueueColorState(0x73284680);
-        func_0023C588(0x81C8, (baseX + 0x110) & 0xFFFF, messageTextGet(161), 16);
+        xglFontDrawStringScaled(0x81C8, (baseX + 0x110) & 0xFFFF, messageTextGet(161), 16);
     } else {
         fontQueueColorState(0x80545934);
         xglFontDrawRightAligned16(0x8348, (baseX + 0x90) & 0xFFFF, messageTextGet(64), 13);
@@ -233,7 +233,7 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
         } else {
             fontQueueColorState(0x802E2E80);
         }
-        func_0023C588(0x8968, (baseX + 0x120) & 0xFFFF, messageTextGet(151), 14);
+        xglFontDrawStringScaled(0x8968, (baseX + 0x120) & 0xFFFF, messageTextGet(151), 14);
         return;
     }
 
@@ -289,16 +289,16 @@ void func_0021CB90(s32 a, s32 b, s32 c, s32 d);
 void xglFontResetState(void);
 s32 battleCurrentRosterIndexGet(void);
 void dispatchCodeRange(u16 *pos, s32 handle, s32 a, s32 b, s32 c);
-void func_0023D608(s32 a, s32 b, s32 c);
-void func_0023D760(s32 a, s32 b, s32 c);
+void xglFontQueueBarRed(s32 a, s32 b, s32 c);
+void xglFontQueueBarBlue(s32 a, s32 b, s32 c);
 s32 xglFontGetFormattedWidth(void *text);
 void *func_00222D48(s32 a, s32 b, s32 c);
 void fontQueueLine(s32 a, s32 b, s32 c, s32 d);
 s32 Get_Rnd_001B8CD0(s32 a, s32 b);
-void func_0023C2C0(s32 a, s32 b, s32 c, s32 d);
+void xglFontDrawCharScaled(s32 a, s32 b, s32 c, s32 d);
 void func_0021ABB0(s32 a, s32 b, void *text, s32 d);
 void mcStateSeekEntry(s32 id);
-s32 func_0023C248(void *text, s32 b);
+s32 xglFontTextWidth(void *text, s32 b);
 s32 xglFontDrawDigitsMinTwo(s32 x, s32 y, s32 value, s32 digits);
 void xglFontDrawDigits(s32 x, s32 y, s32 value, s32 digits);
 extern unsigned char gBattleRosterTable[];
@@ -367,10 +367,10 @@ void budgetDisplayDrawPage(void) {
             rect[1] += 768;
         }
         activeRows = gBudgetDisplayBlock->activeEntryCount;
-        func_0023D608(28936, 29928, activeRows * 48);
+        xglFontQueueBarRed(28936, 29928, activeRows * 48);
         inactiveRows = gBudgetDisplayBlock->entryCount - gBudgetDisplayBlock->activeEntryCount;
         if (inactiveRows > 0) {
-            func_0023D760(28936, ((gBudgetDisplayBlock->activeEntryCount * 768) + 30008) & 0xfff8, inactiveRows * 48);
+            xglFontQueueBarBlue(28936, ((gBudgetDisplayBlock->activeEntryCount * 768) + 30008) & 0xfff8, inactiveRows * 48);
         }
         gBattleRosterTable[1] = savedRoster;
         xglFontResetState();
@@ -432,11 +432,11 @@ void budgetDisplayDrawPage(void) {
         if (gBudgetDisplayBlock->mode == 4) {
             fontQueueColorState(0x73284680);
             text = messageTextGet(161);
-            func_0023C588(30648, 0x87B8, text, 16);
+            xglFontDrawStringScaled(30648, 0x87B8, text, 16);
         } else {
             fontQueueColorState(0x80626262);
             digits = xglFontDrawUnsignedNumber(30968, 0x87B8, Get_Rnd_001B8CD0(10, 0), 16);
-            func_0023C2C0((((digits << 4) + 31032) & 0xfff8), 0x87D8, 71, 16);
+            xglFontDrawCharScaled((((digits << 4) + 31032) & 0xfff8), 0x87D8, 71, 16);
         }
 
         if (gBudgetDisplayBlock->fadeValue < 256) {
@@ -465,7 +465,7 @@ void budgetDisplayDrawPage(void) {
         budget = gBudgetDisplayBlock->budget;
         digits = xglFontDrawUnsignedNumber(0x8068, 0x87B8, budget->remainingAmount - budget->spentAmount, 16);
         text = messageTextGet(92);
-        func_0023C588((((digits << 4) + 0x80A8) & 0xfff8), 0x87D8, text, 16);
+        xglFontDrawStringScaled((((digits << 4) + 0x80A8) & 0xfff8), 0x87D8, text, 16);
     }
 
     xglFontSetAlphaScale(gBudgetDisplayBlock->fontAlpha[3]);
@@ -474,7 +474,7 @@ void budgetDisplayDrawPage(void) {
     func_0021ABB0(0, 11, text, 0);
     mcStateSeekEntry(418);
     text = messageTextGet(157);
-    yPos = func_0023C248(text, 15);
+    yPos = xglFontTextWidth(text, 15);
     rect[0] = 16 * (373 - yPos) + 28664;
     rect[1] = 29352;
     rect[2] = -29128;
@@ -483,7 +483,7 @@ void budgetDisplayDrawPage(void) {
     xglFontDrawBoxBlend(rect, 2, 0x73312A29, 1);
     fontQueueColorState(0x80562E2D);
     text = messageTextGet(157);
-    func_0023C588((u16) (rect[0] - yPos + 192), (u16) (rect[1] + 96), text, 15);
+    xglFontDrawStringScaled((u16) (rect[0] - yPos + 192), (u16) (rect[1] + 96), text, 15);
     rect[0] = -32504;
     ((void (*)(s32 mask)) fontQueueColorState)(0x80626262);
     if (totalSeconds > 0x57E3F) {
@@ -494,8 +494,8 @@ void budgetDisplayDrawPage(void) {
     xglFontDrawDigitsMinTwo((u16) (rect[0] + 2704), (u16) (rect[1] + 64), minutesTotal % 60, 16);
     hoursTotal = minutesTotal / 60;
     xglFontDrawDigits((u16) (rect[0] + 2176), (u16) (rect[1] + 64), hoursTotal, 16);
-    func_0023C2C0((u16) (rect[0] + 2224), (u16) (rect[1] + 80), 58, 16);
-    func_0023C2C0((u16) (rect[0] + 2752), (u16) (rect[1] + 80), 58, 16);
+    xglFontDrawCharScaled((u16) (rect[0] + 2224), (u16) (rect[1] + 80), 58, 16);
+    xglFontDrawCharScaled((u16) (rect[0] + 2752), (u16) (rect[1] + 80), 58, 16);
     xglFontSetAlphaScale(128);
 }
 

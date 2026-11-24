@@ -3042,6 +3042,281 @@
     }
    ]
   },
+  "main/tu184": {
+   ".rodata": [
+    {
+     "range": [
+      "0x005389a0",
+      "0x00538a18"
+     ],
+     "generated": [
+      "0x005389a0",
+      "0x00538a18"
+     ],
+     "generated_by": [
+      "saveScreenMenuStep",
+      "saveScreenFileReadState"
+     ],
+     "c_owned_symbols": [
+      "jtbl_005389A0",
+      "jtbl_005389C0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/res_get_path.o"
+     }
+    },
+    {
+     "range": [
+      "0x00538a30",
+      "0x00538a98"
+     ],
+     "generated": [
+      "0x00538a30",
+      "0x00538a94"
+     ],
+     "generated_by": [
+      "saveFileReadCallback",
+      "saveScreenSetup",
+      "saveFileMenuUpdate"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00538A30",
+      "D_00538A50",
+      "jtbl_00538A70"
+     ],
+     "also_referenced_by_c": [
+      "D_00538A98"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/res_get_path.o"
+     }
+    }
+   ]
+  },
+  "main/tu185": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f5fc",
+      "0x0054f604"
+     ],
+     "generated": [
+      "0x0054f5fc",
+      "0x0054f604"
+     ],
+     "generated_by": [
+      "pagedTableAnimateSlots"
+     ],
+     "c_owned_symbols": [
+      "D_0054F5FC",
+      "D_0054F600"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu185.o"
+     }
+    }
+   ]
+  },
+  "main/tu187": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00538c20",
+      "0x00538d40"
+     ],
+     "generated": [
+      "0x00538c20",
+      "0x00538d3c"
+     ],
+     "generated_by": [
+      "seVoiceUnitSetMode",
+      "seVoiceUnitUpdate",
+      "seVoiceRecordTableDraw",
+      "seVoiceListBuild",
+      "seVoiceSceneEnter",
+      "seVoiceScreenUpdate"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00538C20",
+      "jtbl_00538C50",
+      "jtbl_00538C80",
+      "jtbl_00538CB0",
+      "jtbl_00538CD0",
+      "jtbl_00538CF0"
+     ],
+     "also_referenced_by_c": [
+      "gSeVoiceCdFilePath",
+      "gSeVoiceCdCommand"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu187.o"
+     }
+    }
+   ]
+  },
+  "main/tu188": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00538d50",
+      "0x00538db8"
+     ],
+     "generated": [
+      "0x00538d50",
+      "0x00538db8"
+     ],
+     "generated_by": [
+      "xglFontGlyphIndex"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00538D50"
+     ],
+     "also_referenced_by_c": [
+      "gFontRowFlagTable",
+      "gFontGlyphWidthTable"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu188.o"
+     }
+    }
+   ]
+  },
+  "main/tu191": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f604",
+      "0x0054f624"
+     ],
+     "generated": [
+      "0x0054f604",
+      "0x0054f624"
+     ],
+     "generated_by": [
+      "drawScreenPointLayers",
+      "drawSpinningPointLayers"
+     ],
+     "c_owned_symbols": [
+      "D_0054F604",
+      "D_0054F608",
+      "D_0054F60C",
+      "D_0054F610",
+      "D_0054F614",
+      "D_0054F618",
+      "D_0054F61C",
+      "D_0054F620"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu191.o"
+     }
+    }
+   ],
+   ".sdata": [
+    {
+     "range": [
+      "0x00550c00",
+      "0x00550c2c"
+     ],
+     "generated": [
+      "0x00550c00",
+      "0x00550c2c"
+     ],
+     "generated_by": [
+      "fontDrawRotatedSpriteU143",
+      "fontDrawRotatedSpriteU160",
+      "fontDrawRotatedSpriteU232"
+     ],
+     "c_owned_symbols": [
+      "D_00550C00",
+      "D_00550C08",
+      "D_00550C10",
+      "D_00550C18",
+      "D_00550C20",
+      "D_00550C28"
+     ],
+     "also_referenced_by_c": [
+      "gScreenSpinAngle"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu191.o"
+     }
+    }
+   ]
+  },
+  "main/tu193": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00538e60",
+      "0x00538e90"
+     ],
+     "generated": [
+      "0x00538e60",
+      "0x00538e8c"
+     ],
+     "generated_by": [
+      "streamSlotLoadFrame",
+      "streamCdReadCallback"
+     ],
+     "c_owned_symbols": [
+      "D_00538E60",
+      "jtbl_00538E70"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu193.o"
+     }
+    }
+   ]
+  },
+  "main/tu196": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054f708",
+      "0x0054f718"
+     ],
+     "generated": [
+      "0x0054f708",
+      "0x0054f718"
+     ],
+     "generated_by": [
+      "moviePlaybackMoveActor"
+     ],
+     "c_owned_symbols": [
+      "D_0054F708",
+      "D_0054F70C",
+      "D_0054F710",
+      "D_0054F714"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu196.o"
+     }
+    }
+   ]
+  },
   "main/tu206": {
    ".lit4": [
     {
