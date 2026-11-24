@@ -279,7 +279,7 @@ int xglFontIsTextureGlyphCode(unsigned char eucRow, unsigned char eucColumn)
     return 0;
 }
 
-struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07; unsigned short unmodeled_08; unsigned char unmodeled_0a[2]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; /* FONT_CONFIG_DEFAULT_WIDTH, "$xx1,N;". */ unsigned char glyph_default_width; /* FONT_MODE_* bits, set by $prop/$han and the ruby annotation. */ unsigned char text_mode; /* FONT_CONFIG_PROPORTIONAL_MODE, "$xx3,N;". */ unsigned char proportional_mode; unsigned char unmodeled_13; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; /* "$rubyb;" marks where the base text of a ruby annotation starts. */ const unsigned char *ruby_base; /* From the end of the annotation back to the end of its base text; set by "$rubys;". */ unsigned short ruby_advance; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { signed char compact_width; signed char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
+struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07; unsigned short unmodeled_08; unsigned char unmodeled_0a[2]; unsigned char default_width; /* Added to each glyph advance; "$xx7,N;". */ signed char character_spacing; unsigned short unmodeled_0e; /* FONT_CONFIG_DEFAULT_WIDTH, "$xx1,N;". */ unsigned char glyph_default_width; /* FONT_MODE_* bits, set by $prop/$han and the ruby annotation. */ unsigned char text_mode; /* FONT_CONFIG_PROPORTIONAL_MODE, "$xx3,N;". */ unsigned char proportional_mode; unsigned char unmodeled_13; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; /* "$rubyb;" marks where the base text of a ruby annotation starts. */ const unsigned char *ruby_base; /* From the end of the annotation back to the end of its base text; set by "$rubys;". */ unsigned short ruby_advance; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { signed char compact_width; signed char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
 
 extern struct FontStateQueue xglFontState;
 void sceVif1PkRef();
@@ -764,7 +764,7 @@ int xglFontGetStringWidth2(const char *text, int delimiter)
                     int value;
 
                     xglFontParseNumber(&number, &value);
-                    xglFontState.debug_mode = value;
+                    xglFontState.character_spacing = value;
                 }
             } else if (text[1] == 'r' && text[2] == 'u' && text[3] == 'b' && text[4] == 'y' &&
                        text[5] == 's' && text[6] == ';') {
@@ -853,7 +853,7 @@ int xglFontGetStringWidth2(const char *text, int delimiter)
             } else {
                 glyph = FONT_GLYPH_ADVANCE;
             }
-            width += ((glyph + (signed char) xglFontState.debug_mode) * scale) >> 4;
+            width += ((glyph + xglFontState.character_spacing) * scale) >> 4;
         }
         first = 0;
     }
@@ -1134,7 +1134,7 @@ int xglFontCmdInit(FontDrawCursor *cursor, const char **text)
     xglFontState.compact_width = FONT_SCALE_ONE;
     xglFontState.compact_height = FONT_SCALE_ONE;
     xglFontState.glyph_default_width = 4;
-    xglFontState.debug_mode = 0;
+    xglFontState.character_spacing = 0;
     xglFontState.proportional_mode = 0;
     xglFontState.unmodeled_13 = 0;
     (*text)++;
