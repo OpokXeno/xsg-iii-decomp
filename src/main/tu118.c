@@ -22,16 +22,16 @@ typedef struct SefEffectRecord {
 extern s32 sefEffectRecordCount;
 
 extern SefEffectRecord *sefEffectRecords;
-s32 func_002002C8(s32);
+s32 sefReleaseEffectRecord(s32);
 
-/* Calls func_002002C8 for every in-use effect record whose flags04 0x04000000 bit is clear. */
+/* Calls sefReleaseEffectRecord for every in-use effect record whose flags04 0x04000000 bit is clear. */
 void sefReleaseUnflaggedRecords(void) {
     s32 i;
 
     for (i = 0; i < sefEffectRecordCount; i++) {
         if (sefEffectRecords[i].inUse != 0 &&
             (sefEffectRecords[i].noReleaseFlags & 0x04000000) == 0) {
-            func_002002C8(i);
+            sefReleaseEffectRecord(i);
         }
     }
 }
@@ -39,7 +39,7 @@ void sefReleaseUnflaggedRecords(void) {
 /* sefListedOwnerKeys: owner keys, -1 terminated. */
 extern s32 sefListedOwnerKeys[];
 
-/* Calls func_002002C8 for every in-use effect record whose ownerKey is not in the sefListedOwnerKeys list. */
+/* Calls sefReleaseEffectRecord for every in-use effect record whose ownerKey is not in the sefListedOwnerKeys list. */
 void sefReleaseUnlistedOwnerRecords(void) {
     s32 i;
     s32 ownerIndex;
@@ -54,7 +54,7 @@ void sefReleaseUnlistedOwnerRecords(void) {
                 }
             }
             if (isUnlisted == 1) {
-                func_002002C8(i);
+                sefReleaseEffectRecord(i);
             }
         }
     }
@@ -62,8 +62,8 @@ void sefReleaseUnlistedOwnerRecords(void) {
 
 extern SvTypeList svResourceTypeLists[];
 void *func_001F9998(s32 index);
-s32 func_001F5590();
-s32 func_001F7138();
+s32 sefEffectInstanceRelease();
+s32 sefReleaseSlotsByKey();
 
 /* One actor of the table func_001F9998 indexes. */
 typedef struct SefGroupActor {
@@ -92,8 +92,8 @@ void sefReleaseByPendingCount(s32 pendingKey) {
             if (pendingKey < 0 ||
                 svResourceTypeLists[sefEffectRecords[i].resourceType]
                         .pendingCount == pendingKey) {
-                func_001F7138(i, 1);
-                func_002002C8(i);
+                sefReleaseSlotsByKey(i, 1);
+                sefReleaseEffectRecord(i);
             }
         }
     }
@@ -101,7 +101,7 @@ void sefReleaseByPendingCount(s32 pendingKey) {
         SefGroupActor *actor = func_001F9998(i);
         if (actor != 0) {
             if (pendingKey < 0 || svResourceTypeLists[actor->resourceType].pendingCount == pendingKey) {
-                func_001F5590(actor);
+                sefEffectInstanceRelease(actor);
             }
         }
     }
@@ -126,14 +126,14 @@ void sefReleaseOwnerEffects(s32 ownerKey) {
     for (i = 0; i < sefEffectRecordCount; i++) {
         if (sefEffectRecords[i].inUse != 0 &&
             (ownerKey < 0 || sefEffectRecords[i].ownerKey == ownerKey)) {
-            func_001F7138(i, 1);
-            func_002002C8(i);
+            sefReleaseSlotsByKey(i, 1);
+            sefReleaseEffectRecord(i);
         }
     }
     for (i = 0; i < 40; i++) {
         SefGroupActor *actor = func_001F9998(i);
         if (actor != 0 && (actor->ownerKey == ownerKey || ownerKey < 0)) {
-            func_001F5590(actor);
+            sefEffectInstanceRelease(actor);
         }
     }
 }
@@ -172,11 +172,11 @@ void sefEffectHandleRelease(SefEffectObject *effectObject)
         if (effectObject->handleClass == 0) {
             effectIndex = effectObject->effectIndex;
             if (sefEffectRecords[effectIndex].inUse != 0) {
-                func_001F7138(effectIndex, 1);
-                func_002002C8(effectIndex);
+                sefReleaseSlotsByKey(effectIndex, 1);
+                sefReleaseEffectRecord(effectIndex);
             }
         } else {
-            func_001F5590(effectObject);
+            sefEffectInstanceRelease(effectObject);
         }
     }
 }
@@ -184,7 +184,7 @@ void sefEffectHandleRelease(SefEffectObject *effectObject)
 extern SefEntryTable sefEffectEntryTable;
 int sefEffectFlagTest(int mask);
 void sefRunEffectStep(void);
-void func_00203450(void);
+void sefInstallDrawCallbacks(void);
 
 /* Per-frame effect update; gGameLoopRuntimeStorage flag 0x400 resets the draw state instead. */
 void sefFrameUpdate(void)
@@ -196,15 +196,15 @@ void sefFrameUpdate(void)
     if (sefEffectFlagTest(1) == 0) {
         sefRunEffectStep();
     }
-    func_00203450();
+    sefInstallDrawCallbacks();
 }
 
 extern s32 sefKeyframeStepBlock[];
 void sefClearEffectTallies(void);
-void func_002022F0(SefEffectObject *effectObject);
+void sefRunEffectRecords(SefEffectObject *effectObject);
 void sdvExecOwnerAlters(SefEffectObject *effectObject);
-void *func_001F99F0(s32 index);
-void func_001F8010(void *target);
+void *sefFindEffectById(s32 index);
+void sefEffectGroupStep(void *target);
 void sefRunEffectFrames(SefEffectObject *effectObject, f32 frames, f32 frameStep);
 
 /*
@@ -233,13 +233,13 @@ void sefRunEffectFrames(SefEffectObject *effectObject, f32 frames, f32 frameStep
             elapsed = 0.0f;
             while (elapsed < frames) {
                 elapsed += frameStep;
-                func_002022F0(effectObject);
+                sefRunEffectRecords(effectObject);
                 sdvExecOwnerAlters(effectObject);
-                func_001F8010(func_001F99F0(effectObject->effectIndex));
+                sefEffectGroupStep(sefFindEffectById(effectObject->effectIndex));
             }
         } else {
             for (elapsed = 0.0f; elapsed < frames; elapsed += frameStep) {
-                func_001F8010(effectObject);
+                sefEffectGroupStep(effectObject);
             }
         }
     }
@@ -325,7 +325,7 @@ extern void sefClearOwnerGroupFlags();
 extern void sefRegisterGroupCenter();
 extern s32 countFlaggedSefEntries();
 extern s32 func_001F6590();
-extern s32 func_002010C8();
+extern s32 sefScheduleEffectRecord();
 extern s32 func_0020F790();
 extern void svSceneFlagsSet();
 
@@ -433,7 +433,7 @@ extern u16 gSefExecSteps;
 extern SefReferenceCount sefReferenceCounts[];
 extern SefSpawnKey sefRequestKeyBlock;
 SefSchedulerEntry *sefGetScheduler(void);
-s16 *func_001ED360(s32, s32 *, s32, s32 *);
+s16 *scScriptLookup(s32, s32 *, s32, s32 *);
 s32 sefCreateScheduler(s16 *, SefSpawnKey *, s32, s16 *, s32);
 SefSpawnOutput *func_001F9A68(s32);
 SefEffectSlot *sefGetEffectSlot(s32);
@@ -511,7 +511,7 @@ void *sefSpawnEffectFromRequest(SefSpawnRequest *spawnRequest) {
     sched = sefGetScheduler();
     schedIndex = -1;
     schedTableFlag = 0;
-    schedTable = func_001ED360(groupId, &schedTableOffset, 1, &schedTableFlag);
+    schedTable = scScriptLookup(groupId, &schedTableOffset, 1, &schedTableFlag);
     if (!schedTable) {
         return 0;
     }
@@ -547,7 +547,7 @@ void *sefSpawnEffectFromRequest(SefSpawnRequest *spawnRequest) {
                 if (!anySlotBusy) {
                     sefIncrementRef(schedSlot->refId);
                     schedSlot = 0;
-                    func_002002C8(schedIndex);
+                    sefReleaseEffectRecord(schedIndex);
                     schedIndex = -1;
                 }
             }
@@ -559,7 +559,7 @@ void *sefSpawnEffectFromRequest(SefSpawnRequest *spawnRequest) {
             svSceneFlagsSet(1);
         }
         if (ownerGroupCount == 0) {
-            otherSchedTable = func_001ED360(groupId, &otherSchedOffset, 0, 0);
+            otherSchedTable = scScriptLookup(groupId, &otherSchedOffset, 0, 0);
             if (otherSchedTable) {
                 schedIndex = sefCreateScheduler(otherSchedTable + otherSchedOffset, &requestKey, 0, otherSchedTable, -1);
                 if (schedIndex >= 0) {
@@ -584,7 +584,7 @@ void *sefSpawnEffectFromRequest(SefSpawnRequest *spawnRequest) {
             gSbStudioBlock.studioFlags |= 0x10;
         }
         if (schedTableOffset) {
-            schedIndex = func_002010C8(schedTable + schedTableOffset, &requestKey, 0, schedTable, sefOwnerGroupScale * ownerGroupCount, -1, 1, 0);
+            schedIndex = sefScheduleEffectRecord(schedTable + schedTableOffset, &requestKey, 0, schedTable, sefOwnerGroupScale * ownerGroupCount, -1, 1, 0);
             if (schedIndex >= 0) {
                 schedSlot = sched + schedIndex;
                 if (sefSpawnMode == 65) {
@@ -644,11 +644,11 @@ void *sefSpawnEffectFromRequest(SefSpawnRequest *spawnRequest) {
 }
 
 extern s32 D_004749E0[];
-void func_001ECEC8(s32 mode);
+void scKeyTableReset(s32 mode);
 
-/* Calls func_001ECEC8(mode), then sets the three D_004749E0 words: mode 1 clears them all, mode 2 clears word 2 and sets words 0 and 1, any other mode sets them all. */
+/* Calls scKeyTableReset(mode), then sets the three D_004749E0 words: mode 1 clears them all, mode 2 clears word 2 and sets words 0 and 1, any other mode sets them all. */
 void func_001E9F48(s32 mode) {
-    func_001ECEC8(mode);
+    scKeyTableReset(mode);
     switch (mode) {
     case 1:
         D_004749E0[0] = 0;

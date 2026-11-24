@@ -1015,9 +1015,9 @@ void playbackReleaseBlock(SpawnerSlot *slot) {
 }
 
 int slotEffectQueryStart(SpawnerSlot *slot);
-void func_001EAA08(s32 handle, void *vector);
+void sefLinkedObjectSetPosition(s32 handle, void *vector);
 void func_0027B020(s32 handle);
-void func_001ECA60(SpawnerSlot *slot);
+void scEffectObjectUpdate(SpawnerSlot *slot);
 f32 slotGetScale(s32 handle);
 
 /* Update of a kind 4 slot: handles the 0x40 request, follows the height of the slot handle, and releases the aux effect when its countdown runs out. */
@@ -1033,7 +1033,7 @@ void kindFourSlotUpdate(SpawnerSlot *slot) {
     }
     slotFollowTargetHeight(slot, slotGetScale(slot->handle));
     if ((slot->flags & SLOT_FLAG_EFFECT_STARTED) != 0) {
-        func_001EAA08(channel->auxEffectHandle, &slot->position);
+        sefLinkedObjectSetPosition(channel->auxEffectHandle, &slot->position);
         channel->auxEffectLifetime -= 1;
         if (channel->auxEffectLifetime <= 0) {
             auxEffectHandle = channel->auxEffectHandle;
@@ -1046,7 +1046,7 @@ void kindFourSlotUpdate(SpawnerSlot *slot) {
         }
     }
     slotStateFlagEdgeUpdate(slot);
-    func_001ECA60(slot);
+    scEffectObjectUpdate(slot);
 }
 
 /* Kept as its own helper: merging it with vectorCopy renumbers the compiler's labels. */

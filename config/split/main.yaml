@@ -156,16 +156,14 @@ segments:
       - [0xCB0A8, c, tu119]
       - [0xCDA60, c, sc_get]
       - [0xCE610, c, sef_print_121]
-      - [0xCE7A8, c, sdv_seq]
-      - [0xCEB40, c, sdv_wind]
-      - [0xCF270, c, sdv_camera]
-      - [0xCFF18, c, sdv_alter]
+      - [0xCE7A8, c, sdv]
       - [0xD46C0, c, sdv_packet]
       - [0xD5048, c, tu127]
       - [0xD62C0, c, tu128]
       - [0xD8900, c, tu129]
       - [0xDAAD0, c, tu130]
       - [0xDAB78, c, sef]
+      - [0xE4B18, c, sef_132]
       - [0xE8B20, c, vu0_vector]
       - [0xE8CB0, c, vu0_matrix]
       - [0xE8E60, c, vu0_rotate]
@@ -491,10 +489,11 @@ segments:
       - [0x2E8D00, data, sb_natives]
       - [0x2E8E30, data, filter]
       - [0x2E9080, data, tu118]
-      - [0x2E9090, data, sdv_alter]
+      - [0x2E9090, data, sdv]
       - [0x2E9180, data, tu129]
       - [0x310350, data, tu128]
       - [0x334D88, data, sef]
+      - [0x356380, data, sef_132]
       - [0x356450, data, sv_get_image_item]
       - [0x356628, data, tu154]
       - [0x38E6A0, data, srs]
@@ -662,8 +661,7 @@ segments:
       - [0x41F740, rodata, filter]
       - [0x41F8F0, rodata, tu119]
       - [0x41F900, rodata, sc_get]
-      - [0x41F920, rodata, sdv_camera]
-      - [0x41F9C0, rodata, sdv_alter]
+      - [0x41F920, rodata, sdv]
       - [0x41FA90, rodata, tu127]
       - [0x41FEC8, rodata, tu128]
       - [0x41FEE0, rodata, sef]
@@ -815,13 +813,11 @@ segments:
       - [0x430C30, lit4, tu118]
       - [0x430C34, lit4, tu119]
       - [0x430C44, lit4, sc_get]
-      - [0x430C54, lit4, sdv_seq]
-      - [0x430C64, lit4, sdv_wind]
-      - [0x430C68, lit4, sdv_camera]
-      - [0x430C78, lit4, sdv_alter]
+      - [0x430C54, lit4, sdv]
       - [0x430CC4, lit4, tu128]
       - [0x430CDC, lit4, tu129]
       - [0x430CF0, lit4, sef]
+      - [0x430D70, lit4, sef_132]
       - [0x430D88, lit4, sv_get_image_item]
       - [0x430D8C, lit4, tu147]
       - [0x430D90, lit4, xenoActor]
@@ -938,8 +934,9 @@ segments:
       - [0x432000, sdata, filter]
       - [0x43201C, sdata, tu119]
       - [0x432024, sdata, sc_get]
-      - [0x43203C, sdata, sdv_alter]
+      - [0x43203C, sdata, sdv]
       - [0x432040, sdata, sef]
+      - [0x4320AC, sdata, sef_132]
       - [0x4320C0, sdata, sv_get_image_item]
       - [0x432100, sdata, srs]
       - [0x432110, sdata, sef_print_121]
@@ -1109,10 +1106,10 @@ segments:
       - { type: bss, vram: 0x0061A2C0, name: filter }
       - { type: bss, vram: 0x00628050, name: tu119 }
       - { type: bss, vram: 0x0062F4D0, name: sc_get }
-      - { type: bss, vram: 0x0062F830, name: sdv_wind }
-      - { type: bss, vram: 0x00630850, name: sdv_alter }
+      - { type: bss, vram: 0x0062F830, name: sdv }
       - { type: bss, vram: 0x0065D4C0, name: tu127 }
       - { type: bss, vram: 0x00667920, name: sef }
+      - { type: bss, vram: 0x0076C480, name: sef_132 }
       - { type: bss, vram: 0x0076D4D0, name: sv_get_image_item }
       - { type: bss, vram: 0x00771184, name: draw_list }
       - { type: bss, vram: 0x00771198, name: srs }

@@ -60,7 +60,7 @@ typedef struct RoboActorTable {
     RoboActorSlot actors[0];               /* 0x1A0: stride 0x50, read through a pointer walk */
 } RoboActorTable;
 
-void func_001ECE98();
+void scSampleEnableSet();
 s32 roboParamTouchEntry();
 s32 queueGetCurrent();
 s32 queueIsAtStart();
@@ -95,7 +95,7 @@ void roboCommandSubmitQueued(RoboCommandUnit *commandUnit) {
     func_00AAC848(commandUnit, queueIndexAgain, &commandWords[0]);
     queueAdvance(commandUnit);
     func_00AAAAA0(1, commandUnit, unitResource, commandIndex, commandWords[3], 0, 0, queueAtStart, 0);
-    func_001ECE98();
+    scSampleEnableSet();
     func_00AAAF48();
 }
 

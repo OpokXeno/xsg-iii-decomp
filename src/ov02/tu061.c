@@ -113,7 +113,7 @@ s32 func_002105B8(s32 gridX, s32 flag);
 void func_00A857F0(BattleUnit *battleUnit);
 void unitSideRelease(BattleUnit *battleUnit);
 int unitTblRemove(BattleUnit *battleUnit);
-s32 func_001ED068(XenoActor *actor, s16 lookupKey);
+s32 scKeyRangeSample(XenoActor *actor, s16 lookupKey);
 void XenoActorWrapRotation(XenoActor *actor);
 s32 func_00A999A8(void);
 s32 func_00A83BF0(s32 queue);
@@ -165,7 +165,7 @@ void unitTickCommandQueues(void) {
 }
 
 void unitActorSetKey(BattleUnit *battleUnit) {
-    func_001ED068(battleUnit->motionActor, ((UnitPoolRow *) battleUnit->lookupKeyRecord)->lookupKey);
+    scKeyRangeSample(battleUnit->motionActor, ((UnitPoolRow *) battleUnit->lookupKeyRecord)->lookupKey);
 }
 
 void unitSetPositionPercent(BattleUnit *battleUnit, s32 xPercent, s32 zPercent) {

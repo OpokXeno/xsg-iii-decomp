@@ -5,6 +5,10 @@ void assertFailed(const char *message, const char *file, int line);
 
 void sefResetDrawState(void);
 
+void *sefLightSetActiveGet(void);
+
+void sefReplayBufferedEffects(void);
+
 void advanceState(void);
 
 void xcBlockClear(void *clearedBlock);

@@ -827,10 +827,10 @@
     {
      "c_split": false,
      "end": "0x00408180",
-     "ordinal": 125,
-     "piece": "sdv_alter",
+     "ordinal": 122,
+     "piece": "sdv",
      "start": "0x00408090",
-     "tu": "sdv_alter"
+     "tu": "sdv"
     },
     {
      "c_split": false,
@@ -850,11 +850,19 @@
     },
     {
      "c_split": false,
-     "end": "0x00475450",
+     "end": "0x00475380",
      "ordinal": 131,
      "piece": "sef",
      "start": "0x00453D88",
      "tu": "sef"
+    },
+    {
+     "c_split": false,
+     "end": "0x00475450",
+     "ordinal": 132,
+     "piece": "sef_132",
+     "start": "0x00475380",
+     "tu": "sef_132"
     },
     {
      "c_split": false,
@@ -2145,19 +2153,11 @@
     },
     {
      "c_split": false,
-     "end": "0x0053E9C0",
-     "ordinal": 124,
-     "piece": "sdv_camera",
-     "start": "0x0053E920",
-     "tu": "sdv_camera"
-    },
-    {
-     "c_split": false,
      "end": "0x0053EA90",
-     "ordinal": 125,
-     "piece": "sdv_alter",
-     "start": "0x0053E9C0",
-     "tu": "sdv_alter"
+     "ordinal": 122,
+     "piece": "sdv",
+     "start": "0x0053E920",
+     "tu": "sdv"
     },
     {
      "c_split": false,
@@ -3368,35 +3368,11 @@
     },
     {
      "c_split": false,
-     "end": "0x0054FC64",
-     "ordinal": 122,
-     "piece": "sdv_seq",
-     "start": "0x0054FC54",
-     "tu": "sdv_seq"
-    },
-    {
-     "c_split": false,
-     "end": "0x0054FC68",
-     "ordinal": 123,
-     "piece": "sdv_wind",
-     "start": "0x0054FC64",
-     "tu": "sdv_wind"
-    },
-    {
-     "c_split": false,
-     "end": "0x0054FC78",
-     "ordinal": 124,
-     "piece": "sdv_camera",
-     "start": "0x0054FC68",
-     "tu": "sdv_camera"
-    },
-    {
-     "c_split": false,
      "end": "0x0054FCC4",
-     "ordinal": 125,
-     "piece": "sdv_alter",
-     "start": "0x0054FC78",
-     "tu": "sdv_alter"
+     "ordinal": 122,
+     "piece": "sdv",
+     "start": "0x0054FC54",
+     "tu": "sdv"
     },
     {
      "c_split": false,
@@ -3416,11 +3392,19 @@
     },
     {
      "c_split": false,
-     "end": "0x0054FD88",
+     "end": "0x0054FD70",
      "ordinal": 131,
      "piece": "sef",
      "start": "0x0054FCF0",
      "tu": "sef"
+    },
+    {
+     "c_split": false,
+     "end": "0x0054FD88",
+     "ordinal": 132,
+     "piece": "sef_132",
+     "start": "0x0054FD70",
+     "tu": "sef_132"
     },
     {
      "c_split": false,
@@ -4352,18 +4336,26 @@
     {
      "c_split": false,
      "end": "0x00551040",
-     "ordinal": 125,
-     "piece": "sdv_alter",
+     "ordinal": 122,
+     "piece": "sdv",
      "start": "0x0055103C",
-     "tu": "sdv_alter"
+     "tu": "sdv"
     },
     {
      "c_split": false,
-     "end": "0x005510C0",
+     "end": "0x005510AC",
      "ordinal": 131,
      "piece": "sef",
      "start": "0x00551040",
      "tu": "sef"
+    },
+    {
+     "c_split": false,
+     "end": "0x005510C0",
+     "ordinal": 132,
+     "piece": "sef_132",
+     "start": "0x005510AC",
+     "tu": "sef_132"
     },
     {
      "c_split": false,
@@ -5717,19 +5709,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00630850",
-     "ordinal": 123,
-     "piece": "sdv_wind",
-     "start": "0x0062F830",
-     "tu": "sdv_wind"
-    },
-    {
-     "c_split": false,
      "end": "0x0065D4C0",
-     "ordinal": 125,
-     "piece": "sdv_alter",
-     "start": "0x00630850",
-     "tu": "sdv_alter"
+     "ordinal": 122,
+     "piece": "sdv",
+     "start": "0x0062F830",
+     "tu": "sdv"
     },
     {
      "c_split": false,
@@ -5741,11 +5725,19 @@
     },
     {
      "c_split": false,
-     "end": "0x0076D4D0",
+     "end": "0x0076C480",
      "ordinal": 131,
      "piece": "sef",
      "start": "0x00667920",
      "tu": "sef"
+    },
+    {
+     "c_split": false,
+     "end": "0x0076D4D0",
+     "ordinal": 132,
+     "piece": "sef_132",
+     "start": "0x0076C480",
+     "tu": "sef_132"
     },
     {
      "c_split": false,
@@ -6110,16 +6102,14 @@
   "tu119",
   "sc_get",
   "sef_print_121",
-  "sdv_seq",
-  "sdv_wind",
-  "sdv_camera",
-  "sdv_alter",
+  "sdv",
   "sdv_packet",
   "tu127",
   "tu128",
   "tu129",
   "tu130",
   "sef",
+  "sef_132",
   "vu0_vector",
   "vu0_matrix",
   "vu0_rotate",
@@ -65294,18 +65284,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA128",
+     "name": "sefApplyLinkedFlagsByKey",
      "size": 392,
-     "splat_name": "func_001EA128",
+     "splat_name": "sefApplyLinkedFlagsByKey",
      "va": "0x001ea128",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA2B0",
+     "name": "sefApplyLinkedFlagsByGroup",
      "size": 276,
-     "splat_name": "func_001EA2B0",
+     "splat_name": "sefApplyLinkedFlagsByGroup",
      "va": "0x001ea2b0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65348,18 +65338,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA448",
+     "name": "sefGroupHasMatch",
      "size": 208,
-     "splat_name": "func_001EA448",
+     "splat_name": "sefGroupHasMatch",
      "va": "0x001ea448",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA518",
+     "name": "sefReleaseGroupMatches",
      "size": 244,
-     "splat_name": "func_001EA518",
+     "splat_name": "sefReleaseGroupMatches",
      "va": "0x001ea518",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65402,36 +65392,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA6B0",
+     "name": "sefBufferOwnedEffects",
      "size": 232,
-     "splat_name": "func_001EA6B0",
+     "splat_name": "sefBufferOwnedEffects",
      "va": "0x001ea6b0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA798",
+     "name": "sefReplayBufferedEffects",
      "size": 388,
-     "splat_name": "func_001EA798",
+     "splat_name": "sefReplayBufferedEffects",
      "va": "0x001ea798",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA920",
+     "name": "sefLinkedObjectSetWord",
      "size": 60,
-     "splat_name": "func_001EA920",
+     "splat_name": "sefLinkedObjectSetWord",
      "va": "0x001ea920",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA960",
+     "name": "sefLinkedObjectSetChildKey",
      "size": 60,
-     "splat_name": "func_001EA960",
+     "splat_name": "sefLinkedObjectSetChildKey",
      "va": "0x001ea960",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65447,27 +65437,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EA9C8",
+     "name": "sefLinkedObjectSetLinkedFloat",
      "size": 60,
-     "splat_name": "func_001EA9C8",
+     "splat_name": "sefLinkedObjectSetLinkedFloat",
      "va": "0x001ea9c8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EAA08",
+     "name": "sefLinkedObjectSetPosition",
      "size": 104,
-     "splat_name": "func_001EAA08",
+     "splat_name": "sefLinkedObjectSetPosition",
      "va": "0x001eaa08",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EAA70",
+     "name": "sefLinkedObjectSetRotation",
      "size": 36,
-     "splat_name": "func_001EAA70",
+     "splat_name": "sefLinkedObjectSetRotation",
      "va": "0x001eaa70",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65519,18 +65509,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EACA8",
+     "name": "sefSpawnLinkedEffect",
      "size": 248,
-     "splat_name": "func_001EACA8",
+     "splat_name": "sefSpawnLinkedEffect",
      "va": "0x001eaca8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EADA0",
+     "name": "sefSetRecordRect",
      "size": 204,
-     "splat_name": "func_001EADA0",
+     "splat_name": "sefSetRecordRect",
      "va": "0x001eada0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65761,9 +65751,9 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_001ECA60",
+     "name": "scEffectObjectUpdate",
      "size": 1036,
-     "splat_name": "func_001ECA60",
+     "splat_name": "scEffectObjectUpdate",
      "va": "0x001eca60",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65779,54 +65769,54 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ECE98",
+     "name": "scSampleEnableSet",
      "size": 20,
-     "splat_name": "func_001ECE98",
+     "splat_name": "scSampleEnableSet",
      "va": "0x001ece98",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ECEB0",
+     "name": "scSampleEnableClear",
      "size": 24,
-     "splat_name": "func_001ECEB0",
+     "splat_name": "scSampleEnableClear",
      "va": "0x001eceb0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ECEC8",
+     "name": "scKeyTableReset",
      "size": 168,
-     "splat_name": "func_001ECEC8",
+     "splat_name": "scKeyTableReset",
      "va": "0x001ecec8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ECF70",
+     "name": "scKeyRangeReset",
      "size": 128,
-     "splat_name": "func_001ECF70",
+     "splat_name": "scKeyRangeReset",
      "va": "0x001ecf70",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ECFF0",
+     "name": "scKeyRecordGet",
      "size": 120,
-     "splat_name": "func_001ECFF0",
+     "splat_name": "scKeyRecordGet",
      "va": "0x001ecff0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ED068",
+     "name": "scKeyRangeSample",
      "size": 640,
-     "splat_name": "func_001ED068",
+     "splat_name": "scKeyRangeSample",
      "va": "0x001ed068",
      "name_basis": "address",
      "provenance": "estimated"
@@ -65860,9 +65850,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001ED360",
+     "name": "scScriptLookup",
      "size": 652,
-     "splat_name": "func_001ED360",
+     "splat_name": "scScriptLookup",
      "va": "0x001ed360",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66192,9 +66182,9 @@
    "id": "main/tu122",
    "unit": "main",
    "ordinal": 122,
-   "name": "sdv_seq",
-   "path": "src/main/sdv_seq.c",
-   "scaffold_path": "scaffold/src/main/sdv_seq.c",
+   "name": "sdv",
+   "path": "src/main/sdv.c",
+   "scaffold_path": "scaffold/src/main/sdv.c",
    "kind": "gcc",
    "mode": "c",
    "category": "game",
@@ -66204,7 +66194,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.85",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
+    "precision of this score band on X1, held out: 0.227 (17/75)",
+    "TU merge 2026-11-24: sdv_seq, sdv_wind, sdv_camera, sdv_alter"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -66233,7 +66224,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "6 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 4 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -66241,7 +66232,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 4,
+    "of": 40,
     "migration_hints": [],
     "records": []
    },
@@ -66281,120 +66272,7 @@
      "va": "0x001eda28",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".lit4": {
-     "anchored": [
-      "0x0054fc54",
-      "0x0054fc61"
-     ],
-     "bounds": [
-      "0x0054fc51",
-      "0x0054fc64"
-     ],
-     "end": "0x0054FC64",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FC64",
-       "name": "sdv_seq",
-       "start": "0x0054FC54"
-      }
-     ],
-     "size": 16,
-     "splat_type": "lit4",
-     "start": "0x0054FC54"
-    }
-   },
-   "text": {
-    "start": "0x001ed7a8",
-    "end": "0x001edb40",
-    "code_end": "0x001edb3c",
-    "size": 920,
-    "splat": "c",
-    "splat_range": [
-     "0x001ed7a8",
-     "0x001edb40"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X2 port phase 2 express (user 2026-11-20: Express, sin revisi\u00f3n)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/sdv_seq.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu123",
-   "unit": "main",
-   "ordinal": 123,
-   "name": "sdv_wind",
-   "path": "src/main/sdv_wind.c",
-   "scaffold_path": "scaffold/src/main/sdv_wind.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.78",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "first named function tiWindAcquireSlot",
-   "name_confidence": "low",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "1 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 6,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "tiWindAcquireSlot",
@@ -66448,145 +66326,7 @@
      "va": "0x001edcb8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".lit4": "asm",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".lit4": {
-     "anchored": [
-      "0x0054fc64",
-      "0x0054fc65"
-     ],
-     "bounds": [
-      "0x0054fc61",
-      "0x0054fc68"
-     ],
-     "end": "0x0054FC68",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FC68",
-       "name": "sdv_wind",
-       "start": "0x0054FC64"
-      }
-     ],
-     "size": 4,
-     "splat_type": "lit4",
-     "start": "0x0054FC64"
     },
-    ".bss": {
-     "anchored": [
-      "0x0062f830",
-      "0x0062f831"
-     ],
-     "bounds": [
-      "0x0062f4d1",
-      "0x00630850"
-     ],
-     "end": "0x00630850",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00630850",
-       "name": "sdv_wind",
-       "start": "0x0062F830"
-      }
-     ],
-     "size": 4128,
-     "splat_type": "bss",
-     "start": "0x0062F830"
-    }
-   },
-   "text": {
-    "start": "0x001edb40",
-    "end": "0x001ee270",
-    "code_end": "0x001ee270",
-    "size": 1840,
-    "splat": "c",
-    "splat_range": [
-     "0x001edb40",
-     "0x001ee270"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
-    "source": {
-     "kind": "file",
-     "path": "src/main/sdv_wind.c",
-     "include_dirs": [
-      "include"
-     ]
-    }
-   }
-  },
-  {
-   "id": "main/tu124",
-   "unit": "main",
-   "ordinal": 124,
-   "name": "sdv_camera",
-   "path": "src/main/sdv_camera.c",
-   "scaffold_path": "scaffold/src/main/sdv_camera.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.71",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "4 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 4,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "sdvSelectCamera",
@@ -66598,174 +66338,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EE4B0",
+     "name": "sdvBuildCameraPoint",
      "size": 420,
-     "splat_name": "func_001EE4B0",
+     "splat_name": "sdvBuildCameraPoint",
      "va": "0x001ee4b0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EE658",
+     "name": "sdvCameraChannelPlay",
      "size": 1812,
-     "splat_name": "func_001EE658",
+     "splat_name": "sdvCameraChannelPlay",
      "va": "0x001ee658",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EED70",
+     "name": "sdvCameraScheduleUpdate",
      "size": 420,
-     "splat_name": "func_001EED70",
+     "splat_name": "sdvCameraScheduleUpdate",
      "va": "0x001eed70",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".rodata": "asm",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x0053e960",
-      "0x0053e971"
-     ],
-     "bounds": [
-      "0x0053ea69",
-      "0x0053ea90"
-     ],
-     "end": "0x0053E9C0",
-     "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by sdv_183)",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0053E9C0",
-       "name": "sdv_camera",
-       "start": "0x0053E920"
-      }
-     ],
-     "size": 160,
-     "splat_type": "rodata",
-     "start": "0x0053E920"
     },
-    ".lit4": {
-     "anchored": [
-      "0x0054fc68",
-      "0x0054fc75"
-     ],
-     "bounds": [
-      "0x0054fc65",
-      "0x0054fc78"
-     ],
-     "end": "0x0054FC78",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FC78",
-       "name": "sdv_camera",
-       "start": "0x0054FC68"
-      }
-     ],
-     "size": 16,
-     "splat_type": "lit4",
-     "start": "0x0054FC68"
-    }
-   },
-   "text": {
-    "start": "0x001ee270",
-    "end": "0x001eef18",
-    "code_end": "0x001eef14",
-    "size": 3240,
-    "splat": "c",
-    "splat_range": [
-     "0x001ee270",
-     "0x001eef18"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X2 port phase 2 express (user 2026-11-20: Express, sin revisi\u00f3n)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/sdv_camera.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu125",
-   "unit": "main",
-   "ordinal": 125,
-   "name": "sdv_alter",
-   "path": "src/main/sdv_alter.c",
-   "scaffold_path": "scaffold/src/main/sdv_alter.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.96",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "X1 file of 1 homolog function(s)",
-   "name_confidence": "medium",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "28 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 26,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_001EEF18",
+     "name": "sdvProjectEffectPoint",
      "size": 876,
-     "splat_name": "func_001EEF18",
+     "splat_name": "sdvProjectEffectPoint",
      "va": "0x001eef18",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66799,36 +66401,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EF338",
+     "name": "sdvReleaseOwnerSpecials",
      "size": 268,
-     "splat_name": "func_001EF338",
+     "splat_name": "sdvReleaseOwnerSpecials",
      "va": "0x001ef338",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EF448",
+     "name": "sdvSetupEffectEntry",
      "size": 332,
-     "splat_name": "func_001EF448",
+     "splat_name": "sdvSetupEffectEntry",
      "va": "0x001ef448",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EF598",
+     "name": "sdvStepSpecialTrack",
      "size": 2028,
-     "splat_name": "func_001EF598",
+     "splat_name": "sdvStepSpecialTrack",
      "va": "0x001ef598",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001EFD88",
+     "name": "sdvFeedOwnerSpecials",
      "size": 408,
-     "splat_name": "func_001EFD88",
+     "splat_name": "sdvFeedOwnerSpecials",
      "va": "0x001efd88",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66853,18 +66455,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F0DB0",
+     "name": "sdvStartSlotEvents",
      "size": 164,
-     "splat_name": "func_001F0DB0",
+     "splat_name": "sdvStartSlotEvents",
      "va": "0x001f0db0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F0E58",
+     "name": "sdvStartSequenceAlters",
      "size": 940,
-     "splat_name": "func_001F0E58",
+     "splat_name": "sdvStartSequenceAlters",
      "va": "0x001f0e58",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66880,9 +66482,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F1220",
+     "name": "sdvAllocAlter",
      "size": 1256,
-     "splat_name": "func_001F1220",
+     "splat_name": "sdvAllocAlter",
      "va": "0x001f1220",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66907,9 +66509,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F17D0",
+     "name": "sdvStepAlter",
      "size": 3284,
-     "splat_name": "func_001F17D0",
+     "splat_name": "sdvStepAlter",
      "va": "0x001f17d0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66934,9 +66536,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F25B0",
+     "name": "sdvAlterDraw",
      "size": 3492,
-     "splat_name": "func_001F25B0",
+     "splat_name": "sdvAlterDraw",
      "va": "0x001f25b0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66988,9 +66590,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F35E0",
+     "name": "sdvAlterDrawOwned",
      "size": 220,
-     "splat_name": "func_001F35E0",
+     "splat_name": "sdvAlterDrawOwned",
      "va": "0x001f35e0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -66998,13 +66600,43 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm",
-    ".rodata": "asm",
     ".lit4": "asm",
-    ".sdata": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".rodata": "asm",
+    ".data": "asm",
+    ".sdata": "asm"
    },
    "sections": {
+    ".lit4": {
+     "anchored": [
+      "0x0054fc54",
+      "0x0054fc61",
+      "0x0054fc64",
+      "0x0054fc65",
+      "0x0054fc68",
+      "0x0054fc75",
+      "0x0054fc78",
+      "0x0054fcc1"
+     ],
+     "bounds": [
+      "0x0054fc51",
+      "0x0054fc64"
+     ],
+     "end": "0x0054FCC4",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054FCC4",
+       "name": "sdv",
+       "start": "0x0054FC54"
+      }
+     ],
+     "size": 112,
+     "splat_type": "lit4",
+     "start": "0x0054FC54"
+    },
     ".data": {
      "anchored": [
       "0x00408090",
@@ -67015,13 +66647,13 @@
       "0x00408180"
      ],
      "end": "0x00408180",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00408180",
-       "name": "sdv_alter",
+       "name": "sdv",
        "start": "0x00408090"
       }
      ],
@@ -67032,50 +66664,28 @@
     ".rodata": {
      "anchored": [
       "0x0053e920",
+      "0x0053e960",
+      "0x0053e971",
       "0x0053ea69"
      ],
      "bounds": [
-      "0x0053e911",
-      "0x0053e960"
+      "0x0053ea69",
+      "0x0053ea90"
      ],
      "end": "0x0053EA90",
-     "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by sdv_183)",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053EA90",
-       "name": "sdv_alter",
-       "start": "0x0053E9C0"
+       "name": "sdv",
+       "start": "0x0053E920"
       }
      ],
-     "size": 208,
+     "size": 368,
      "splat_type": "rodata",
-     "start": "0x0053E9C0"
-    },
-    ".lit4": {
-     "anchored": [
-      "0x0054fc78",
-      "0x0054fcc1"
-     ],
-     "bounds": [
-      "0x0054fc75",
-      "0x0054fcc4"
-     ],
-     "end": "0x0054FCC4",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FCC4",
-       "name": "sdv_alter",
-       "start": "0x0054FC78"
-      }
-     ],
-     "size": 76,
-     "splat_type": "lit4",
-     "start": "0x0054FC78"
+     "start": "0x0053E920"
     },
     ".sdata": {
      "anchored": [
@@ -67087,13 +66697,13 @@
       "0x00551040"
      ],
      "end": "0x00551040",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00551040",
-       "name": "sdv_alter",
+       "name": "sdv",
        "start": "0x0055103C"
       }
      ],
@@ -67103,50 +66713,52 @@
     },
     ".bss": {
      "anchored": [
+      "0x0062f830",
+      "0x0062f831",
       "0x00630850",
       "0x00630851"
      ],
      "bounds": [
-      "0x0062f831",
-      "0x0065d4c0"
+      "0x0062f4d1",
+      "0x00630850"
      ],
      "end": "0x0065D4C0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0065D4C0",
-       "name": "sdv_alter",
-       "start": "0x00630850"
+       "name": "sdv",
+       "start": "0x0062F830"
       }
      ],
-     "size": 183408,
+     "size": 187536,
      "splat_type": "bss",
-     "start": "0x00630850"
+     "start": "0x0062F830"
     }
    },
    "text": {
-    "start": "0x001eef18",
+    "start": "0x001ed7a8",
     "end": "0x001f36c0",
     "code_end": "0x001f36bc",
-    "size": 18344,
+    "size": 24344,
     "splat": "c",
     "splat_range": [
-     "0x001eef18",
+     "0x001ed7a8",
      "0x001f36c0"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; nothrow evidence sdvStartSequenceAlters/sdvFeedOwnerSpecials)"
    },
    "import": {
     "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
+    "note": "X2 port phase 2 express (user 2026-11-20: Express, sin revisi\u00f3n)",
     "source": {
-     "kind": "file",
-     "path": "src/main/sdv_alter.c",
      "include_dirs": [
       "include"
-     ]
+     ],
+     "kind": "file",
+     "path": "src/main/sdv.c"
     }
    }
   },
@@ -67228,9 +66840,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F3788",
+     "name": "sdvPacketRelease",
      "size": 156,
-     "splat_name": "func_001F3788",
+     "splat_name": "sdvPacketRelease",
      "va": "0x001f3788",
      "name_basis": "address",
      "provenance": "estimated"
@@ -67317,7 +66929,7 @@
    "path": "src/main/tu127.c",
    "scaffold_path": "scaffold/src/main/tu127.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -67369,34 +66981,34 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_001F4048",
+     "name": "sdvShadowQueueDraw",
      "size": 2700,
-     "splat_name": "func_001F4048",
+     "splat_name": "sdvShadowQueueDraw",
      "va": "0x001f4048",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F4AD8",
+     "name": "sdvShadowBlockDraw",
      "size": 1896,
-     "splat_name": "func_001F4AD8",
+     "splat_name": "sdvShadowBlockDraw",
      "va": "0x001f4ad8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5240",
+     "name": "sdvReleaseShadowBlock",
      "size": 128,
-     "splat_name": "func_001F5240",
+     "splat_name": "sdvReleaseShadowBlock",
      "va": "0x001f5240",
      "name_basis": "address",
      "provenance": "estimated"
     }
    ],
    "owners": {
-    ".text": "asm",
+    ".text": "c",
     ".rodata": "asm",
     ".bss": "asm"
    },
@@ -67461,6 +67073,17 @@
      "0x001f52c0"
     ],
     "note": null
+   },
+   "import": {
+    "mode": "c",
+    "note": "express tu119-131, user order 2026-11-24",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/tu127.c"
+    }
    }
   },
   {
@@ -67541,27 +67164,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "clearRecordTables",
+     "name": "sefEffectTablesClear",
      "size": 60,
-     "splat_name": "clearRecordTables",
+     "splat_name": "sefEffectTablesClear",
      "va": "0x001f52e0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5320",
+     "name": "sefClaimFirstSlot",
      "size": 284,
-     "splat_name": "func_001F5320",
+     "splat_name": "sefClaimFirstSlot",
      "va": "0x001f5320",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5440",
+     "name": "sefClaimSlotAt",
      "size": 308,
-     "splat_name": "func_001F5440",
+     "splat_name": "sefClaimSlotAt",
      "va": "0x001f5440",
      "name_basis": "address",
      "provenance": "estimated"
@@ -67577,90 +67200,90 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5590",
+     "name": "sefEffectInstanceRelease",
      "size": 288,
-     "splat_name": "func_001F5590",
+     "splat_name": "sefEffectInstanceRelease",
      "va": "0x001f5590",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F56B0",
+     "name": "sefEffectPoolClaim",
      "size": 180,
-     "splat_name": "func_001F56B0",
+     "splat_name": "sefEffectPoolClaim",
      "va": "0x001f56b0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5768",
+     "name": "sefEffectNodeClaim",
      "size": 228,
-     "splat_name": "func_001F5768",
+     "splat_name": "sefEffectNodeClaim",
      "va": "0x001f5768",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5850",
+     "name": "sefEffectPoolRelease",
      "size": 164,
-     "splat_name": "func_001F5850",
+     "splat_name": "sefEffectPoolRelease",
      "va": "0x001f5850",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F58F8",
+     "name": "sefEffectNodeRelease",
      "size": 140,
-     "splat_name": "func_001F58F8",
+     "splat_name": "sefEffectNodeRelease",
      "va": "0x001f58f8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5988",
+     "name": "sefTakeKeys",
      "size": 580,
-     "splat_name": "func_001F5988",
+     "splat_name": "sefTakeKeys",
      "va": "0x001f5988",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5BD0",
+     "name": "sefReleaseKeys",
      "size": 212,
-     "splat_name": "func_001F5BD0",
+     "splat_name": "sefReleaseKeys",
      "va": "0x001f5bd0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5CA8",
+     "name": "sefEffectTransformClaim",
      "size": 84,
-     "splat_name": "func_001F5CA8",
+     "splat_name": "sefEffectTransformClaim",
      "va": "0x001f5ca8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "clearRecordEntry",
+     "name": "sefEffectTransformClear",
      "size": 68,
-     "splat_name": "clearRecordEntry",
+     "splat_name": "sefEffectTransformClear",
      "va": "0x001f5d00",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F5D48",
+     "name": "sefBuildSpecEntries",
      "size": 1452,
-     "splat_name": "func_001F5D48",
+     "splat_name": "sefBuildSpecEntries",
      "va": "0x001f5d48",
      "name_basis": "address",
      "provenance": "estimated"
@@ -67703,90 +67326,90 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F6DE0",
+     "name": "sefCompactActiveEffectRecords",
      "size": 264,
-     "splat_name": "func_001F6DE0",
+     "splat_name": "sefCompactActiveEffectRecords",
      "va": "0x001f6de0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F6EE8",
+     "name": "sefRunCompactedEffects",
      "size": 592,
-     "splat_name": "func_001F6EE8",
+     "splat_name": "sefRunCompactedEffects",
      "va": "0x001f6ee8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F7138",
+     "name": "sefReleaseSlotsByKey",
      "size": 268,
-     "splat_name": "func_001F7138",
+     "splat_name": "sefReleaseSlotsByKey",
      "va": "0x001f7138",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F7248",
+     "name": "sefSetSlotValueByKey",
      "size": 128,
-     "splat_name": "func_001F7248",
+     "splat_name": "sefSetSlotValueByKey",
      "va": "0x001f7248",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F72C8",
+     "name": "sefSetEntryValueById",
      "size": 128,
-     "splat_name": "func_001F72C8",
+     "splat_name": "sefSetEntryValueById",
      "va": "0x001f72c8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F7348",
+     "name": "sefSetEntryWeightById",
      "size": 128,
-     "splat_name": "func_001F7348",
+     "splat_name": "sefSetEntryWeightById",
      "va": "0x001f7348",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F73C8",
+     "name": "sefSetSlotRecordPos",
      "size": 224,
-     "splat_name": "func_001F73C8",
+     "splat_name": "sefSetSlotRecordPos",
      "va": "0x001f73c8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F74A8",
+     "name": "sefSetSlotRecordVectorQ",
      "size": 224,
-     "splat_name": "func_001F74A8",
+     "splat_name": "sefSetSlotRecordVectorQ",
      "va": "0x001f74a8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F7588",
+     "name": "sefSetSlotRecordVectorR",
      "size": 224,
-     "splat_name": "func_001F7588",
+     "splat_name": "sefSetSlotRecordVectorR",
      "va": "0x001f7588",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F7668",
+     "name": "sefSetSlotRecordVectorRW",
      "size": 216,
-     "splat_name": "func_001F7668",
+     "splat_name": "sefSetSlotRecordVectorRW",
      "va": "0x001f7668",
      "name_basis": "address",
      "provenance": "estimated"
@@ -67983,9 +67606,9 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_001F7900",
+     "name": "sefAdvanceCurveTrack16",
      "size": 180,
-     "splat_name": "func_001F7900",
+     "splat_name": "sefAdvanceCurveTrack16",
      "va": "0x001f7900",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68055,18 +67678,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F8010",
+     "name": "sefEffectGroupStep",
      "size": 1644,
-     "splat_name": "func_001F8010",
+     "splat_name": "sefEffectGroupStep",
      "va": "0x001f8010",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F8680",
+     "name": "sefUpdateAllEffectGroups",
      "size": 208,
-     "splat_name": "func_001F8680",
+     "splat_name": "sefUpdateAllEffectGroups",
      "va": "0x001f8680",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68091,9 +67714,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F89C8",
+     "name": "sefBuildDrawPacket",
      "size": 876,
-     "splat_name": "func_001F89C8",
+     "splat_name": "sefBuildDrawPacket",
      "va": "0x001f89c8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68109,18 +67732,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F8E28",
+     "name": "sefLineEffectDraw",
      "size": 2092,
-     "splat_name": "func_001F8E28",
+     "splat_name": "sefLineEffectDraw",
      "va": "0x001f8e28",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F9658",
+     "name": "sefDrawEffectGroup",
      "size": 624,
-     "splat_name": "func_001F9658",
+     "splat_name": "sefDrawEffectGroup",
      "va": "0x001f9658",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68145,9 +67768,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F99F0",
+     "name": "sefFindEffectById",
      "size": 120,
-     "splat_name": "func_001F99F0",
+     "splat_name": "sefFindEffectById",
      "va": "0x001f99f0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68310,18 +67933,18 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_001F9AD0",
+     "name": "sdvPacketHeadGet",
      "size": 72,
-     "splat_name": "func_001F9AD0",
+     "splat_name": "sdvPacketHeadGet",
      "va": "0x001f9ad0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001F9B18",
+     "name": "sdvPacketRecordGet",
      "size": 72,
-     "splat_name": "func_001F9B18",
+     "splat_name": "sdvPacketRecordGet",
      "va": "0x001f9b18",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68399,7 +68022,8 @@
    "boundary_evidence": [
     "model log-odds -0.79",
     "precision of this score band on X1, held out: 0.188 (12/64)",
-    "TU merge 2026-11-20: sef_131, sef_132, tu133, sef_134, sef_135"
+    "TU merge 2026-11-20: sef_131, sef_132, tu133, sef_134, sef_135",
+    "TU cut 2026-11-24 (user order): func_002046F8, func_00205DF0 and func_002050A8 are exact only when sefGetActiveTableSlot and sefGetLineAdr may throw (C of another object); both halves compile identical without aliases"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -68436,7 +68060,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 172,
+    "of": 116,
     "migration_hints": [],
     "records": []
    },
@@ -68587,9 +68211,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FA338",
+     "name": "sefSampleVectorCurveTrack",
      "size": 320,
-     "splat_name": "func_001FA338",
+     "splat_name": "sefSampleVectorCurveTrack",
      "va": "0x001fa338",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68668,45 +68292,45 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FA808",
+     "name": "sefEvaluateKeyTrackPoint",
      "size": 1104,
-     "splat_name": "func_001FA808",
+     "splat_name": "sefEvaluateKeyTrackPoint",
      "va": "0x001fa808",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FAC58",
+     "name": "sefComputeMotionStep",
      "size": 1480,
-     "splat_name": "func_001FAC58",
+     "splat_name": "sefComputeMotionStep",
      "va": "0x001fac58",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FB220",
+     "name": "sefTransformPointSaved",
      "size": 68,
-     "splat_name": "func_001FB220",
+     "splat_name": "sefTransformPointSaved",
      "va": "0x001fb220",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FB268",
+     "name": "sefTransformPointIfMoved",
      "size": 124,
-     "splat_name": "func_001FB268",
+     "splat_name": "sefTransformPointIfMoved",
      "va": "0x001fb268",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FB2E8",
+     "name": "sefAdvanceMotionState",
      "size": 948,
-     "splat_name": "func_001FB2E8",
+     "splat_name": "sefAdvanceMotionState",
      "va": "0x001fb2e8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68731,45 +68355,45 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FBD18",
+     "name": "sefRotateBlockUpdate",
      "size": 284,
-     "splat_name": "func_001FBD18",
+     "splat_name": "sefRotateBlockUpdate",
      "va": "0x001fbd18",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FBE38",
+     "name": "sefCurveTrackAdvance",
      "size": 884,
-     "splat_name": "func_001FBE38",
+     "splat_name": "sefCurveTrackAdvance",
      "va": "0x001fbe38",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FC1B0",
+     "name": "sefSwLoadParameterBlock",
      "size": 1132,
-     "splat_name": "func_001FC1B0",
+     "splat_name": "sefSwLoadParameterBlock",
      "va": "0x001fc1b0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FC620",
+     "name": "sefAdvanceParticle",
      "size": 1540,
-     "splat_name": "func_001FC620",
+     "splat_name": "sefAdvanceParticle",
      "va": "0x001fc620",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FCC28",
+     "name": "sefEffectObjectTick",
      "size": 500,
-     "splat_name": "func_001FCC28",
+     "splat_name": "sefEffectObjectTick",
      "va": "0x001fcc28",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68803,9 +68427,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FD000",
+     "name": "sefInitLine",
      "size": 2000,
-     "splat_name": "func_001FD000",
+     "splat_name": "sefInitLine",
      "va": "0x001fd000",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68839,36 +68463,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FDBE0",
+     "name": "sefQueueEffectEvents",
      "size": 1104,
-     "splat_name": "func_001FDBE0",
+     "splat_name": "sefQueueEffectEvents",
      "va": "0x001fdbe0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FE030",
+     "name": "sefSpawnLocalPart",
      "size": 1728,
-     "splat_name": "func_001FE030",
+     "splat_name": "sefSpawnLocalPart",
      "va": "0x001fe030",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FE6F0",
+     "name": "sefEmitLocalEffectSteps",
      "size": 2732,
-     "splat_name": "func_001FE6F0",
+     "splat_name": "sefEmitLocalEffectSteps",
      "va": "0x001fe6f0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FF1A0",
+     "name": "sefUpdateLineRecord",
      "size": 1348,
-     "splat_name": "func_001FF1A0",
+     "splat_name": "sefUpdateLineRecord",
      "va": "0x001ff1a0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68893,18 +68517,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FF7B0",
+     "name": "sefFindFreeEffectSlot",
      "size": 136,
-     "splat_name": "func_001FF7B0",
+     "splat_name": "sefFindFreeEffectSlot",
      "va": "0x001ff7b0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FF838",
+     "name": "sefReleaseEffectSlot",
      "size": 136,
-     "splat_name": "func_001FF838",
+     "splat_name": "sefReleaseEffectSlot",
      "va": "0x001ff838",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68938,9 +68562,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001FFA50",
+     "name": "sefRunEffectSlotScript",
      "size": 1756,
-     "splat_name": "func_001FFA50",
+     "splat_name": "sefRunEffectSlotScript",
      "va": "0x001ffa50",
      "name_basis": "address",
      "provenance": "estimated"
@@ -68965,45 +68589,45 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00200180",
+     "name": "sefClearEffectRecordTails",
      "size": 144,
-     "splat_name": "func_00200180",
+     "splat_name": "sefClearEffectRecordTails",
      "va": "0x00200180",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00200210",
+     "name": "sefClaimAllocRecord",
      "size": 184,
-     "splat_name": "func_00200210",
+     "splat_name": "sefClaimAllocRecord",
      "va": "0x00200210",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002002C8",
+     "name": "sefReleaseEffectRecord",
      "size": 620,
-     "splat_name": "func_002002C8",
+     "splat_name": "sefReleaseEffectRecord",
      "va": "0x002002c8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00200538",
+     "name": "sefScanRecordKeysHit",
      "size": 180,
-     "splat_name": "func_00200538",
+     "splat_name": "sefScanRecordKeysHit",
      "va": "0x00200538",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002005F0",
+     "name": "sefSpawnRecordItems",
      "size": 648,
-     "splat_name": "func_002005F0",
+     "splat_name": "sefSpawnRecordItems",
      "va": "0x002005f0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69019,9 +68643,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002008D8",
+     "name": "sefUpdateRecordHitFlagsAndMatrices",
      "size": 1768,
-     "splat_name": "func_002008D8",
+     "splat_name": "sefUpdateRecordHitFlagsAndMatrices",
      "va": "0x002008d8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69037,9 +68661,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002010C8",
+     "name": "sefScheduleEffectRecord",
      "size": 1044,
-     "splat_name": "func_002010C8",
+     "splat_name": "sefScheduleEffectRecord",
      "va": "0x002010c8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69073,18 +68697,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002017E0",
+     "name": "sefCameraSelectIsLinked",
      "size": 36,
-     "splat_name": "func_002017E0",
+     "splat_name": "sefCameraSelectIsLinked",
      "va": "0x002017e0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00201808",
+     "name": "sefCopyProbeView",
      "size": 144,
-     "splat_name": "func_00201808",
+     "splat_name": "sefCopyProbeView",
      "va": "0x00201808",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69118,54 +68742,54 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00201EA0",
+     "name": "sefAddSlotLaneTallies",
      "size": 620,
-     "splat_name": "func_00201EA0",
+     "splat_name": "sefAddSlotLaneTallies",
      "va": "0x00201ea0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00202110",
+     "name": "sefRebaseRecordTimes",
      "size": 480,
-     "splat_name": "func_00202110",
+     "splat_name": "sefRebaseRecordTimes",
      "va": "0x00202110",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002022F0",
+     "name": "sefRunEffectRecords",
      "size": 1924,
-     "splat_name": "func_002022F0",
+     "splat_name": "sefRunEffectRecords",
      "va": "0x002022f0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00202A78",
+     "name": "sefUpdateEntryLights",
      "size": 184,
-     "splat_name": "func_00202A78",
+     "splat_name": "sefUpdateEntryLights",
      "va": "0x00202a78",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00202B30",
+     "name": "sefRegisterEntry",
      "size": 404,
-     "splat_name": "func_00202B30",
+     "splat_name": "sefRegisterEntry",
      "va": "0x00202b30",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00202CC8",
+     "name": "sefRebuildEntryTable",
      "size": 476,
-     "splat_name": "func_00202CC8",
+     "splat_name": "sefRebuildEntryTable",
      "va": "0x00202cc8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69199,18 +68823,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00203048",
+     "name": "sefReadProbePoint",
      "size": 156,
-     "splat_name": "func_00203048",
+     "splat_name": "sefReadProbePoint",
      "va": "0x00203048",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002030E8",
+     "name": "sefRefreshProbePoints",
      "size": 532,
-     "splat_name": "func_002030E8",
+     "splat_name": "sefRefreshProbePoints",
      "va": "0x002030e8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69262,9 +68886,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00203450",
+     "name": "sefInstallDrawCallbacks",
      "size": 156,
-     "splat_name": "func_00203450",
+     "splat_name": "sefInstallDrawCallbacks",
      "va": "0x00203450",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69334,9 +68958,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00203690",
+     "name": "sefCreateScheduledRequest",
      "size": 316,
-     "splat_name": "func_00203690",
+     "splat_name": "sefCreateScheduledRequest",
      "va": "0x00203690",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69352,9 +68976,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002037F8",
+     "name": "sefClaimTableSlot",
      "size": 92,
-     "splat_name": "func_002037F8",
+     "splat_name": "sefClaimTableSlot",
      "va": "0x002037f8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69415,9 +69039,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00203990",
+     "name": "sefGetActiveTableSlot",
      "size": 76,
-     "splat_name": "func_00203990",
+     "splat_name": "sefGetActiveTableSlot",
      "va": "0x00203990",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69469,9 +69093,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00203A88",
+     "name": "sefSetSlotDirectionFromVector",
      "size": 108,
-     "splat_name": "func_00203A88",
+     "splat_name": "sefSetSlotDirectionFromVector",
      "va": "0x00203a88",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69484,7 +69108,250 @@
      "va": "0x00203af8",
      "name_basis": "address",
      "provenance": "estimated"
+    }
+   ],
+   "owners": {
+    ".text": "c",
+    ".data": "asm",
+    ".rodata": "asm",
+    ".lit4": "asm",
+    ".sdata": "asm",
+    ".sbss": "asm",
+    ".bss": "asm"
+   },
+   "sections": {
+    ".data": {
+     "anchored": [
+      "0x00453d88",
+      "0x004749d4",
+      "0x004749f0",
+      "0x004749f1"
+     ],
+     "bounds": [
+      "0x004520d1",
+      "0x00453e50"
+     ],
+     "end": "0x00475380",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00475380",
+       "name": "sef",
+       "start": "0x00453D88"
+      }
+     ],
+     "size": 136696,
+     "splat_type": "data",
+     "start": "0x00453D88"
     },
+    ".rodata": {
+     "anchored": [
+      "0x0053ef10",
+      "0x0053f1a9"
+     ],
+     "bounds": [
+      "0x0053eec9",
+      "0x0053f278"
+     ],
+     "end": "0x0053F230",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu128)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0053F230",
+       "name": "sef",
+       "start": "0x0053EEE0"
+      }
+     ],
+     "size": 848,
+     "splat_type": "rodata",
+     "start": "0x0053EEE0"
+    },
+    ".lit4": {
+     "anchored": [
+      "0x0054fcf0",
+      "0x0054fd6d",
+      "0x0054fd70"
+     ],
+     "bounds": [
+      "0x0054fced",
+      "0x0054fd70"
+     ],
+     "end": "0x0054FD70",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054FD70",
+       "name": "sef",
+       "start": "0x0054FCF0"
+      }
+     ],
+     "size": 128,
+     "splat_type": "lit4",
+     "start": "0x0054FCF0"
+    },
+    ".sdata": {
+     "anchored": [
+      "0x00551040",
+      "0x005510a1",
+      "0x005510ac"
+     ],
+     "bounds": [
+      "0x0055103d",
+      "0x005510ac"
+     ],
+     "end": "0x005510AC",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005510AC",
+       "name": "sef",
+       "start": "0x00551040"
+      }
+     ],
+     "size": 108,
+     "splat_type": "sdata",
+     "start": "0x00551040"
+    },
+    ".sbss": {
+     "anchored": [
+      "0x00551514",
+      "0x00551515"
+     ],
+     "bounds": [
+      "0x00551511",
+      "0x00551518"
+     ],
+     "end": "0x00551518",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-20",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00551518",
+       "name": "sef",
+       "start": "0x00551514"
+      }
+     ],
+     "size": 4,
+     "splat_type": "sbss",
+     "start": "0x00551514"
+    },
+    ".bss": {
+     "anchored": [
+      "0x00667920",
+      "0x0076c471",
+      "0x0076c480"
+     ],
+     "bounds": [
+      "0x0065d4c1",
+      "0x0076c480"
+     ],
+     "end": "0x0076C480",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0076C480",
+       "name": "sef",
+       "start": "0x00667920"
+      }
+     ],
+     "size": 1067872,
+     "splat_type": "bss",
+     "start": "0x00667920"
+    }
+   },
+   "text": {
+    "start": "0x001f9b78",
+    "end": "0x00203b18",
+    "code_end": "0x00203b14",
+    "size": 40864,
+    "splat": "c",
+    "splat_range": [
+     "0x001f9b78",
+     "0x00203b18"
+    ],
+    "note": "TU cut 2026-11-24 (user order): func_002046F8, func_00205DF0 and func_002050A8 are exact only when sefGetActiveTableSlot and sefGetLineAdr may throw (C of another object); both halves compile identical without aliases"
+   },
+   "import": {
+    "mode": "c",
+    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
+    "source": {
+     "kind": "file",
+     "path": "src/main/sef.c",
+     "include_dirs": [
+      "include"
+     ]
+    }
+   }
+  },
+  {
+   "id": "main/tu132",
+   "unit": "main",
+   "ordinal": 132,
+   "name": "sef_132",
+   "path": "src/main/sef_132.c",
+   "scaffold_path": "scaffold/src/main/sef_132.c",
+   "kind": "gcc",
+   "mode": "c",
+   "category": "game",
+   "map_class": "game",
+   "domain": null,
+   "in_scope": true,
+   "boundary_kind": "inferred",
+   "boundary_evidence": [
+    "TU cut 2026-11-24 (user order): func_002046F8, func_00205DF0 and func_002050A8 are exact only when sefGetActiveTableSlot and sefGetLineAdr may throw (C of another object); both halves compile identical without aliases",
+    "cut window 0x203B18..0x203BC8; the model of 2026-11-17 also cut at 0x203B18 (sef_134)"
+   ],
+   "boundary_confidence": "medium",
+   "provisional": true,
+   "name_basis": "split of sef at 0x203B18 (2026-11-24); no original name known",
+   "name_confidence": "low",
+   "contract": {
+    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
+    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
+    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
+    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
+    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
+    "compiler_profile": "ee-gcc2_96-realconv-lp7",
+    "flags": [
+     "-O2",
+     "-G4"
+    ],
+    "language": "c",
+    "source_class": "c",
+    "assembler_options": [
+     "-g"
+    ]
+   },
+   "contract_evidence": {
+    "compiler": "2.96",
+    "compiler_confidence": "medium",
+    "assembler_class": "LA29",
+    "assembler_confidence": "medium",
+    "g_flag": "-G4",
+    "g_basis": "TU merge 2026-11-20 of 5 TUs; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_confidence": "high",
+    "optimization": "-O2",
+    "source": "reports/x3-compiler-calibration.md"
+   },
+   "accepted": {
+    "all_functions_accepted": false,
+    "functions": 0,
+    "of": 56,
+    "migration_hints": [],
+    "records": []
+   },
+   "functions": [
     {
      "binding": "GLOBAL",
      "name": "sefMemFillWords",
@@ -69622,18 +69489,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00204080",
+     "name": "sefDirectionToAngles",
      "size": 148,
-     "splat_name": "func_00204080",
+     "splat_name": "sefDirectionToAngles",
      "va": "0x00204080",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00204118",
+     "name": "sefGetSourceMatrix",
      "size": 456,
-     "splat_name": "func_00204118",
+     "splat_name": "sefGetSourceMatrix",
      "va": "0x00204118",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69649,27 +69516,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00204318",
+     "name": "sefGetBattlePoint",
      "size": 500,
-     "splat_name": "func_00204318",
+     "splat_name": "sefGetBattlePoint",
      "va": "0x00204318",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00204510",
+     "name": "sefCopyBattleObjectSlot",
      "size": 180,
-     "splat_name": "func_00204510",
+     "splat_name": "sefCopyBattleObjectSlot",
      "va": "0x00204510",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002045C8",
+     "name": "sefCopyKindTableMatrix",
      "size": 300,
-     "splat_name": "func_002045C8",
+     "splat_name": "sefCopyKindTableMatrix",
      "va": "0x002045c8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69712,9 +69579,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00205380",
+     "name": "sefFindSearchKey",
      "size": 88,
-     "splat_name": "func_00205380",
+     "splat_name": "sefFindSearchKey",
      "va": "0x00205380",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69730,9 +69597,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00205470",
+     "name": "sefRandomDirection",
      "size": 168,
-     "splat_name": "func_00205470",
+     "splat_name": "sefRandomDirection",
      "va": "0x00205470",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69775,9 +69642,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00205638",
+     "name": "sefGetMatrixPoint",
      "size": 1976,
-     "splat_name": "func_00205638",
+     "splat_name": "sefGetMatrixPoint",
      "va": "0x00205638",
      "name_basis": "address",
      "provenance": "estimated"
@@ -69993,19 +69860,13 @@
    "owners": {
     ".text": "c",
     ".data": "asm",
-    ".rodata": "asm",
     ".lit4": "asm",
     ".sdata": "asm",
-    ".sbss": "asm",
     ".bss": "asm"
    },
    "sections": {
     ".data": {
      "anchored": [
-      "0x00453d88",
-      "0x004749d4",
-      "0x004749f0",
-      "0x004749f1",
       "0x00475389",
       "0x004753a1",
       "0x004753f0",
@@ -70016,48 +69877,22 @@
       "0x00453e50"
      ],
      "end": "0x00475450",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00475450",
-       "name": "sef",
-       "start": "0x00453D88"
+       "name": "sef_132",
+       "start": "0x00475380"
       }
      ],
-     "size": 136904,
+     "size": 208,
      "splat_type": "data",
-     "start": "0x00453D88"
-    },
-    ".rodata": {
-     "anchored": [
-      "0x0053ef10",
-      "0x0053f1a9"
-     ],
-     "bounds": [
-      "0x0053eec9",
-      "0x0053f278"
-     ],
-     "end": "0x0053F230",
-     "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu128)",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0053F230",
-       "name": "sef",
-       "start": "0x0053EEE0"
-      }
-     ],
-     "size": 848,
-     "splat_type": "rodata",
-     "start": "0x0053EEE0"
+     "start": "0x00475380"
     },
     ".lit4": {
      "anchored": [
-      "0x0054fcf0",
-      "0x0054fd6d",
       "0x0054fd70",
       "0x0054fd85"
      ],
@@ -70066,24 +69901,22 @@
       "0x0054fd70"
      ],
      "end": "0x0054FD88",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054FD88",
-       "name": "sef",
-       "start": "0x0054FCF0"
+       "name": "sef_132",
+       "start": "0x0054FD70"
       }
      ],
-     "size": 152,
+     "size": 24,
      "splat_type": "lit4",
-     "start": "0x0054FCF0"
+     "start": "0x0054FD70"
     },
     ".sdata": {
      "anchored": [
-      "0x00551040",
-      "0x005510a1",
       "0x005510ac",
       "0x005510ad",
       "0x005510b0",
@@ -70094,48 +69927,22 @@
       "0x005510ac"
      ],
      "end": "0x005510C0",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005510C0",
-       "name": "sef",
-       "start": "0x00551040"
+       "name": "sef_132",
+       "start": "0x005510AC"
       }
      ],
-     "size": 128,
+     "size": 20,
      "splat_type": "sdata",
-     "start": "0x00551040"
-    },
-    ".sbss": {
-     "anchored": [
-      "0x00551514",
-      "0x00551515"
-     ],
-     "bounds": [
-      "0x00551511",
-      "0x00551518"
-     ],
-     "end": "0x00551518",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00551518",
-       "name": "sef",
-       "start": "0x00551514"
-      }
-     ],
-     "size": 4,
-     "splat_type": "sbss",
-     "start": "0x00551514"
+     "start": "0x005510AC"
     },
     ".bss": {
      "anchored": [
-      "0x00667920",
-      "0x0076c471",
       "0x0076c480",
       "0x0076c4c1"
      ],
@@ -70144,39 +69951,39 @@
       "0x0076c480"
      ],
      "end": "0x0076D4D0",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "evidence_source": "cut",
+     "rule": "TU cut 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0076D4D0",
-       "name": "sef",
-       "start": "0x00667920"
+       "name": "sef_132",
+       "start": "0x0076C480"
       }
      ],
-     "size": 1072048,
+     "size": 4176,
      "splat_type": "bss",
-     "start": "0x00667920"
+     "start": "0x0076C480"
     }
    },
    "text": {
-    "start": "0x001f9b78",
+    "start": "0x00203b18",
     "end": "0x00207b20",
     "code_end": "0x00207b1c",
-    "size": 57256,
+    "size": 16392,
     "splat": "c",
     "splat_range": [
-     "0x001f9b78",
+     "0x00203b18",
      "0x00207b20"
     ],
-    "note": "TU merge 2026-11-20 (user order: cuts removed, one object)"
+    "note": "TU cut 2026-11-24 (user order): func_002046F8, func_00205DF0 and func_002050A8 are exact only when sefGetActiveTableSlot and sefGetLineAdr may throw (C of another object); both halves compile identical without aliases"
    },
    "import": {
     "mode": "c",
     "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
     "source": {
      "kind": "file",
-     "path": "src/main/sef.c",
+     "path": "src/main/sef_132.c",
      "include_dirs": [
       "include"
      ]

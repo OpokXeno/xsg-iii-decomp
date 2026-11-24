@@ -45,7 +45,7 @@ typedef struct SefLinkedContext {
 } SefLinkedContext;
 
 SefLinkedContext *sefGetBattleData(void);
-void *func_00203990(int index);
+void *sefGetActiveTableSlot(int index);
 extern Matrix4 sefCameraMatrix[1];
 
 /* Partial local effect record: the point handles and the count of handles still held. */

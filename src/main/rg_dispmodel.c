@@ -188,7 +188,7 @@ typedef struct RgDispLoopBlock {
 
 extern RgDispLoopBlock gGameLoopRuntimeStorage;
 s32 slotModelTopPointGet(AlignedVector4 *out, RgDispModel *model);
-void func_001EAA08(s32 effectHandle, AlignedVector4 *offset);
+void sefLinkedObjectSetPosition(s32 effectHandle, AlignedVector4 *offset);
 
 void RgDispModelRelease(RgDispModel *model);
 
@@ -255,7 +255,7 @@ void func_001BF970(void) {
         if (model->effectHandle != 0) {
             slotModelTopPointGet(&effectPosition, model);
             RgDispAddVector(&effectPosition, &effectPosition, &model->effectOffset);
-            func_001EAA08(model->effectHandle, &effectPosition);
+            sefLinkedObjectSetPosition(model->effectHandle, &effectPosition);
         }
         if ((model->modelFlags & 0x200) && (actor = (BlinkActorView *) model->actor) != 0) {
             if (--model->effectFramesLeft <= 0) {

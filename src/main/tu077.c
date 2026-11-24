@@ -347,10 +347,10 @@ void emitterSlotRelease(SpawnActor *spawnActor) {
 
 f32 slotGetScale(s32);
 s32 slotFollowTargetHeight(SpawnActor *owner, f32 scale);
-void func_001EAA08(s32 handle, SpawnVector4 *work);
+void sefLinkedObjectSetPosition(s32 handle, SpawnVector4 *work);
 void func_0027B020(s32);
 void slotStateFlagEdgeUpdate(SpawnActor *owner);
-void func_001ECA60(SpawnActor *owner);
+void scEffectObjectUpdate(SpawnActor *owner);
 
 /* Update callback of mode 2 slots: counts down the sef effect timer and releases it when it expires. */
 void func_001C4368(SpawnActor *spawnActor) {
@@ -362,7 +362,7 @@ void func_001C4368(SpawnActor *spawnActor) {
     slotScale = slotGetScale(spawnActor->actorHandle);
     slotFollowTargetHeight(spawnActor, slotScale);
     if (spawnActor->flags & 0x2000) {
-        func_001EAA08(effectSlot->sefEffectHandle, &spawnActor->position);
+        sefLinkedObjectSetPosition(effectSlot->sefEffectHandle, &spawnActor->position);
         effectSlot->sefEffectCountdown -= 1;
         if (effectSlot->sefEffectCountdown <= 0) {
             sefHandle = effectSlot->sefEffectHandle;
@@ -375,7 +375,7 @@ void func_001C4368(SpawnActor *spawnActor) {
         }
     }
     slotStateFlagEdgeUpdate(spawnActor);
-    func_001ECA60(spawnActor);
+    scEffectObjectUpdate(spawnActor);
 }
 
 typedef struct SpawnDecodeOut {

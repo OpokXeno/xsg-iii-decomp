@@ -4459,7 +4459,7 @@ typedef struct ParticleEmitter {
 
 f32 sefNoiseNext(void);
 void func_002018E8(s32, s32, s32, s32, s32, s32);
-void func_001EEF18(s32 *origin, EffectParticle *particle, s32 segments, s32 z, f32 *scale, s32 style, s32 zero);
+void sdvProjectEffectPoint(s32 *origin, EffectParticle *particle, s32 segments, s32 z, f32 *scale, s32 style, s32 zero);
 
 static inline s32 ClampInsetWindow(s32 value, s32 low, s32 high) {
     s32 result;
@@ -4688,13 +4688,13 @@ void filterShimmerDraw(ParticleEmitter *emitter) {
             scale[1] = (f32) ((double) extentY * 0.01);
             if (segments == 8) {
                 particle->y = particle->time >> 4;
-                func_001EEF18(origin, particle, 8, originZ, scale, style, 0);
+                sdvProjectEffectPoint(origin, particle, 8, originZ, scale, style, 0);
                 particle->z = originZ;
                 scale[0] = (f32) extentX;
                 scale[1] = (f32) extentY;
             } else {
                 particle->y = particle->time >> 4;
-                func_001EEF18(origin, particle, segments, 0, scale, style, 0);
+                sdvProjectEffectPoint(origin, particle, segments, 0, scale, style, 0);
             }
             x = origin[0];
             y = origin[1];
@@ -4830,7 +4830,7 @@ static inline void MistScaleVector(Vector4 *destination, Vector4 *vector, f32 sc
 }
 
 Vector4 *MMathApplyMatrix(Vector4 *destination, EffectMatrix *matrix, Vector4 *source);
-void func_00204118(EffectMatrix *matrix, s32 shape);
+void sefGetSourceMatrix(EffectMatrix *matrix, s32 shape);
 
 /* Draws the mist of one emitter: particles spawn in a cloud around the origin, rise with
    their velocity, hold and vanish, and each one is sent as a nine-spoke sprite. */
@@ -4962,7 +4962,7 @@ void xglMistEmitterDraw(MistEmitter *emitter) {
     if (motion != 0) {
         func_002018E8(motion->motion[0], motion->motion[1], motion->motion[2], motion->motion[3],
                       motion->motion[4], motion->motion[5]);
-        func_00204118(&matrix, shape);
+        sefGetSourceMatrix(&matrix, shape);
         offset.vector = matrix.row[3];
         matrix.row[3].x = matrix.row[3].y = matrix.row[3].z = 0.0f;
         matrix.row[3].w = 1.0f;
@@ -5075,12 +5075,12 @@ void xglMistEmitterDraw(MistEmitter *emitter) {
             scale[0] = (f32) ((double) particle->size * 0.01);
             scale[1] = (f32) ((double) extentY * 0.01);
             if (shape == 8) {
-                func_001EEF18(screen, position.words, 8, originZ, scale, style, 0);
+                sdvProjectEffectPoint(screen, position.words, 8, originZ, scale, style, 0);
                 scale[0] = (f32) particle->size;
                 particle->position.words[2] = originZ;
                 scale[1] = (f32) extentY;
             } else {
-                func_001EEF18(screen, position.words, 0, 0, scale, style, 0);
+                sdvProjectEffectPoint(screen, position.words, 0, 0, scale, style, 0);
             }
         }
 

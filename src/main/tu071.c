@@ -51,9 +51,9 @@ typedef struct SpawnSlot {
     AlignedVector4 effectOffset;
 } SpawnSlot;
 
-void func_001EAA08(void *effect);
+void sefLinkedObjectSetPosition(void *effect);
 void func_00284E30(void *spawnerState, AlignedVector4 *source, AlignedVector4 *sum);
-void func_001EAA70(void *effect, AlignedVector4 *source);
+void sefLinkedObjectSetRotation(void *effect, AlignedVector4 *source);
 void func_001EAA98(void *effect, AlignedVector4 *source);
 
 /* Sets the slot position and forwards it to the actor or effect that the slot spawnKind drives. */
@@ -112,7 +112,7 @@ void SpawnSlotSetPosition(SpawnSlot *slot, AlignedVector4 *newPosition) {
     }
         return;
     case 16384:
-        func_001EAA08(slot->spawnerState.effect);
+        sefLinkedObjectSetPosition(slot->spawnerState.effect);
         return;
     case 16:
     case 0x20000:
@@ -137,7 +137,7 @@ void SpawnSlotSetRotation(SpawnSlot *slot, AlignedVector4 *newRotation) {
     CopyVectorMem(&slot->rotation, newRotation);
     switch (slot->spawnKind) {
     case 16384:
-        func_001EAA70(slot->spawnerState.effect, newRotation);
+        sefLinkedObjectSetRotation(slot->spawnerState.effect, newRotation);
         break;
     case 1:
     case 2:

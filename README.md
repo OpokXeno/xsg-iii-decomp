@@ -10,11 +10,11 @@ The Sony SDK and public libraries do not need to be recovered.
 
 ## Progress
 
-Recovered 4,431 of 7,288 in-scope game function(s) (60.799%).
+Recovered 4,599 of 7,288 in-scope game function(s) (63.104%).
 
 | Version | Target | Functions | Progress |
 | --- | --- | ---: | ---: |
-| NTSC-U | `SLUS_213.89` | 3,561 / 5,596 | 63.635% |
+| NTSC-U | `SLUS_213.89` | 3,729 / 5,596 | 66.637% |
 | NTSC-U | `OV01.OVL` | 13 / 21 | 61.905% |
 | NTSC-U | `OV02.OVL` | 761 / 1,364 | 55.792% |
 | NTSC-U | `OV04.OVL` | 96 / 307 | 31.270% |

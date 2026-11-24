@@ -29,10 +29,10 @@ void *memset(void *, s32, s32);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu237", func_0025BF88);
 
-s32 func_00203048(s32, s32, s32, s32);
+s32 sefReadProbePoint(s32, s32, s32, s32);
 
 s32 battleActorMatrixLoad(s32 outMatrix, s32 actor, s32 pose) {
-    return func_00203048(actor, pose, outMatrix, 1) != 0;
+    return sefReadProbePoint(actor, pose, outMatrix, 1) != 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu237", func_0025C018);

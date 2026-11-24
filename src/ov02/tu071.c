@@ -566,7 +566,7 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu071", func_00AA46F0);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu071", func_00AA4780);
 
-s32 func_001EA518(BattleSlot *, s32);
+s32 sefReleaseGroupMatches(BattleSlot *, s32);
 
 void battleActorPostEvent(BattleActor *actor, s32 category, s32 event) {
     BattleSlot *unitActor;
@@ -577,7 +577,7 @@ void battleActorPostEvent(BattleActor *actor, s32 category, s32 event) {
     if (unitSide != 0) {
         unitActor = unitSide->unitActor;
     }
-    func_001EA518(unitActor, (category << 0xC) | event);
+    sefReleaseGroupMatches(unitActor, (category << 0xC) | event);
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu071", func_00AA4890);

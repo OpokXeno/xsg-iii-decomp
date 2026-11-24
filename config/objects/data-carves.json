@@ -2189,6 +2189,38 @@
     }
    ]
   },
+  "main/tu120": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fc44",
+      "0x0054fc54"
+     ],
+     "generated": [
+      "0x0054fc44",
+      "0x0054fc54"
+     ],
+     "generated_by": [
+      "scEffectObjectUpdate",
+      "scKeyTableReset",
+      "scKeyRangeReset",
+      "scKeyRangeSample"
+     ],
+     "c_owned_symbols": [
+      "D_0054FC44",
+      "D_0054FC48",
+      "D_0054FC4C",
+      "D_0054FC50"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sc_get.o"
+     }
+    }
+   ]
+  },
   "main/tu122": {
    ".lit4": [
     {
@@ -2214,67 +2246,92 @@
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/sdv_seq.o"
+      "object": "build/main/build/c/sdv.o"
      }
-    }
-   ]
-  },
-  "main/tu123": {
-   ".lit4": [
+    },
     {
      "range": [
       "0x0054fc64",
-      "0x0054fc68"
+      "0x0054fcc4"
      ],
      "generated": [
       "0x0054fc64",
-      "0x0054fc68"
+      "0x0054fcc4"
      ],
      "generated_by": [
+      "sdvBuildCameraPoint",
+      "sdvCameraChannelPlay",
+      "sdvProjectEffectPoint",
+      "sdvStepSpecialTrack",
+      "sdvStartSequenceAlters",
+      "sdvAllocAlter",
+      "sdvStepAlter",
+      "sdvApplySlotEvent",
       "tiWindUpdateKeyframes"
      ],
      "c_owned_symbols": [
-      "D_0054FC64"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/sdv_wind.o"
-     }
-    }
-   ]
-  },
-  "main/tu125": {
-   ".lit4": [
-    {
-     "range": [
-      "0x0054fc80",
-      "0x0054fc94"
-     ],
-     "generated": [
-      "0x0054fc80",
-      "0x0054fc94"
-     ],
-     "generated_by": [
-      "sdvApplySlotEvent"
-     ],
-     "c_owned_symbols": [
+      "D_0054FC64",
+      "D_0054FC68",
+      "D_0054FC6C",
+      "D_0054FC70",
+      "D_0054FC74",
+      "D_0054FC78",
+      "D_0054FC7C",
       "D_0054FC80",
       "D_0054FC84",
       "D_0054FC88",
       "D_0054FC8C",
-      "D_0054FC90"
+      "D_0054FC90",
+      "D_0054FC94",
+      "D_0054FC98",
+      "D_0054FC9C",
+      "D_0054FCA0",
+      "D_0054FCA4",
+      "D_0054FCA8",
+      "D_0054FCAC",
+      "D_0054FCB0",
+      "D_0054FCB4",
+      "D_0054FCB8",
+      "D_0054FCBC",
+      "D_0054FCC0"
      ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/sdv_alter.o"
+      "object": "build/main/build/c/sdv.o"
      }
     }
    ],
    ".rodata": [
+    {
+     "range": [
+      "0x0053e960",
+      "0x0053e9c0"
+     ],
+     "generated": [
+      "0x0053e960",
+      "0x0053e9c0"
+     ],
+     "generated_by": [
+      "sdvCameraChannelPlay"
+     ],
+     "c_owned_symbols": [
+      "D_0053E960",
+      "D_0053E970"
+     ],
+     "also_referenced_by_c": [
+      "D_0053E920",
+      "D_0053E930",
+      "D_0053E950",
+      "D_0053E9C0"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sdv.o"
+     }
+    },
     {
      "range": [
       "0x0053e9d0",
@@ -2292,11 +2349,77 @@
       "D_0053EA60",
       "D_0053EA68"
      ],
+     "also_referenced_by_c": [
+      "sdvAlphaBlendTable"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sdv.o"
+     }
+    }
+   ]
+  },
+  "main/tu128": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fcc4",
+      "0x0054fcdc"
+     ],
+     "generated": [
+      "0x0054fcc4",
+      "0x0054fcdc"
+     ],
+     "generated_by": [
+      "sefTakeKeys",
+      "func_001F6698"
+     ],
+     "c_owned_symbols": [
+      "D_0054FCC4",
+      "D_0054FCC8",
+      "D_0054FCCC",
+      "D_0054FCD0",
+      "D_0054FCD4",
+      "D_0054FCD8"
+     ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/sdv_alter.o"
+      "object": "build/main/build/c/tu128.o"
+     }
+    }
+   ]
+  },
+  "main/tu129": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fcdc",
+      "0x0054fcf0"
+     ],
+     "generated": [
+      "0x0054fcdc",
+      "0x0054fcf0"
+     ],
+     "generated_by": [
+      "sefEffectGroupStep",
+      "sefBuildDrawPacket",
+      "sefLineEffectDraw"
+     ],
+     "c_owned_symbols": [
+      "D_0054FCDC",
+      "D_0054FCE0",
+      "D_0054FCE4",
+      "D_0054FCE8",
+      "D_0054FCEC"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu129.o"
      }
     }
    ]
@@ -2306,13 +2429,26 @@
     {
      "range": [
       "0x0054fcf0",
-      "0x0054fd14"
+      "0x0054fd70"
      ],
      "generated": [
       "0x0054fcf0",
-      "0x0054fd14"
+      "0x0054fd70"
      ],
      "generated_by": [
+      "func_001FB6A0",
+      "func_00201508",
+      "func_002018E8",
+      "func_00201C30",
+      "sefAnalyzeAnim",
+      "sefEffectObjectTick",
+      "sefEmitLocalEffectSteps",
+      "sefInitLine",
+      "sefQueueEffectEvents",
+      "sefRunEffectRecords",
+      "sefSpawnLocalPart",
+      "sefUpdateLineRecord",
+      "sefUpdateRecordHitFlagsAndMatrices",
       "srsAtan2"
      ],
      "c_owned_symbols": [
@@ -2324,7 +2460,30 @@
       "D_0054FD04",
       "D_0054FD08",
       "D_0054FD0C",
-      "D_0054FD10"
+      "D_0054FD10",
+      "D_0054FD14",
+      "D_0054FD18",
+      "D_0054FD1C",
+      "D_0054FD20",
+      "D_0054FD24",
+      "D_0054FD28",
+      "D_0054FD2C",
+      "D_0054FD30",
+      "D_0054FD34",
+      "D_0054FD38",
+      "D_0054FD3C",
+      "D_0054FD40",
+      "D_0054FD44",
+      "D_0054FD48",
+      "D_0054FD4C",
+      "D_0054FD50",
+      "D_0054FD54",
+      "D_0054FD58",
+      "D_0054FD5C",
+      "D_0054FD60",
+      "D_0054FD64",
+      "D_0054FD68",
+      "D_0054FD6C"
      ],
      "also_referenced_by_c": [],
      "basis": {
@@ -2332,30 +2491,72 @@
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/sef.o"
      }
-    },
+    }
+   ],
+   ".rodata": [
     {
      "range": [
-      "0x0054fd24",
-      "0x0054fd28"
+      "0x0053ef30",
+      "0x0053ef50"
      ],
      "generated": [
-      "0x0054fd24",
-      "0x0054fd28"
+      "0x0053ef30",
+      "0x0053ef4c"
      ],
      "generated_by": [
-      "sefAnalyzeAnim"
+      "func_00200878"
      ],
      "c_owned_symbols": [
-      "D_0054FD24"
+      "jtbl_0053EF30"
      ],
      "also_referenced_by_c": [
-      "sefTwoPi",
-      "sefCircleAngleScale"
+      "sefDefaultPoint",
+      "sefDefaultAxis",
+      "D_0053EF10",
+      "D_0053EF20",
+      "sefStudioPatternEven",
+      "sefStudioPatternOdd",
+      "sefEffectOwner",
+      "sefSetupArg",
+      "sefTeardownArg"
      ],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/sef.o"
+     }
+    }
+   ]
+  },
+  "main/tu132": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054fd70",
+      "0x0054fd88"
+     ],
+     "generated": [
+      "0x0054fd70",
+      "0x0054fd88"
+     ],
+     "generated_by": [
+      "func_00206058",
+      "sefGetCirclePos",
+      "sefRandAngle"
+     ],
+     "c_owned_symbols": [
+      "sefTwoPi",
+      "sefCircleAngleScale",
+      "D_0054FD78",
+      "D_0054FD7C",
+      "D_0054FD80",
+      "D_0054FD84"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sef_132.o"
      }
     }
    ]

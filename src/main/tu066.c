@@ -1302,7 +1302,7 @@ void gameSuspendSoundThreads(void) {
 s32 func_001BBC68();
 s32 gameEnterPlayState(void);
 s32 actorSoundStop();
-s32 func_001EA6B0();
+s32 sefBufferOwnedEffects();
 s32 xenoActorSetAttrBit8();
 
 /* Stops the actor sound, resets the actor attributes and enters the play state. */
@@ -1313,7 +1313,7 @@ void gameActorSetupStep(void) {
     actorSoundStop(actorSoundHandle);
     func_001BBC68();
     xenoActorSetAttrBit8(1);
-    func_001EA6B0();
+    sefBufferOwnedEffects();
     sefSetSceneMode(0);
     Vibration_Stop();
     gGameLoopRuntime.loopFlags &= ~0x100;
@@ -1432,7 +1432,7 @@ void func_001BDEC8(void) {
         break;
     }
     sefSetSceneMode(1);
-    func_001EA798();
+    sefReplayBufferedEffects();
     if (sceneStateBlock->fogBlock != 0) {
         sefSetFogOverride(sceneStateBlock->fogBlock + 704, sceneStateBlock->fogBlock + 720);
     }

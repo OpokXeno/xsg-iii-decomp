@@ -47,10 +47,10 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu011", func_00A85398);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu011", func_00A854D8);
 
-s32 func_001EA518(struct XenoActor *, s32);
+s32 sefReleaseGroupMatches(struct XenoActor *, s32);
 
 void battleUnitSendSlotValue(BattleUnit *battleUnit, s32 category, s32 event) {
-    func_001EA518(battleUnit->actor, (category << 0xC) | event);
+    sefReleaseGroupMatches(battleUnit->actor, (category << 0xC) | event);
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu011", func_00A85570);

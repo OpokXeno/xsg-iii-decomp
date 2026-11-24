@@ -40464,13 +40464,13 @@
      2
     ],
     [
-     "func_001EA128",
+     "sefApplyLinkedFlagsByKey",
      2007336,
      392,
      2
     ],
     [
-     "func_001EA2B0",
+     "sefApplyLinkedFlagsByGroup",
      2007728,
      276,
      2
@@ -40500,13 +40500,13 @@
      2
     ],
     [
-     "func_001EA448",
+     "sefGroupHasMatch",
      2008136,
      208,
      2
     ],
     [
-     "func_001EA518",
+     "sefReleaseGroupMatches",
      2008344,
      244,
      2
@@ -40536,25 +40536,25 @@
      2
     ],
     [
-     "func_001EA6B0",
+     "sefBufferOwnedEffects",
      2008752,
      232,
      2
     ],
     [
-     "func_001EA798",
+     "sefReplayBufferedEffects",
      2008984,
      388,
      2
     ],
     [
-     "func_001EA920",
+     "sefLinkedObjectSetWord",
      2009376,
      60,
      2
     ],
     [
-     "func_001EA960",
+     "sefLinkedObjectSetChildKey",
      2009440,
      60,
      2
@@ -40566,19 +40566,19 @@
      2
     ],
     [
-     "func_001EA9C8",
+     "sefLinkedObjectSetLinkedFloat",
      2009544,
      60,
      2
     ],
     [
-     "func_001EAA08",
+     "sefLinkedObjectSetPosition",
      2009608,
      104,
      2
     ],
     [
-     "func_001EAA70",
+     "sefLinkedObjectSetRotation",
      2009712,
      36,
      2
@@ -40614,13 +40614,13 @@
      2
     ],
     [
-     "func_001EACA8",
+     "sefSpawnLinkedEffect",
      2010280,
      248,
      2
     ],
     [
-     "func_001EADA0",
+     "sefSetRecordRect",
      2010528,
      204,
      2
@@ -40650,7 +40650,7 @@
      2
     ],
     [
-     "func_001ECA60",
+     "scEffectObjectUpdate",
      2017888,
      1036,
      2
@@ -40662,37 +40662,37 @@
      2
     ],
     [
-     "func_001ECE98",
+     "scSampleEnableSet",
      2018968,
      20,
      2
     ],
     [
-     "func_001ECEB0",
+     "scSampleEnableClear",
      2018992,
      24,
      2
     ],
     [
-     "func_001ECEC8",
+     "scKeyTableReset",
      2019016,
      168,
      2
     ],
     [
-     "func_001ECF70",
+     "scKeyRangeReset",
      2019184,
      128,
      2
     ],
     [
-     "func_001ECFF0",
+     "scKeyRecordGet",
      2019312,
      120,
      2
     ],
     [
-     "func_001ED068",
+     "scKeyRangeSample",
      2019432,
      640,
      2
@@ -40716,7 +40716,7 @@
      2
     ],
     [
-     "func_001ED360",
+     "scScriptLookup",
      2020192,
      652,
      2
@@ -40824,25 +40824,25 @@
      2
     ],
     [
-     "func_001EE4B0",
+     "sdvBuildCameraPoint",
      2024624,
      420,
      2
     ],
     [
-     "func_001EE658",
+     "sdvCameraChannelPlay",
      2025048,
      1812,
      2
     ],
     [
-     "func_001EED70",
+     "sdvCameraScheduleUpdate",
      2026864,
      420,
      2
     ],
     [
-     "func_001EEF18",
+     "sdvProjectEffectPoint",
      2027288,
      876,
      2
@@ -40866,25 +40866,25 @@
      2
     ],
     [
-     "func_001EF338",
+     "sdvReleaseOwnerSpecials",
      2028344,
      268,
      2
     ],
     [
-     "func_001EF448",
+     "sdvSetupEffectEntry",
      2028616,
      332,
      2
     ],
     [
-     "func_001EF598",
+     "sdvStepSpecialTrack",
      2028952,
      2028,
      2
     ],
     [
-     "func_001EFD88",
+     "sdvFeedOwnerSpecials",
      2030984,
      408,
      2
@@ -40902,13 +40902,13 @@
      2
     ],
     [
-     "func_001F0DB0",
+     "sdvStartSlotEvents",
      2035120,
      164,
      2
     ],
     [
-     "func_001F0E58",
+     "sdvStartSequenceAlters",
      2035288,
      940,
      2
@@ -40920,7 +40920,7 @@
      2
     ],
     [
-     "func_001F1220",
+     "sdvAllocAlter",
      2036256,
      1256,
      2
@@ -40938,7 +40938,7 @@
      2
     ],
     [
-     "func_001F17D0",
+     "sdvStepAlter",
      2037712,
      3284,
      2
@@ -40956,7 +40956,7 @@
      2
     ],
     [
-     "func_001F25B0",
+     "sdvAlterDraw",
      2041264,
      3492,
      2
@@ -40992,7 +40992,7 @@
      2
     ],
     [
-     "func_001F35E0",
+     "sdvAlterDrawOwned",
      2045408,
      220,
      2
@@ -41010,7 +41010,7 @@
      2
     ],
     [
-     "func_001F3788",
+     "sdvPacketRelease",
      2045832,
      156,
      2
@@ -41046,19 +41046,19 @@
      2
     ],
     [
-     "func_001F4048",
+     "sdvShadowQueueDraw",
      2048072,
      2700,
      2
     ],
     [
-     "func_001F4AD8",
+     "sdvShadowBlockDraw",
      2050776,
      1896,
      2
     ],
     [
-     "func_001F5240",
+     "sdvReleaseShadowBlock",
      2052672,
      128,
      2
@@ -41076,19 +41076,19 @@
      2
     ],
     [
-     "clearRecordTables",
+     "sefEffectTablesClear",
      2052832,
      60,
      2
     ],
     [
-     "func_001F5320",
+     "sefClaimFirstSlot",
      2052896,
      284,
      2
     ],
     [
-     "func_001F5440",
+     "sefClaimSlotAt",
      2053184,
      308,
      2
@@ -41100,61 +41100,61 @@
      2
     ],
     [
-     "func_001F5590",
+     "sefEffectInstanceRelease",
      2053520,
      288,
      2
     ],
     [
-     "func_001F56B0",
+     "sefEffectPoolClaim",
      2053808,
      180,
      2
     ],
     [
-     "func_001F5768",
+     "sefEffectNodeClaim",
      2053992,
      228,
      2
     ],
     [
-     "func_001F5850",
+     "sefEffectPoolRelease",
      2054224,
      164,
      2
     ],
     [
-     "func_001F58F8",
+     "sefEffectNodeRelease",
      2054392,
      140,
      2
     ],
     [
-     "func_001F5988",
+     "sefTakeKeys",
      2054536,
      580,
      2
     ],
     [
-     "func_001F5BD0",
+     "sefReleaseKeys",
      2055120,
      212,
      2
     ],
     [
-     "func_001F5CA8",
+     "sefEffectTransformClaim",
      2055336,
      84,
      2
     ],
     [
-     "clearRecordEntry",
+     "sefEffectTransformClear",
      2055424,
      68,
      2
     ],
     [
-     "func_001F5D48",
+     "sefBuildSpecEntries",
      2055496,
      1452,
      2
@@ -41184,61 +41184,61 @@
      2
     ],
     [
-     "func_001F6DE0",
+     "sefCompactActiveEffectRecords",
      2059744,
      264,
      2
     ],
     [
-     "func_001F6EE8",
+     "sefRunCompactedEffects",
      2060008,
      592,
      2
     ],
     [
-     "func_001F7138",
+     "sefReleaseSlotsByKey",
      2060600,
      268,
      2
     ],
     [
-     "func_001F7248",
+     "sefSetSlotValueByKey",
      2060872,
      128,
      2
     ],
     [
-     "func_001F72C8",
+     "sefSetEntryValueById",
      2061000,
      128,
      2
     ],
     [
-     "func_001F7348",
+     "sefSetEntryWeightById",
      2061128,
      128,
      2
     ],
     [
-     "func_001F73C8",
+     "sefSetSlotRecordPos",
      2061256,
      224,
      2
     ],
     [
-     "func_001F74A8",
+     "sefSetSlotRecordVectorQ",
      2061480,
      224,
      2
     ],
     [
-     "func_001F7588",
+     "sefSetSlotRecordVectorR",
      2061704,
      224,
      2
     ],
     [
-     "func_001F7668",
+     "sefSetSlotRecordVectorRW",
      2061928,
      216,
      2
@@ -41262,7 +41262,7 @@
      2
     ],
     [
-     "func_001F7900",
+     "sefAdvanceCurveTrack16",
      2062592,
      180,
      2
@@ -41310,13 +41310,13 @@
      2
     ],
     [
-     "func_001F8010",
+     "sefEffectGroupStep",
      2064400,
      1644,
      2
     ],
     [
-     "func_001F8680",
+     "sefUpdateAllEffectGroups",
      2066048,
      208,
      2
@@ -41334,7 +41334,7 @@
      2
     ],
     [
-     "func_001F89C8",
+     "sefBuildDrawPacket",
      2066888,
      876,
      2
@@ -41346,13 +41346,13 @@
      2
     ],
     [
-     "func_001F8E28",
+     "sefLineEffectDraw",
      2068008,
      2092,
      2
     ],
     [
-     "func_001F9658",
+     "sefDrawEffectGroup",
      2070104,
      624,
      2
@@ -41370,7 +41370,7 @@
      2
     ],
     [
-     "func_001F99F0",
+     "sefFindEffectById",
      2071024,
      120,
      2
@@ -41388,13 +41388,13 @@
      2
     ],
     [
-     "func_001F9AD0",
+     "sdvPacketHeadGet",
      2071248,
      72,
      2
     ],
     [
-     "func_001F9B18",
+     "sdvPacketRecordGet",
      2071320,
      72,
      2
@@ -41514,7 +41514,7 @@
      2
     ],
     [
-     "func_001FA338",
+     "sefSampleVectorCurveTrack",
      2073400,
      320,
      2
@@ -41568,31 +41568,31 @@
      2
     ],
     [
-     "func_001FA808",
+     "sefEvaluateKeyTrackPoint",
      2074632,
      1104,
      2
     ],
     [
-     "func_001FAC58",
+     "sefComputeMotionStep",
      2075736,
      1480,
      2
     ],
     [
-     "func_001FB220",
+     "sefTransformPointSaved",
      2077216,
      68,
      2
     ],
     [
-     "func_001FB268",
+     "sefTransformPointIfMoved",
      2077288,
      124,
      2
     ],
     [
-     "func_001FB2E8",
+     "sefAdvanceMotionState",
      2077416,
      948,
      2
@@ -41610,31 +41610,31 @@
      2
     ],
     [
-     "func_001FBD18",
+     "sefRotateBlockUpdate",
      2080024,
      284,
      2
     ],
     [
-     "func_001FBE38",
+     "sefCurveTrackAdvance",
      2080312,
      884,
      2
     ],
     [
-     "func_001FC1B0",
+     "sefSwLoadParameterBlock",
      2081200,
      1132,
      2
     ],
     [
-     "func_001FC620",
+     "sefAdvanceParticle",
      2082336,
      1540,
      2
     ],
     [
-     "func_001FCC28",
+     "sefEffectObjectTick",
      2083880,
      500,
      2
@@ -41658,7 +41658,7 @@
      2
     ],
     [
-     "func_001FD000",
+     "sefInitLine",
      2084864,
      2000,
      2
@@ -41682,25 +41682,25 @@
      2
     ],
     [
-     "func_001FDBE0",
+     "sefQueueEffectEvents",
      2087904,
      1104,
      2
     ],
     [
-     "func_001FE030",
+     "sefSpawnLocalPart",
      2089008,
      1728,
      2
     ],
     [
-     "func_001FE6F0",
+     "sefEmitLocalEffectSteps",
      2090736,
      2732,
      2
     ],
     [
-     "func_001FF1A0",
+     "sefUpdateLineRecord",
      2093472,
      1348,
      2
@@ -41718,13 +41718,13 @@
      2
     ],
     [
-     "func_001FF7B0",
+     "sefFindFreeEffectSlot",
      2095024,
      136,
      2
     ],
     [
-     "func_001FF838",
+     "sefReleaseEffectSlot",
      2095160,
      136,
      2
@@ -41748,7 +41748,7 @@
      2
     ],
     [
-     "func_001FFA50",
+     "sefRunEffectSlotScript",
      2095696,
      1756,
      2
@@ -41766,31 +41766,31 @@
      2
     ],
     [
-     "func_00200180",
+     "sefClearEffectRecordTails",
      2097536,
      144,
      2
     ],
     [
-     "func_00200210",
+     "sefClaimAllocRecord",
      2097680,
      184,
      2
     ],
     [
-     "func_002002C8",
+     "sefReleaseEffectRecord",
      2097864,
      620,
      2
     ],
     [
-     "func_00200538",
+     "sefScanRecordKeysHit",
      2098488,
      180,
      2
     ],
     [
-     "func_002005F0",
+     "sefSpawnRecordItems",
      2098672,
      648,
      2
@@ -41802,7 +41802,7 @@
      2
     ],
     [
-     "func_002008D8",
+     "sefUpdateRecordHitFlagsAndMatrices",
      2099416,
      1768,
      2
@@ -41814,7 +41814,7 @@
      2
     ],
     [
-     "func_002010C8",
+     "sefScheduleEffectRecord",
      2101448,
      1044,
      2
@@ -41838,13 +41838,13 @@
      2
     ],
     [
-     "func_002017E0",
+     "sefCameraSelectIsLinked",
      2103264,
      36,
      2
     ],
     [
-     "func_00201808",
+     "sefCopyProbeView",
      2103304,
      144,
      2
@@ -41868,37 +41868,37 @@
      2
     ],
     [
-     "func_00201EA0",
+     "sefAddSlotLaneTallies",
      2104992,
      620,
      2
     ],
     [
-     "func_00202110",
+     "sefRebaseRecordTimes",
      2105616,
      480,
      2
     ],
     [
-     "func_002022F0",
+     "sefRunEffectRecords",
      2106096,
      1924,
      2
     ],
     [
-     "func_00202A78",
+     "sefUpdateEntryLights",
      2108024,
      184,
      2
     ],
     [
-     "func_00202B30",
+     "sefRegisterEntry",
      2108208,
      404,
      2
     ],
     [
-     "func_00202CC8",
+     "sefRebuildEntryTable",
      2108616,
      476,
      2
@@ -41922,13 +41922,13 @@
      2
     ],
     [
-     "func_00203048",
+     "sefReadProbePoint",
      2109512,
      156,
      2
     ],
     [
-     "func_002030E8",
+     "sefRefreshProbePoints",
      2109672,
      532,
      2
@@ -41964,7 +41964,7 @@
      2
     ],
     [
-     "func_00203450",
+     "sefInstallDrawCallbacks",
      2110544,
      156,
      2
@@ -42012,7 +42012,7 @@
      2
     ],
     [
-     "func_00203690",
+     "sefCreateScheduledRequest",
      2111120,
      316,
      2
@@ -42024,7 +42024,7 @@
      2
     ],
     [
-     "func_002037F8",
+     "sefClaimTableSlot",
      2111480,
      92,
      2
@@ -42066,7 +42066,7 @@
      2
     ],
     [
-     "func_00203990",
+     "sefGetActiveTableSlot",
      2111888,
      76,
      2
@@ -42102,7 +42102,7 @@
      2
     ],
     [
-     "func_00203A88",
+     "sefSetSlotDirectionFromVector",
      2112136,
      108,
      2
@@ -42204,13 +42204,13 @@
      2
     ],
     [
-     "func_00204080",
+     "sefDirectionToAngles",
      2113664,
      148,
      2
     ],
     [
-     "func_00204118",
+     "sefGetSourceMatrix",
      2113816,
      456,
      2
@@ -42222,19 +42222,19 @@
      2
     ],
     [
-     "func_00204318",
+     "sefGetBattlePoint",
      2114328,
      500,
      2
     ],
     [
-     "func_00204510",
+     "sefCopyBattleObjectSlot",
      2114832,
      180,
      2
     ],
     [
-     "func_002045C8",
+     "sefCopyKindTableMatrix",
      2115016,
      300,
      2
@@ -42264,7 +42264,7 @@
      2
     ],
     [
-     "func_00205380",
+     "sefFindSearchKey",
      2118528,
      88,
      2
@@ -42276,7 +42276,7 @@
      2
     ],
     [
-     "func_00205470",
+     "sefRandomDirection",
      2118768,
      168,
      2
@@ -42306,7 +42306,7 @@
      2
     ],
     [
-     "func_00205638",
+     "sefGetMatrixPoint",
      2119224,
      1976,
      2

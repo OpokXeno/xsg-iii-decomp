@@ -312,7 +312,7 @@ void mapProbeFlagOn(void *source, void *id, void *value);
 
 float func_002AA490(void *a0, void *a1, void *a2);
 
-void func_001EAA08(void *a0, void *a1);
+void sefLinkedObjectSetPosition(void *a0, void *a1);
 
 void sefEffectHandleRelease(struct SefEffectObject *effectObject);
 
@@ -334,7 +334,7 @@ void func_001C7CE8(EffectActor *self) {
     __asm__ __volatile__("sqc2 vf0, 0(%0)" : : "r"(&probe) : "memory");
     mapProbeFlagOn(&probe, &probe, state->probeRecord);
     state->probePoint.y = func_002AA490(&state->probePoint, &probe, state->probeRecord);
-    func_001EAA08(progress->effectObject, &state->probePoint);
+    sefLinkedObjectSetPosition(progress->effectObject, &state->probePoint);
     flags = self->flags;
     if (!(flags & 0x20)) {
         return;

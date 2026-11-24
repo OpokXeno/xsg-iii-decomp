@@ -491,7 +491,7 @@ void playerModeOneUpdate(SoundActor *actor);
 void playerModeTwoUpdate(SoundActor *actor);
 
 void XenoActorClearModeWhenDone(SoundActor *actor);
-void func_001ECA60(SoundActor *actor);
+void scEffectObjectUpdate(SoundActor *actor);
 void XenoActorApplyMode(SoundActor *actor);
 void XenoActorWrapRotation(ActorModel *model);
 
@@ -536,7 +536,7 @@ void playerFrameUpdate(SoundActor *actor) {
         break;
     }
     actorSoundSyncFlags(actor);
-    func_001ECA60(actor);
+    scEffectObjectUpdate(actor);
     func_001C5250(actor);
     XenoActorApplyMode(actor);
     if ((actor->model->ct.attribute & ~0xFF) != 512) {

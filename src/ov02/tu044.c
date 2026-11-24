@@ -231,7 +231,7 @@ s32 monsActorHasSefFlagOne(s32 unusedValue, MonsActor **actorRef)
   return 0;
 }
 
-s32 func_001EA448();
+s32 sefGroupHasMatch();
 s32 *battleRecordBlockGet(void);
 
 s32 monsActionReady(MonsActorSlot *monsterSlot) {
@@ -244,7 +244,7 @@ s32 monsActionReady(MonsActorSlot *monsterSlot) {
         return 1;
     }
     sessionState = battleRecordBlockGet();
-    return func_001EA448(monsterSlot->actor->sefActorHandle, sessionState->unk_428) == 0;
+    return sefGroupHasMatch(monsterSlot->actor->sefActorHandle, sessionState->unk_428) == 0;
 }
 
 s32 monsActorSefFlagBit28(s32 unusedValue, MonsActor **actorRef)
