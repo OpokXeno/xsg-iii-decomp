@@ -138,19 +138,11 @@
     },
     {
      "c_split": false,
-     "end": "0x003E2C08",
+     "end": "0x003E30F8",
      "ordinal": 240,
      "piece": "tu240",
      "start": "0x003E2990",
      "tu": "tu240"
-    },
-    {
-     "c_split": false,
-     "end": "0x003E30F8",
-     "ordinal": 241,
-     "piece": "tu241",
-     "start": "0x003E2C08",
-     "tu": "tu241"
     },
     {
      "c_split": false,
@@ -234,27 +226,19 @@
     },
     {
      "c_split": false,
-     "end": "0x003E3AE0",
-     "ordinal": 289,
-     "piece": "tu289",
-     "start": "0x003E38E0",
-     "tu": "tu289"
-    },
-    {
-     "c_split": false,
      "end": "0x003E3CE0",
-     "ordinal": 290,
+     "ordinal": 289,
      "piece": "rg_singleton_id",
-     "start": "0x003E3AE0",
+     "start": "0x003E38E0",
      "tu": "rg_singleton_id"
     },
     {
      "c_split": false,
      "end": "0x003E3D40",
-     "ordinal": 293,
-     "piece": "tu293",
+     "ordinal": 292,
+     "piece": "tu292",
      "start": "0x003E3CE0",
-     "tu": "tu293"
+     "tu": "tu292"
     },
     {
      "c_split": false,
@@ -283,10 +267,10 @@
     {
      "c_split": false,
      "end": "0x003E3F20",
-     "ordinal": 254,
-     "piece": "tu254",
+     "ordinal": 253,
+     "piece": "tu253",
      "start": "0x003E3E50",
-     "tu": "tu254"
+     "tu": "tu253"
     },
     {
      "c_split": false,
@@ -299,18 +283,18 @@
     {
      "c_split": false,
      "end": "0x003E42A0",
-     "ordinal": 284,
-     "piece": "tu284",
+     "ordinal": 282,
+     "piece": "tu282",
      "start": "0x003E4120",
-     "tu": "tu284"
+     "tu": "tu282"
     },
     {
      "c_split": false,
      "end": "0x003E4330",
-     "ordinal": 286,
-     "piece": "tu286",
+     "ordinal": 285,
+     "piece": "tu285",
      "start": "0x003E42A0",
-     "tu": "tu286"
+     "tu": "tu285"
     },
     {
      "c_split": false,
@@ -635,10 +619,10 @@
     {
      "c_split": false,
      "end": "0x003EC290",
-     "ordinal": 302,
-     "piece": "tu302",
+     "ordinal": 301,
+     "piece": "tu301",
      "start": "0x003EC1F0",
-     "tu": "tu302"
+     "tu": "tu301"
     },
     {
      "c_split": false,
@@ -699,10 +683,10 @@
     {
      "c_split": false,
      "end": "0x004026E0",
-     "ordinal": 372,
-     "piece": "tu372",
+     "ordinal": 371,
+     "piece": "tu371",
      "start": "0x004026D8",
-     "tu": "tu372"
+     "tu": "tu371"
     },
     {
      "c_split": false,
@@ -819,10 +803,10 @@
     {
      "c_split": false,
      "end": "0x00407E30",
-     "ordinal": 107,
-     "piece": "tu107",
+     "ordinal": 106,
+     "piece": "sb_natives",
      "start": "0x00407D00",
-     "tu": "tu107"
+     "tu": "sb_natives"
     },
     {
      "c_split": false,
@@ -890,19 +874,11 @@
     },
     {
      "c_split": false,
-     "end": "0x004AD6B0",
-     "ordinal": 152,
+     "end": "0x004AD7B0",
+     "ordinal": 151,
      "piece": "srs",
      "start": "0x004AD6A0",
      "tu": "srs"
-    },
-    {
-     "c_split": false,
-     "end": "0x004AD7B0",
-     "ordinal": 151,
-     "piece": "xgl_debug_file_151",
-     "start": "0x004AD6B0",
-     "tu": "xgl_debug_file_151"
     },
     {
      "c_split": false,
@@ -1010,18 +986,10 @@
     },
     {
      "c_split": false,
-     "end": "0x004B4B48",
-     "ordinal": 179,
-     "piece": "tu179",
-     "start": "0x004B3790",
-     "tu": "tu179"
-    },
-    {
-     "c_split": false,
      "end": "0x004C67F0",
      "ordinal": 178,
      "piece": "tu178",
-     "start": "0x004B4B48",
+     "start": "0x004B3790",
      "tu": "tu178"
     },
     {
@@ -1338,10 +1306,10 @@
     {
      "c_split": false,
      "end": "0x00530CB8",
-     "ordinal": 256,
-     "piece": "tu256",
+     "ordinal": 255,
+     "piece": "tu255",
      "start": "0x00530B88",
-     "tu": "tu256"
+     "tu": "tu255"
     },
     {
      "c_split": false,
@@ -1377,7 +1345,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00530E30",
+     "end": "0x00530E70",
      "ordinal": 292,
      "piece": "tu292",
      "start": "0x00530D38",
@@ -1385,27 +1353,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00530E70",
-     "ordinal": 293,
-     "piece": "tu293",
-     "start": "0x00530E30",
-     "tu": "tu293"
-    },
-    {
-     "c_split": false,
-     "end": "0x00530E78",
+     "end": "0x00530E90",
      "ordinal": 253,
      "piece": "tu253",
      "start": "0x00530E70",
      "tu": "tu253"
-    },
-    {
-     "c_split": false,
-     "end": "0x00530E90",
-     "ordinal": 254,
-     "piece": "tu254",
-     "start": "0x00530E78",
-     "tu": "tu254"
     },
     {
      "c_split": false,
@@ -1417,19 +1369,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00530F80",
-     "ordinal": 283,
-     "piece": "tu283",
-     "start": "0x00530EA0",
-     "tu": "tu283"
-    },
-    {
-     "c_split": false,
      "end": "0x005310A0",
-     "ordinal": 284,
-     "piece": "tu284",
-     "start": "0x00530F80",
-     "tu": "tu284"
+     "ordinal": 282,
+     "piece": "tu282",
+     "start": "0x00530EA0",
+     "tu": "tu282"
     },
     {
      "c_split": false,
@@ -1754,10 +1698,10 @@
     {
      "c_split": false,
      "end": "0x005393A8",
-     "ordinal": 210,
-     "piece": "tu210",
+     "ordinal": 209,
+     "piece": "tu209",
      "start": "0x00539380",
-     "tu": "tu210"
+     "tu": "tu209"
     },
     {
      "c_split": false,
@@ -1929,7 +1873,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0053BF70",
+     "end": "0x0053C0F0",
      "ordinal": 299,
      "piece": "tu299",
      "start": "0x0053BF10",
@@ -1937,19 +1881,11 @@
     },
     {
      "c_split": false,
-     "end": "0x0053C0F0",
-     "ordinal": 300,
-     "piece": "tu300",
-     "start": "0x0053BF70",
-     "tu": "tu300"
-    },
-    {
-     "c_split": false,
      "end": "0x0053C190",
-     "ordinal": 302,
-     "piece": "tu302",
+     "ordinal": 301,
+     "piece": "tu301",
      "start": "0x0053C0F0",
-     "tu": "tu302"
+     "tu": "tu301"
     },
     {
      "c_split": false,
@@ -2178,10 +2114,10 @@
     {
      "c_split": false,
      "end": "0x0053E740",
-     "ordinal": 107,
-     "piece": "tu107",
+     "ordinal": 106,
+     "piece": "sb_natives",
      "start": "0x0053E418",
-     "tu": "tu107"
+     "tu": "sb_natives"
     },
     {
      "c_split": false,
@@ -2282,7 +2218,7 @@
     {
      "c_split": false,
      "end": "0x0053F558",
-     "ordinal": 152,
+     "ordinal": 151,
      "piece": "srs",
      "start": "0x0053F4B8",
      "tu": "srs"
@@ -2721,10 +2657,10 @@
     {
      "c_split": false,
      "end": "0x0054F2B8",
-     "ordinal": 259,
-     "piece": "tu259",
+     "ordinal": 258,
+     "piece": "tu258",
      "start": "0x0054F2A8",
-     "tu": "tu259"
+     "tu": "tu258"
     },
     {
      "c_split": false,
@@ -2777,7 +2713,7 @@
     {
      "c_split": false,
      "end": "0x0054F358",
-     "ordinal": 290,
+     "ordinal": 289,
      "piece": "rg_singleton_id",
      "start": "0x0054F354",
      "tu": "rg_singleton_id"
@@ -2817,10 +2753,10 @@
     {
      "c_split": false,
      "end": "0x0054F380",
-     "ordinal": 254,
-     "piece": "tu254",
+     "ordinal": 253,
+     "piece": "tu253",
      "start": "0x0054F378",
-     "tu": "tu254"
+     "tu": "tu253"
     },
     {
      "c_split": false,
@@ -2833,10 +2769,10 @@
     {
      "c_split": false,
      "end": "0x0054F390",
-     "ordinal": 284,
-     "piece": "tu284",
+     "ordinal": 282,
+     "piece": "tu282",
      "start": "0x0054F388",
-     "tu": "tu284"
+     "tu": "tu282"
     },
     {
      "c_split": false,
@@ -3033,10 +2969,10 @@
     {
      "c_split": false,
      "end": "0x0054F624",
-     "ordinal": 192,
-     "piece": "tu192",
+     "ordinal": 191,
+     "piece": "tu191",
      "start": "0x0054F604",
-     "tu": "tu192"
+     "tu": "tu191"
     },
     {
      "c_split": false,
@@ -3200,19 +3136,11 @@
     },
     {
      "c_split": false,
-     "end": "0x0054F8D8",
+     "end": "0x0054F8F8",
      "ordinal": 299,
      "piece": "tu299",
      "start": "0x0054F8CC",
      "tu": "tu299"
-    },
-    {
-     "c_split": false,
-     "end": "0x0054F8F8",
-     "ordinal": 300,
-     "piece": "tu300",
-     "start": "0x0054F8D8",
-     "tu": "tu300"
     },
     {
      "c_split": false,
@@ -3872,10 +3800,10 @@
     {
      "c_split": false,
      "end": "0x00550860",
-     "ordinal": 266,
-     "piece": "tu266",
+     "ordinal": 265,
+     "piece": "tu265",
      "start": "0x00550858",
-     "tu": "tu266"
+     "tu": "tu265"
     },
     {
      "c_split": false,
@@ -3895,19 +3823,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00550884",
+     "end": "0x00550888",
      "ordinal": 292,
      "piece": "tu292",
      "start": "0x00550878",
      "tu": "tu292"
-    },
-    {
-     "c_split": false,
-     "end": "0x00550888",
-     "ordinal": 293,
-     "piece": "tu293",
-     "start": "0x00550884",
-     "tu": "tu293"
     },
     {
      "c_split": false,
@@ -3935,19 +3855,11 @@
     },
     {
      "c_split": false,
-     "end": "0x005508E0",
-     "ordinal": 283,
-     "piece": "tu283",
-     "start": "0x005508C0",
-     "tu": "tu283"
-    },
-    {
-     "c_split": false,
      "end": "0x00550960",
-     "ordinal": 284,
-     "piece": "tu284",
-     "start": "0x005508E0",
-     "tu": "tu284"
+     "ordinal": 282,
+     "piece": "tu282",
+     "start": "0x005508C0",
+     "tu": "tu282"
     },
     {
      "c_split": false,
@@ -4064,7 +3976,7 @@
     {
      "c_split": false,
      "end": "0x00550BB8",
-     "ordinal": 181,
+     "ordinal": 180,
      "piece": "xgl_cd_clock",
      "start": "0x00550BB4",
      "tu": "xgl_cd_clock"
@@ -4111,19 +4023,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00550C2C",
+     "end": "0x00550C30",
      "ordinal": 191,
      "piece": "tu191",
      "start": "0x00550C00",
      "tu": "tu191"
-    },
-    {
-     "c_split": false,
-     "end": "0x00550C30",
-     "ordinal": 192,
-     "piece": "tu192",
-     "start": "0x00550C2C",
-     "tu": "tu192"
     },
     {
      "c_split": false,
@@ -4472,7 +4376,7 @@
     {
      "c_split": false,
      "end": "0x00551110",
-     "ordinal": 152,
+     "ordinal": 151,
      "piece": "srs",
      "start": "0x00551100",
      "tu": "srs"
@@ -4688,10 +4592,10 @@
     {
      "c_split": false,
      "end": "0x00551310",
-     "ordinal": 179,
-     "piece": "tu179",
+     "ordinal": 178,
+     "piece": "tu178",
      "start": "0x00551308",
-     "tu": "tu179"
+     "tu": "tu178"
     }
    ],
    "start": "0x00550280"
@@ -4743,10 +4647,10 @@
     {
      "c_split": false,
      "end": "0x005513AC",
-     "ordinal": 256,
-     "piece": "tu256",
+     "ordinal": 255,
+     "piece": "tu255",
      "start": "0x005513A8",
-     "tu": "tu256"
+     "tu": "tu255"
     },
     {
      "c_split": false,
@@ -4807,10 +4711,10 @@
     {
      "c_split": false,
      "end": "0x005513FC",
-     "ordinal": 284,
-     "piece": "tu284",
+     "ordinal": 282,
+     "piece": "tu282",
      "start": "0x005513F4",
-     "tu": "tu284"
+     "tu": "tu282"
     },
     {
      "c_split": false,
@@ -5302,7 +5206,7 @@
     {
      "c_split": false,
      "end": "0x0055AB70",
-     "ordinal": 290,
+     "ordinal": 289,
      "piece": "rg_singleton_id",
      "start": "0x0055AAF0",
      "tu": "rg_singleton_id"
@@ -5366,10 +5270,10 @@
     {
      "c_split": false,
      "end": "0x0055CBC0",
-     "ordinal": 284,
-     "piece": "tu284",
+     "ordinal": 282,
+     "piece": "tu282",
      "start": "0x0055B250",
-     "tu": "tu284"
+     "tu": "tu282"
     },
     {
      "c_split": false,
@@ -5463,9 +5367,9 @@
      "c_split": false,
      "end": "0x005A6BD8",
      "ordinal": 180,
-     "piece": "tu180",
+     "piece": "xgl_cd_clock",
      "start": "0x005A6BD0",
-     "tu": "tu180"
+     "tu": "xgl_cd_clock"
     },
     {
      "c_split": false,
@@ -5629,18 +5533,10 @@
     },
     {
      "c_split": false,
-     "end": "0x005E255C",
-     "ordinal": 372,
-     "piece": "tu372",
-     "start": "0x005E2550",
-     "tu": "tu372"
-    },
-    {
-     "c_split": false,
      "end": "0x005EA640",
      "ordinal": 371,
      "piece": "tu371",
-     "start": "0x005E255C",
+     "start": "0x005E2550",
      "tu": "tu371"
     },
     {
@@ -5774,10 +5670,10 @@
     {
      "c_split": false,
      "end": "0x0060E0A0",
-     "ordinal": 403,
-     "piece": "tu403",
+     "ordinal": 402,
+     "piece": "tu402",
      "start": "0x0060E080",
-     "tu": "tu403"
+     "tu": "tu402"
     },
     {
      "c_split": false,
@@ -5870,7 +5766,7 @@
     {
      "c_split": false,
      "end": "0x007711F0",
-     "ordinal": 152,
+     "ordinal": 151,
      "piece": "srs",
      "start": "0x00771198",
      "tu": "srs"
@@ -6207,7 +6103,6 @@
   "tu104",
   "sb_vm",
   "sb_natives",
-  "tu107",
   "filter",
   "tu116",
   "sef_117",
@@ -6235,10 +6130,8 @@
   "tu145",
   "tu146",
   "tu147",
-  "tu148",
   "tu149",
   "tu150",
-  "xgl_debug_file_151",
   "srs",
   "tu153",
   "tu154",
@@ -6264,8 +6157,6 @@
   "tu176",
   "tu177",
   "tu178",
-  "tu179",
-  "tu180",
   "xgl_cd_clock",
   "tu182",
   "tu183",
@@ -6277,7 +6168,6 @@
   "tu189",
   "tu190",
   "tu191",
-  "tu192",
   "tu193",
   "BlendTest",
   "CFLLightTest",
@@ -6295,7 +6185,6 @@
   "TiWatSim",
   "TiWater",
   "tu209",
-  "tu210",
   "XenoActorEvent",
   "XenoActorEvent_ReadItem",
   "tu215",
@@ -6316,7 +6205,6 @@
   "tu238",
   "tu239",
   "tu240",
-  "tu241",
   "tu242",
   "tu243",
   "tu244",
@@ -6330,19 +6218,15 @@
   "tu251",
   "tu252",
   "tu253",
-  "tu254",
   "tu255",
-  "tu256",
   "tu257",
   "tu258",
-  "tu259",
   "gs_packet_setup",
   "distance",
   "tu262",
   "tu263",
   "tu264",
   "tu265",
-  "tu266",
   "tu267",
   "tu268",
   "tu269",
@@ -6359,29 +6243,21 @@
   "tu280",
   "tu281",
   "tu282",
-  "tu283",
-  "tu284",
   "tu285",
-  "tu286",
   "tu287",
   "tu288",
-  "tu289",
   "rg_singleton_id",
   "tu291",
   "tu292",
-  "tu293",
   "tu294",
   "tu295",
   "tu296",
   "tu297",
   "tu298",
   "tu299",
-  "tu300",
   "tu143",
   "tu301",
-  "tu302",
   "tu303",
-  "tu304",
   "tu305",
   "tu306",
   "tu307",
@@ -6438,7 +6314,6 @@
   "tu369",
   "tu370",
   "tu371",
-  "tu372",
   "tu373",
   "tu374",
   "tu375",
@@ -6469,8 +6344,6 @@
   "tu400",
   "tu401",
   "tu402",
-  "tu403",
-  "tu404",
   "tu405",
   "sce_sdk",
   "runtime"
@@ -62876,7 +62749,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.92",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
+    "precision of this score band on X1, held out: 0.188 (12/64)",
+    "TU merge 2026-11-24: sb_natives, tu107"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -62905,7 +62779,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "1 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -62913,7 +62787,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 15,
+    "of": 28,
     "migration_hints": [],
     "records": []
    },
@@ -63052,120 +62926,7 @@
      "va": "0x001d4448",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".lit4": {
-     "anchored": [
-      "0x0054fb84",
-      "0x0054fb85"
-     ],
-     "bounds": [
-      "0x0054fb81",
-      "0x0054fb88"
-     ],
-     "end": "0x0054FB88",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FB88",
-       "name": "sb_natives",
-       "start": "0x0054FB84"
-      }
-     ],
-     "size": 4,
-     "splat_type": "lit4",
-     "start": "0x0054FB84"
-    }
-   },
-   "text": {
-    "start": "0x001d3fc0",
-    "end": "0x001d4520",
-    "code_end": "0x001d4520",
-    "size": 1376,
-    "splat": "c",
-    "splat_range": [
-     "0x001d3fc0",
-     "0x001d4520"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
-    "source": {
-     "kind": "file",
-     "path": "src/main/sb_natives.c",
-     "include_dirs": [
-      "include"
-     ]
-    }
-   }
-  },
-  {
-   "id": "main/tu107",
-   "unit": "main",
-   "ordinal": 107,
-   "name": "tu107",
-   "path": "src/main/tu107.c",
-   "scaffold_path": "scaffold/src/main/tu107.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.97",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 13,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "vmSpadSubmitTypedPair",
@@ -63286,10 +63047,35 @@
    ],
    "owners": {
     ".text": "c",
+    ".lit4": "asm",
     ".data": "asm",
     ".rodata": "asm"
    },
    "sections": {
+    ".lit4": {
+     "anchored": [
+      "0x0054fb84",
+      "0x0054fb85"
+     ],
+     "bounds": [
+      "0x0054fb81",
+      "0x0054fb88"
+     ],
+     "end": "0x0054FB88",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054FB88",
+       "name": "sb_natives",
+       "start": "0x0054FB84"
+      }
+     ],
+     "size": 4,
+     "splat_type": "lit4",
+     "start": "0x0054FB84"
+    },
     ".data": {
      "anchored": [
       "0x00407d00",
@@ -63300,13 +63086,13 @@
       "0x00407e30"
      ],
      "end": "0x00407E30",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00407E30",
-       "name": "tu107",
+       "name": "sb_natives",
        "start": "0x00407D00"
       }
      ],
@@ -63324,13 +63110,13 @@
       "0x0053e740"
      ],
      "end": "0x0053E740",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053E740",
-       "name": "tu107",
+       "name": "sb_natives",
        "start": "0x0053E418"
       }
      ],
@@ -63340,26 +63126,26 @@
     }
    },
    "text": {
-    "start": "0x001d4520",
+    "start": "0x001d3fc0",
     "end": "0x001d4c30",
     "code_end": "0x001d4c30",
-    "size": 1808,
+    "size": 3184,
     "splat": "c",
     "splat_range": [
-     "0x001d4520",
+     "0x001d3fc0",
      "0x001d4c30"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
+    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
     "source": {
+     "kind": "file",
+     "path": "src/main/sb_natives.c",
      "include_dirs": [
       "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu107.c"
+     ]
     }
    }
   },
@@ -72449,7 +72235,7 @@
    "path": "src/main/tu147.c",
    "scaffold_path": "scaffold/src/main/tu147.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -72457,7 +72243,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.80",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
+    "precision of this score band on X1, held out: 0.227 (17/75)",
+    "TU merge 2026-11-24: tu147, tu148"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -72486,7 +72273,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "1 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -72494,7 +72281,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 5,
+    "of": 8,
     "migration_hints": [],
     "records": []
    },
@@ -72543,109 +72330,7 @@
      "va": "0x0020ed98",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "asm",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".lit4": {
-     "anchored": [
-      "0x0054fd8c",
-      "0x0054fd8d"
-     ],
-     "bounds": [
-      "0x0054fd89",
-      "0x0054fd90"
-     ],
-     "end": "0x0054FD90",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054FD90",
-       "name": "tu147",
-       "start": "0x0054FD8C"
-      }
-     ],
-     "size": 4,
-     "splat_type": "lit4",
-     "start": "0x0054FD8C"
-    }
-   },
-   "text": {
-    "start": "0x0020ec38",
-    "end": "0x0020ee08",
-    "code_end": "0x0020ee04",
-    "size": 464,
-    "splat": "c",
-    "splat_range": [
-     "0x0020ec38",
-     "0x0020ee08"
-    ],
-    "note": null
-   }
-  },
-  {
-   "id": "main/tu148",
-   "unit": "main",
-   "ordinal": 148,
-   "name": "tu148",
-   "path": "src/main/tu148.c",
-   "scaffold_path": "scaffold/src/main/tu148.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -0.85",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 3,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "quatRotationColumnX",
@@ -72675,20 +72360,46 @@
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".lit4": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".lit4": {
+     "anchored": [
+      "0x0054fd8c",
+      "0x0054fd8d"
+     ],
+     "bounds": [
+      "0x0054fd89",
+      "0x0054fd90"
+     ],
+     "end": "0x0054FD90",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054FD90",
+       "name": "tu147",
+       "start": "0x0054FD8C"
+      }
+     ],
+     "size": 4,
+     "splat_type": "lit4",
+     "start": "0x0054FD8C"
+    }
+   },
    "text": {
-    "start": "0x0020ee08",
+    "start": "0x0020ec38",
     "end": "0x0020eec8",
     "code_end": "0x0020eec8",
-    "size": 192,
+    "size": 656,
     "splat": "c",
     "splat_range": [
-     "0x0020ee08",
+     "0x0020ec38",
      "0x0020eec8"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -72698,7 +72409,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu148.c"
+     "path": "src/main/tu147.c"
     }
    }
   },
@@ -72967,9 +72678,9 @@
    "id": "main/tu151",
    "unit": "main",
    "ordinal": 151,
-   "name": "xgl_debug_file_151",
-   "path": "src/main/xgl_debug_file_151.c",
-   "scaffold_path": "scaffold/src/main/xgl_debug_file_151.c",
+   "name": "srs",
+   "path": "src/main/srs.c",
+   "scaffold_path": "scaffold/src/main/srs.c",
    "kind": "gcc",
    "mode": "c",
    "category": "game",
@@ -72979,7 +72690,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "lit4_step: .lit4 0x54fd8c -> 0x54f624",
-    "exact-gap precision of this kind on X1: 0.667"
+    "exact-gap precision of this kind on X1: 0.667",
+    "TU merge 2026-11-24: xgl_debug_file_151, srs"
    ],
    "boundary_confidence": "medium",
    "provisional": true,
@@ -73008,7 +72720,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -73016,7 +72728,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 10,
     "migration_hints": [],
     "records": []
    },
@@ -73047,120 +72759,7 @@
      "va": "0x0020f688",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x004ad6b0",
-      "0x004ad6b1"
-     ],
-     "bounds": [
-      "0x004ad6ad",
-      "0x004ad7b0"
-     ],
-     "end": "0x004AD7B0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x004AD7B0",
-       "name": "xgl_debug_file_151",
-       "start": "0x004AD6B0"
-      }
-     ],
-     "size": 256,
-     "splat_type": "data",
-     "start": "0x004AD6B0"
-    }
-   },
-   "text": {
-    "start": "0x0020f618",
-    "end": "0x0020f6b8",
-    "code_end": "0x0020f6b8",
-    "size": 160,
-    "splat": "c",
-    "splat_range": [
-     "0x0020f618",
-     "0x0020f6b8"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X2 port phase 2 express (user 2026-11-20: Express, sin revisi\u00f3n)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/xgl_debug_file_151.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu152",
-   "unit": "main",
-   "ordinal": 152,
-   "name": "srs",
-   "path": "src/main/srs.c",
-   "scaffold_path": "scaffold/src/main/srs.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.38",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 7,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "srsFormatEffectStem",
@@ -73236,24 +72835,26 @@
     ".data": {
      "anchored": [
       "0x004ad6a0",
-      "0x004ad6ad"
+      "0x004ad6ad",
+      "0x004ad6b0",
+      "0x004ad6b1"
      ],
      "bounds": [
       "0x00475629",
       "0x004ad6b0"
      ],
-     "end": "0x004AD6B0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x004AD7B0",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x004AD6B0",
+       "end": "0x004AD7B0",
        "name": "srs",
        "start": "0x004AD6A0"
       }
      ],
-     "size": 16,
+     "size": 272,
      "splat_type": "data",
      "start": "0x004AD6A0"
     },
@@ -73267,8 +72868,8 @@
       "0x0053f558"
      ],
      "end": "0x0053F558",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
@@ -73291,8 +72892,8 @@
       "0x00551110"
      ],
      "end": "0x00551110",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
@@ -73315,8 +72916,8 @@
       "0x007711f0"
      ],
      "end": "0x007711F0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
@@ -73331,16 +72932,16 @@
     }
    },
    "text": {
-    "start": "0x0020f6b8",
+    "start": "0x0020f618",
     "end": "0x0020fcb8",
     "code_end": "0x0020fcb8",
-    "size": 1536,
+    "size": 1696,
     "splat": "c",
     "splat_range": [
-     "0x0020f6b8",
+     "0x0020f618",
      "0x0020fcb8"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -79341,7 +78942,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "lit4_step: .lit4 0x54f690 -> 0x54f5fc",
-    "exact-gap precision of this kind on X1: 0.667"
+    "exact-gap precision of this kind on X1: 0.667",
+    "TU merge 2026-11-24: tu178, tu179"
    ],
    "boundary_confidence": "medium",
    "provisional": true,
@@ -79370,7 +78972,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -79378,7 +78980,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 5,
+    "of": 8,
     "migration_hints": [],
     "records": []
    },
@@ -79427,120 +79029,7 @@
      "va": "0x00224918",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x004b4b48",
-      "0x004b4b49"
-     ],
-     "bounds": [
-      "0x004cc321",
-      "0x004c67f0"
-     ],
-     "end": "0x004C67F0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x004C67F0",
-       "name": "tu178",
-       "start": "0x004B4B48"
-      }
-     ],
-     "size": 72872,
-     "splat_type": "data",
-     "start": "0x004B4B48"
-    }
-   },
-   "text": {
-    "start": "0x00224600",
-    "end": "0x00224958",
-    "code_end": "0x00224958",
-    "size": 856,
-    "splat": "c",
-    "splat_range": [
-     "0x00224600",
-     "0x00224958"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu178.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu179",
-   "unit": "main",
-   "ordinal": 179,
-   "name": "tu179",
-   "path": "src/main/tu179.c",
-   "scaffold_path": "scaffold/src/main/tu179.c",
-   "kind": "gcc",
-   "mode": "asm",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.08",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "8 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 3,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_00224958",
@@ -79570,7 +79059,7 @@
     }
    ],
    "owners": {
-    ".text": "asm",
+    ".text": "c",
     ".data": "asm",
     ".sdata": "asm"
    },
@@ -79578,24 +79067,26 @@
     ".data": {
      "anchored": [
       "0x004b3790",
+      "0x004b4b48",
+      "0x004b4b49",
       "0x004cc321"
      ],
      "bounds": [
       "0x004b36f5",
       "0x004b4b48"
      ],
-     "end": "0x004B4B48",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x004C67F0",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x004B4B48",
-       "name": "tu179",
+       "end": "0x004C67F0",
+       "name": "tu178",
        "start": "0x004B3790"
       }
      ],
-     "size": 5048,
+     "size": 77920,
      "splat_type": "data",
      "start": "0x004B3790"
     },
@@ -79609,13 +79100,13 @@
       "0x00551310"
      ],
      "end": "0x00551310",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00551310",
-       "name": "tu179",
+       "name": "tu178",
        "start": "0x00551308"
       }
      ],
@@ -79625,25 +79116,36 @@
     }
    },
    "text": {
-    "start": "0x00224958",
+    "start": "0x00224600",
     "end": "0x00225770",
     "code_end": "0x0022576c",
-    "size": 3608,
+    "size": 4464,
     "splat": "c",
     "splat_range": [
-     "0x00224958",
+     "0x00224600",
      "0x00225770"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
+   },
+   "import": {
+    "mode": "c",
+    "note": "X3 bulk express integration (user 2026-11-21)",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/tu178.c"
+    }
    }
   },
   {
    "id": "main/tu180",
    "unit": "main",
    "ordinal": 180,
-   "name": "tu180",
-   "path": "src/main/tu180.c",
-   "scaffold_path": "scaffold/src/main/tu180.c",
+   "name": "xgl_cd_clock",
+   "path": "src/main/xgl_cd_clock.c",
+   "scaffold_path": "scaffold/src/main/xgl_cd_clock.c",
    "kind": "gcc",
    "mode": "c",
    "category": "game",
@@ -79653,7 +79155,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.49",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu180, xgl_cd_clock"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -79682,7 +79185,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -79690,7 +79193,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 4,
+    "of": 8,
     "migration_hints": [],
     "records": []
    },
@@ -79730,120 +79233,7 @@
      "va": "0x002257f0",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".bss": {
-     "anchored": [
-      "0x005a6bd0",
-      "0x005a6bd1"
-     ],
-     "bounds": [
-      "0x005a6bc1",
-      "0x005a6bd8"
-     ],
-     "end": "0x005A6BD8",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x005A6BD8",
-       "name": "tu180",
-       "start": "0x005A6BD0"
-      }
-     ],
-     "size": 8,
-     "splat_type": "bss",
-     "start": "0x005A6BD0"
-    }
-   },
-   "text": {
-    "start": "0x00225770",
-    "end": "0x00225938",
-    "code_end": "0x00225938",
-    "size": 456,
-    "splat": "c",
-    "splat_range": [
-     "0x00225770",
-     "0x00225938"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu180.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu181",
-   "unit": "main",
-   "ordinal": 181,
-   "name": "xgl_cd_clock",
-   "path": "src/main/xgl_cd_clock.c",
-   "scaffold_path": "scaffold/src/main/xgl_cd_clock.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.88",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "first named function xglClockSampleDayTime",
-   "name_confidence": "low",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "3 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 4,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_00225938",
@@ -79883,9 +79273,34 @@
    ],
    "owners": {
     ".text": "c",
+    ".bss": "asm",
     ".sdata": "asm"
    },
    "sections": {
+    ".bss": {
+     "anchored": [
+      "0x005a6bd0",
+      "0x005a6bd1"
+     ],
+     "bounds": [
+      "0x005a6bc1",
+      "0x005a6bd8"
+     ],
+     "end": "0x005A6BD8",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005A6BD8",
+       "name": "xgl_cd_clock",
+       "start": "0x005A6BD0"
+      }
+     ],
+     "size": 8,
+     "splat_type": "bss",
+     "start": "0x005A6BD0"
+    },
     ".sdata": {
      "anchored": [
       "0x00550bb4",
@@ -79896,8 +79311,8 @@
       "0x00550bb8"
      ],
      "end": "0x00550BB8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
@@ -79912,26 +79327,26 @@
     }
    },
    "text": {
-    "start": "0x00225938",
+    "start": "0x00225770",
     "end": "0x00225bd8",
     "code_end": "0x00225bd8",
-    "size": 672,
+    "size": 1128,
     "splat": "c",
     "splat_range": [
-     "0x00225938",
+     "0x00225770",
      "0x00225bd8"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
-    "note": "X3 express port of X2 C (user 2026-11-20: express, sin revisi\u00f3n; los 1306 pares)",
+    "note": "X3 bulk express integration (user 2026-11-21)",
     "source": {
-     "kind": "file",
-     "path": "src/main/xgl_cd_clock.c",
      "include_dirs": [
       "include"
-     ]
+     ],
+     "kind": "file",
+     "path": "src/main/xgl_cd_clock.c"
     }
    }
   },
@@ -83389,7 +82804,7 @@
    "path": "src/main/tu191.c",
    "scaffold_path": "scaffold/src/main/tu191.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -83397,7 +82812,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.41",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu191, tu192"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -83426,7 +82842,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "32 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -83434,7 +82850,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 9,
+    "of": 12,
     "migration_hints": [],
     "records": []
    },
@@ -83519,109 +82935,7 @@
      "va": "0x0023f0e8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "asm",
-    ".sdata": "asm"
-   },
-   "sections": {
-    ".sdata": {
-     "anchored": [
-      "0x00550c00",
-      "0x00550c29"
-     ],
-     "bounds": [
-      "0x00550bf9",
-      "0x00550c2c"
-     ],
-     "end": "0x00550C2C",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00550C2C",
-       "name": "tu191",
-       "start": "0x00550C00"
-      }
-     ],
-     "size": 44,
-     "splat_type": "sdata",
-     "start": "0x00550C00"
-    }
-   },
-   "text": {
-    "start": "0x0023e128",
-    "end": "0x0023f860",
-    "code_end": "0x0023f85c",
-    "size": 5944,
-    "splat": "c",
-    "splat_range": [
-     "0x0023e128",
-     "0x0023f860"
-    ],
-    "note": null
-   }
-  },
-  {
-   "id": "main/tu192",
-   "unit": "main",
-   "ordinal": 192,
-   "name": "tu192",
-   "path": "src/main/tu192.c",
-   "scaffold_path": "scaffold/src/main/tu192.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.70",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "21 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 3,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_0023F860",
@@ -83652,10 +82966,36 @@
    ],
    "owners": {
     ".text": "c",
-    ".lit4": "asm",
-    ".sdata": "asm"
+    ".sdata": "asm",
+    ".lit4": "asm"
    },
    "sections": {
+    ".sdata": {
+     "anchored": [
+      "0x00550c00",
+      "0x00550c29",
+      "0x00550c2c",
+      "0x00550c2d"
+     ],
+     "bounds": [
+      "0x00550bf9",
+      "0x00550c2c"
+     ],
+     "end": "0x00550C30",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550C30",
+       "name": "tu191",
+       "start": "0x00550C00"
+      }
+     ],
+     "size": 48,
+     "splat_type": "sdata",
+     "start": "0x00550C00"
+    },
     ".lit4": {
      "anchored": [
       "0x0054f604",
@@ -83666,56 +83006,32 @@
       "0x0054f624"
      ],
      "end": "0x0054F624",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054F624",
-       "name": "tu192",
+       "name": "tu191",
        "start": "0x0054F604"
       }
      ],
      "size": 32,
      "splat_type": "lit4",
      "start": "0x0054F604"
-    },
-    ".sdata": {
-     "anchored": [
-      "0x00550c2c",
-      "0x00550c2d"
-     ],
-     "bounds": [
-      "0x00550c29",
-      "0x00550c30"
-     ],
-     "end": "0x00550C30",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00550C30",
-       "name": "tu192",
-       "start": "0x00550C2C"
-      }
-     ],
-     "size": 4,
-     "splat_type": "sdata",
-     "start": "0x00550C2C"
     }
    },
    "text": {
-    "start": "0x0023f860",
+    "start": "0x0023e128",
     "end": "0x0023fd38",
     "code_end": "0x0023fd34",
-    "size": 1240,
+    "size": 7184,
     "splat": "c",
     "splat_range": [
-     "0x0023f860",
+     "0x0023e128",
      "0x0023fd38"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -83725,7 +83041,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu192.c"
+     "path": "src/main/tu191.c"
     }
    }
   },
@@ -87891,7 +87207,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.45",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu209, tu210"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -87920,7 +87237,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -87928,7 +87245,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 7,
+    "of": 15,
     "migration_hints": [],
     "records": []
    },
@@ -87995,94 +87312,7 @@
      "va": "0x0024e4a8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x0024e348",
-    "end": "0x0024e4f0",
-    "code_end": "0x0024e4f0",
-    "size": 424,
-    "splat": "c",
-    "splat_range": [
-     "0x0024e348",
-     "0x0024e4f0"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu209.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu210",
-   "unit": "main",
-   "ordinal": 210,
-   "name": "tu210",
-   "path": "src/main/tu210.c",
-   "scaffold_path": "scaffold/src/main/tu210.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.18",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 8,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "xglCdInitReadRing",
@@ -88171,13 +87401,13 @@
       "0x005393a8"
      ],
      "end": "0x005393A8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005393A8",
-       "name": "tu210",
+       "name": "tu209",
        "start": "0x00539380"
       }
      ],
@@ -88187,16 +87417,16 @@
     }
    },
    "text": {
-    "start": "0x0024e4f0",
+    "start": "0x0024e348",
     "end": "0x0024e678",
     "code_end": "0x0024e674",
-    "size": 392,
+    "size": 816,
     "splat": "c",
     "splat_range": [
-     "0x0024e4f0",
+     "0x0024e348",
      "0x0024e678"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -88206,7 +87436,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu210.c"
+     "path": "src/main/tu209.c"
     }
    }
   },
@@ -93922,7 +93152,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.71",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
+    "precision of this score band on X1, held out: 0.227 (17/75)",
+    "TU merge 2026-11-24: tu240, tu241"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -93951,7 +93182,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -93959,7 +93190,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 11,
     "migration_hints": [],
     "records": []
    },
@@ -93990,120 +93221,7 @@
      "va": "0x0025d9d8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x003e2990",
-      "0x003e2bc1"
-     ],
-     "bounds": [
-      "0x003e2981",
-      "0x003e2c08"
-     ],
-     "end": "0x003E2C08",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003E2C08",
-       "name": "tu240",
-       "start": "0x003E2990"
-      }
-     ],
-     "size": 632,
-     "splat_type": "data",
-     "start": "0x003E2990"
-    }
-   },
-   "text": {
-    "start": "0x0025d960",
-    "end": "0x0025da00",
-    "code_end": "0x0025d9fc",
-    "size": 160,
-    "splat": "c",
-    "splat_range": [
-     "0x0025d960",
-     "0x0025da00"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu240.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu241",
-   "unit": "main",
-   "ordinal": 241,
-   "name": "tu241",
-   "path": "src/main/tu241.c",
-   "scaffold_path": "scaffold/src/main/tu241.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.33",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 8,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "textPlayDefaultTable",
@@ -94184,40 +93302,42 @@
    "sections": {
     ".data": {
      "anchored": [
+      "0x003e2990",
+      "0x003e2bc1",
       "0x003e2c08",
       "0x003e30f1"
      ],
      "bounds": [
-      "0x003e2bc1",
-      "0x003e30f8"
+      "0x003e2981",
+      "0x003e2c08"
      ],
      "end": "0x003E30F8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003E30F8",
-       "name": "tu241",
-       "start": "0x003E2C08"
+       "name": "tu240",
+       "start": "0x003E2990"
       }
      ],
-     "size": 1264,
+     "size": 1896,
      "splat_type": "data",
-     "start": "0x003E2C08"
+     "start": "0x003E2990"
     }
    },
    "text": {
-    "start": "0x0025da00",
+    "start": "0x0025d960",
     "end": "0x0025db30",
     "code_end": "0x0025db30",
-    "size": 304,
+    "size": 464,
     "splat": "c",
     "splat_range": [
-     "0x0025da00",
+     "0x0025d960",
      "0x0025db30"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -94227,7 +93347,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu241.c"
+     "path": "src/main/tu240.c"
     }
    }
   },
@@ -96977,7 +96097,7 @@
    "path": "src/main/tu253.c",
    "scaffold_path": "scaffold/src/main/tu253.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -96985,7 +96105,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "lit4_step: .lit4 0x54f2a4 -> 0x54f378",
-    "exact-gap precision of this kind on X1: 0.667"
+    "exact-gap precision of this kind on X1: 0.667",
+    "TU merge 2026-11-24: tu253, tu254"
    ],
    "boundary_confidence": "medium",
    "provisional": true,
@@ -97014,7 +96135,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "9 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -97022,7 +96143,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 11,
     "migration_hints": [],
     "records": []
    },
@@ -97053,109 +96174,7 @@
      "va": "0x002626d0",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "asm",
-    ".rodata": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x00530e70",
-      "0x00530e71"
-     ],
-     "bounds": [
-      "0x00530e61",
-      "0x00530e78"
-     ],
-     "end": "0x00530E78",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00530E78",
-       "name": "tu253",
-       "start": "0x00530E70"
-      }
-     ],
-     "size": 8,
-     "splat_type": "rodata",
-     "start": "0x00530E70"
-    }
-   },
-   "text": {
-    "start": "0x00262278",
-    "end": "0x002627c0",
-    "code_end": "0x002627c0",
-    "size": 1352,
-    "splat": "c",
-    "splat_range": [
-     "0x00262278",
-     "0x002627c0"
-    ],
-    "note": null
-   }
-  },
-  {
-   "id": "main/tu254",
-   "unit": "main",
-   "ordinal": 254,
-   "name": "tu254",
-   "path": "src/main/tu254.c",
-   "scaffold_path": "scaffold/src/main/tu254.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.99",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "8 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 8,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_002627C0",
@@ -97231,11 +96250,37 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm",
     ".rodata": "asm",
+    ".data": "asm",
     ".lit4": "asm"
    },
    "sections": {
+    ".rodata": {
+     "anchored": [
+      "0x00530e70",
+      "0x00530e71",
+      "0x00530e78",
+      "0x00530e81"
+     ],
+     "bounds": [
+      "0x00530e61",
+      "0x00530e78"
+     ],
+     "end": "0x00530E90",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00530E90",
+       "name": "tu253",
+       "start": "0x00530E70"
+      }
+     ],
+     "size": 32,
+     "splat_type": "rodata",
+     "start": "0x00530E70"
+    },
     ".data": {
      "anchored": [
       "0x003e3e50",
@@ -97246,43 +96291,19 @@
       "0x003e3f20"
      ],
      "end": "0x003E3F20",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003E3F20",
-       "name": "tu254",
+       "name": "tu253",
        "start": "0x003E3E50"
       }
      ],
      "size": 208,
      "splat_type": "data",
      "start": "0x003E3E50"
-    },
-    ".rodata": {
-     "anchored": [
-      "0x00530e78",
-      "0x00530e81"
-     ],
-     "bounds": [
-      "0x00530e71",
-      "0x00530e90"
-     ],
-     "end": "0x00530E90",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00530E90",
-       "name": "tu254",
-       "start": "0x00530E78"
-      }
-     ],
-     "size": 24,
-     "splat_type": "rodata",
-     "start": "0x00530E78"
     },
     ".lit4": {
      "anchored": [
@@ -97294,13 +96315,13 @@
       "0x0054f380"
      ],
      "end": "0x0054F380",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054F380",
-       "name": "tu254",
+       "name": "tu253",
        "start": "0x0054F378"
       }
      ],
@@ -97310,16 +96331,16 @@
     }
    },
    "text": {
-    "start": "0x002627c0",
+    "start": "0x00262278",
     "end": "0x002631d0",
     "code_end": "0x002631d0",
-    "size": 2576,
+    "size": 3928,
     "splat": "c",
     "splat_range": [
-     "0x002627c0",
+     "0x00262278",
      "0x002631d0"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -97329,7 +96350,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu254.c"
+     "path": "src/main/tu253.c"
     }
    }
   },
@@ -97349,7 +96370,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.23",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu255, tu256"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -97378,7 +96400,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -97386,7 +96408,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 6,
+    "of": 23,
     "migration_hints": [],
     "records": []
    },
@@ -97444,94 +96466,7 @@
      "va": "0x00263340",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x002631d0",
-    "end": "0x00263368",
-    "code_end": "0x00263368",
-    "size": 408,
-    "splat": "c",
-    "splat_range": [
-     "0x002631d0",
-     "0x00263368"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu255.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu256",
-   "unit": "main",
-   "ordinal": 256,
-   "name": "tu256",
-   "path": "src/main/tu256.c",
-   "scaffold_path": "scaffold/src/main/tu256.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.35",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "2 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 17,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_00263368",
@@ -97702,13 +96637,13 @@
       "0x00530cb8"
      ],
      "end": "0x00530CB8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00530CB8",
-       "name": "tu256",
+       "name": "tu255",
        "start": "0x00530B88"
       }
      ],
@@ -97726,13 +96661,13 @@
       "0x005513ac"
      ],
      "end": "0x005513AC",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005513AC",
-       "name": "tu256",
+       "name": "tu255",
        "start": "0x005513A8"
       }
      ],
@@ -97742,16 +96677,16 @@
     }
    },
    "text": {
-    "start": "0x00263368",
+    "start": "0x002631d0",
     "end": "0x00263eb0",
     "code_end": "0x00263eac",
-    "size": 2888,
+    "size": 3296,
     "splat": "c",
     "splat_range": [
-     "0x00263368",
+     "0x002631d0",
      "0x00263eb0"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -97761,7 +96696,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu256.c"
+     "path": "src/main/tu255.c"
     }
    }
   },
@@ -97955,7 +96890,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.10",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu258, tu259"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -97984,7 +96920,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "1 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -97992,7 +96928,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 20,
     "migration_hints": [],
     "records": []
    },
@@ -98023,94 +96959,7 @@
      "va": "0x00263fd0",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x00263f08",
-    "end": "0x00264028",
-    "code_end": "0x00264024",
-    "size": 288,
-    "splat": "c",
-    "splat_range": [
-     "0x00263f08",
-     "0x00264028"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu258.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu259",
-   "unit": "main",
-   "ordinal": 259,
-   "name": "tu259",
-   "path": "src/main/tu259.c",
-   "scaffold_path": "scaffold/src/main/tu259.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.98",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "24 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 17,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "cameraScriptActivate",
@@ -98280,13 +97129,13 @@
       "0x0054f2b8"
      ],
      "end": "0x0054F2B8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054F2B8",
-       "name": "tu259",
+       "name": "tu258",
        "start": "0x0054F2A8"
       }
      ],
@@ -98296,16 +97145,16 @@
     }
    },
    "text": {
-    "start": "0x00264028",
+    "start": "0x00263f08",
     "end": "0x00264280",
     "code_end": "0x00264280",
-    "size": 600,
+    "size": 888,
     "splat": "c",
     "splat_range": [
-     "0x00264028",
+     "0x00263f08",
      "0x00264280"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -98315,7 +97164,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu259.c"
+     "path": "src/main/tu258.c"
     }
    }
   },
@@ -99964,7 +98813,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.52",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
+    "precision of this score band on X1, held out: 0.188 (12/64)",
+    "TU merge 2026-11-24: tu265, tu266"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -99993,7 +98843,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "19 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -100001,7 +98851,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 10,
+    "of": 15,
     "migration_hints": [],
     "records": []
    },
@@ -100095,195 +98945,7 @@
      "va": "0x00267680",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".rodata": "asm",
-    ".lit4": "asm",
-    ".sbss": "asm",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x00530d00",
-      "0x00530d01"
-     ],
-     "bounds": [
-      "0x00530cf1",
-      "0x00530d78"
-     ],
-     "end": "0x00530D38",
-     "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu265)",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00530D38",
-       "name": "tu265",
-       "start": "0x00530D00"
-      }
-     ],
-     "size": 56,
-     "splat_type": "rodata",
-     "start": "0x00530D00"
     },
-    ".lit4": {
-     "anchored": [
-      "0x0054f318",
-      "0x0054f329"
-     ],
-     "bounds": [
-      "0x0054f315",
-      "0x0054f32c"
-     ],
-     "end": "0x0054F32C",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054F32C",
-       "name": "tu265",
-       "start": "0x0054F318"
-      }
-     ],
-     "size": 20,
-     "splat_type": "lit4",
-     "start": "0x0054F318"
-    },
-    ".sbss": {
-     "anchored": [
-      "0x005513d8",
-      "0x005513ed"
-     ],
-     "bounds": [
-      "0x005513c9",
-      "0x005513f0"
-     ],
-     "end": "0x005513F0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x005513F0",
-       "name": "tu265",
-       "start": "0x005513D8"
-      }
-     ],
-     "size": 24,
-     "splat_type": "sbss",
-     "start": "0x005513D8"
-    },
-    ".bss": {
-     "anchored": [
-      "0x0055a8a0",
-      "0x0055af91"
-     ],
-     "bounds": [
-      "0x0055a891",
-      "0x0055aaf0"
-     ],
-     "end": "0x0055AAF0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0055AAF0",
-       "name": "tu265",
-       "start": "0x0055A8A0"
-      }
-     ],
-     "size": 592,
-     "splat_type": "bss",
-     "start": "0x0055A8A0"
-    }
-   },
-   "text": {
-    "start": "0x00267108",
-    "end": "0x00267998",
-    "code_end": "0x00267994",
-    "size": 2192,
-    "splat": "c",
-    "splat_range": [
-     "0x00267108",
-     "0x00267998"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu265.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu266",
-   "unit": "main",
-   "ordinal": 266,
-   "name": "tu266",
-   "path": "src/main/tu266.c",
-   "scaffold_path": "scaffold/src/main/tu266.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -0.99",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "3 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 5,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "func_00267998",
@@ -100332,9 +98994,109 @@
    ],
    "owners": {
     ".text": "c",
+    ".rodata": "asm",
+    ".lit4": "asm",
+    ".sbss": "asm",
+    ".bss": "asm",
     ".sdata": "asm"
    },
    "sections": {
+    ".rodata": {
+     "anchored": [
+      "0x00530d00",
+      "0x00530d01"
+     ],
+     "bounds": [
+      "0x00530cf1",
+      "0x00530d78"
+     ],
+     "end": "0x00530D38",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00530D38",
+       "name": "tu265",
+       "start": "0x00530D00"
+      }
+     ],
+     "size": 56,
+     "splat_type": "rodata",
+     "start": "0x00530D00"
+    },
+    ".lit4": {
+     "anchored": [
+      "0x0054f318",
+      "0x0054f329"
+     ],
+     "bounds": [
+      "0x0054f315",
+      "0x0054f32c"
+     ],
+     "end": "0x0054F32C",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054F32C",
+       "name": "tu265",
+       "start": "0x0054F318"
+      }
+     ],
+     "size": 20,
+     "splat_type": "lit4",
+     "start": "0x0054F318"
+    },
+    ".sbss": {
+     "anchored": [
+      "0x005513d8",
+      "0x005513ed"
+     ],
+     "bounds": [
+      "0x005513c9",
+      "0x005513f0"
+     ],
+     "end": "0x005513F0",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005513F0",
+       "name": "tu265",
+       "start": "0x005513D8"
+      }
+     ],
+     "size": 24,
+     "splat_type": "sbss",
+     "start": "0x005513D8"
+    },
+    ".bss": {
+     "anchored": [
+      "0x0055a8a0",
+      "0x0055af91"
+     ],
+     "bounds": [
+      "0x0055a891",
+      "0x0055aaf0"
+     ],
+     "end": "0x0055AAF0",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0055AAF0",
+       "name": "tu265",
+       "start": "0x0055A8A0"
+      }
+     ],
+     "size": 592,
+     "splat_type": "bss",
+     "start": "0x0055A8A0"
+    },
     ".sdata": {
      "anchored": [
       "0x00550858",
@@ -100345,13 +99107,13 @@
       "0x00550860"
      ],
      "end": "0x00550860",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00550860",
-       "name": "tu266",
+       "name": "tu265",
        "start": "0x00550858"
       }
      ],
@@ -100361,16 +99123,16 @@
     }
    },
    "text": {
-    "start": "0x00267998",
+    "start": "0x00267108",
     "end": "0x00267ca0",
     "code_end": "0x00267ca0",
-    "size": 776,
+    "size": 2968,
     "splat": "c",
     "splat_range": [
-     "0x00267998",
+     "0x00267108",
      "0x00267ca0"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -100380,7 +99142,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu266.c"
+     "path": "src/main/tu265.c"
     }
    }
   },
@@ -103195,7 +101957,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.02",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu282, tu283, tu284"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -103224,7 +101987,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 3 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -103232,7 +101995,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 5,
+    "of": 66,
     "migration_hints": [],
     "records": []
    },
@@ -103281,94 +102044,7 @@
      "va": "0x0026bcd8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x0026bac8",
-    "end": "0x0026bda0",
-    "code_end": "0x0026bda0",
-    "size": 728,
-    "splat": "c",
-    "splat_range": [
-     "0x0026bac8",
-     "0x0026bda0"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu282.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu283",
-   "unit": "main",
-   "ordinal": 283,
-   "name": "tu283",
-   "path": "src/main/tu283.c",
-   "scaffold_path": "scaffold/src/main/tu283.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.89",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "first named function msgPutWait",
-   "name_confidence": "low",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "19 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 12,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_0026BDA0",
@@ -103476,145 +102152,7 @@
      "va": "0x0026c378",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".rodata": "asm",
-    ".sdata": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x00530ea0",
-      "0x00530ed9"
-     ],
-     "bounds": [
-      "0x00530e99",
-      "0x00530f80"
-     ],
-     "end": "0x00530F80",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00530F80",
-       "name": "tu283",
-       "start": "0x00530EA0"
-      }
-     ],
-     "size": 224,
-     "splat_type": "rodata",
-     "start": "0x00530EA0"
     },
-    ".sdata": {
-     "anchored": [
-      "0x005508c0",
-      "0x005508c3"
-     ],
-     "bounds": [
-      "0x005508b9",
-      "0x005508e0"
-     ],
-     "end": "0x005508E0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x005508E0",
-       "name": "tu283",
-       "start": "0x005508C0"
-      }
-     ],
-     "size": 32,
-     "splat_type": "sdata",
-     "start": "0x005508C0"
-    }
-   },
-   "text": {
-    "start": "0x0026bda0",
-    "end": "0x0026c588",
-    "code_end": "0x0026c584",
-    "size": 2024,
-    "splat": "c",
-    "splat_range": [
-     "0x0026bda0",
-     "0x0026c588"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu283.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu284",
-   "unit": "main",
-   "ordinal": 284,
-   "name": "tu284",
-   "path": "src/main/tu284.c",
-   "scaffold_path": "scaffold/src/main/tu284.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "lit4_step: .lit4 0x54f350 -> 0x54f388",
-    "exact-gap precision of this kind on X1: 0.667"
-   ],
-   "boundary_confidence": "medium",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "19 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 49,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "func_0026C588",
@@ -104059,10 +102597,10 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm",
     ".rodata": "asm",
-    ".lit4": "asm",
     ".sdata": "asm",
+    ".data": "asm",
+    ".lit4": "asm",
     ".sbss": "asm",
     ".bss": "asm"
    },
@@ -104077,13 +102615,13 @@
       "0x003e42a0"
      ],
      "end": "0x003E42A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003E42A0",
-       "name": "tu284",
+       "name": "tu282",
        "start": "0x003E4120"
       }
      ],
@@ -104093,27 +102631,29 @@
     },
     ".rodata": {
      "anchored": [
+      "0x00530ea0",
+      "0x00530ed9",
       "0x00530f80",
       "0x00531081"
      ],
      "bounds": [
-      "0x00530ed9",
-      "0x005310a0"
+      "0x00530e99",
+      "0x00530f80"
      ],
      "end": "0x005310A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005310A0",
-       "name": "tu284",
-       "start": "0x00530F80"
+       "name": "tu282",
+       "start": "0x00530EA0"
       }
      ],
-     "size": 288,
+     "size": 512,
      "splat_type": "rodata",
-     "start": "0x00530F80"
+     "start": "0x00530EA0"
     },
     ".lit4": {
      "anchored": [
@@ -104125,13 +102665,13 @@
       "0x0054f390"
      ],
      "end": "0x0054F390",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054F390",
-       "name": "tu284",
+       "name": "tu282",
        "start": "0x0054F388"
       }
      ],
@@ -104141,27 +102681,29 @@
     },
     ".sdata": {
      "anchored": [
+      "0x005508c0",
+      "0x005508c3",
       "0x005508e0",
       "0x005508e9"
      ],
      "bounds": [
-      "0x005508c3",
-      "0x00550960"
+      "0x005508b9",
+      "0x005508e0"
      ],
      "end": "0x00550960",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00550960",
-       "name": "tu284",
-       "start": "0x005508E0"
+       "name": "tu282",
+       "start": "0x005508C0"
       }
      ],
-     "size": 128,
+     "size": 160,
      "splat_type": "sdata",
-     "start": "0x005508E0"
+     "start": "0x005508C0"
     },
     ".sbss": {
      "anchored": [
@@ -104173,13 +102715,13 @@
       "0x005513fc"
      ],
      "end": "0x005513FC",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005513FC",
-       "name": "tu284",
+       "name": "tu282",
        "start": "0x005513F4"
       }
      ],
@@ -104197,13 +102739,13 @@
       "0x0055cbc0"
      ],
      "end": "0x0055CBC0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0055CBC0",
-       "name": "tu284",
+       "name": "tu282",
        "start": "0x0055B250"
       }
      ],
@@ -104213,16 +102755,16 @@
     }
    },
    "text": {
-    "start": "0x0026c588",
+    "start": "0x0026bac8",
     "end": "0x0026e528",
     "code_end": "0x0026e524",
-    "size": 8096,
+    "size": 10848,
     "splat": "c",
     "splat_range": [
-     "0x0026c588",
+     "0x0026bac8",
      "0x0026e528"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -104232,7 +102774,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu284.c"
+     "path": "src/main/tu282.c"
     }
    }
   },
@@ -104252,7 +102794,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.64",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
+    "precision of this score band on X1, held out: 0.188 (12/64)",
+    "TU merge 2026-11-24: tu285, tu286"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -104281,7 +102824,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "4 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -104289,7 +102832,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 6,
     "migration_hints": [],
     "records": []
    },
@@ -104320,120 +102863,7 @@
      "va": "0x0026e590",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".sbss": "asm"
-   },
-   "sections": {
-    ".sbss": {
-     "anchored": [
-      "0x005513fc",
-      "0x005513fd"
-     ],
-     "bounds": [
-      "0x005513f9",
-      "0x00551400"
-     ],
-     "end": "0x00551400",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00551400",
-       "name": "tu285",
-       "start": "0x005513FC"
-      }
-     ],
-     "size": 4,
-     "splat_type": "sbss",
-     "start": "0x005513FC"
-    }
-   },
-   "text": {
-    "start": "0x0026e528",
-    "end": "0x0026e5a0",
-    "code_end": "0x0026e59c",
-    "size": 120,
-    "splat": "c",
-    "splat_range": [
-     "0x0026e528",
-     "0x0026e5a0"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu285.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu286",
-   "unit": "main",
-   "ordinal": 286,
-   "name": "tu286",
-   "path": "src/main/tu286.c",
-   "scaffold_path": "scaffold/src/main/tu286.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.26",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 3,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "setSwitchState",
@@ -104464,9 +102894,34 @@
    ],
    "owners": {
     ".text": "c",
+    ".sbss": "asm",
     ".data": "asm"
    },
    "sections": {
+    ".sbss": {
+     "anchored": [
+      "0x005513fc",
+      "0x005513fd"
+     ],
+     "bounds": [
+      "0x005513f9",
+      "0x00551400"
+     ],
+     "end": "0x00551400",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00551400",
+       "name": "tu285",
+       "start": "0x005513FC"
+      }
+     ],
+     "size": 4,
+     "splat_type": "sbss",
+     "start": "0x005513FC"
+    },
     ".data": {
      "anchored": [
       "0x003e42a0",
@@ -104477,13 +102932,13 @@
       "0x003e4330"
      ],
      "end": "0x003E4330",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003E4330",
-       "name": "tu286",
+       "name": "tu285",
        "start": "0x003E42A0"
       }
      ],
@@ -104493,16 +102948,16 @@
     }
    },
    "text": {
-    "start": "0x0026e5a0",
+    "start": "0x0026e528",
     "end": "0x0026e750",
     "code_end": "0x0026e750",
-    "size": 432,
+    "size": 552,
     "splat": "c",
     "splat_range": [
-     "0x0026e5a0",
+     "0x0026e528",
      "0x0026e750"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -104512,7 +102967,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu286.c"
+     "path": "src/main/tu285.c"
     }
    }
   },
@@ -104889,9 +103344,9 @@
    "id": "main/tu289",
    "unit": "main",
    "ordinal": 289,
-   "name": "tu289",
-   "path": "src/main/tu289.c",
-   "scaffold_path": "scaffold/src/main/tu289.c",
+   "name": "rg_singleton_id",
+   "path": "src/main/rg_singleton_id.c",
+   "scaffold_path": "scaffold/src/main/rg_singleton_id.c",
    "kind": "gcc",
    "mode": "c",
    "category": "game",
@@ -104901,7 +103356,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.48",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu289, rg_singleton_id"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -104930,7 +103386,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -104938,7 +103394,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 4,
+    "of": 23,
     "migration_hints": [],
     "records": []
    },
@@ -104978,120 +103434,7 @@
      "va": "0x0026f9b0",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x003e38e0",
-      "0x003e3a71"
-     ],
-     "bounds": [
-      "0x003e38c1",
-      "0x003e3ae0"
-     ],
-     "end": "0x003E3AE0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003E3AE0",
-       "name": "tu289",
-       "start": "0x003E38E0"
-      }
-     ],
-     "size": 512,
-     "splat_type": "data",
-     "start": "0x003E38E0"
-    }
-   },
-   "text": {
-    "start": "0x0026f370",
-    "end": "0x0026fa70",
-    "code_end": "0x0026fa70",
-    "size": 1792,
-    "splat": "c",
-    "splat_range": [
-     "0x0026f370",
-     "0x0026fa70"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu289.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu290",
-   "unit": "main",
-   "ordinal": 290,
-   "name": "rg_singleton_id",
-   "path": "src/main/rg_singleton_id.c",
-   "scaffold_path": "scaffold/src/main/rg_singleton_id.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.22",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "X1 file of 1 homolog function(s)",
-   "name_confidence": "medium",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "5 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 19,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_0026FA70",
@@ -105273,27 +103616,29 @@
    "sections": {
     ".data": {
      "anchored": [
+      "0x003e38e0",
+      "0x003e3a71",
       "0x003e3ae0",
       "0x004c83a5"
      ],
      "bounds": [
-      "0x003e3a71",
-      "0x003e3ce0"
+      "0x003e38c1",
+      "0x003e3ae0"
      ],
      "end": "0x003E3CE0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003E3CE0",
        "name": "rg_singleton_id",
-       "start": "0x003E3AE0"
+       "start": "0x003E38E0"
       }
      ],
-     "size": 512,
+     "size": 1024,
      "splat_type": "data",
-     "start": "0x003E3AE0"
+     "start": "0x003E38E0"
     },
     ".lit4": {
      "anchored": [
@@ -105305,8 +103650,8 @@
       "0x0054f358"
      ],
      "end": "0x0054F358",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
@@ -105329,8 +103674,8 @@
       "0x0055ab70"
      ],
      "end": "0x0055AB70",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
@@ -105345,16 +103690,16 @@
     }
    },
    "text": {
-    "start": "0x0026fa70",
+    "start": "0x0026f370",
     "end": "0x00271d68",
     "code_end": "0x00271d68",
-    "size": 8952,
+    "size": 10744,
     "splat": "c",
     "splat_range": [
-     "0x0026fa70",
+     "0x0026f370",
      "0x00271d68"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -105576,7 +103921,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.24",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu292, tu293"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -105605,7 +103951,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "8 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -105613,7 +103959,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 8,
+    "of": 29,
     "migration_hints": [],
     "records": []
    },
@@ -105689,145 +104035,7 @@
      "va": "0x00272d18",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".rodata": "asm",
-    ".sdata": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x00530d78",
-      "0x00530e29"
-     ],
-     "bounds": [
-      "0x00530d01",
-      "0x00530e30"
-     ],
-     "end": "0x00530E30",
-     "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu265)",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00530E30",
-       "name": "tu292",
-       "start": "0x00530D38"
-      }
-     ],
-     "size": 248,
-     "splat_type": "rodata",
-     "start": "0x00530D38"
     },
-    ".sdata": {
-     "anchored": [
-      "0x00550878",
-      "0x0055087a"
-     ],
-     "bounds": [
-      "0x00550871",
-      "0x00550884"
-     ],
-     "end": "0x00550884",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00550884",
-       "name": "tu292",
-       "start": "0x00550878"
-      }
-     ],
-     "size": 12,
-     "splat_type": "sdata",
-     "start": "0x00550878"
-    }
-   },
-   "text": {
-    "start": "0x00272650",
-    "end": "0x00272d88",
-    "code_end": "0x00272d88",
-    "size": 1848,
-    "splat": "c",
-    "splat_range": [
-     "0x00272650",
-     "0x00272d88"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu292.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu293",
-   "unit": "main",
-   "ordinal": 293,
-   "name": "tu293",
-   "path": "src/main/tu293.c",
-   "scaffold_path": "scaffold/src/main/tu293.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.05",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "8 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 21,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "func_00272D88",
@@ -106020,11 +104228,63 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm",
     ".rodata": "asm",
-    ".sdata": "asm"
+    ".sdata": "asm",
+    ".data": "asm"
    },
    "sections": {
+    ".rodata": {
+     "anchored": [
+      "0x00530d78",
+      "0x00530e29",
+      "0x00530e30",
+      "0x00530e61"
+     ],
+     "bounds": [
+      "0x00530d01",
+      "0x00530e30"
+     ],
+     "end": "0x00530E70",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00530E70",
+       "name": "tu292",
+       "start": "0x00530D38"
+      }
+     ],
+     "size": 312,
+     "splat_type": "rodata",
+     "start": "0x00530D38"
+    },
+    ".sdata": {
+     "anchored": [
+      "0x00550878",
+      "0x0055087a",
+      "0x00550884",
+      "0x00550885"
+     ],
+     "bounds": [
+      "0x00550871",
+      "0x00550884"
+     ],
+     "end": "0x00550888",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550888",
+       "name": "tu292",
+       "start": "0x00550878"
+      }
+     ],
+     "size": 16,
+     "splat_type": "sdata",
+     "start": "0x00550878"
+    },
     ".data": {
      "anchored": [
       "0x003e3ce0",
@@ -106035,80 +104295,32 @@
       "0x003e3d40"
      ],
      "end": "0x003E3D40",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003E3D40",
-       "name": "tu293",
+       "name": "tu292",
        "start": "0x003E3CE0"
       }
      ],
      "size": 96,
      "splat_type": "data",
      "start": "0x003E3CE0"
-    },
-    ".rodata": {
-     "anchored": [
-      "0x00530e30",
-      "0x00530e61"
-     ],
-     "bounds": [
-      "0x00530e29",
-      "0x00530e70"
-     ],
-     "end": "0x00530E70",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00530E70",
-       "name": "tu293",
-       "start": "0x00530E30"
-      }
-     ],
-     "size": 64,
-     "splat_type": "rodata",
-     "start": "0x00530E30"
-    },
-    ".sdata": {
-     "anchored": [
-      "0x00550884",
-      "0x00550885"
-     ],
-     "bounds": [
-      "0x0055087a",
-      "0x00550888"
-     ],
-     "end": "0x00550888",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00550888",
-       "name": "tu293",
-       "start": "0x00550884"
-      }
-     ],
-     "size": 4,
-     "splat_type": "sdata",
-     "start": "0x00550884"
     }
    },
    "text": {
-    "start": "0x00272d88",
+    "start": "0x00272650",
     "end": "0x00273898",
     "code_end": "0x00273894",
-    "size": 2832,
+    "size": 4680,
     "splat": "c",
     "splat_range": [
-     "0x00272d88",
+     "0x00272650",
      "0x00273898"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -106118,7 +104330,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu293.c"
+     "path": "src/main/tu292.c"
     }
    }
   },
@@ -108508,7 +106720,7 @@
    "path": "src/main/tu299.c",
    "scaffold_path": "scaffold/src/main/tu299.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -108516,7 +106728,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.21",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu299, tu300"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -108545,7 +106758,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "3 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -108553,7 +106766,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 9,
+    "of": 34,
     "migration_hints": [],
     "records": []
    },
@@ -108638,135 +106851,7 @@
      "va": "0x0027ed88",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "asm",
-    ".rodata": "asm",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".rodata": {
-     "anchored": [
-      "0x0053bf10",
-      "0x0053bf61"
-     ],
-     "bounds": [
-      "0x0053bee1",
-      "0x0053bf70"
-     ],
-     "end": "0x0053BF70",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0053BF70",
-       "name": "tu299",
-       "start": "0x0053BF10"
-      }
-     ],
-     "size": 96,
-     "splat_type": "rodata",
-     "start": "0x0053BF10"
     },
-    ".lit4": {
-     "anchored": [
-      "0x0054f8cc",
-      "0x0054f8d5"
-     ],
-     "bounds": [
-      "0x0054f8c9",
-      "0x0054f8d8"
-     ],
-     "end": "0x0054F8D8",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054F8D8",
-       "name": "tu299",
-       "start": "0x0054F8CC"
-      }
-     ],
-     "size": 12,
-     "splat_type": "lit4",
-     "start": "0x0054F8CC"
-    }
-   },
-   "text": {
-    "start": "0x0027db68",
-    "end": "0x0027ee20",
-    "code_end": "0x0027ee1c",
-    "size": 4792,
-    "splat": "c",
-    "splat_range": [
-     "0x0027db68",
-     "0x0027ee20"
-    ],
-    "note": null
-   }
-  },
-  {
-   "id": "main/tu300",
-   "unit": "main",
-   "ordinal": 300,
-   "name": "tu300",
-   "path": "src/main/tu300.c",
-   "scaffold_path": "scaffold/src/main/tu300.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.80",
-    "precision of this score band on X1, held out: 0.227 (17/75)",
-    "cut repair 2026-11-20: data-run evidence (cut_audit.py)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "8 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 25,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "streamCacheEntryReady",
@@ -109001,64 +107086,68 @@
    "sections": {
     ".rodata": {
      "anchored": [
+      "0x0053bf10",
+      "0x0053bf61",
       "0x0053bf70",
       "0x0053c081"
      ],
      "bounds": [
-      "0x0053bf61",
-      "0x0053c0c0"
+      "0x0053bee1",
+      "0x0053bf70"
      ],
      "end": "0x0053C0F0",
-     "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by tu300)",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053C0F0",
-       "name": "tu300",
-       "start": "0x0053BF70"
+       "name": "tu299",
+       "start": "0x0053BF10"
       }
      ],
-     "size": 384,
+     "size": 480,
      "splat_type": "rodata",
-     "start": "0x0053BF70"
+     "start": "0x0053BF10"
     },
     ".lit4": {
      "anchored": [
+      "0x0054f8cc",
+      "0x0054f8d5",
       "0x0054f8d8",
       "0x0054f8f5"
      ],
      "bounds": [
-      "0x0054f8d5",
-      "0x0054f8f8"
+      "0x0054f8c9",
+      "0x0054f8d8"
      ],
      "end": "0x0054F8F8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054F8F8",
-       "name": "tu300",
-       "start": "0x0054F8D8"
+       "name": "tu299",
+       "start": "0x0054F8CC"
       }
      ],
-     "size": 32,
+     "size": 44,
      "splat_type": "lit4",
-     "start": "0x0054F8D8"
+     "start": "0x0054F8CC"
     }
    },
    "text": {
-    "start": "0x0027ee20",
+    "start": "0x0027db68",
     "end": "0x00281d08",
     "code_end": "0x00281d04",
-    "size": 12008,
+    "size": 16800,
     "splat": "c",
     "splat_range": [
-     "0x0027ee20",
+     "0x0027db68",
      "0x00281d08"
     ],
-    "note": "text cut moved 2026-11-20 (cut_audit.py: one .lit4/.rodata run per object)"
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -109068,7 +107157,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu300.c"
+     "path": "src/main/tu299.c"
     }
    }
   },
@@ -109275,7 +107364,8 @@
     "rodata_order: .rodata 0x531050 -> 0x53c1c8",
     "lit4_step: .lit4 0x54f8f4 -> 0x54f980",
     "exact-gap precision of this kind on X1: 0.855",
-    "TU split 2026-11-20: lower part is tu143"
+    "TU split 2026-11-20: lower part is tu143",
+    "TU merge 2026-11-24: tu301, tu302"
    ],
    "boundary_confidence": "high",
    "provisional": true,
@@ -109304,7 +107394,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "39 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -109312,7 +107402,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 9,
+    "of": 23,
     "migration_hints": [],
     "records": []
    },
@@ -109397,120 +107487,7 @@
      "va": "0x00283c30",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".lit4": {
-     "anchored": [
-      "0x0054f8f8",
-      "0x0054f9dd"
-     ],
-     "bounds": [
-      "0x0054f8f5",
-      "0x0054f934"
-     ],
-     "end": "0x0054F934",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054F934",
-       "name": "tu301",
-       "start": "0x0054F8F8"
-      }
-     ],
-     "size": 60,
-     "splat_type": "lit4",
-     "start": "0x0054F8F8"
-    }
-   },
-   "text": {
-    "start": "0x00282a20",
-    "end": "0x00283c80",
-    "code_end": "0x00283c7c",
-    "size": 4704,
-    "splat": "c",
-    "splat_range": [
-     "0x00282a20",
-     "0x00283c80"
-    ],
-    "note": "TU split 2026-11-20"
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu301.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu302",
-   "unit": "main",
-   "ordinal": 302,
-   "name": "tu302",
-   "path": "src/main/tu302.c",
-   "scaffold_path": "scaffold/src/main/tu302.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.64",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 14,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "sbNativeChildClearStateBits",
@@ -109640,10 +107617,35 @@
    ],
    "owners": {
     ".text": "c",
+    ".lit4": "asm",
     ".data": "asm",
     ".rodata": "asm"
    },
    "sections": {
+    ".lit4": {
+     "anchored": [
+      "0x0054f8f8",
+      "0x0054f9dd"
+     ],
+     "bounds": [
+      "0x0054f8f5",
+      "0x0054f934"
+     ],
+     "end": "0x0054F934",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054F934",
+       "name": "tu301",
+       "start": "0x0054F8F8"
+      }
+     ],
+     "size": 60,
+     "splat_type": "lit4",
+     "start": "0x0054F8F8"
+    },
     ".data": {
      "anchored": [
       "0x003ec1f0",
@@ -109654,13 +107656,13 @@
       "0x003ec290"
      ],
      "end": "0x003EC290",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003EC290",
-       "name": "tu302",
+       "name": "tu301",
        "start": "0x003EC1F0"
       }
      ],
@@ -109678,13 +107680,13 @@
       "0x0053c180"
      ],
      "end": "0x0053C190",
-     "evidence_source": "cut_audit",
-     "rule": "relabel 2026-11-20 (cells referenced only by tu302)",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053C190",
-       "name": "tu302",
+       "name": "tu301",
        "start": "0x0053C0F0"
       }
      ],
@@ -109694,16 +107696,16 @@
     }
    },
    "text": {
-    "start": "0x00283c80",
+    "start": "0x00282a20",
     "end": "0x00284a60",
     "code_end": "0x00284a5c",
-    "size": 3552,
+    "size": 8256,
     "splat": "c",
     "splat_range": [
-     "0x00283c80",
+     "0x00282a20",
      "0x00284a60"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -109713,7 +107715,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu302.c"
+     "path": "src/main/tu301.c"
     }
    }
   },
@@ -109733,7 +107735,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.60",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
+    "precision of this score band on X1, held out: 0.188 (12/64)",
+    "TU merge 2026-11-24: tu303, tu304"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -109762,7 +107765,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "1 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -109770,7 +107773,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 19,
+    "of": 25,
     "migration_hints": [],
     "records": []
    },
@@ -109945,170 +107948,7 @@
      "va": "0x00285860",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm",
-    ".rodata": "asm",
-    ".lit4": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x003ec290",
-      "0x003ec291"
-     ],
-     "bounds": [
-      "0x003ec1f1",
-      "0x003ec298"
-     ],
-     "end": "0x003EC298",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003EC298",
-       "name": "tu303",
-       "start": "0x003EC290"
-      }
-     ],
-     "size": 8,
-     "splat_type": "data",
-     "start": "0x003EC290"
     },
-    ".rodata": {
-     "anchored": [
-      "0x0053c190",
-      "0x0053c191"
-     ],
-     "bounds": [
-      "0x0053c181",
-      "0x0053c1c8"
-     ],
-     "end": "0x0053C1C8",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0053C1C8",
-       "name": "tu303",
-       "start": "0x0053C190"
-      }
-     ],
-     "size": 56,
-     "splat_type": "rodata",
-     "start": "0x0053C190"
-    },
-    ".lit4": {
-     "anchored": [
-      "0x0054f934",
-      "0x0054f935"
-     ],
-     "bounds": [
-      "0x0054f9dd",
-      "0x0054f938"
-     ],
-     "end": "0x0054F938",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0054F938",
-       "name": "tu303",
-       "start": "0x0054F934"
-      }
-     ],
-     "size": 4,
-     "splat_type": "lit4",
-     "start": "0x0054F934"
-    }
-   },
-   "text": {
-    "start": "0x00284a60",
-    "end": "0x00285930",
-    "code_end": "0x00285930",
-    "size": 3792,
-    "splat": "c",
-    "splat_range": [
-     "0x00284a60",
-     "0x00285930"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu303.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu304",
-   "unit": "main",
-   "ordinal": 304,
-   "name": "tu304",
-   "path": "src/main/tu304.c",
-   "scaffold_path": "scaffold/src/main/tu304.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.83",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 6,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "isOutsideRadiusXZ",
@@ -110165,20 +108005,96 @@
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".data": "asm",
+    ".rodata": "asm",
+    ".lit4": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".data": {
+     "anchored": [
+      "0x003ec290",
+      "0x003ec291"
+     ],
+     "bounds": [
+      "0x003ec1f1",
+      "0x003ec298"
+     ],
+     "end": "0x003EC298",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x003EC298",
+       "name": "tu303",
+       "start": "0x003EC290"
+      }
+     ],
+     "size": 8,
+     "splat_type": "data",
+     "start": "0x003EC290"
+    },
+    ".rodata": {
+     "anchored": [
+      "0x0053c190",
+      "0x0053c191"
+     ],
+     "bounds": [
+      "0x0053c181",
+      "0x0053c1c8"
+     ],
+     "end": "0x0053C1C8",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0053C1C8",
+       "name": "tu303",
+       "start": "0x0053C190"
+      }
+     ],
+     "size": 56,
+     "splat_type": "rodata",
+     "start": "0x0053C190"
+    },
+    ".lit4": {
+     "anchored": [
+      "0x0054f934",
+      "0x0054f935"
+     ],
+     "bounds": [
+      "0x0054f9dd",
+      "0x0054f938"
+     ],
+     "end": "0x0054F938",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0054F938",
+       "name": "tu303",
+       "start": "0x0054F934"
+      }
+     ],
+     "size": 4,
+     "splat_type": "lit4",
+     "start": "0x0054F934"
+    }
+   },
    "text": {
-    "start": "0x00285930",
+    "start": "0x00284a60",
     "end": "0x00285d50",
     "code_end": "0x00285d50",
-    "size": 1056,
+    "size": 4848,
     "splat": "c",
     "splat_range": [
-     "0x00285930",
+     "0x00284a60",
      "0x00285d50"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -110188,7 +108104,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu304.c"
+     "path": "src/main/tu303.c"
     }
    }
   },
@@ -126215,7 +124131,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.57",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
+    "precision of this score band on X1, held out: 0.188 (12/64)",
+    "TU merge 2026-11-24: tu371, tu372"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -126244,7 +124161,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -126252,7 +124169,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 10,
     "migration_hints": [],
     "records": []
    },
@@ -126283,120 +124200,7 @@
      "va": "0x002c13c8",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".bss": {
-     "anchored": [
-      "0x005e255c",
-      "0x005e255d"
-     ],
-     "bounds": [
-      "0x005e2575",
-      "0x005ea640"
-     ],
-     "end": "0x005EA640",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x005EA640",
-       "name": "tu371",
-       "start": "0x005E255C"
-      }
-     ],
-     "size": 32996,
-     "splat_type": "bss",
-     "start": "0x005E255C"
-    }
-   },
-   "text": {
-    "start": "0x002c0d90",
-    "end": "0x002c13e0",
-    "code_end": "0x002c13e0",
-    "size": 1616,
-    "splat": "c",
-    "splat_range": [
-     "0x002c0d90",
-     "0x002c13e0"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu371.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu372",
-   "unit": "main",
-   "ordinal": 372,
-   "name": "tu372",
-   "path": "src/main/tu372.c",
-   "scaffold_path": "scaffold/src/main/tu372.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.31",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 7,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_002C13E0",
@@ -126463,10 +124267,36 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".data": "asm"
    },
    "sections": {
+    ".bss": {
+     "anchored": [
+      "0x005e2550",
+      "0x005e255c",
+      "0x005e255d",
+      "0x005e2575"
+     ],
+     "bounds": [
+      "0x005ea636",
+      "0x005e255c"
+     ],
+     "end": "0x005EA640",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005EA640",
+       "name": "tu371",
+       "start": "0x005E2550"
+      }
+     ],
+     "size": 33008,
+     "splat_type": "bss",
+     "start": "0x005E2550"
+    },
     ".data": {
      "anchored": [
       "0x004026d8",
@@ -126477,56 +124307,32 @@
       "0x004026e0"
      ],
      "end": "0x004026E0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x004026E0",
-       "name": "tu372",
+       "name": "tu371",
        "start": "0x004026D8"
       }
      ],
      "size": 8,
      "splat_type": "data",
      "start": "0x004026D8"
-    },
-    ".bss": {
-     "anchored": [
-      "0x005e2550",
-      "0x005e2575"
-     ],
-     "bounds": [
-      "0x005ea636",
-      "0x005e255c"
-     ],
-     "end": "0x005E255C",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x005E255C",
-       "name": "tu372",
-       "start": "0x005E2550"
-      }
-     ],
-     "size": 12,
-     "splat_type": "bss",
-     "start": "0x005E2550"
     }
    },
    "text": {
-    "start": "0x002c13e0",
+    "start": "0x002c0d90",
     "end": "0x002c1c70",
     "code_end": "0x002c1c70",
-    "size": 2192,
+    "size": 3808,
     "splat": "c",
     "splat_range": [
-     "0x002c13e0",
+     "0x002c0d90",
      "0x002c1c70"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -126536,7 +124342,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu372.c"
+     "path": "src/main/tu371.c"
     }
    }
   },
@@ -135895,7 +133701,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.51",
-    "precision of this score band on X1, held out: 0.188 (12/64)"
+    "precision of this score band on X1, held out: 0.188 (12/64)",
+    "TU merge 2026-11-24: tu402, tu403, tu404"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -135924,7 +133731,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 3 TUs (flags were ['-G4'])",
     "g_confidence": "medium",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -135932,7 +133739,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 14,
     "migration_hints": [],
     "records": []
    },
@@ -135963,94 +133770,7 @@
      "va": "0x002e6398",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c"
-   },
-   "sections": {},
-   "text": {
-    "start": "0x002e6348",
-    "end": "0x002e63b0",
-    "code_end": "0x002e63ac",
-    "size": 104,
-    "splat": "c",
-    "splat_range": [
-     "0x002e6348",
-     "0x002e63b0"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu402.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu403",
-   "unit": "main",
-   "ordinal": 403,
-   "name": "tu403",
-   "path": "src/main/tu403.c",
-   "scaffold_path": "scaffold/src/main/tu403.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "rodata_order: .rodata 0x53e230 -> 0x542df8",
-    "exact-gap precision of this kind on X1: 0.667"
-   ],
-   "boundary_confidence": "medium",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 3,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "func_002E63B0",
@@ -136077,120 +133797,7 @@
      "va": "0x002e6490",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".bss": "asm"
-   },
-   "sections": {
-    ".bss": {
-     "anchored": [
-      "0x0060e080",
-      "0x0060e081"
-     ],
-     "bounds": [
-      "0x0060e08d",
-      "0x0060e0a0"
-     ],
-     "end": "0x0060E0A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0060E0A0",
-       "name": "tu403",
-       "start": "0x0060E080"
-      }
-     ],
-     "size": 32,
-     "splat_type": "bss",
-     "start": "0x0060E080"
-    }
-   },
-   "text": {
-    "start": "0x002e63b0",
-    "end": "0x002e64a8",
-    "code_end": "0x002e64a4",
-    "size": 248,
-    "splat": "c",
-    "splat_range": [
-     "0x002e63b0",
-     "0x002e64a8"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu403.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu404",
-   "unit": "main",
-   "ordinal": 404,
-   "name": "tu404",
-   "path": "src/main/tu404.c",
-   "scaffold_path": "scaffold/src/main/tu404.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -2.07",
-    "precision of this score band on X1, held out: 0.231 (3/13)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "one threshold for main; was -G0, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "medium",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 8,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "recordListFlush",
@@ -136265,20 +133872,46 @@
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".bss": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".bss": {
+     "anchored": [
+      "0x0060e080",
+      "0x0060e081"
+     ],
+     "bounds": [
+      "0x0060e08d",
+      "0x0060e0a0"
+     ],
+     "end": "0x0060E0A0",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0060E0A0",
+       "name": "tu402",
+       "start": "0x0060E080"
+      }
+     ],
+     "size": 32,
+     "splat_type": "bss",
+     "start": "0x0060E080"
+    }
+   },
    "text": {
-    "start": "0x002e64a8",
+    "start": "0x002e6348",
     "end": "0x002e6580",
     "code_end": "0x002e657c",
-    "size": 216,
+    "size": 568,
     "splat": "c",
     "splat_range": [
-     "0x002e64a8",
+     "0x002e6348",
      "0x002e6580"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -136288,7 +133921,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu404.c"
+     "path": "src/main/tu402.c"
     }
    }
   },

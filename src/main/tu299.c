@@ -1,8 +1,29 @@
 #include "common.h"
 
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027DB68);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027DDE8);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027DEF0);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027E0F8);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027E4F0);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027E600);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027E6D8);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027E838);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027ED88);
+
 typedef unsigned short u16;
+
 typedef int s32;
+
 typedef float f32;
+
 typedef short s16;
 
 /* The object a stream record is written for (arg0 of the functions below); offsets measured from the original code. */
@@ -68,9 +89,10 @@ s32 streamCacheEntryReady(StreamSubject *subject) {
     return activeLoad->readyFlag == 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_0027EE40);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027EE40);
 
 s32 pendingCountGet();
+
 s32 isOutsideRadius3D(void *, void *, f32);
 
 s32 streamNeedsUpdate(StreamSubject *subject) {
@@ -82,13 +104,18 @@ s32 streamNeedsUpdate(StreamSubject *subject) {
     return needsUpdate;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_0027EF38);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027EF38);
 
 void streamBeginRecord();
+
 void func_0027B450();
+
 void streamPutWord();
+
 void streamPutFloat(f32);
+
 void func_0027B590(void *);
+
 void streamFlushNoop();
 
 void streamWriteBlockRecord(StreamSubject *subject) {
@@ -319,36 +346,36 @@ void streamWriteMinimalRecord(StreamSubject *subject) {
     streamFlushNoop();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_0027FAA0);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027FAA0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_0027FC58);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027FC58);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_0027FE20);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_0027FE20);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00280060);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00280060);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00280348);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00280348);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00280580);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00280580);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00280790);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00280790);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00280B28);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00280B28);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_002810F0);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_002810F0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_002813E8);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_002813E8);
 
 void streamNoOpA(void) {
 
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_002817E8);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_002817E8);
 
 void streamNoOpB(void) {
 
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00281980);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00281980);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu300", func_00281C20);
+INCLUDE_ASM("asm/main/nonmatchings/tu299", func_00281C20);

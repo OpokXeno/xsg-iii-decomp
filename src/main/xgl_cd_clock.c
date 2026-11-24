@@ -1,7 +1,20 @@
 #include "common.h"
 #include "shared.h"
-
 #include "main/xgl_cd.h"
+
+typedef int s32;
+
+s32 stubReturnZeroPrimary(void) {
+    return 0;
+}
+
+s32 stubReturnZeroSecondary(void) {
+    return 0;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/xgl_cd_clock", func_00225780);
+
+INCLUDE_ASM("asm/main/nonmatchings/xgl_cd_clock", func_002257F0);
 
 void xglClockRead(XglClock *clock);
 

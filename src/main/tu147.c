@@ -1,5 +1,15 @@
 #include "common.h"
 
+INCLUDE_ASM("asm/main/nonmatchings/tu147", func_0020EC38);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu147", func_0020EC78);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu147", func_0020ECB8);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu147", func_0020ECF8);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu147", func_0020ED98);
+
 void *quatRotationColumnX(void *rotationColumn, void *quaternion) {
     __asm__ __volatile__("lqc2 vf1, 0(%0)" : : "r"(quaternion) : "memory");
     __asm__ __volatile__("vadd.xyzw vf2, vf1, vf1" : : : "memory");

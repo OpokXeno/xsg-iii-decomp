@@ -1,20 +1,29 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_002627C0);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_00262278);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_002628F8);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_002623B8);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_00262970);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_002626D0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_00262A10);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_002627C0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_00262AD0);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_002628F8);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_00262E80);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_00262970);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_00262A10);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_00262AD0);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_00262E80);
 
 typedef int s32;
+
 typedef float f32;
+
 extern s32 gSegmentPointTable;
+
 s32 xglVectorNormal();
 
 /* Output of segmentPlanarNormalXZ: the XZ normal of a segment, stored as x, 0, z, 1. */
@@ -45,4 +54,4 @@ s32 segmentPlanarNormalXZ(PlanarNormal *segmentNormal, s32 segmentRow) {
     return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu254", func_002630F8);
+INCLUDE_ASM("asm/main/nonmatchings/tu253", func_002630F8);

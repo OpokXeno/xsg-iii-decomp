@@ -1,5 +1,26 @@
 #include "common.h"
 
+INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_0026F370);
+
+INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_0026F700);
+
+typedef int s32;
+
+typedef long long s64;
+
+typedef float f32;
+
+s32 func_0026FA00(s32, s32, s64);
+
+s64 func_003098D0(f32);
+
+void movieFrameSetFade(s32 scratchQuads, s32 scratchQuadsUsed, f32 fadeAmount)
+{
+    func_0026FA00(scratchQuads, scratchQuadsUsed, func_003098D0(fadeAmount * 70.0f) << 0x18);
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_0026F9B0);
+
 INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_0026FA70);
 
 INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_0026FAD0);
@@ -18,9 +39,8 @@ INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_00271280);
 
 INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_00271480);
 
-typedef int s32;
-typedef float f32;
 typedef unsigned char u8;
+
 extern s32 gRgSingletonIdEnabled;
 
 void rgSingletonIDEnable(void) {
@@ -34,7 +54,9 @@ void rgSingletonIDDisable(void) {
 INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_002714F8);
 
 extern f32 gSingletonBobFrequency;
+
 f32 rgSingletonWriteRect(s32 spriteRect, f32 *coords, f32 offset);
+
 f32 sinf(f32);
 
 typedef struct RgSingletonIDItem {
@@ -58,6 +80,7 @@ void rgSingletonIDUpdateSlideIn(s32 spriteRect, RgSingletonIDItem *idSprite) {
 INCLUDE_ASM("asm/main/nonmatchings/rg_singleton_id", func_00271638);
 
 extern unsigned char gSingletonIdState[];
+
 s32 singletonIdStateBuild(void *state, s32 id, void *idSource, s32 idKind);
 
 void RgSingletonIDEntry(s32 id, void *idSource, s32 idKind) {

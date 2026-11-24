@@ -149,7 +149,6 @@ segments:
       - [0xB1808, c, tu104]
       - [0xB2108, c, sb_vm]
       - [0xB4FC0, c, sb_natives]
-      - [0xB5520, c, tu107]
       - [0xB5C30, c, filter]
       - [0xC9850, c, tu116]
       - [0xC9AF0, c, sef_117]
@@ -177,11 +176,9 @@ segments:
       - [0xEF9E0, c, tu145]
       - [0xEFA78, c, tu146]
       - [0xEFC38, c, tu147]
-      - [0xEFE08, c, tu148]
       - [0xEFEC8, c, tu149]
       - [0xF0278, c, tu150]
-      - [0xF0618, c, xgl_debug_file_151]
-      - [0xF06B8, c, srs]
+      - [0xF0618, c, srs]
       - [0xF0CB8, c, tu153]
       - [0xF18E8, c, tu154]
       - [0xF19D0, c, tu155]
@@ -206,9 +203,7 @@ segments:
       - [0x1023A8, c, tu176]
       - [0x103598, c, tu177]
       - [0x105600, c, tu178]
-      - [0x105958, c, tu179]
-      - [0x106770, c, tu180]
-      - [0x106938, c, xgl_cd_clock]
+      - [0x106770, c, xgl_cd_clock]
       - [0x106BD8, c, tu182]
       - [0x107100, c, tu183]
       - [0x111430, c, res_get_path]
@@ -219,7 +214,6 @@ segments:
       - [0x11DE40, c, tu189]
       - [0x11ECB0, c, tu190]
       - [0x11F128, c, tu191]
-      - [0x120860, c, tu192]
       - [0x120D38, c, tu193]
       - [0x1229C8, c, BlendTest]
       - [0x122EB8, c, CFLLightTest]
@@ -237,7 +231,6 @@ segments:
       - [0x12DA00, c, TiWatSim]
       - [0x12E1A8, c, TiWater]
       - [0x12F348, c, tu209]
-      - [0x12F4F0, c, tu210]
       - [0x12F678, c, XenoActorEvent]
       - [0x132278, c, XenoActorEvent_ReadItem]
       - [0x133358, c, tu215]
@@ -258,7 +251,6 @@ segments:
       - [0x13D408, c, tu238]
       - [0x13E518, c, tu239]
       - [0x13E960, c, tu240]
-      - [0x13EA00, c, tu241]
       - [0x13EB30, c, tu242]
       - [0x13F3D8, c, tu243]
       - [0x13F430, c, tu244]
@@ -272,19 +264,15 @@ segments:
       - [0x1426C8, c, tu251]
       - [0x142D78, c, tu252]
       - [0x143278, c, tu253]
-      - [0x1437C0, c, tu254]
       - [0x1441D0, c, tu255]
-      - [0x144368, c, tu256]
       - [0x144EB0, c, tu257]
       - [0x144F08, c, tu258]
-      - [0x145028, c, tu259]
       - [0x145280, c, gs_packet_setup]
       - [0x145CB0, c, distance]
       - [0x145E60, c, tu262]
       - [0x1475A8, c, tu263]
       - [0x147B30, c, tu264]
       - [0x148108, c, tu265]
-      - [0x148998, c, tu266]
       - [0x148CA0, c, tu267]
       - [0x149020, c, tu268]
       - [0x149548, c, tu269]
@@ -301,29 +289,21 @@ segments:
       - [0x14C580, c, tu280]
       - [0x14C818, c, tu281]
       - [0x14CAC8, c, tu282]
-      - [0x14CDA0, c, tu283]
-      - [0x14D588, c, tu284]
       - [0x14F528, c, tu285]
-      - [0x14F5A0, c, tu286]
       - [0x14F750, c, tu287]
       - [0x14FEC8, c, tu288]
-      - [0x150370, c, tu289]
-      - [0x150A70, c, rg_singleton_id]
+      - [0x150370, c, rg_singleton_id]
       - [0x152D68, c, tu291]
       - [0x153650, c, tu292]
-      - [0x153D88, c, tu293]
       - [0x154898, c, tu294]
       - [0x154E30, c, tu295]
       - [0x1561B8, c, tu296]
       - [0x156820, c, tu297]
       - [0x15B060, c, tu298]
       - [0x15EB68, c, tu299]
-      - [0x15FE20, c, tu300]
       - [0x162D08, c, tu143]
       - [0x163A20, c, tu301]
-      - [0x164C80, c, tu302]
       - [0x165A60, c, tu303]
-      - [0x166930, c, tu304]
       - [0x166D50, c, tu305]
       - [0x167820, c, tu306]
       - [0x1679C0, c, tu307]
@@ -380,7 +360,6 @@ segments:
       - [0x19E210, c, tu369]
       - [0x19F3F8, c, tu370]
       - [0x1A1D90, c, tu371]
-      - [0x1A23E0, c, tu372]
       - [0x1A2C70, c, tu373]
       - [0x1A3DB8, c, tu374]
       - [0x1A7AD0, c, tu375]
@@ -411,8 +390,6 @@ segments:
       - [0x1C4850, c, tu400]
       - [0x1C5668, c, tu401]
       - [0x1C7348, c, tu402]
-      - [0x1C73B0, c, tu403]
-      - [0x1C74A8, c, tu404]
       - [0x1C7580, c, tu405]
       - [0x1C79B8, hasm, sce_sdk]
       - [0x1E4A50, hasm, runtime]
@@ -429,7 +406,6 @@ segments:
       - [0x2C1180, data, tu238]
       - [0x2C3330, data, tu239]
       - [0x2C3990, data, tu240]
-      - [0x2C3C08, data, tu241]
       - [0x2C40F8, data, tu242]
       - [0x2C42A8, data, tu243]
       - [0x2C4340, data, tu244]
@@ -440,16 +416,15 @@ segments:
       - [0x2C4830, data, tu264]
       - [0x2C4850, data, tu270]
       - [0x2C48C0, data, tu278]
-      - [0x2C48E0, data, tu289]
-      - [0x2C4AE0, data, rg_singleton_id]
-      - [0x2C4CE0, data, tu293]
+      - [0x2C48E0, data, rg_singleton_id]
+      - [0x2C4CE0, data, tu292]
       - [0x2C4D40, data, tu294]
       - [0x2C4E20, data, tu295]
       - [0x2C4E40, data, tu246]
-      - [0x2C4E50, data, tu254]
+      - [0x2C4E50, data, tu253]
       - [0x2C4F20, data, tu274]
-      - [0x2C5120, data, tu284]
-      - [0x2C52A0, data, tu286]
+      - [0x2C5120, data, tu282]
+      - [0x2C52A0, data, tu285]
       - [0x2C5330, data, tu272]
       - [0x2C5500, data, tu060]
       - [0x2C56AC, data, tu065]
@@ -490,7 +465,7 @@ segments:
       - [0x2CD140, data, nml_packet_add_225]
       - [0x2CD1B0, data, TiWatSim]
       - [0x2CD1E0, data, tu298]
-      - [0x2CD1F0, data, tu302]
+      - [0x2CD1F0, data, tu301]
       - [0x2CD290, data, tu303]
       - [0x2CD298, data, tu322]
       - [0x2CD3D0, data, tu310]
@@ -498,7 +473,7 @@ segments:
       - [0x2E3680, data, tu373]
       - [0x2E36B8, data, tu368]
       - [0x2E36D0, data, tu366]
-      - [0x2E36D8, data, tu372]
+      - [0x2E36D8, data, tu371]
       - [0x2E36E0, data, tu375]
       - [0x2E3710, data, tu374]
       - [0x2E3830, data, tu387]
@@ -513,7 +488,7 @@ segments:
       - [0x2E50A0, data, tu398]
       - [0x2E89E0, data, tu399]
       - [0x2E8B08, data, sb_vm]
-      - [0x2E8D00, data, tu107]
+      - [0x2E8D00, data, sb_natives]
       - [0x2E8E30, data, filter]
       - [0x2E9080, data, tu118]
       - [0x2E9090, data, sdv_alter]
@@ -523,7 +498,6 @@ segments:
       - [0x356450, data, sv_get_image_item]
       - [0x356628, data, tu154]
       - [0x38E6A0, data, srs]
-      - [0x38E6B0, data, xgl_debug_file_151]
       - [0x38E7B0, data, game_movie]
       - [0x38EF70, data, xenoActor]
       - [0x38EF80, data, xeno_actor_set]
@@ -537,8 +511,7 @@ segments:
       - [0x3944D4, data, tu091]
       - [0x394584, data, xgl_cd]
       - [0x394698, data, xgl_mc_request]
-      - [0x394790, data, tu179]
-      - [0x395B48, data, tu178]
+      - [0x394790, data, tu178]
       - [0x3A77F0, data, xgl_jpeg]
       - [0x3A7F88, data, se_volume]
       - [0x3A7FD0, data, sound_driver]
@@ -584,18 +557,15 @@ segments:
       - [0x411AF0, rodata, tu249]
       - [0x411B10, rodata, tu251]
       - [0x411B80, rodata, tu252]
-      - [0x411B88, rodata, tu256]
+      - [0x411B88, rodata, tu255]
       - [0x411CB8, rodata, gs_packet_setup]
       - [0x411CC0, rodata, tu262]
       - [0x411CF0, rodata, tu264]
       - [0x411D00, rodata, tu265]
       - [0x411D38, rodata, tu292]
-      - [0x411E30, rodata, tu293]
       - [0x411E70, rodata, tu253]
-      - [0x411E78, rodata, tu254]
       - [0x411E90, rodata, tu274]
-      - [0x411EA0, rodata, tu283]
-      - [0x411F80, rodata, tu284]
+      - [0x411EA0, rodata, tu282]
       - [0x4120A0, rodata, tu060]
       - [0x4120E8, rodata, tu064]
       - [0x412170, rodata, tu065]
@@ -636,7 +606,7 @@ segments:
       - [0x419F00, rodata, tu169]
       - [0x41A018, rodata, tu174]
       - [0x41A020, rodata, EventViewer]
-      - [0x41A380, rodata, tu210]
+      - [0x41A380, rodata, tu209]
       - [0x41A3A8, rodata, XenoActorEvent]
       - [0x41A9B0, rodata, XenoActorEvent_ReadItem]
       - [0x41AB38, rodata, tu215]
@@ -659,8 +629,7 @@ segments:
       - [0x41CEB8, rodata, TiWatSim]
       - [0x41CEE0, rodata, tu298]
       - [0x41CF10, rodata, tu299]
-      - [0x41CF70, rodata, tu300]
-      - [0x41D0F0, rodata, tu302]
+      - [0x41D0F0, rodata, tu301]
       - [0x41D190, rodata, tu303]
       - [0x41D1C8, rodata, tu308]
       - [0x41D200, rodata, tu143]
@@ -689,7 +658,7 @@ segments:
       - [0x41F250, rodata, tu398]
       - [0x41F270, rodata, tu400]
       - [0x41F2B0, rodata, sb_vm]
-      - [0x41F418, rodata, tu107]
+      - [0x41F418, rodata, sb_natives]
       - [0x41F740, rodata, filter]
       - [0x41F8F0, rodata, tu119]
       - [0x41F900, rodata, sc_get]
@@ -757,7 +726,7 @@ segments:
       - [0x430294, lit4, tu249]
       - [0x4302A0, lit4, tu251]
       - [0x4302A4, lit4, tu252]
-      - [0x4302A8, lit4, tu259]
+      - [0x4302A8, lit4, tu258]
       - [0x4302B8, lit4, gs_packet_setup]
       - [0x4302DC, lit4, tu262]
       - [0x4302FC, lit4, tu263]
@@ -769,9 +738,9 @@ segments:
       - [0x430360, lit4, tu295]
       - [0x430368, lit4, tu236]
       - [0x43036C, lit4, tu142]
-      - [0x430378, lit4, tu254]
+      - [0x430378, lit4, tu253]
       - [0x430380, lit4, tu276]
-      - [0x430388, lit4, tu284]
+      - [0x430388, lit4, tu282]
       - [0x430390, lit4, tu287]
       - [0x4303A0, lit4, tu268]
       - [0x4303AC, lit4, tu272]
@@ -796,7 +765,7 @@ segments:
       - [0x4305DC, lit4, tu091]
       - [0x4305E4, lit4, tu160]
       - [0x4305FC, lit4, tu185]
-      - [0x430604, lit4, tu192]
+      - [0x430604, lit4, tu191]
       - [0x430624, lit4, tu155]
       - [0x43062C, lit4, tu163]
       - [0x430678, lit4, tu165]
@@ -818,7 +787,6 @@ segments:
       - [0x430840, lit4, TiWatSim]
       - [0x430848, lit4, tu298]
       - [0x4308CC, lit4, tu299]
-      - [0x4308D8, lit4, tu300]
       - [0x4308F8, lit4, tu301]
       - [0x430934, lit4, tu303]
       - [0x430938, lit4, tu305]
@@ -901,16 +869,14 @@ segments:
       - [0x431840, sdata, tu257]
       - [0x431848, sdata, tu262]
       - [0x431850, sdata, tu264]
-      - [0x431858, sdata, tu266]
+      - [0x431858, sdata, tu265]
       - [0x431860, sdata, tu278]
       - [0x431870, sdata, tu279]
       - [0x431878, sdata, tu292]
-      - [0x431884, sdata, tu293]
       - [0x431888, sdata, tu294]
       - [0x431898, sdata, tu295]
       - [0x4318B0, sdata, tu274]
-      - [0x4318C0, sdata, tu283]
-      - [0x4318E0, sdata, tu284]
+      - [0x4318C0, sdata, tu282]
       - [0x431960, sdata, tu060]
       - [0x43196C, sdata, tu064]
       - [0x431990, sdata, tu066]
@@ -932,7 +898,6 @@ segments:
       - [0x431BD8, sdata, tu187]
       - [0x431BF8, sdata, tu188]
       - [0x431C00, sdata, tu191]
-      - [0x431C2C, sdata, tu192]
       - [0x431C30, sdata, tu193]
       - [0x431C38, sdata, tu155]
       - [0x431C50, sdata, tu163]
@@ -1003,14 +968,14 @@ segments:
       - [0x4322DC, sdata, ti_dynamics_node]
       - [0x4322E4, sdata, undulate]
       - [0x432304, sdata, sb_vm]
-      - [0x432308, sdata, tu179]
+      - [0x432308, sdata, tu178]
       - [0x432310]
       - { type: sbss, vram: 0x00551380, name: tu238 }
       - { type: sbss, vram: 0x0055138C, name: tu242 }
       - { type: sbss, vram: 0x00551390, name: game_camera }
       - { type: sbss, vram: 0x00551398, name: tu249 }
       - { type: sbss, vram: 0x0055139C, name: tu252 }
-      - { type: sbss, vram: 0x005513A8, name: tu256 }
+      - { type: sbss, vram: 0x005513A8, name: tu255 }
       - { type: sbss, vram: 0x005513AC, name: gs_packet_setup }
       - { type: sbss, vram: 0x005513B8, name: tu262 }
       - { type: sbss, vram: 0x005513C0, name: tu278 }
@@ -1018,7 +983,7 @@ segments:
       - { type: sbss, vram: 0x005513CC, name: tu142 }
       - { type: sbss, vram: 0x005513D8, name: tu265 }
       - { type: sbss, vram: 0x005513F0, name: tu277 }
-      - { type: sbss, vram: 0x005513F4, name: tu284 }
+      - { type: sbss, vram: 0x005513F4, name: tu282 }
       - { type: sbss, vram: 0x005513FC, name: tu285 }
       - { type: sbss, vram: 0x00551400, name: rg_dispmodel }
       - { type: sbss, vram: 0x00551404, name: tu098 }
@@ -1088,7 +1053,7 @@ segments:
       - { type: bss, vram: 0x0055AF40, name: tu238 }
       - { type: bss, vram: 0x0055AFA0, name: tu267 }
       - { type: bss, vram: 0x0055B220, name: tu274 }
-      - { type: bss, vram: 0x0055B250, name: tu284 }
+      - { type: bss, vram: 0x0055B250, name: tu282 }
       - { type: bss, vram: 0x0055CBC0, name: tu287 }
       - { type: bss, vram: 0x0055CC00, name: tu067 }
       - { type: bss, vram: 0x0055E5C0, name: rg_dispmodel }
@@ -1100,7 +1065,7 @@ segments:
       - { type: bss, vram: 0x005A69C0, name: tu062 }
       - { type: bss, vram: 0x005A6AC0, name: tu095 }
       - { type: bss, vram: 0x005A6BC0, name: tu160 }
-      - { type: bss, vram: 0x005A6BD0, name: tu180 }
+      - { type: bss, vram: 0x005A6BD0, name: xgl_cd_clock }
       - { type: bss, vram: 0x005A6BD8, name: tu175 }
       - { type: bss, vram: 0x005A6C58, name: XenoActorEvent }
       - { type: bss, vram: 0x005A6C60, name: gifState }
@@ -1121,8 +1086,7 @@ segments:
       - { type: bss, vram: 0x005D0EB0, name: tu364 }
       - { type: bss, vram: 0x005E12D0, name: tu366 }
       - { type: bss, vram: 0x005E1F00, name: tu370 }
-      - { type: bss, vram: 0x005E2550, name: tu372 }
-      - { type: bss, vram: 0x005E255C, name: tu371 }
+      - { type: bss, vram: 0x005E2550, name: tu371 }
       - { type: bss, vram: 0x005EA640, name: tu373 }
       - { type: bss, vram: 0x005EAEFC, name: tu367 }
       - { type: bss, vram: 0x005EE490, name: tu374 }
@@ -1139,7 +1103,7 @@ segments:
       - { type: bss, vram: 0x006052A0, name: tu398 }
       - { type: bss, vram: 0x006069CC, name: tu399 }
       - { type: bss, vram: 0x00609250, name: tu401 }
-      - { type: bss, vram: 0x0060E080, name: tu403 }
+      - { type: bss, vram: 0x0060E080, name: tu402 }
       - { type: bss, vram: 0x0060E0A0, name: tu400 }
       - { type: bss, vram: 0x0060E0C0, name: sb_vm }
       - { type: bss, vram: 0x0061A2C0, name: filter }

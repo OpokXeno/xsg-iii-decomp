@@ -3,7 +3,9 @@
 INCLUDE_ASM("asm/main/nonmatchings/tu178", func_00224600);
 
 typedef signed char s8;
+
 typedef int s32;
+
 typedef unsigned char u8;
 
 typedef struct AgedEntryRing {
@@ -34,3 +36,9 @@ void *xglMcTableGetAgedEntry(s32 age) {
     ringIndex = (gXglMcAgedEntries.ringCursor - age) + 0x32;
     return &gXglMcAgedEntries.agedEntries[ringIndex % 50];
 }
+
+INCLUDE_ASM("asm/main/nonmatchings/tu178", func_00224958);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu178", func_00224A80);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu178", func_00225108);

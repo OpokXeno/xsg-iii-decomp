@@ -7,8 +7,11 @@ INCLUDE_ASM("asm/main/nonmatchings/tu265", func_002671F0);
 INCLUDE_ASM("asm/main/nonmatchings/tu265", func_00267228);
 
 typedef unsigned char u8;
+
 typedef int s32;
+
 typedef signed char s8;
+
 typedef float f32;
 
 /* One camera cameraSlot: 0x60 bytes, the first byte is the active flag. */
@@ -18,6 +21,7 @@ typedef struct CameraSlot {
 } CameraSlot;
 
 extern CameraSlot gCameraSlots[];
+
 void *memset(void *, int, unsigned int);
 
 void cameraSlotsClear(void) {
@@ -25,6 +29,7 @@ void cameraSlotsClear(void) {
 }
 
 s32 func_00266008();
+
 s32 func_00267680();
 
 void cameraSlotsUpdate(void)
@@ -70,3 +75,17 @@ f32 floatWrapToPeriod(f32 value, f32 period) {
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu265", func_00267680);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu265", func_00267998);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu265", func_002679F8);
+
+INCLUDE_ASM("asm/main/nonmatchings/tu265", func_00267A58);
+
+extern s32 D_00550858;
+
+void battleClearFlag(void) {
+    D_00550858 = 0;
+}
+
+INCLUDE_ASM("asm/main/nonmatchings/tu265", func_00267AD8);

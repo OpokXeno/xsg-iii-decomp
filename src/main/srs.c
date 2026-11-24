@@ -1,7 +1,39 @@
 #include "common.h"
 
+typedef int s32;
+
+extern char xglDebFileNameBuffer[];
+
+char *strcpy(char *destination, const char *source);
+
+void xglDebFileNameSet(const char *text) {
+    strcpy(xglDebFileNameBuffer, text);
+}
+
+int xglDebFileRead(const char *name, void *buffer);
+
+int xglDebFileSize(const char *name);
+
+int xglDebFileReadSize(void *fileBuffer, const char *name)
+{
+    if (xglDebFileRead(name, fileBuffer) >= 0) {
+        return xglDebFileSize(name);
+    }
+    return -1;
+}
+
+s32 func_0030E8E4(s32);
+
+s32 xglDebFileBufferSize(s32 fileSize) {
+    s32 paddedSize;
+
+    paddedSize = fileSize + 0x14;
+    return (func_0030E8E4(paddedSize) == 0) ? 0 : paddedSize;
+}
+
 /* Sprintf-shaped varargs callee; the link name of 0x0030E1B8 (test_050.c declares it the same way). */
 int GameMpeg2Play(char *destination, const char *format, ...);
+
 /* Kind-prefix pointer table at 0x004AD6A0 (scaffold data of this TU). */
 extern char *srsEffectKindPrefix[4];
 
@@ -29,12 +61,17 @@ void srsFormatEffectStem(int effectNo, char *stemBuffer, int withSubNo)
 INCLUDE_ASM("asm/main/nonmatchings/srs", func_0020F790);
 
 typedef signed char s8;
-typedef int s32;
+
 typedef unsigned char u8;
+
 typedef unsigned int u32;
+
 extern s32 gSrsEffectFileSuffixKindThree[];
+
 extern s32 gSrsEffectFileSuffixKindBelowThree[];
+
 extern s8 gSrsEffectNameBuffer[];
+
 s32 func_0030E3D0(s8 *stemBuffer, s32 *format);
 
 s8 *srsEffectNameGet(s32 effectNo) {
@@ -51,12 +88,19 @@ s8 *srsEffectNameGet(s32 effectNo) {
 }
 
 extern const s8 gSrsAssetFormatCeRepeatTag[];
+
 extern const s8 gSrsAssetFormatCdChars[];
+
 extern const s8 gSrsAssetFormatEfPosition[];
+
 extern const s8 gSrsAssetFormatEfFallback[];
+
 extern const s8 gSrsAssetFormatNameOnly[];
+
 extern s8 gSrsAssetNameBuffer[];
+
 u32 func_00181C18();
+
 s32 xglCdGetFileSize();
 
 s8 *srsBuildAssetName(s8 *name, s32 isLoaded)
@@ -85,7 +129,9 @@ s8 *srsBuildAssetName(s8 *name, s32 isLoaded)
 }
 
 s8 *srsEffectNameGet(s32 effectNo);
+
 s8 *srsBuildAssetName(s8 *name, s32 isLoaded);
+
 s32 func_0020FE10(s32);
 
 void srsEffectPrepare(s32 effectNo) {

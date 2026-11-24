@@ -2416,7 +2416,7 @@
     }
    ]
   },
-  "main/tu152": {
+  "main/tu151": {
    ".rodata": [
     {
      "range": [
@@ -2436,7 +2436,15 @@
       "D_0053F4D8",
       "D_0053F4E8"
      ],
-     "also_referenced_by_c": [],
+     "also_referenced_by_c": [
+      "gSrsEffectFileSuffixKindThree",
+      "gSrsEffectFileSuffixKindBelowThree",
+      "gSrsAssetFormatCeRepeatTag",
+      "gSrsAssetFormatCdChars",
+      "gSrsAssetFormatEfPosition",
+      "gSrsAssetFormatEfFallback",
+      "gSrsAssetFormatNameOnly"
+     ],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
