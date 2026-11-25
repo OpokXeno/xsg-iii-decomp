@@ -284,7 +284,8 @@ struct FontStateQueue {
     unsigned short fontFlags;
     unsigned char font_selection;
     unsigned char unmodeled_07;
-    unsigned short unmodeled_08;
+    /* Glyph images uploaded since the font packet was built (the glyph draw counts them). */
+    unsigned short glyph_upload_count;
     unsigned char unmodeled_0a[2];
     unsigned char default_width;
     /* Added to each glyph advance; "$xx7,N;". */
@@ -296,7 +297,8 @@ struct FontStateQueue {
     unsigned char text_mode;
     /* FONT_CONFIG_PROPORTIONAL_MODE, "$xx3,N;". */
     unsigned char proportional_mode;
-    unsigned char unmodeled_13;
+    /* Slant of the glyphs in pixels: the glyph draw shifts the top corners right by it (X2 horizontal_shift). */
+    unsigned char horizontal_shift;
     /* Set: the glyphs are depth tested (TEST_1 GEQUAL) and do not write Z. */
     unsigned char depth_test;
     unsigned char unmodeled_15[7];
@@ -1174,7 +1176,7 @@ int xglFontCmdInit(FontDrawCursor *cursor, const char **text)
     xglFontState.glyph_default_width = 4;
     xglFontState.character_spacing = 0;
     xglFontState.proportional_mode = 0;
-    xglFontState.unmodeled_13 = 0;
+    xglFontState.horizontal_shift = 0;
     (*text)++;
     xglFontState.ruby_offset_y = 2;
     xglFontState.unmodeled_0e = 0;
@@ -1708,7 +1710,7 @@ void func_00185A20(void)
     cursor->scale_y = FONT_SCALE_ONE;
     cursor->packet = xglPacketGetCurrent();
     xglFontBuildPacket(cursor, 0);
-    xglFontState.unmodeled_08 = 0;
+    xglFontState.glyph_upload_count = 0;
     text = (unsigned char *) (&xglFontState + 1);
     while (*text != 0) {
         text = func_00184B30(cursor, text) + 1;

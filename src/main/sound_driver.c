@@ -63,7 +63,7 @@ typedef struct SoundRecordBlock {
     unsigned char unmodeled_05[3];
     unsigned char *driver_work;  /* +0x08: the driver work area D_0089BF00 */
     VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
-    unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
+    unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | kind << 16 | group << 8 | index */
     SoundChannelState channelStates[SOUND_CHANNEL_COUNT]; /* +0x530: indexed by channel (1..63; 0 unused) */
     SoundSlot soundSlotRecords[4]; /* +0x630 */
 } SoundRecordBlock;
@@ -81,10 +81,10 @@ extern unsigned char gSeBankDirName[];
 /* The range set (row of the range table) of each song number. */
 extern unsigned char soundSongRangeSet[];
 
-/* Assigns the channels of `id` to (id, a1, a2): ids below SOUND_RANGE_IDS use the range between
+/* Assigns the channels of `id` to (id, kind, group): ids below SOUND_RANGE_IDS use the range between
  * their boundary and the next one in the current song's range set, other ids the one channel
  * id & 0xFF. A nonzero `range` (first << 16 | count) gives the range relative to that start. */
-void func_0018E6F0(int id, int a1, int a2, unsigned int range)
+void func_0018E6F0(int id, int kind, int group, unsigned int range)
 {
     unsigned short boundaries[SOUND_RANGE_SET_COUNT][SOUND_RANGE_BOUNDARIES] = {
         { 0x001, 0x013, 0x020, 0x02B, 0x100, 0x118, 0x130, 0x040, 0x042, 0x046, 0x04A, 0x04E,
@@ -110,13 +110,13 @@ void func_0018E6F0(int id, int a1, int a2, unsigned int range)
         last = first + (range & 0xFFFF);
     }
     for (channel = first; channel < last; channel++) {
-        gSoundRecordBlock.channelAssign[channel] = (id << 24) + (a1 << 16) + (a2 << 8) + (channel - first);
+        gSoundRecordBlock.channelAssign[channel] = (id << 24) + (kind << 16) + (group << 8) + (channel - first);
     }
 }
 
-void seBgmLoadDefault(int a0, int a1, int a2)
+void seBgmLoadDefault(int id, int kind, int group)
 {
-    func_0018E6F0(a0, a1, a2, 0);
+    func_0018E6F0(id, kind, group, 0);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
@@ -136,7 +136,7 @@ void func_0018E870(int slot, void *bank, int numbered);
 /* Registers the bank file at bankAddress in slot id & 0xFF (or only stops the slot when there is none). A single bank
  * goes to that slot; a bank list fills consecutive slots, one per nonempty entry. Without a current song, a slot of a
  * bank group first stops every slot of its group (once per group). */
-void func_0018E940(int a0, void *bankAddress)
+void func_0018E940(int id, void *bankAddress)
 {
     unsigned int *header;
     unsigned int *offset;
@@ -151,7 +151,7 @@ void func_0018E940(int a0, void *bankAddress)
     int first;
     int last;
 
-    slot = a0 & 0xFF;
+    slot = id & 0xFF;
     if (bankAddress == 0) {
         func_0018EC68(slot);
         return;
@@ -159,7 +159,7 @@ void func_0018E940(int a0, void *bankAddress)
     header = bankAddress;
     if (header[0] == SOUND_BANK_SINGLE_MAGIC) {
         func_0018EC68(slot);
-        func_0018E870(slot, bankAddress, a0 <= SOUND_RANGE_IDS);
+        func_0018E870(slot, bankAddress, id <= SOUND_RANGE_IDS);
         return;
     }
     tableBytes = header[0];
@@ -217,7 +217,7 @@ INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EBE8);
 void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan);
 extern const char gSeMasterBankPath[];
 int xglCdReadFile(const char *name, void *buffer, int mode, void *notify);
-void func_0018E940(int a0, void *bankAddress);
+void func_0018E940(int id, void *bankAddress);
 void func_00180DD8(unsigned int a0, int a1);
 
 void seLoadMasterBank(void)
@@ -867,7 +867,6 @@ typedef struct SoundIopSetup {
 #define SOUND_SONG_NONE 0xFF
 /* The slot records of the record block. */
 #define SOUND_SLOT_RECORDS 4
-#define SOUND_CHANNEL_STATES (SOUND_CHANNEL_COUNT - 1) /* channels 1..63 */
 extern unsigned char D_0089BF00[];
 void func_00166B30(int value);
 void func_0015F8C8(int value);

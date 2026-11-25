@@ -190,8 +190,8 @@ typedef struct XglLightCurve {
     int count;
     int minimum;
     int maximum;
-    int unknown12;
-    int fixed;
+    int unmodeled_0c;
+    int sampleTime;          /* +0x10: the clamped sample time, 24.8 fixed point */
     u8 unmodeled_14[0x20 - 0x14];
     Vector4 keys[1];         /* +0x20: count key rows (time, value) */
 } XglLightCurve;
@@ -204,21 +204,21 @@ float func_0019FA20(int count, Vector4 *keyframes, float time, float weight);
 /* XS2 xglLightPackSampleCurve: samples the curve at *cursor at time and moves *cursor past it. */
 f32 func_00197A00(XglLightStreamWord **cursor, f32 time)
 {
-    float result = 0.0f;
+    float result;
     XglLightCurve *record;
     Vector4 *keys;
 
     record = (XglLightCurve *) *cursor;
-    record->fixed = ((int) time << 8) + (int) ((time - (float) (int) time) * LIGHT_CURVE_FIXED_ONE);
-    if (record->fixed > (record->maximum << 8)) {
-        record->fixed = record->maximum << 8;
+    record->sampleTime = ((int) time << 8) + (int) ((time - (float) (int) time) * LIGHT_CURVE_FIXED_ONE);
+    if (record->sampleTime > (record->maximum << 8)) {
+        record->sampleTime = record->maximum << 8;
     }
-    if (record->fixed < (record->minimum << 8)) {
-        record->fixed = record->minimum << 8;
+    if (record->sampleTime < (record->minimum << 8)) {
+        record->sampleTime = record->minimum << 8;
     }
     keys = record->keys;
     result = func_0019FA20(record->count, keys,
-                           (float) (record->fixed / 256) + (float) (record->fixed % 256) / LIGHT_CURVE_FIXED_ONE,
+                           (float) (record->sampleTime / 256) + (float) (record->sampleTime % 256) / LIGHT_CURVE_FIXED_ONE,
                            LIGHT_CURVE_KEY_WEIGHT);
     *cursor = (XglLightStreamWord *) &keys[record->count];
     return result;
