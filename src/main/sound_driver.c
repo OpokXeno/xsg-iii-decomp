@@ -35,6 +35,8 @@ typedef union SoundControl {
     /* The head has a slot's layout too; soundSlotReopen indexes the slots as soundSlotRecords[index + 1]. */
     SoundSlot soundSlotRecords[3];
 } SoundControl;
+/* Sound channels 1..63 (channel 0 is not used). */
+#define SOUND_CHANNEL_COUNT 64
 /* One sound channel's state word: state in the second byte, a counter in the first. */
 typedef union SoundChannelState {
     int word;
@@ -62,8 +64,7 @@ typedef struct SoundRecordBlock {
     unsigned char *driver_work;  /* +0x08: the driver work area D_0089BF00 */
     VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
     unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
-    unsigned char unmodeled_530[0x534 - 0x530];
-    SoundChannelState table_b[63]; /* +0x534: channels 1..63, see soundApplySettings */
+    SoundChannelState channelStates[SOUND_CHANNEL_COUNT]; /* +0x530: indexed by channel (1..63; 0 unused) */
     SoundSlot soundSlotRecords[4]; /* +0x630 */
 } SoundRecordBlock;
 typedef signed char s8;
@@ -199,9 +200,9 @@ void func_0018E940(int a0, void *bankAddress)
 
 void func_001801C0();
 int func_0018EC68(int channel);
+void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
 
-void seBankLoadNumbered(s32 id, s32 number) {
-    extern void func_0018E4C0();
+void seBankLoadNumbered(s32 id, const char *number) {
     s8 name[0x100];
 
     func_0018EC68(id);
@@ -356,8 +357,7 @@ extern unsigned char gSeAdxFileExt[];
 extern unsigned char gSeAdxDirName[];
 
 /* Formats the file key from the number and starts it on the slot index. */
-void soundSlotStartNumbered(s32 soundSlotNumber, s32 fileNumber) {
-    extern s32 func_0018E4C0();
+void soundSlotStartNumbered(s32 soundSlotNumber, const char *fileNumber) {
     s8 fileKey[0x100];
 
     func_0018E4C0(fileKey, gSeAdxDirName, fileNumber, gSeAdxFileExt);
@@ -385,7 +385,6 @@ void func_0015E488(int id);
  * the list and loops it. A null slot (the lookup failed) does nothing. */
 void func_0018F2D0(int soundSlotNumber, const char *fileName, ...)
 {
-    extern void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
     SoundSlot *soundSlot;
     char *key;
     va_list args;
@@ -676,7 +675,6 @@ void soundDriverSetStreamMode(s32 streamEnable) {
 #define SOUND_CHANNEL_STARTING 0 /* next pass: playing */
 #define SOUND_CHANNEL_PLAYING 1  /* cleared when the counter is 0 or func_0017ECA8 reports it done */
 #define SOUND_CHANNEL_STOPPING 2 /* func_0017E970 stops it, then playing with counter 0 */
-#define SOUND_CHANNEL_COUNT 64
 #define SOUND_CHANNEL_PLAYING_IDLE (SOUND_CHANNEL_PLAYING << 8)
 
 int seVolumeRampStep(VolumeRamp *ramp);
@@ -710,7 +708,7 @@ void soundApplySettings(void)
     }
     func_0017F210();
     func_00160200();
-    channel = gSoundRecordBlock.table_b;
+    channel = &gSoundRecordBlock.channelStates[1];
     for (i = 1; i < SOUND_CHANNEL_COUNT; i++) {
         if (channel->half != 0) {
             switch (channel->half >> 8) {
@@ -760,10 +758,10 @@ void func_0017D348(SoundSongPairTable *table);
 #define SOUND_SONG_3 3
 #define SOUND_STOP_SONG3 -1
 #define SOUND_STOP_OTHER -2
-/* The songs with a swapped bank: SOUND_BANK_SONG_FIRST and the next one, and SOUND_BANK_SONG_LAST. */
-#define SOUND_BANK_SONG_FIRST 1
-#define SOUND_BANK_SONG_RUN 2
-#define SOUND_BANK_SONG_LAST 4
+/* The songs with a swapped channel bank. */
+#define SOUND_BANK_SONG_1 1
+#define SOUND_BANK_SONG_2 2
+#define SOUND_BANK_SONG_4 4
 
 /* Switches to song `song`: stops the channels, passes the song's pair list on as a table and, for the
  * songs with a swapped bank (1, 2 and 4), saves the live bank of the old song and restores the
@@ -790,8 +788,8 @@ void func_0018FAC8(int song)
         pair++;
     }
     func_0017D348(&table);
-    if ((unsigned char) (gSoundRecordBlock.current_song - SOUND_BANK_SONG_FIRST) < SOUND_BANK_SONG_RUN
-        || gSoundRecordBlock.current_song == SOUND_BANK_SONG_LAST) {
+    if (gSoundRecordBlock.current_song == SOUND_BANK_SONG_1 || gSoundRecordBlock.current_song == SOUND_BANK_SONG_2
+        || gSoundRecordBlock.current_song == SOUND_BANK_SONG_4) {
         for (i = 0; i < SOUND_BANK_CHANNELS; i++) {
             gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i] =
                 gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i];
@@ -801,7 +799,7 @@ void func_0018FAC8(int song)
                 gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + 2 * SOUND_BANK_CHANNELS + i];
         }
     }
-    if ((unsigned int) (song - SOUND_BANK_SONG_FIRST) < SOUND_BANK_SONG_RUN || song == SOUND_BANK_SONG_LAST) {
+    if (song == SOUND_BANK_SONG_1 || song == SOUND_BANK_SONG_2 || song == SOUND_BANK_SONG_4) {
         for (i = 0; i < SOUND_BANK_CHANNELS; i++) {
             gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i] =
                 gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i];
@@ -867,7 +865,7 @@ typedef struct SoundIopSetup {
 #define SOUND_IOP_WORK_ADDRESS 0x1D9000
 /* No song loaded. */
 #define SOUND_SONG_NONE 0xFF
-/* Channels below SOUND_RANGE_IDS have a voice the setup switches on. */
+/* The slot records of the record block. */
 #define SOUND_SLOT_RECORDS 4
 #define SOUND_CHANNEL_STATES (SOUND_CHANNEL_COUNT - 1) /* channels 1..63 */
 extern unsigned char D_0089BF00[];
@@ -906,6 +904,7 @@ void func_0018FD58(void)
     func_0018FAC8(0);
     soundSetFullVolume();
     gSoundRecordBlock.channelAssign[0] = 0;
+    /* Channels below SOUND_RANGE_IDS have a voice the setup switches on. */
     for (channel = 1; channel < SOUND_RANGE_IDS; channel++) {
         gSoundRecordBlock.channelAssign[channel] = 0;
         func_0017ED00(channel, 1);
@@ -914,7 +913,7 @@ void func_0018FD58(void)
         gSoundRecordBlock.channelAssign[channel] = 0;
     }
     for (channel = 1; channel < SOUND_CHANNEL_COUNT; channel++) {
-        gSoundRecordBlock.table_b[channel - 1].word = 0;
+        gSoundRecordBlock.channelStates[channel].word = 0;
     }
     for (slot = 0; slot < SOUND_SLOT_RECORDS; slot++) {
         gSoundRecordBlock.soundSlotRecords[slot].voiceWork.voiceWorkBuffer = 0;
