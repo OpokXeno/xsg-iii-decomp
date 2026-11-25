@@ -10065,6 +10065,7 @@ $L499 = 0x00540390;
 gMoviePathPrefixText = 0x00540378;
 exitProgramBanner = 0x00540620;
 errorBanner = 0x00540660;
+xglLightKeyAxisTemplate = 0x005412F0;
 cfeForwardVector = 0x00541DE0;
 heapDumpSeparatorFormat = 0x00542518;
 heapDumpHeadFormat = 0x00542540;

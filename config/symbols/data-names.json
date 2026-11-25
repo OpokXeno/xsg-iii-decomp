@@ -138,6 +138,7 @@
    "0x00540408": "soundCdLocationFormat",
    "0x00540620": "exitProgramBanner",
    "0x00540660": "errorBanner",
+   "0x005412f0": "xglLightKeyAxisTemplate",
    "0x005414f0": "packetFullCondition",
    "0x00541500": "packetSourceFile",
    "0x00541510": "packetFullMessage",
