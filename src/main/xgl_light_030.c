@@ -218,7 +218,8 @@ f32 xglLightPackSampleCurve(XglLightStreamWord **cursor, f32 time)
     }
     keys = record->keys;
     result = func_0019FA20(record->count, keys,
-                           (float) (record->sampleTime / 256) + (float) (record->sampleTime % 256) / LIGHT_CURVE_FIXED_ONE,
+                           (float) (record->sampleTime / 256)
+                               + (float) (record->sampleTime % 256) / LIGHT_CURVE_FIXED_ONE,
                            LIGHT_CURVE_KEY_WEIGHT);
     *cursor = (XglLightStreamWord *) &keys[record->count];
     return result;

@@ -54,8 +54,8 @@ void xglPacketTextureTrans(XglTextureTransSet *set)
         } else {
             blockWidth = entry->size >> 16;
         }
-        xglPacketTextureTransSetup[TEXTURE_TRANS_BITBLT_AD] = ((u64) (((D_004C8390.texture_base << 11) + entry->vramOffset) >> 6) << 32)
-            | ((u64) blockWidth << 48);
+        xglPacketTextureTransSetup[TEXTURE_TRANS_BITBLT_AD] =
+            ((u64) (((D_004C8390.texture_base << 11) + entry->vramOffset) >> 6) << 32) | ((u64) blockWidth << 48);
         xglPacketTextureTransSetup[TEXTURE_TRANS_REGION_AD] = width | ((u64) entry->height << 32);
         sceVif1PkCnt(pCurrentPacket, 0);
         sceVif1PkAddDataN(pCurrentPacket, xglPacketTextureTransSetup, TEXTURE_TRANS_SETUP_WORDS);

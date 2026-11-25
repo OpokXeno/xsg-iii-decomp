@@ -4,6 +4,9 @@
 #include "shared.h"
 #include "main/tu018.h"
 
+int func_0018EC68(int channel);
+void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
+
 /* >>> CHUNK se_bank_load */
 
 int soundDriverReset(void);
@@ -201,8 +204,6 @@ void func_0018E940(int id, void *bankAddress)
 }
 
 void func_001801C0();
-int func_0018EC68(int channel);
-void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
 
 void seBankLoadNumbered(s32 id, const char *number) {
     s8 name[0x100];
