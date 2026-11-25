@@ -123,7 +123,7 @@ void func_001329D0(int playerHandle, const char *name);
 
 int xglCdCheckFile(const char *path, void *record);
 
-int GameMpeg2Play(char *destination, const char *format, unsigned int lbn, unsigned int sectors);
+int sprintf(char *destination, const char *format, unsigned int lbn, unsigned int sectors);
 
 /* Starts the movie file `name` on the player record: sets the volume (unless the record has the
  * extra sound flag), builds the path from the prefix with / as \, looks it up and gives the
@@ -164,7 +164,7 @@ int moviePlayerStartFile(MoviePlayerRecord *player, const char *name)
     if (xglCdCheckFile(path, &file) != 0) {
         return -1;
     }
-    GameMpeg2Play(path + 1, gMovieKeyFormat, file.lbn, file.stored_bytes >> 11);
+    sprintf(path + 1, gMovieKeyFormat, file.lbn, file.stored_bytes >> 11);
     func_001329D0(player->playerHandle, path + 1);
     player->frame_stamp = -1;
     return 0;

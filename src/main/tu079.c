@@ -1107,7 +1107,7 @@ typedef struct FocusObject {
     FocusBlock focusBlock; /* +0x150 */
 } FocusObject;
 
-void GameMpeg2Play(char *dst, const char *fmt, ...);
+void sprintf(char *dst, const char *fmt, ...);
 void xglFontDebugPrintf(s32, s32, char *);
 s32 mapStaticObjectProbe(void *, void *);
 
@@ -1122,19 +1122,19 @@ void focusDebugOverlayDraw(FocusObject *focusObject) {
 
     focusState = &focusObject->focusBlock;
     position = &focusObject->model->position;
-    GameMpeg2Play(text, "\022\010\010X:%.2f Y:%.2f Z:%.2f", position->x, position->y, position->z);
+    sprintf(text, "\022\010\010X:%.2f Y:%.2f Z:%.2f", position->x, position->y, position->z);
     xglFontDebugPrintf(8, 0x80, text);
     angle = focusObject->model->rotation.v.y;
     displayedValue = (s32) (angle * 57.29578f) % 360;
     if (displayedValue < 0) {
         displayedValue += 360;
     }
-    GameMpeg2Play(text, "\022\010\010R:%.2f(%d)", angle, displayedValue);
+    sprintf(text, "\022\010\010R:%.2f(%d)", angle, displayedValue);
     xglFontDebugPrintf(8, 0x88, text);
-    GameMpeg2Play(text, "\022\010\010ATTR:%08X", focusObject->model->ct.attribute);
+    sprintf(text, "\022\010\010ATTR:%08X", focusObject->model->ct.attribute);
     xglFontDebugPrintf(8, 0x90, text);
     displayedValue = mapStaticObjectProbe(&focusObject->position, &probeOut);
-    GameMpeg2Play(text, "\022\010\010MV:%.2f SEID:%2d", focusState->moveValue, displayedValue);
+    sprintf(text, "\022\010\010MV:%.2f SEID:%2d", focusState->moveValue, displayedValue);
     xglFontDebugPrintf(8, 0x98, text);
 }
 

@@ -18,7 +18,7 @@ typedef struct PxyProfileEntry {
 extern PxyProfileEntry pxyProfileEntries[PXY_ENTRY_COUNT];
 int strcmp(const char *, const char *);
 char *strcpy(char *, const char *);
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 
 /* Frees every profile slot. */
 void func_0019C8D0(void)
@@ -85,7 +85,7 @@ float pxyProfileEnd(const char *name)
         msPerTick = 0.0052173799f;
         pxyProfileEntries[profileSlot].totalTicks = pxyProfileEntries[profileSlot].totalTicks + (*T1_COUNT - pxyProfileEntries[profileSlot].startTicks);
         elapsedMs = pxyProfileEntries[profileSlot].totalTicks * msPerTick;
-        GameMpeg2Play(pxyProfileEntries[profileSlot].text, "%s  %3.2f", pxyProfileEntries[profileSlot].name, elapsedMs);
+        sprintf(pxyProfileEntries[profileSlot].text, "%s  %3.2f", pxyProfileEntries[profileSlot].name, elapsedMs);
     }
     return elapsedMs;
 }

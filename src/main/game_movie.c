@@ -503,7 +503,7 @@ INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B5618);
 extern GameSynopsisWaitState synopsisCrossfadeState;
 extern const char synopsisAlphaLabelFormat[];
 extern PadRecord PadData[2];
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 void seVoiceStartDefault(unsigned int handle);
 void sefFlagSetBit26(void);
 
@@ -524,9 +524,9 @@ int GameSynopsisCrossfadeWait(void)
         if (alpha > 128) {
             alpha = 128;
         }
-        GameMpeg2Play(labelBuffer, synopsisAlphaLabelFormat, 128 - alpha);
+        sprintf(labelBuffer, synopsisAlphaLabelFormat, 128 - alpha);
         moviePrintLabelValue(labelBuffer, synopsisCrossfadeState.crossfadeOutValue);
-        GameMpeg2Play(labelBuffer, synopsisAlphaLabelFormat, alpha);
+        sprintf(labelBuffer, synopsisAlphaLabelFormat, alpha);
         moviePrintLabelValue(labelBuffer, synopsisCrossfadeState.crossfadeInValue);
         if ((PadData[0].heldAndPressed & 0x800010c) == 0x800010c) {
             sefFlagSetBit26();

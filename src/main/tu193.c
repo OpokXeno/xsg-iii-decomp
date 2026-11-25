@@ -1,17 +1,17 @@
 #include "common.h"
 
 extern char *gFontEscapeBuffer;
-void GameMpeg2Play();
+void sprintf();
 
 typedef int s32;
 
 s32 streamSlotLoadFrame(s32 streamSlot);
 
-/* Calls GameMpeg2Play with the slot's file name, mnu\umn\<slot + 1>.jpg, and gFontEscapeBuffer. Returns that buffer address. */
+/* Calls sprintf with the slot's file name, mnu\umn\<slot + 1>.jpg, and gFontEscapeBuffer. Returns that buffer address. */
 s32 streamSlotLoadFrame(s32 streamSlot) {
     char moviePath[15] = "mnu\\umn\\%d.jpg";
 
-    GameMpeg2Play(gFontEscapeBuffer, moviePath, streamSlot + 1);
+    sprintf(gFontEscapeBuffer, moviePath, streamSlot + 1);
     return (s32) gFontEscapeBuffer;
 }
 

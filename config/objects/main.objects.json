@@ -142409,9 +142409,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "GameMpeg2Play",
+     "name": "sprintf",
      "size": 144,
-     "splat_name": "GameMpeg2Play",
+     "splat_name": "sprintf",
      "va": "0x0030e1b8",
      "name_basis": "address",
      "provenance": "estimated"

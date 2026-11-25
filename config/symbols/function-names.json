@@ -457,7 +457,7 @@
    "0x0030cef4": "memcpy",
    "0x0030d0a8": "memset",
    "0x0030d298": "printf",
-   "0x0030e1b8": "GameMpeg2Play",
+   "0x0030e1b8": "sprintf",
    "0x0030e68c": "strcmp",
    "0x0030e7d0": "strcpy",
    "0x0030e8e4": "strlen",

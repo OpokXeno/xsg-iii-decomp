@@ -34,7 +34,7 @@ char *xglDebFileBufferSize(char *resource) {
 }
 
 /* Sprintf-shaped varargs callee; the link name of 0x0030E1B8 (test_050.c declares it the same way). */
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 
 /* Kind-prefix pointer table at 0x004AD6A0 (scaffold data of this TU). */
 extern char *srsEffectKindPrefix[4];
@@ -46,18 +46,18 @@ void srsFormatEffectStem(int effectNo, char *stemBuffer, int withSubNo)
     int effectSub = effectNo & 0x3ff;
 
     if (effectNo < 0) {
-        GameMpeg2Play(stemBuffer, "bad effect no:%d", effectNo);
+        sprintf(stemBuffer, "bad effect no:%d", effectNo);
         return;
     }
     if (effectKind == 3) {
-        GameMpeg2Play(stemBuffer, "%s%04d", srsEffectKindPrefix[3], effectNo & 0x0fffffff);
+        sprintf(stemBuffer, "%s%04d", srsEffectKindPrefix[3], effectNo & 0x0fffffff);
         return;
     }
     if (withSubNo != 0) {
-        GameMpeg2Play(stemBuffer, "%s%03d_%03d", srsEffectKindPrefix[effectKind], effectIndex, effectSub);
+        sprintf(stemBuffer, "%s%03d_%03d", srsEffectKindPrefix[effectKind], effectIndex, effectSub);
         return;
     }
-    GameMpeg2Play(stemBuffer, "%s%03d", srsEffectKindPrefix[effectKind], effectIndex);
+    sprintf(stemBuffer, "%s%03d", srsEffectKindPrefix[effectKind], effectIndex);
 }
 
 s32 sefMakeEffectHandle(s32 kind, s32 index, s32 sub);
@@ -177,18 +177,18 @@ char *srsBuildAssetName(char *name, s32 isLoaded)
     if (isLoaded != 0) {
         if (name[0] == 'c' && name[1] == 'e' && (nameSixthChar = name[6]) == '9' && (nameSeventhChar = name[7]) == nameSixthChar && name[8] == nameSeventhChar) {
             position = func_00181C18(0);
-            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatCeRepeatTag, position, (position >> 8) & 0xFFFF, name);
+            sprintf(gSrsAssetNameBuffer, gSrsAssetFormatCeRepeatTag, position, (position >> 8) & 0xFFFF, name);
         } else {
-            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatCdChars, name[0], name[1], name[2], name);
+            sprintf(gSrsAssetNameBuffer, gSrsAssetFormatCdChars, name[0], name[1], name[2], name);
         }
     } else if (name[0] == 'e' && name[1] == 'f') {
         position = func_00181C18(0);
-        GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatEfPosition, position, (position >> 8) & 0xFFFF, name);
+        sprintf(gSrsAssetNameBuffer, gSrsAssetFormatEfPosition, position, (position >> 8) & 0xFFFF, name);
         if (xglCdGetFileSize(gSrsAssetNameBuffer) < 0) {
-            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatEfFallback, name);
+            sprintf(gSrsAssetNameBuffer, gSrsAssetFormatEfFallback, name);
         }
     } else {
-        GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatNameOnly, name);
+        sprintf(gSrsAssetNameBuffer, gSrsAssetFormatNameOnly, name);
     }
     return gSrsAssetNameBuffer;
 }

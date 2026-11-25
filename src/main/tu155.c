@@ -125,7 +125,7 @@ s32 xglFontPrintExtendedColorByte(s32, s32, s32, s32);
 s32 func_00A85160(u8 itemId, u8 quantity);
 s32 *func_A87550(s32 recordNumber);
 const char *messageTextGet(s32 id);
-void GameMpeg2Play(char *moviePath, const char *format, s32 movieName);
+void sprintf(char *moviePath, const char *format, s32 movieName);
 extern char *gFontEscapeBuffer;
 
 /* Draws one row of the battle result list for entry `slot`: the message with its fade-in when the entry has
@@ -204,7 +204,7 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
                                      0xFE & (-128 - ((((u8) gBudgetDisplayBlock->messageFade[rowIndex]) - 64) << 1)));
         }
         xglFontSetColor(90, 91, 172);
-        GameMpeg2Play(gFontEscapeBuffer, messageTextGet(150), messageText);
+        sprintf(gFontEscapeBuffer, messageTextGet(150), messageText);
         xglFontPrintIndexed(315, ((baseX - 0x71F8) >> 4) + 15, gFontEscapeBuffer);
         xglFontPrintAlphaCommand(68, 0, 128);
         return;
@@ -414,7 +414,7 @@ void budgetDisplayDrawPage(void) {
                 if (text != 0) {
                     xglFontPrintIndexed(74, rect[1], text);
                 }
-                GameMpeg2Play(gFontEscapeBuffer, "%d", gBudgetDisplayBlock->recordAmount[i]);
+                sprintf(gFontEscapeBuffer, "%d", gBudgetDisplayBlock->recordAmount[i]);
                 xglFontPrintIndexed(400, rect[1], gFontEscapeBuffer);
                 text = messageTextGet(154);
                 xglFontPrintIndexed(417, rect[1], text);

@@ -8,7 +8,7 @@
 
 void *memset(void *destination, int value, unsigned int count);
 
-void GameMpeg2Play(const char *name);
+void sprintf(const char *name);
 u8 *resCmdMpeg2(u8 *cursor);
 
 struct Func430Row {
@@ -172,7 +172,7 @@ extern struct McScreen *gSaveScreen;
 /* Formats text (a messageTextGet result) with value into the screen message; clears the message when text is 0. */
 void saveScreenSetFormattedMessage(int text, int value) {
     if (text != 0) {
-        ((void (*)()) GameMpeg2Play)(&gSaveScreen->message[0], text, value);
+        ((void (*)()) sprintf)(&gSaveScreen->message[0], text, value);
         return;
     }
     gSaveScreen->message[0] = 0;
@@ -253,7 +253,7 @@ void saveScreenSetMessage(s32 sheetIndex) {
  * resCmd handlers do.
  */
 u8 *resCmdMpeg2(u8 *cursor) {
-    GameMpeg2Play(cursor);
+    sprintf(cursor);
     return cursor;
 }
 
@@ -1586,7 +1586,7 @@ s32 saveScreenPlayTitleMovie(s32 fileBuffer, s32 fileNumber) {
         titleText = messageTextGet(641);
     }
     labelText = messageTextGet(630);
-    ((int (*)(char *destination, ...)) GameMpeg2Play)(movieName, labelText,
+    ((int (*)(char *destination, ...)) sprintf)(movieName, labelText,
                                                       messageTextGet(battleRosterCursorEntryIdGet(0) + 679),
                                                       tensText, onesText, titleText);
     return func_001894A0(fileBuffer, fileNumber, movieName);
