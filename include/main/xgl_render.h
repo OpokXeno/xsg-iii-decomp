@@ -68,11 +68,13 @@ typedef struct XglRenderStateBlock {
     unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
-    unsigned short work_buffer_base;    /* +0x0E: the third full-screen page (X2 work_buffer_base; label movieBackdropBasePage) */
+    /* +0x0E: the third full-screen page (X2 work_buffer_base; label movieBackdropBasePage) */
+    unsigned short work_buffer_base;
     unsigned short aux_page;            /* +0x10: a VRAM page func_0019A6F0 sets; no reader in this build */
     unsigned short texture_base;        /* +0x12: the texture buffer page (Packet.c's texture transfer) */
     unsigned short aux_page2;           /* +0x14: a VRAM page func_0019A6F0 sets; no reader in this build */
-    unsigned short display_buffer_base; /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame */
+    /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame */
+    unsigned short display_buffer_base;
     unsigned short flip_base;           /* +0x18: the next display page (X2 sRenderFlipBase) */
     unsigned char unmodeled_1a[2];      /* +0x1A..+0x1B */
     XglRenderFadeCallback finalPacketCallbacks[RENDER_FINAL_CALLBACK_COUNT]; /* +0x1C: run by xglRenderFinalPacket */
@@ -83,13 +85,15 @@ typedef struct XglRenderStateBlock {
     unsigned char unmodeled_77;         /* +0x77 */
     unsigned short frame_count;         /* +0x78: advanced by frame_delta on every base swap */
     unsigned short vsync_tick_count;    /* +0x7A: VSyncs since the last render move (X2 xglRenderVSyncTickCount) */
-    short skipped_frame_count;          /* +0x7C: half the ticks minus one, at least 0 (X2 xglRenderSkippedFrameCount) */
+    /* +0x7C: half the ticks minus one, at least 0 (X2 xglRenderSkippedFrameCount) */
+    short skipped_frame_count;
     unsigned char unmodeled_7e[2];      /* +0x7E..+0x7F */
     /* +0x80 / +0x81: the video mode xglRenderScanLineInit resets the GS with (PAL, else 480p when
      * progressiveMode is set, else NTSC interlaced); xglRenderStart sets +0x81 (xglRenderStartFlag). */
     unsigned char palMode;              /* +0x80 */
     unsigned char progressiveMode;      /* +0x81 */
-    unsigned char movieMode;            /* +0x82: the base swap sends the movie frame instead of swapping pages (label gXglRenderFadeDisabled) */
+    /* +0x82: the base swap sends the movie frame instead of swapping pages (label gXglRenderFadeDisabled) */
+    unsigned char movieMode;
     unsigned char unmodeled_83;         /* +0x83 */
     unsigned char syncBacklogFull;      /* +0x84 */
 } XglRenderStateBlock;

@@ -45,7 +45,8 @@ typedef union SoundChannelState {
     } bytes;
 } SoundChannelState;
 
-/* Channels in the assignment table of the record block (soundApplySettings counts its channel states with SOUND_CHANNEL_COUNT). */
+/* Channels in the assignment table of the record block (soundApplySettings counts its channel states with
+ * SOUND_CHANNEL_COUNT). */
 #define SOUND_ASSIGN_COUNT 0x118
 /* The songs with a swapped channel bank keep three banks of SOUND_BANK_CHANNELS channels from
  * SOUND_LIVE_BANK in the save area from SOUND_SAVED_BANK, which runs past the channel table. */
@@ -792,7 +793,8 @@ void func_0018FAC8(int song)
     if ((unsigned char) (gSoundRecordBlock.current_song - SOUND_BANK_SONG_FIRST) < SOUND_BANK_SONG_RUN
         || gSoundRecordBlock.current_song == SOUND_BANK_SONG_LAST) {
         for (i = 0; i < SOUND_BANK_CHANNELS; i++) {
-            gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i] = gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i];
+            gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i] =
+                gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i];
             gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + SOUND_BANK_CHANNELS + i] =
                 gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + SOUND_BANK_CHANNELS + i];
             gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + 2 * SOUND_BANK_CHANNELS + i] =
@@ -801,7 +803,8 @@ void func_0018FAC8(int song)
     }
     if ((unsigned int) (song - SOUND_BANK_SONG_FIRST) < SOUND_BANK_SONG_RUN || song == SOUND_BANK_SONG_LAST) {
         for (i = 0; i < SOUND_BANK_CHANNELS; i++) {
-            gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i] = gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i];
+            gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + i] =
+                gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + i];
             gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + SOUND_BANK_CHANNELS + i] =
                 gSoundRecordBlock.channelAssign[SOUND_SAVED_BANK + SOUND_BANK_CHANNELS + i];
             gSoundRecordBlock.channelAssign[SOUND_LIVE_BANK + 2 * SOUND_BANK_CHANNELS + i] =

@@ -24,7 +24,7 @@ void func_0018E4C0(char *path, const char *dirName, const char *fileName, const 
     CdFilePosition position;
     char *cursor;
     const char *src;
-    char c;
+    char character;
 
     path[0] = 's';
     path[1] = 'n';
@@ -37,11 +37,11 @@ void func_0018E4C0(char *path, const char *dirName, const char *fileName, const 
     }
     *cursor++ = SOUND_PATH_SEPARATOR;
     src = fileName;
-    while ((c = *src++) != 0) {
-        if (c == '/') {
-            c = SOUND_PATH_SEPARATOR;
+    while ((character = *src++) != 0) {
+        if (character == '/') {
+            character = SOUND_PATH_SEPARATOR;
         }
-        *cursor++ = c;
+        *cursor++ = character;
     }
     src = ext;
     while ((*cursor++ = *src++) != 0) {

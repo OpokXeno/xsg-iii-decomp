@@ -131,7 +131,8 @@ void func_00199A20(void)
     func_002F4898(pCurrentPacket);
     FlushCache(0);
     if (xglPacketSendMode != 0) {
-        fPacket = (float) (func_002F48F0(pCurrentPacket) << 4) / (float) (pCurrentPacket->limit - pCurrentPacket->buffer);
+        fPacket = (float) (func_002F48F0(pCurrentPacket) << 4)
+                  / (float) (pCurrentPacket->limit - pCurrentPacket->buffer);
         if (!(fPacket < PACKET_FULL_RATIO)) {
             func_001936A8(packetFullCondition, packetSourceFile, PACKET_MOVE_ASSERT_LINE, packetFullMessage);
         }
