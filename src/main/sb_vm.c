@@ -559,7 +559,7 @@ int sbImageLinkImports(struct SbImageHeader *image, struct SbImageHeader *librar
     return 1;
 }
 
-int func_0030E68C(const char *a, const char *b);
+int strcmp(const char *a, const char *b);
 
 /* Native id of a method: owner index in the high half, method index in the low half; -1 when the owner or the method is not registered. */
 int sbFindNative(const char *ownerName, const char *methodName)
@@ -568,9 +568,9 @@ int sbFindNative(const char *ownerName, const char *methodName)
     int method;
 
     for (owner = 0; owner < sbNativeOwnerCount; owner++) {
-        if (func_0030E68C(ownerName, sbNativeOwners[owner].name) == 0) {
+        if (strcmp(ownerName, sbNativeOwners[owner].name) == 0) {
             for (method = 0; method < sbNativeOwners[owner].count; method++) {
-                if (func_0030E68C(methodName, D_00616CC4[owner][0][method].name) == 0) {
+                if (strcmp(methodName, D_00616CC4[owner][0][method].name) == 0) {
                     return (owner << 16) + method;
                 }
             }
@@ -728,7 +728,7 @@ int sbNameTableFind(struct SbImageHeader *image, const char *name)
     nameBase = nameBase + sbNameTable(image)[0];
     nameEntries = (SbNameEntry *)nameBase;
     for (; nameIndex < nameCount; nameIndex++) {
-        if (func_0030E68C(name, nameBase + nameEntries[nameIndex].name_offset) == 0) {
+        if (strcmp(name, nameBase + nameEntries[nameIndex].name_offset) == 0) {
             return nameEntries[nameIndex].entryPc;
         }
     }

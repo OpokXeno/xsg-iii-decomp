@@ -142463,9 +142463,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0030E68C",
+     "name": "strcmp",
      "size": 324,
-     "splat_name": "func_0030E68C",
+     "splat_name": "strcmp",
      "va": "0x0030e68c",
      "name_basis": "address",
      "provenance": "estimated"
@@ -142499,9 +142499,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0030EBD0",
+     "name": "strncmp",
      "size": 440,
-     "splat_name": "func_0030EBD0",
+     "splat_name": "strncmp",
      "va": "0x0030ebd0",
      "name_basis": "address",
      "provenance": "estimated"

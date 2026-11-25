@@ -90,7 +90,7 @@ s32 GameMpeg2Play();
 s32 func_00248060();
 void movieTextWindowInitAlt(const char *text);
 s32 movieFileRequestAlt(const char *fileName);
-s32 func_0030E68C();
+s32 strcmp();
 s32 memset();
 
 void movieDecodeToFixedAlt(void) {
@@ -98,7 +98,7 @@ void movieDecodeToFixedAlt(void) {
 
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInitAlt(D_00550D68);
-    if ((movieFileRequestAlt(D_003EBA80) == 1) && (func_0030E68C(D_005A7F6C, D_00550D70) != 0)) {
+    if ((movieFileRequestAlt(D_003EBA80) == 1) && (strcmp(D_005A7F6C, D_00550D70) != 0)) {
         GameMpeg2Play(formattedMessage, D_0053AEC0, D_00550D68, D_005A7F6C);
         func_00248060(&D_00550D5C, formattedMessage);
     }
@@ -113,7 +113,7 @@ void movieDecodeToSlotAlt(void) {
 
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInitAlt(D_00550D68);
-    if ((movieFileRequestAlt(D_003EBA80) == 1) && (func_0030E68C(D_005A7F6C, D_00550D70) != 0)) {
+    if ((movieFileRequestAlt(D_003EBA80) == 1) && (strcmp(D_005A7F6C, D_00550D70) != 0)) {
         GameMpeg2Play(formattedMessage, D_0053AEC0, D_00550D68, D_005A7F6C);
         func_002483C8(&D_005A7D10[D_00550D58], formattedMessage);
     }

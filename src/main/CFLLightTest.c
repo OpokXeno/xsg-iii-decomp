@@ -501,7 +501,7 @@ void movieTextWindowInit(const char *text);
 
 s32 movieFileRequest(const char *fileName);
 
-s32 func_0030E68C();
+s32 strcmp();
 
 s32 func_0030E8E4();
 
@@ -517,7 +517,7 @@ void movieFileLoadNext(void) {
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInit(gMovieMessageText);
     if (movieFileRequest(gMovieSourceFileName) == 1) {
-        if (func_0030E68C(gMovieFileNameStorage, "")) {
+        if (strcmp(gMovieFileNameStorage, "")) {
             char *scanStart = gMovieSourceFileName - 1;
             char *baseNameStart;
 
@@ -549,7 +549,7 @@ void movieDecodeToFixed(void) {
 
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInit(gMovieMessageText);
-    if ((movieFileRequest(gMovieSourceFileName) == 1) && (func_0030E68C(gMovieFileNameStorage, "") != 0)) {
+    if ((movieFileRequest(gMovieSourceFileName) == 1) && (strcmp(gMovieFileNameStorage, "") != 0)) {
         GameMpeg2Play(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
         cflLightTestViewLoadPxyTxy(&gMovieFixedSlot, formattedMessage);
     }
@@ -562,7 +562,7 @@ void movieDecodeToSlot(void) {
 
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInit(gMovieMessageText);
-    if ((movieFileRequest(gMovieSourceFileName) == 1) && (func_0030E68C(gMovieFileNameStorage, "") != 0)) {
+    if ((movieFileRequest(gMovieSourceFileName) == 1) && (strcmp(gMovieFileNameStorage, "") != 0)) {
         GameMpeg2Play(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
         cflLightTestViewReloadXap(&gMovieSlotTable.movieSlots[gMovieSlotIndex].actor, formattedMessage);
     }
@@ -593,7 +593,7 @@ void moviePlaybackDrawText(s32 x, s32 y) {
     char infoText[0x40];
     MovieSlotPlayback *actor = gMovieSlotTable.movieSlots[gMovieSlotIndex].actor;
 
-    if (func_0030E68C(gMovieSlotTable.movieSlots[gMovieSlotIndex].fileName, "")) {
+    if (strcmp(gMovieSlotTable.movieSlots[gMovieSlotIndex].fileName, "")) {
         GameMpeg2Play(infoText, "ID %3d Name %s", gMovieSlotIndex,
                       gMovieSlotTable.movieSlots[gMovieSlotIndex].fileName);
     } else {

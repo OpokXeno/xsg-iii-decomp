@@ -374,19 +374,25 @@
     {
      "range": [
       "0x00540250",
-      "0x005402c0"
+      "0x00540360"
      ],
      "generated": [
       "0x00540250",
-      "0x005402c0"
+      "0x0054035c"
      ],
      "generated_by": [
-      "xglMcStartQueuedRequest",
-      "xglMcAdvanceCreateRequest"
+      "xglMcAdvanceCreateRequest",
+      "xglMcMain",
+      "xglMcStartQueuedRequest"
      ],
      "c_owned_symbols": [
       "jtbl_00540250",
-      "jtbl_00540280"
+      "jtbl_00540280",
+      "D_005402C0",
+      "D_005402D0",
+      "jtbl_005402F0",
+      "jtbl_00540320",
+      "jtbl_00540340"
      ],
      "also_referenced_by_c": [],
      "basis": {

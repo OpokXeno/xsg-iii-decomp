@@ -249,6 +249,7 @@
    "0x0089b880": "xglMcQueue",
    "0x0089be44": "xglMcCardState",
    "0x0089be48": "xglMcCardStatusWord",
+   "0x0089bec4": "savedMcRequest",
    "0x008bbfb0": "sdvSpecialBuf",
    "0x008c06b0": "pxyProfileEntries",
    "0x008c2bf8": "pxyCurrentLight",

@@ -92,7 +92,7 @@ typedef struct ShapeRectExtent {
 } ShapeRectExtent;
 
 float MMathCalcLengthXZ(ExtentVector *vector);
-int func_0030EBD0(const char *left, const char *right, unsigned int length);
+int strncmp(const char *left, const char *right, unsigned int length);
 
 /* Fills the extents shape of an actor from its name record: the footprint is looked up by
  * the nameRecord's shapeKind in one of three tables (square, circle, rectangle) and scaled by 5.0
@@ -117,11 +117,11 @@ int actorExtentShapeFromName(ActorExtentShape *shape, char *name) {
         return 1;
     }
     scale = name[0] == 'r' ? 5.0f : 1.0f;
-    if (func_0030EBD0(name, "ck_", 3) == 0 || func_0030EBD0(name, "rk_", 3) == 0) {
+    if (strncmp(name, "ck_", 3) == 0 || strncmp(name, "rk_", 3) == 0) {
         shape->keepsSlotFlags = 1;
     }
     while (nameRecord->name != 0) {
-        if (func_0030EBD0(nameRecord->name, name, 7) != 0) {
+        if (strncmp(nameRecord->name, name, 7) != 0) {
             nameRecord++;
             continue;
         }
@@ -147,7 +147,7 @@ int actorExtentShapeFromName(ActorExtentShape *shape, char *name) {
             shape->angle58 = nameRecord->recordAngleThird;
             shape->angle50 = nameRecord->recordAngleFirst;
             shape->angle54 = gShapeAngleSecondTable[nameRecord->recordAngleSecondIndex];
-            if (func_0030EBD0(name + 2, "_sp", 3) == 0) {
+            if (strncmp(name + 2, "_sp", 3) == 0) {
                 shape->angle54 = 0;
                 shape->angle58 = SHAPE_ANGLE_CODE_NONE;
             }

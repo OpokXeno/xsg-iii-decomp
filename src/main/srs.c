@@ -62,7 +62,7 @@ void srsFormatEffectStem(int effectNo, char *stemBuffer, int withSubNo)
 
 s32 sefMakeEffectHandle(s32 kind, s32 index, s32 sub);
 
-s32 func_0030E68C(signed char *text, const signed char *other);
+s32 strcmp(signed char *text, const signed char *other);
 
 extern const signed char gSrsEffectFileExtension[];
 
@@ -85,7 +85,7 @@ s32 srsParseEffectFileName(char *fileName) {
     }
     hasDotExtension = fileName[fileNameLength - 4] == '.';
     if (hasDotExtension) {
-        suffixMatches = func_0030E68C(fileName + fileNameLength - 3, gSrsEffectFileExtension) == 0;
+        suffixMatches = strcmp(fileName + fileNameLength - 3, gSrsEffectFileExtension) == 0;
     } else {
         suffixMatches = fileName[fileNameLength - 4] != '_';
     }
@@ -376,7 +376,7 @@ extern SvTypeList svResourceTypeLists[];
 
 void srsFormatEffectStem(int effectNo, char *buffer, int flag);
 
-int func_0030EBD0(const char *left, const char *right, unsigned int length);
+int strncmp(const char *left, const char *right, unsigned int length);
 
 /* Finds the entry of a mapper whose name starts with the stem of effectId; *effectTypeKind receives the record's type kind. */
 SvTypeListEntry *svFindEffectEntryByStem(int mapperIndex, int effectId, int *effectTypeKind);
@@ -424,7 +424,7 @@ SvTypeListEntry *svFindEffectEntryByStem(int mapperIndex, int effectId, int *eff
         if (mapperTypeList->entries[mapperEntryIndex].used != 0 &&
             mapperTypeList->entries[mapperEntryIndex].resourceKind == 5 &&
             mapperTypeList->entries[mapperEntryIndex].name != (char *) -1) {
-            if (func_0030EBD0(stem, mapperTypeList->entries[mapperEntryIndex].name, func_0030E8E4(stem)) ==
+            if (strncmp(stem, mapperTypeList->entries[mapperEntryIndex].name, func_0030E8E4(stem)) ==
                 0) {
                 if (effectTypeKind != 0) {
                     *effectTypeKind = mapperTypeList->typeKind;

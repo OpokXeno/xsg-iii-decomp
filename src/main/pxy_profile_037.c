@@ -16,7 +16,7 @@ typedef struct PxyProfileEntry {
 
 /* The profile slots, scaffold .bss at 0x008C06B0. */
 extern PxyProfileEntry pxyProfileEntries[PXY_ENTRY_COUNT];
-int func_0030E68C(const char *, const char *);
+int strcmp(const char *, const char *);
 char *strcpy(char *, const char *);
 int GameMpeg2Play(char *destination, const char *format, ...);
 
@@ -40,7 +40,7 @@ void pxyProfileBegin(const char *name)
     profileSlot = -1;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -75,7 +75,7 @@ float pxyProfileEnd(const char *name)
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -103,7 +103,7 @@ float func_0019CBB0(const char *name)
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -129,7 +129,7 @@ float pxyProfileGetMs(const char *name)
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -154,7 +154,7 @@ float pxyProfileGetMsUnchecked(const char *name)
     profileSlot = -1;
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
-        if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+        if (strcmp(pxyProfileEntries[i].name, name) == 0) {
             profileSlot = i;
             break;
         }

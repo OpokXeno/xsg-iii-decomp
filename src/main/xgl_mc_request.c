@@ -52,13 +52,19 @@ extern McQueueEntry xglMcQueue[16];
 
 /* The icon.sys contents the create request keeps (sizeof(sceMcIconSys) bytes, byte aligned). */
 typedef struct McIconSys {
-    unsigned char contents[0x3C4];
+    unsigned char header[0x1C4];   /* +0x000: the sceMcIconSys fields up to the delete icon name */
+    unsigned char reserved[0x200]; /* +0x1C4: the reserved tail, cleared before a save writes icon.sys */
 } McIconSys;
 
 /* Memory-card state block at xglMcCardState. */
 typedef struct XglMcCardState {
-    unsigned char requestPhase;            /* +0x00: phase of the request requestPhase machine */
-    unsigned char substate;         /* +0x01: step inside the current state, cleared per request */
+    union {
+        struct {
+            unsigned char requestPhase; /* +0x00: phase of the request requestPhase machine */
+            unsigned char substate;     /* +0x01: step inside the current state, cleared per request */
+        };
+        unsigned short phaseAndStep;    /* +0x00: requestPhase | substate << 8 (MC_PHASE_STEP) */
+    };
     unsigned char unmodeled_02[1];
     unsigned char next_card;        /* +0x03: bit 0 is the card the next status poll asks about */
     union {
@@ -229,8 +235,9 @@ typedef struct McScanWork {
     unsigned char cardScanState[100];   /* +0x00: per card number: 1 present, 2 read */
     unsigned char latest;      /* +0x64: card number with the newest time stamp */
     unsigned char scanStatus;      /* +0x65 */
-    unsigned char has_icon;    /* +0x66: the card's folder holds a full icon.sys */
-    unsigned char unmodeled_67[0x2000 - 0x67];
+    unsigned char saveCount;   /* +0x66: cards with a full save, counted by a counting list request */
+    unsigned char iconFlags;   /* +0x67: MC_ICON_SYS_FOUND / MC_SAVE_FILE_FOUND of the card's folder */
+    unsigned char unmodeled_68[0x2000 - 0x68];
     /* +0x2000: the file contents (up to MC_OLD_SAVE_BYTES for check-old), then the bytes reported
      * from them at the start. */
     unsigned char saveContents[MC_OLD_SAVE_BYTES];
@@ -428,8 +435,18 @@ char *xglMcSetFullPath(int card, int selector)
 
 /* The memory-card state block starts at the splat label xglMcCardBlock, 0x3C4 bytes before xglMcCardState.
  * The request functions reach the state through this base; its first part is not modeled. */
+/* Entries of the directory read that checks for icon.sys after a read or write request. */
+#define MC_ICON_CHECK_ENTRIES 6
+
 typedef struct XglMcCardBlock {
-    McIconSys icon;
+    union {
+        McIconSys icon;
+        /* +0x200: the directory table of the icon.sys check (64-byte aligned for sceMcGetDir). */
+        struct {
+            unsigned char unmodeled_000[0x200];
+            McDirectoryEntry directory[MC_ICON_CHECK_ENTRIES];
+        } iconCheck;
+    };
     XglMcCardState cardState;
 } XglMcCardBlock;
 
@@ -682,7 +699,432 @@ int xglMcOpenNearestSave(void)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_mc_request", xglMcMain);
+/* xglMcCardState.requestPhase and .substate read together as one halfword (MC_PHASE_STEP). */
+#define MC_PHASE_STEP(phase, step) (((step) << 8) | (phase))
+/* The last check-old search mode (the fourth base path, xglMcOpenNearestSave). */
+#define MC_OLD_SEARCH_LAST 3
+/* Check-old mode 3: the flag byte of the save that marks a clear. */
+#define MC_OLD3_FLAG 0x50E6
+/* McScanWork.cardScanState: the card's save was read. */
+#define MC_SLOT_READ 2
+/* Scan step of a counting list request (activeRequest.file < 0): counts the cards with a full save. */
+#define MC_SCAN_COUNT 5
+/* McScanWork.iconFlags: the folder holds icon.sys (MC_ICON_SYS_FOUND) and the save file
+ * (MC_SAVE_FILE_FOUND), each with its full size. */
+#define MC_ICON_SYS_FOUND 1
+#define MC_SAVE_FILE_FOUND 2
+#define MC_SAVE_COMPLETE (MC_ICON_SYS_FOUND | MC_SAVE_FILE_FOUND)
+/* The save file of this game: its name prefix (the folder name) and its size. */
+#define MC_SAVE_NAME_LENGTH 17 /* "BASLUS-21389Xeno3" */
+#define MC_SAVE_FILE_BYTES 0x130B0
+/* Steps of a read or write request (xglMcCardState.substate). */
+#define MC_RW_OPENED 0
+#define MC_RW_TRANSFERRED 1
+#define MC_RW_OPEN_ICON 2
+#define MC_RW_WRITE_ICON 3
+#define MC_RW_ICON_WRITTEN 4
+#define MC_RW_LIST_FOLDER 5
+#define MC_RW_CHECK_ICON 6
+
+int sceMcClose(int fileDescriptor);
+int sceMcWrite(int fileDescriptor, const void *contents, int contentsSize);
+int strncmp(const char *left, const char *right, unsigned int length);
+
+/* XS2 xglMcMain: one step of the memory-card state machine. Without a finished card operation it
+ * returns the card status (busy while requests wait); otherwise it handles the result of the
+ * operation for the current request phase, starts the next queued request or the next status
+ * poll, and returns the status word. XS3 adds the save count of a counting list request, the
+ * save-file check of the list scan, and the icon.sys check after a read or write. */
+int xglMcMain(void)
+{
+    XglClock clock;
+    int command;
+    int result;
+    int sync;
+    short *status;
+    int stored;
+    McScanWork *list;
+    int (*callback)(int code, void *work);
+    McDirectoryEntry *directory;
+    McDirectoryEntry *scanEntry;
+    McDirectoryEntry *folderEntry;
+    int folderIndex;
+    unsigned int latest;
+    unsigned int timestamp;
+    int latestSlot;
+    int index;
+    int entry;
+    int slot;
+    int created;
+    int cardType;
+    int scan;
+    unsigned char card;
+    unsigned char phase;
+    void *transfer;
+    int size;
+    unsigned char *data;
+    int chosen;
+    int selected;
+    char *end;
+    McQueueEntry *request;
+    unsigned char *clearSlot;
+    int found;
+
+    sync = sceMcSync(1, &command, &result);
+    if (sync == 0) {
+        if (xglMcCardBlock.cardState.requestPhase == MC_STATE_POLL_INFO && xglMcQueueEnd == xglMcQueueTop) {
+            return xglMcCardBlock.cardState.card_status.combined;
+        }
+        return MC_STATUS_BUSY_BOTH;
+    }
+    if (sync == -1) {
+        result = 0;
+        command = 0;
+    }
+    switch (xglMcCardBlock.cardState.requestPhase) {
+    case MC_STATE_POLL_INFO:
+        if (xglMcQueueEnd == xglMcQueueTop) {
+            status = &xglMcCardBlock.cardState.card_status.perCardStatus[xglMcCardBlock.cardState.fileDescriptor];
+            switch (xglMcCardBlock.cardState.card_type) {
+            case MC_TYPE_PS1:
+                *status = MC_STATUS_PS1_CARD;
+                break;
+            case MC_TYPE_PS2:
+                *status = MC_STATUS_READY;
+                break;
+            case MC_TYPE_POCKETSTATION:
+                *status = MC_STATUS_POCKETSTATION;
+                break;
+            default:
+                *status = MC_STATUS_NONE;
+                break;
+            }
+            if (result == -1 || result == -2) {
+                *status = MC_STATUS_ERROR;
+            } else {
+                cardType = xglMcCardBlock.cardState.card_type;
+                if (cardType == MC_TYPE_PS2 && result == 0 && xglMcCardBlock.cardState.formatted == 0) {
+                    *status = MC_STATUS_UNFORMATTED;
+                }
+            }
+        }
+        xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+    case MC_STATE_IDLE:
+        if (xglMcQueueEnd != xglMcQueueTop) {
+            request = &xglMcQueue[xglMcQueueTop];
+            savedMcRequest = *request;
+            xglMcStartQueuedRequest(request);
+            xglMcQueueTop = (xglMcQueueTop + 1) & MC_QUEUE_MASK;
+            return MC_STATUS_BUSY_BOTH;
+        }
+        card = xglMcCardBlock.cardState.next_card & 1;
+        xglMcCardBlock.cardState.fileDescriptor = card;
+        sceMcGetInfo(card, 0, &xglMcCardBlock.cardState.card_type, 0, &xglMcCardBlock.cardState.formatted);
+        xglMcCardBlock.cardState.requestPhase = MC_STATE_POLL_INFO;
+        xglMcCardBlock.cardState.next_card ^= 1;
+        break;
+    case MC_STATE_OPEN_CLOSE:
+        *xglMcCardBlock.cardState.activeRequest.callerResult = result;
+        xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+        if (result < 0) {
+            break;
+        }
+        sceMcClose(result);
+        return MC_STATUS_BUSY_BOTH;
+    case MC_STATE_EXIST_SCAN:
+    case MC_STATE_LIST:
+    case MC_STATE_CHECK_OLD:
+        list = (McScanWork *)xglMcCardBlock.cardState.activeRequest.bufferAddress;
+        callback = xglMcCardBlock.cardState.activeRequest.callback;
+        while ((stored = result) < 0) {
+            if (xglMcCardBlock.cardState.phaseAndStep == MC_PHASE_STEP(MC_STATE_CHECK_OLD, MC_SCAN_READ)
+                && xglMcCardBlock.cardState.activeRequest.file == MC_OLD_SEARCH_LAST) {
+                list->scanStatus = MC_LIST_FAILED;
+                if (result >= MC_RESULT_SOFT_LIMIT) {
+                    callback(MC_CALLBACK_NO_DATA, list);
+                } else {
+                    callback(MC_CALLBACK_ERROR, list);
+                }
+            } else {
+                if (stored >= MC_RESULT_SOFT_LIMIT
+                    && (xglMcCardBlock.cardState.substate == MC_SCAN_REPORT
+                        || xglMcCardBlock.cardState.substate == MC_SCAN_ICON_CHECK)) {
+                    break;
+                }
+                if (xglMcCardBlock.cardState.requestPhase == MC_STATE_EXIST_SCAN) {
+                    break;
+                }
+                if (xglMcCardBlock.cardState.substate == MC_SCAN_READ) {
+                    break;
+                }
+                if (xglMcCardBlock.cardState.substate == MC_SCAN_COUNT) {
+                    break;
+                }
+                list->scanStatus = MC_LIST_FAILED;
+                callback(MC_CALLBACK_ERROR, list);
+            }
+            xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+            return MC_STATUS_BUSY_BOTH;
+        }
+        switch (xglMcCardBlock.cardState.substate) {
+        case MC_SCAN_DIRECTORY:
+            *xglMcCardBlock.cardState.activeRequest.callerResult = stored;
+            /* Clears the slot table, latest, status and the save count. */
+            index = MC_LATEST_SLOT_INDEX + 2;
+            clearSlot = &list->saveCount;
+            do {
+                index--;
+                *clearSlot = 0;
+                clearSlot--;
+            } while (index >= 0);
+            if (result > 0) {
+                directory = (McDirectoryEntry *)MC_DIRECTORY_TABLE((unsigned int)list);
+                latest = 0;
+                index = 0;
+                latestSlot = 0;
+                while (index < result) {
+                    slot = 0;
+                    for (end = directory->name; *end != 0; end++) {
+                    }
+                    if ((end[-2] & 0xF0) == '0' && (end[-1] & 0xF0) == '0') {
+                        slot = end[-2] * 10 + end[-1] - ('0' * 10 + '0');
+                    }
+                    list->cardScanState[slot] = MC_SLOT_WANTED;
+                    clock.year = directory->year;
+                    clock.month = directory->month;
+                    clock.day = directory->day;
+                    clock.hour = directory->hour;
+                    clock.minute = directory->minute;
+                    clock.second = directory->seconds;
+                    clock.status = 0;
+                    timestamp = xglClockDayTime2UInt(&clock);
+                    if (latest < timestamp) {
+                        latest = timestamp;
+                        latestSlot = slot;
+                    }
+                    index++;
+                    directory++;
+                }
+                list->latest = latestSlot;
+                list->scanStatus = MC_LIST_FOUND;
+            }
+            if (xglMcCardBlock.cardState.requestPhase == MC_STATE_EXIST_SCAN) {
+                xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+            } else if (xglMcCardBlock.cardState.requestPhase == MC_STATE_LIST) {
+                chosen = callback(MC_CALLBACK_DIRECTORY, list);
+                if (chosen < 0) {
+                    chosen = list->latest;
+                }
+                xglMcCardBlock.cardState.selector = chosen;
+            } else {
+                xglMcCardBlock.cardState.selector = list->latest;
+            }
+            xglMcCardBlock.cardState.substate = MC_SCAN_NEXT_CARD;
+            return MC_STATUS_BUSY_BOTH;
+        case MC_SCAN_REPORT:
+            selected = -1;
+            if (xglMcCardBlock.cardState.fileDescriptor >= 0) {
+                sceMcClose(xglMcCardBlock.cardState.fileDescriptor);
+            }
+            list->cardScanState[xglMcCardBlock.cardState.card] = MC_SLOT_READ;
+            if (xglMcCardBlock.cardState.requestPhase == MC_STATE_LIST) {
+                if (list->iconFlags == 0) {
+                    memset(list->saveContents, 0, xglMcCardBlock.cardState.activeRequest.contentsSize);
+                }
+                selected = callback(xglMcCardBlock.cardState.card, list->saveContents);
+            } else {
+                data = list->saveContents;
+                switch ((unsigned int)xglMcCardBlock.cardState.activeRequest.file) {
+                case 0:
+                case 1:
+                    data[0] = 0;
+                    if (data[MC_OLD_CLEAR_FLAG] == MC_OLD_CLEAR_VALUE) {
+                        data[0] = 1;
+                    }
+                    list->saveContents[1] = data[MC_OLD_INFO_1];
+                    list->saveContents[2] = data[MC_OLD_INFO_2];
+                    list->saveContents[3] = data[MC_OLD_INFO_3];
+                    list->saveContents[4] = 0;
+                    list->saveContents[5] = data[MC_OLD_INFO_5];
+                    list->saveContents[6] = data[MC_OLD_INFO_6];
+                    list->saveContents[7] = data[MC_OLD_INFO_7];
+                    break;
+                case 2:
+                    data[0] = data[MC_OLD2_FLAG];
+                    list->saveContents[1] = data[MC_OLD2_INFO_1];
+                    break;
+                case MC_OLD_SEARCH_LAST:
+                    data[0] = 0;
+                    if (data[MC_OLD3_FLAG] != 0) {
+                        data[0] = 1;
+                    }
+                    break;
+                }
+                callback(xglMcCardBlock.cardState.activeRequest.file, data);
+            }
+            if (selected >= 0) {
+                xglMcCardBlock.cardState.selector = selected;
+            }
+            xglMcCardBlock.cardState.substate = MC_SCAN_NEXT_CARD;
+            return MC_STATUS_BUSY_BOTH;
+        case MC_SCAN_NEXT_CARD:
+            if (xglMcCardBlock.cardState.requestPhase == MC_STATE_LIST) {
+                scan = xglMcStartDirectoryScan();
+                xglMcCardBlock.cardState.substate = MC_SCAN_ICON_CHECK;
+            } else {
+                scan = xglMcOpenNearestSave();
+                xglMcCardBlock.cardState.substate = MC_SCAN_READ;
+            }
+            switch (scan) {
+            case 0:
+                return MC_STATUS_BUSY_BOTH;
+            case -1:
+                xglMcCardBlock.cardState.substate = MC_SCAN_DIRECTORY;
+                return MC_STATUS_BUSY_BOTH;
+            case 1:
+                list->scanStatus = MC_LIST_FAILED;
+                callback(MC_CALLBACK_NO_DATA, list);
+                if (xglMcCardBlock.cardState.activeRequest.file < 0) {
+                    *xglMcCardBlock.cardState.activeRequest.callerResult = list->saveCount;
+                }
+                xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+                break;
+            }
+            break;
+        case MC_SCAN_READ:
+            xglMcCardBlock.cardState.fileDescriptor = result;
+            if (result >= 0) {
+                if (xglMcCardBlock.cardState.requestPhase == MC_STATE_LIST) {
+                    sceMcRead(stored, list->saveContents, xglMcCardBlock.cardState.activeRequest.contentsSize);
+                } else {
+                    sceMcRead(stored, list->saveContents, MC_OLD_SAVE_BYTES);
+                }
+            } else {
+                list->iconFlags = 0;
+            }
+            xglMcCardBlock.cardState.substate = MC_SCAN_REPORT;
+            return MC_STATUS_BUSY_BOTH;
+        case MC_SCAN_ICON_CHECK:
+            list->iconFlags = 0;
+            if (result >= 0) {
+                scanEntry = (McDirectoryEntry *)MC_DIRECTORY_TABLE((unsigned int)list);
+                for (entry = 0; entry < result; entry++, scanEntry++) {
+                    if (strcmp(scanEntry->name, "icon.sys") == 0 && scanEntry->fileSize == sizeof(McIconSys)) {
+                        list->iconFlags |= MC_ICON_SYS_FOUND;
+                    }
+                    if (strncmp(scanEntry->name, "BASLUS-21389Xeno3", MC_SAVE_NAME_LENGTH) == 0
+                        && scanEntry->fileSize == MC_SAVE_FILE_BYTES) {
+                        list->iconFlags |= MC_SAVE_FILE_FOUND;
+                    }
+                }
+            }
+            xglMcSetFullPath(xglMcCardBlock.cardState.card, 0);
+            sceMcOpen(xglMcCardBlock.cardState.activeRequest.port, 0, xglMcCardBlock.cardState.full_path, MC_OPEN_READ);
+            xglMcCardBlock.cardState.substate = MC_SCAN_READ;
+            if (xglMcCardBlock.cardState.activeRequest.file < 0) {
+                xglMcCardBlock.cardState.substate = MC_SCAN_COUNT;
+            }
+            return MC_STATUS_BUSY_BOTH;
+        case MC_SCAN_COUNT:
+            list->cardScanState[xglMcCardBlock.cardState.card] = 0;
+            if (result >= 0) {
+                sceMcClose(result);
+                if (list->iconFlags == MC_SAVE_COMPLETE) {
+                    list->cardScanState[xglMcCardBlock.cardState.card] = MC_SLOT_READ;
+                    list->saveCount++;
+                    chosen = callback(xglMcCardBlock.cardState.card, 0);
+                    if (chosen >= 0) {
+                        xglMcCardBlock.cardState.selector = chosen;
+                    }
+                }
+            }
+            xglMcCardBlock.cardState.substate = MC_SCAN_NEXT_CARD;
+            return MC_STATUS_BUSY_BOTH;
+        }
+        break;
+    case MC_STATE_CREATE:
+        created = xglMcAdvanceCreateRequest(result);
+        if (created == 0) {
+            return MC_STATUS_BUSY_BOTH;
+        }
+        xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+        if (created < 0) {
+            xglMcCardBlock.cardState.card_status.combined = MC_STATUS_BUSY_BOTH;
+        }
+        break;
+    case MC_STATE_WRITE:
+    case MC_STATE_READ:
+        if (result >= 0) {
+            switch (xglMcCardBlock.cardState.substate) {
+            case MC_RW_OPENED:
+                xglMcCardBlock.cardState.fileDescriptor = result;
+                phase = xglMcCardBlock.cardState.requestPhase;
+                size = xglMcCardBlock.cardState.activeRequest.contentsSize;
+                transfer = (void *)xglMcCardBlock.cardState.activeRequest.bufferAddress;
+                switch (phase) {
+                case MC_STATE_WRITE:
+                    sceMcWrite(result, transfer, size);
+                    break;
+                case MC_STATE_READ:
+                    sceMcRead(result, transfer, size);
+                    break;
+                }
+                xglMcCardBlock.cardState.substate = MC_RW_TRANSFERRED;
+                break;
+            case MC_RW_TRANSFERRED:
+            case MC_RW_ICON_WRITTEN:
+                sceMcClose(xglMcCardBlock.cardState.fileDescriptor);
+                if (xglMcCardBlock.cardState.phaseAndStep == MC_PHASE_STEP(MC_STATE_WRITE, MC_RW_TRANSFERRED)) {
+                    xglMcCardBlock.cardState.substate = MC_RW_OPEN_ICON;
+                } else {
+                    xglMcCardBlock.cardState.substate = MC_RW_LIST_FOLDER;
+                }
+                break;
+            case MC_RW_OPEN_ICON:
+                xglMcSetFullPath(xglMcCardBlock.cardState.activeRequest.file, 1);
+                sceMcOpen(xglMcCardBlock.cardState.activeRequest.port, 0, xglMcCardBlock.cardState.full_path,
+                          MC_OPEN_WRITE_CREATE);
+                xglMcCardBlock.cardState.substate = MC_RW_WRITE_ICON;
+                break;
+            case MC_RW_WRITE_ICON:
+                xglMcCardBlock.cardState.fileDescriptor = result;
+                memset(xglMcCardBlock.icon.reserved, 0, sizeof(xglMcCardBlock.icon.reserved));
+                sceMcWrite(xglMcCardBlock.cardState.fileDescriptor, &xglMcCardBlock.icon, sizeof(McIconSys));
+                xglMcCardBlock.cardState.substate = MC_RW_ICON_WRITTEN;
+                break;
+            case MC_RW_LIST_FOLDER:
+                xglMcSetFullPath(xglMcCardBlock.cardState.activeRequest.file, (int)xglMcAnyFolderName);
+                func_002F9A40(xglMcCardBlock.cardState.activeRequest.port, 0, xglMcCardBlock.cardState.full_path, 0,
+                              MC_ICON_CHECK_ENTRIES, (int)xglMcCardBlock.iconCheck.directory);
+                xglMcCardBlock.cardState.substate = MC_RW_CHECK_ICON;
+                break;
+            case MC_RW_CHECK_ICON:
+                found = 0;
+                if (result > 0) {
+                    folderEntry = xglMcCardBlock.iconCheck.directory;
+                    for (folderIndex = 0; folderIndex < result; folderEntry++, folderIndex++) {
+                        if (strcmp(folderEntry->name, "icon.sys") == 0 && folderEntry->fileSize == sizeof(McIconSys)) {
+                            found = 1;
+                            break;
+                        }
+                    }
+                }
+                if (!found) {
+                    memset((void *)xglMcCardBlock.cardState.activeRequest.bufferAddress, 0,
+                           xglMcCardBlock.cardState.activeRequest.contentsSize);
+                }
+                xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+                break;
+            }
+            return MC_STATUS_BUSY_BOTH;
+        }
+        *xglMcCardBlock.cardState.activeRequest.callerResult = result;
+        xglMcCardBlock.cardState.card_status.combined = MC_STATUS_BUSY_BOTH;
+        xglMcCardBlock.cardState.requestPhase = MC_STATE_IDLE;
+        break;
+    }
+    return xglMcCardStatusWord[0];
+}
 
 int xglMcEasyLoad(const char *path, void *loadedContents, int loadedSize)
 {

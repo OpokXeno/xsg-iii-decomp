@@ -124,7 +124,7 @@ void xglCurApplyVector(Vector4 *in, Vector4 *out);
 void xglCurSetTranslate(Vector4 *point);
 void xglCurMatrixGet(void *matrix);
 void tiDrawJointDrawAxes(void *matrix, float scale);
-int func_0030E68C(unsigned char *entry, const char *name);
+int strcmp(unsigned char *entry, const char *name);
 void func_001975C8(void *block);
 void func_002A70E8(void *block);
 void tiWordClearBits(void *block, int mask);
@@ -946,7 +946,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_002911C0);
 
 INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_002912B0);
 
-/* Returns the index of the first entry (112 bytes each, from the link record at actor+0x504) for which func_0030E68C returns 0; -1 when there is no link, the link's tag is not 0x797870 or none matches. */
+/* Returns the index of the first entry (112 bytes each, from the link record at actor+0x504) for which strcmp returns 0; -1 when there is no link, the link's tag is not 0x797870 or none matches. */
 int XenoActorFindPart(XenoActor *actor, const char *partName) {
     PxyModelHeader *partPack;
     unsigned char *partGeometryEntry;
@@ -959,7 +959,7 @@ int XenoActorFindPart(XenoActor *actor, const char *partName) {
             i = 0;
             if (partPack->geometryCount > 0) {
                 for (; i < partPack->geometryCount; i++) {
-                    if (func_0030E68C(partGeometryEntry, partName) == 0) {
+                    if (strcmp(partGeometryEntry, partName) == 0) {
                         return i;
                     }
                     partGeometryEntry += 112;
@@ -983,7 +983,7 @@ int XenoActorHidePart(XenoActor *actor, const char *partName) {
             subPack = (PxyModelHeader *)BYTE_OFFSET(pack, pack->subPackOffset);
             subGeom = BYTE_OFFSET(subPack, subPack->geometryOffset);
             for (i = 0; i < subPack->geometryCount; i++) {
-                if (func_0030E68C(subGeom, partName) == 0) {
+                if (strcmp(subGeom, partName) == 0) {
                     actor->subVisibility[i >> 5] |= 1 << (i & 31);
                     return 1;
                 }
@@ -991,7 +991,7 @@ int XenoActorHidePart(XenoActor *actor, const char *partName) {
             }
         }
         for (i = 0; i < pack->geometryCount; i++) {
-            if (func_0030E68C(geom, partName) == 0) {
+            if (strcmp(geom, partName) == 0) {
                 actor->visibility[i >> 5] |= 1 << (i & 31);
                 return 1;
             }
@@ -1014,7 +1014,7 @@ int XenoActorShowPart(XenoActor *actor, const char *partName) {
             subPack = (PxyModelHeader *)BYTE_OFFSET(pack, pack->subPackOffset);
             subGeom = BYTE_OFFSET(subPack, subPack->geometryOffset);
             for (i = 0; i < subPack->geometryCount; i++) {
-                if (func_0030E68C(subGeom, partName) == 0) {
+                if (strcmp(subGeom, partName) == 0) {
                     actor->subVisibility[i >> 5] &= ~(1 << (i & 31));
                     return 1;
                 }
@@ -1022,7 +1022,7 @@ int XenoActorShowPart(XenoActor *actor, const char *partName) {
             }
         }
         for (i = 0; i < pack->geometryCount; i++) {
-            if (func_0030E68C(geom, partName) == 0) {
+            if (strcmp(geom, partName) == 0) {
                 actor->visibility[i >> 5] &= ~(1 << (i & 31));
                 return 1;
             }

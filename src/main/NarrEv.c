@@ -84,7 +84,7 @@ INCLUDE_ASM("asm/main/nonmatchings/NarrEv", func_0024AA30);
 extern s32 gNarrEvActionCode[];
 extern unsigned char gNarrEvMatchName[];
 extern s32 gNarrEvMatchFound;
-s32 func_0030E68C();
+s32 strcmp();
 
 /* Table read by narrEvStartOnNameMatch and narrEvIncrementCounter: entries of 0x290 bytes start at entryBase. */
 typedef struct NarrEvEntryTable {
@@ -97,7 +97,7 @@ typedef struct NarrEvEntryTable {
 } NarrEvEntryTable;
 
 void narrEvStartOnNameMatch(NarrEvEntryTable *narrTable) {
-    if (func_0030E68C(narrTable->narrEntryBase + (narrTable->narrEntryCount * 0x290) + 0x250, gNarrEvMatchName) != 0) {
+    if (strcmp(narrTable->narrEntryBase + (narrTable->narrEntryCount * 0x290) + 0x250, gNarrEvMatchName) != 0) {
         gNarrEvActionCode[0] = 0x3C;
         gNarrEvMatchFound = 1;
     }
