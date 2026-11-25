@@ -66642,19 +66642,19 @@
      2
     ],
     [
-     "func_002F4888",
+     "sceVif1PkReset",
      3098760,
      16,
      2
     ],
     [
-     "func_002F4898",
+     "sceVif1PkTerminate",
      3098776,
      88,
      2
     ],
     [
-     "func_002F48F0",
+     "sceVif1PkSize",
      3098864,
      20,
      2
@@ -66678,7 +66678,7 @@
      2
     ],
     [
-     "func_002F4A68",
+     "sceVif1PkEnd",
      3099240,
      88,
      2

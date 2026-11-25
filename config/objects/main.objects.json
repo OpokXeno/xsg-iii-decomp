@@ -138570,27 +138570,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F4888",
+     "name": "sceVif1PkReset",
      "size": 16,
-     "splat_name": "func_002F4888",
+     "splat_name": "sceVif1PkReset",
      "va": "0x002f4888",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F4898",
+     "name": "sceVif1PkTerminate",
      "size": 88,
-     "splat_name": "func_002F4898",
+     "splat_name": "sceVif1PkTerminate",
      "va": "0x002f4898",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F48F0",
+     "name": "sceVif1PkSize",
      "size": 20,
-     "splat_name": "func_002F48F0",
+     "splat_name": "sceVif1PkSize",
      "va": "0x002f48f0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -138624,9 +138624,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F4A68",
+     "name": "sceVif1PkEnd",
      "size": 88,
-     "splat_name": "func_002F4A68",
+     "splat_name": "sceVif1PkEnd",
      "va": "0x002f4a68",
      "name_basis": "address",
      "provenance": "estimated"

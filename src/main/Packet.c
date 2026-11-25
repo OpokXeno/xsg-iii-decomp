@@ -105,11 +105,11 @@ void xglPacketInitDoubleBuffer(u32 packetBase, u32 packetHalfSize, float reserve
 typedef int s32;
 extern s32 xglPacketSendMode;
 
-/* The sceVif1Pk calls of XS2's xglPacketMove (End, Terminate, Reset) and the packet's size in quadwords. */
-void func_002F4A68(XglPacket *packet, u32 flag);
-void func_002F4898(XglPacket *packet);
-u32 func_002F48F0(XglPacket *packet);
-void func_002F4888(XglPacket *packet);
+/* The sceVif1Pk calls of XS2's xglPacketMove. */
+void sceVif1PkEnd(XglPacket *packet, u32 flag);
+void sceVif1PkTerminate(XglPacket *packet);
+u32 sceVif1PkSize(XglPacket *packet);
+void sceVif1PkReset(XglPacket *packet);
 void FlushCache(int mode);
 void func_001936A8(const char *condition, const char *file, int line, const char *format, ...);
 
@@ -127,11 +127,11 @@ void func_00199A20(void)
 {
     float fPacket;
 
-    func_002F4A68(pCurrentPacket, 0);
-    func_002F4898(pCurrentPacket);
+    sceVif1PkEnd(pCurrentPacket, 0);
+    sceVif1PkTerminate(pCurrentPacket);
     FlushCache(0);
     if (xglPacketSendMode != 0) {
-        fPacket = (float) (func_002F48F0(pCurrentPacket) << 4)
+        fPacket = (float) (sceVif1PkSize(pCurrentPacket) << 4)
                   / (float) (pCurrentPacket->limit - pCurrentPacket->buffer);
         if (!(fPacket < PACKET_FULL_RATIO)) {
             func_001936A8(packetFullCondition, packetSourceFile, PACKET_MOVE_ASSERT_LINE, packetFullMessage);
@@ -144,7 +144,7 @@ void func_00199A20(void)
     } else {
         pCurrentPacket = &D_008BC260[1];
     }
-    func_002F4888(pCurrentPacket);
+    sceVif1PkReset(pCurrentPacket);
 }
 
 void xglDmaDirectSrcChain(u32 channel, u32 address);
