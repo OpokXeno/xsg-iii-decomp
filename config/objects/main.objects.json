@@ -46422,7 +46422,7 @@
    "path": "src/main/tu039.c",
    "scaffold_path": "scaffold/src/main/tu039.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -46521,7 +46521,7 @@
     }
    ],
    "owners": {
-    ".text": "asm"
+    ".text": "c"
    },
    "sections": {},
    "text": {
@@ -46535,6 +46535,17 @@
      "0x0019e148"
     ],
     "note": null
+   },
+   "import": {
+    "mode": "c",
+    "note": "X3 package 1: tu039 recovered as C",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/tu039.c"
+    }
    }
   },
   {
