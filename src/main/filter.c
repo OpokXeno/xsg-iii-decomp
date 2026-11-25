@@ -39,7 +39,7 @@ typedef struct DrawEnvRecord {
 } DrawEnvRecord;
 
 /* The draw-environment drawRecord pool (struct completed below with the xgl filter code). */
-extern struct DrawEnvRecord gDrawArea;
+static struct DrawEnvRecord gDrawArea;
 void drawAreaSetWindow(s32, s32, s32, s32, s32, s32, s32, s32, s32, s32);
 
 struct DrawEnvRecord *drawEnvGetRecord(void) {
@@ -1919,7 +1919,7 @@ typedef struct ScreenWarpParams {
     s32 movieActive; /* +0x1C: nonzero when the movie draw environments are used */
 } ScreenWarpParams;
 
-extern f32 gXglWarpRandomScales[];
+static f32 gXglWarpRandomScales[512];
 extern s32 gXglWarpGifTag[];
 
 typedef struct WarpVertex {
@@ -2440,7 +2440,22 @@ void filterWavyBlur2Draw(RadialBlur *blur) {
     xglPacketSendDirect((s32) packet, packetSize >> 4);
 }
 
-extern unsigned char D_0061BE35[];
+
+#define SLOT_SIZE 0x54
+
+typedef struct SlotControlBlock {
+    u8 hookIndex; /* +0x00: index of the release hook in gSlotReleaseHooks */
+    u8 unk01;
+    u8 allocIndex; /* +0x02 */
+    u8 slotId;     /* +0x03: key compared by func_001E7890, 0 when the record is free */
+    s32 issuedCount;
+    u8 unmodeled_08[0x40 - 0x08];
+    s32 doneCount;
+    u8 unmodeled_44[0x50 - 0x44];
+    u32 controlFlags; /* +0x50 */
+} SlotControlBlock;
+
+static SlotControlBlock gFixedSlots[5];
 
 typedef struct {
     u8 p[0x60];
@@ -2513,7 +2528,7 @@ void filterDirBlurDraw(ScreenQuadRecord *quad, s32 packet) {
     if (xglFilterShouldSkip()) {
         return;
     }
-    if (D_0061BE35[0] == 0) {
+    if (((u8 *) gFixedSlots)[3 * SLOT_SIZE + 1] == 0) {
         if (xglRenderMovieIsActive()) {
             if (field) {
                 drawEnvSetHalfDisplayNext();
@@ -4352,7 +4367,9 @@ void filterSpeculerDraw(DisplayCopyRequest *request) {
     }
 }
 
-extern signed char gXglEffectSlotMask;
+
+static signed char gXglEffectSlotMask;
+
 
 /* Claims the lowest free bit of the effect-slot mask gXglEffectSlotMask. Returns the 1-based slot id, or 0 when all eight are used. */
 s32 xglEffectSlotAlloc(void) {
@@ -4374,7 +4391,7 @@ typedef struct SlotPool {
     s32 slotId; /* +0x40: 1..8 while the pool holds a slot, 0 when empty */
 } SlotPool;
 
-extern u8 gXglEffectSlots[];
+static u8 gXglEffectSlots[16400];
 void *memset(void *destination, int value, unsigned int size);
 
 /* Releases the effect slot held by pool: clears its particle block and its bit in gXglEffectSlotMask. */
@@ -7000,7 +7017,7 @@ typedef struct DissolveCell {
 #define DISSOLVE_CORNER_ANGLE 1.0471973f /* 60 degrees */
 #define DISSOLVE_FADE_FRAMES 5
 
-extern DissolveCell gXglDissolveCells[DISSOLVE_ROWS * DISSOLVE_COLUMNS];
+static DissolveCell gXglDissolveCells[DISSOLVE_ROWS * DISSOLVE_COLUMNS];
 
 typedef enum DissolvePhase {
     DISSOLVE_START = 1,
@@ -7529,30 +7546,15 @@ void filterTest6Draw(void) {
 void filterTest7Draw(void) {
 }
 
-#define SLOT_SIZE 0x54
-
-typedef struct SlotControlBlock {
-    u8 hookIndex; /* +0x00: index of the release hook in gSlotReleaseHooks */
-    u8 unk01;
-    u8 allocIndex; /* +0x02 */
-    u8 slotId;     /* +0x03: key compared by func_001E7890, 0 when the record is free */
-    s32 issuedCount;
-    u8 unmodeled_08[0x40 - 0x08];
-    s32 doneCount;
-    u8 unmodeled_44[0x50 - 0x44];
-    u32 controlFlags; /* +0x50 */
-} SlotControlBlock;
-
-extern SlotControlBlock gFixedSlots[];
 void *memset(void *destination, int value, unsigned int blockCount);
 void slotSetFixedValue(s32 fixedValue);
 void slotSendFrame(s32 packet);
 
-extern SlotControlBlock D_0061BEE0[];
-extern SlotControlBlock D_0061B018[];
-extern SlotControlBlock *D_0061BF38[];
-extern SlotControlBlock *D_0061BFB8[];
-extern SlotControlBlock D_0061BA98[];
+static SlotControlBlock D_0061BEE0[1];
+static SlotControlBlock D_0061B018[32];
+static SlotControlBlock *D_0061BF38[32];
+static SlotControlBlock *D_0061BFB8[8];
+static SlotControlBlock D_0061BA98[8];
 
 /* Clears the slot tables and the draw-area record, then installs the two callbacks of D_004C8390. */
 void func_001E7268(void) {
@@ -7615,8 +7617,6 @@ void func_001E7358(SlotControlBlock *slotControl, s32 fixedValue) {
 typedef void (*SlotHook)(void);
 
 extern SlotHook gSlotReleaseHooks[];
-extern SlotControlBlock gFixedSlotControl[];
-extern u8 D_0061BE35[];
 void slotSendCommand(s32 command, s32 sendParams);
 void slotCallReleaseHookAndClear(SlotControlBlock *slotControl);
 void slotRelease(s32 slotIndex);
@@ -7636,8 +7636,8 @@ void slotCallReleaseHookAndClear(SlotControlBlock *slotControl) {
 void slotSetFixedValue(s32 fixedValue) {
     u32 controlFlags;
 
-    func_001E7358(gFixedSlotControl, fixedValue);
-    controlFlags = gFixedSlotControl->controlFlags;
+    func_001E7358(&gFixedSlots[4], fixedValue);
+    controlFlags = gFixedSlots[4].controlFlags;
     if ((controlFlags >> 1) & 1) {
         slotRelease(4);
     }
@@ -7647,8 +7647,8 @@ void slotReleaseChecked(s32 slotIndex, s32 forceRelease);
 void slotReleaseKind8Checked(s32 slotIndex);
 
 s32 stateIsReady(void);
-extern u8 D_00407FC0[];
-extern u8 D_00408020[];
+extern unsigned long long D_00407FC0[];
+extern unsigned long long D_00408020[];
 
 /* Builds the active studio camera window packet and sends the slot records of the frame through VIF1. */
 void slotSendFrame(s32 packet) {
@@ -8143,7 +8143,6 @@ typedef struct SlotSend6 {
     s32 w[6];
 } SlotSend6;
 
-extern u8 D_0061BE34[];
 
 typedef struct SlotSendView {
     u8 hookIndex;
@@ -8165,8 +8164,6 @@ typedef struct SlotSendView {
     s32 unmodeled_44[4];
 } SlotSendView;
 
-extern SlotSendView D_0061BD8C;
-extern SlotSendView D_0061BDE0;
 
 /* Copies a send payload into the slot view that matches command: 0x27/0x28 the fixed slots, 0x1F/0x0A D_0061BD8C, 0x23 D_0061BDE0, 0x29 marks D_0061BE34 busy. */
 void slotSendCommand(s32 command, s32 sendParams) {
@@ -8177,32 +8174,32 @@ void slotSendCommand(s32 command, s32 sendParams) {
     }
     switch (command) {
     case 0x27:
-        slotRecord = (SlotSendView *) gFixedSlots;
+        slotRecord = (SlotSendView *) &gFixedSlots[0];
         goto tail;
     case 0x28:
-        slotRecord = (SlotSendView *) gFixedSlotControl;
+        slotRecord = (SlotSendView *) &gFixedSlots[4];
         goto tail;
     case 0x1F:
-        slotRecord = &D_0061BD8C;
+        slotRecord = (SlotSendView *) &gFixedSlots[1];
         slotRecord->hookIndex = command;
         slotRecord->send.withThree.three = *(SlotSend3 *) sendParams;
         slotRecord->send.withThree.wasBusy = slotRecord->busy != 0;
         break;
     case 0x0A:
-        slotRecord = &D_0061BD8C;
+        slotRecord = (SlotSendView *) &gFixedSlots[1];
         slotRecord->hookIndex = command;
         slotRecord->send.withTwo.two = *(SlotSend2 *) sendParams;
         slotRecord->send.withTwo.wasBusy = slotRecord->busy != 0;
         break;
     case 0x23:
-        slotRecord = &D_0061BDE0;
+        slotRecord = (SlotSendView *) &gFixedSlots[2];
     tail:
         slotRecord->hookIndex = command;
         slotRecord->doneCount = 0;
         slotRecord->send.six = *(SlotSend6 *) sendParams;
         break;
     case 0x29:
-        slotRecord = (SlotSendView *) D_0061BE34;
+        slotRecord = (SlotSendView *) &gFixedSlots[3];
         slotRecord->hookIndex = command;
         slotRecord->busy = 1;
         break;
@@ -8350,14 +8347,14 @@ void scratchpadClearSendCmd29(void) {
 s32 slotStateActive(void) {
     u32 stateMinusOne;
 
-    stateMinusOne = (D_0061BE35[0] + 0xFF) & 0xFF;
+    stateMinusOne = (((SlotSendView *) &gFixedSlots[3])->busy + 0xFF) & 0xFF;
     return stateMinusOne < 2U;
 }
 
 s32 slotStateInactive(void) {
     u32 stateMinusOne;
 
-    stateMinusOne = (D_0061BE35[0] + 0xFF) & 0xFF;
+    stateMinusOne = (((SlotSendView *) &gFixedSlots[3])->busy + 0xFF) & 0xFF;
     return stateMinusOne >= 2U;
 }
 
@@ -8404,3 +8401,69 @@ void slotSetAllEnableBits(s32 isEnabled) {
 void slotHookNoop(void) {
 
 }
+
+/* Initialized data of the TU (.data and .sdata), in address order. */
+s64 D_00407DB0[14] = {
+    0, 0x5100000600000000LL, 0x5000000000008001LL, 0xEEEEELL, 0, 20, 0x70000LL, 71,
+    0, 6, 0, 66, 0, 8,
+};
+
+s32 gXglWarpGifTag[4] = {
+    32768, 548323328, 83, 0,
+};
+
+SlotHandler gSlotHandlers[50] = {
+    0, 0, 0, 0,
+    filterBlurDraw, filterMosaicDraw, filterNegaposiDraw, 0,
+    0, filterMonotoneDraw, filterCrossFadeDraw, filterSwell2Draw,
+    filterWavyBlurDraw, filterTorusDraw, filterDirBlurDraw, 0,
+    0, filterRippleDraw, filterRipple2Draw, filterDistortDraw,
+    filterSwellDraw, filterDofDraw, filterNoiseDraw, filterNoise2Draw,
+    filterSpeculerDraw, filterShimmerDraw, filterRefractDraw, xglMistEmitterDraw,
+    func_001E0E10, filterCorrectDraw, filterSoftFocusDraw, filterWipeDraw,
+    filterGradationDraw, filterScreenBlurDraw, filterColorDraw, filterFadeDraw,
+    filterPlaneDraw, filterDof2Draw, filterWavyBlur2Draw, filterFadeDraw,
+    filterFadeDraw, filterCutInDraw, filterTestDraw, filterTest2Draw,
+    filterTest3Draw, filterTest4Draw, filterTest5Draw, filterTest6Draw,
+    filterTest7Draw, 0,
+};
+
+SlotHook gSlotReleaseHooks[50] = {
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, xglEffectSlotRelease, 0, xglEffectSlotRelease,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0, 0, 0,
+    0, 0,
+};
+
+unsigned long long D_00407FC0[12] = {
+    0x0000000000000000ULL, 0x5100000500000000ULL, 0x4000000000008001ULL, 0x000000000000EEEEULL,
+    0x0000000000000000ULL, 0x000000000000003FULL, 0x0000000131000000ULL, 0x000000000000004EULL,
+    0x000006FC007FC005ULL, 0x0000000000000008ULL, 0x0000000000000000ULL, 0x0000000000000040ULL,
+};
+
+unsigned long long D_00408020[12] = {
+    0x0000000000000000ULL, 0x5100000500000000ULL, 0x4000000000008001ULL, 0x000000000000EEEEULL,
+    0x0000000000000000ULL, 0x000000000000003FULL, 0x0000000031000000ULL, 0x000000000000004EULL,
+    0x0000000000000000ULL, 0x000000000000004CULL, 0x0000000000000000ULL, 0x0000000000000040ULL,
+};
+
+s32 gPacketBufferBase = 0;
+void *gPacketCursor = 0;
+s32 *gPacketLastTag = 0;
+s32 gPacketEntryCount = 0;
+s32 gTagQuadCount = 0;
+s32 gXglWaveScrollX = 0;
+s32 gXglWaveScrollY = 0;
+
+const char D_0053E838[40] = "\x1b" "[31m\x1b" "[47m\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "[%d]=%d \x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x1b" "[0m\n";
+
+static u8 D_00620060[32752];

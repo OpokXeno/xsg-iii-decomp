@@ -100,9 +100,6 @@ typedef struct SdvShadowKey {
 #define SDV_KEY_SOURCE 0x100   /* the request's source actor */
 #define SDV_KEY_TARGET 0x200   /* the request's target actor */
 
-extern float gSdvHundredthScale;
-extern float gSdvTenthScale;
-
 /* Steps a shadow key sequence and copies the row it reaches into the shadow fields of the
  * request's actor that the row's flags pick. */
 void sdvExecShadowSeq(SdvSequence *sequence)
@@ -140,10 +137,10 @@ void sdvExecShadowSeq(SdvSequence *sequence)
     actorFlags = shadowKey->actorFlags;
     moveState = shadowKey->moveState;
     shadowCount = shadowKey->shadowCount;
-    velocity = velocityTenths * gSdvTenthScale;
-    shadowValue = shadowValueHundredths * gSdvHundredthScale;
-    angle = angleHundredths * gSdvHundredthScale;
-    shadowValue3 = shadowValue3Hundredths * gSdvHundredthScale;
+    velocity = velocityTenths * 0.1f;
+    shadowValue = shadowValueHundredths * 0.01f;
+    angle = angleHundredths * 0.01f;
+    shadowValue3 = shadowValue3Hundredths * 0.01f;
     if (actorFlags & SDV_KEY_TARGET) {
         actor = battleRequest->target;
     } else if (actorFlags & SDV_KEY_SOURCE) {
@@ -563,6 +560,14 @@ void func_002674C0(int wave, int value, Vector4 *amplitude, Vector4 *phase, int 
 /* sdvBuildCameraPoint takes four parameters; the callers below also pass a fifth argument, a zero word the callee ignores. */
 typedef void (*SdvCameraPointBuilder)(SdvCameraPoint *point, int kind, short *placement, int flags, int zero);
 
+const AlignedVector4 D_0053E920 = { 0.0f, 0.0f, -1.0f, 1.0f };
+
+const AlignedVector4 D_0053E930 = { 0.0f, 0.0f, -1.0f, 1.0f };
+
+const AlignedVector4 D_0053E940 = { 0.0f, 1.0f, 0.0f, 1.0f };
+
+const AlignedVector4 D_0053E950 = { -1.0f, -1.0f, 1.0f, 1.0f };
+
 /* Plays the key row of one camera channel at frame: kinds 0 and 1 apply camera points (the row and the next one), kind 2
  * applies the two blend angles, kind 3 applies up to three wave entries. Returns 0 when the channel is at its end row,
  * else 1. */
@@ -860,7 +865,7 @@ typedef struct PartTransform {
     short scaled;
 } PartTransform;
 
-extern AlignedVector4 D_0053E9C0;
+extern const AlignedVector4 D_0053E9C0;
 extern StudioCamera *xglStudioGetActiveCamera(void);
 extern void sefGetCameraPos(ApM4*);
 extern void MMathMulMatrix(ApM4*,ApM4*,ApM4*);
@@ -1445,6 +1450,8 @@ static inline void normalizeInPlace(Vector4 *direction)
     MMathNormalizeVector2(direction, direction);
 }
 
+const AlignedVector4 D_0053E9C0 = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 /* SdvSlotData.mode: the event arguments are absolute coordinates, not scaled to the located target. */
 #define SDV_ALTER_MODE_SINGLE 8
 
@@ -1853,6 +1860,8 @@ void sdvApplySlotEvent(signed char *slot, SdvSlotEvent *event, int update)
         *slot = slotSetupMode0(*slot, opcode, setup);
     }
 }
+
+const u64 sdvAlphaBlendTable[4] = { 0x44ULL, 0x48ULL, 0x8000000042ULL, 0x6AULL };
 
 typedef struct SdvSlotEventList {
     unsigned char unmodeled_00[8];
@@ -2870,7 +2879,7 @@ typedef union SdvAlterQuad {
 extern SdvAlterEnvironment sdvAlterEnvironment;
 extern unsigned char D_00001B70[];
 extern unsigned char D_00001BD0[];
-extern u64 sdvAlphaBlendTable[4];
+extern const u64 sdvAlphaBlendTable[4];
 extern unsigned short D_004C8390[];
 void *xglPacketReserve(int drawnSegments);
 void xglPacketBufferInit(unsigned int address);
@@ -3310,3 +3319,41 @@ void sdvAlterDrawOwned(s32 owner) {
         }
     }
 }
+
+/* Per-part key tables of the slot effects. */
+short D_00408090[] = {
+    1, 3, 7, 15, 31, 63, 127, 255,
+    511, 0, 0, 0
+};
+
+unsigned short D_004080A8[] = {
+    260, 261, 262, 263, 264, 265, 266, 267,
+    268, 269, 270, 271, 272, 273, 274, 275,
+    276, 277, 278, 279, 280, 281, 282, 283,
+    284, 285, 286, 287, 0, 0, 0, 0
+};
+
+unsigned short D_004080E8[] = {
+    262, 264, 265, 266, 267, 268, 269, 270,
+    271, 272, 273, 274, 275, 276, 277, 278,
+    0, 0, 0, 0
+};
+
+/* The GIF tag and the GS registers of the alter pass: TEX0, TEST, TEX1, CLAMP, ZBUF and ALPHA. */
+SdvAlterEnvironment sdvAlterEnvironment = {
+    { 0x1000000000008006ULL, 0x0EULL },
+    { 0x0ULL, 0x06ULL },
+    { 0x0005000DULL, 0x47ULL },
+    { 0x60ULL, 0x14ULL },
+    { 0x5ULL, 0x08ULL },
+    { 0x131000000ULL, 0x4EULL },
+    { 0x48ULL, 0x42ULL }
+};
+
+int sdvAlterSerial = 0;
+
+TiWindSlot tiWindSlots[4];
+
+SdvSpecialRecord gSdvSpecialRecords[32];
+
+SdvAlter gSdvAlters[49];

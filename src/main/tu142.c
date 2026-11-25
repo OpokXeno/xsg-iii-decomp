@@ -2,8 +2,8 @@
 
 #include "shared.h"
 /* Axis and direction of the segment helpers below: 0 is x, 2 is z; the sign is +1 or -1. */
-extern int gSegmentAxisIndex;
-extern int gSegmentAxisSign;
+static int gSegmentAxisIndex;
+static int gSegmentAxisSign;
 
 /* Picks the segment axis (z when the two ends differ in z, else x) and the sign of the direction along it. */
 void xglSegmentSelectAxis(Vector4 *segmentPoints) {

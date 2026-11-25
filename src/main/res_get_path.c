@@ -1898,6 +1898,8 @@ s32 saveScreenCreate(void) {
 extern const char *gSaveImagePath;
 
 /* Completion callback of the save file read: 4 marks the file image ready, -2 and -1 read it again. */
+const char D_00538A18[24] = "mnu\\xx\\icon.bin";
+
 void saveFileReadCallback(s32 fileReadState, s32 unusedA, s32 unusedB) {
     switch (fileReadState) {
     case 4:
@@ -2503,10 +2505,11 @@ void saveWriteConfirmMenu(s32 setup) {
     }
 }
 
-extern const char D_00538A98[];
 void saveWriteConfirmDraw(unsigned char alpha);
 
 /* Draws the write confirm box: the save options box, then the two lines of messages 829 and 830. */
+const char D_00538A98[8] = { 0x15, 0x02, 0x01, 0x16 };
+
 void saveWriteConfirmDraw(unsigned char alpha) {
     struct Box16 box;
     s32 i;
@@ -2614,3 +2617,9 @@ void saveSlotListUpdate(int listLoadRequested)
     }
     func_00221B40(&gSaveScreen->fileList, 1);
 }
+
+unsigned char D_003E6E54[12] = { 0 };
+struct McScreen *gSaveScreen = 0;
+u8 *gSaveFileBuffer = 0;
+char D_00550BC8[4] = { 0 };
+const char *gSaveImagePath = D_00538A18;

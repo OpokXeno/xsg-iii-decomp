@@ -505,3 +505,5 @@ void drawSpinningPointLayers(u16 x, u16 y, u16 drawSize) {
     drawRotatedSquare(&point.x, drawSize, 2, -(gScreenSpinAngle + 1.5707964f));
     drawRotatedSquare(&point.x, drawSize, 2, -(gScreenSpinAngle + 4.712389f));
 }
+
+f32 gScreenSpinAngle = 0.0f;

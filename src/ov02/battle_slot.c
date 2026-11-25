@@ -23,7 +23,7 @@ void battleCallbackSlotsRunUpdate(void);
 #include "ov02/tu025.h"
 
 
-extern CallbackSlot battleCallbackSlotTable[BATTLE_CALLBACK_SLOT_COUNT];
+static CallbackSlot battleCallbackSlotTable[BATTLE_CALLBACK_SLOT_COUNT];
 
 void battleSlotClear(void *slot) {
     CallbackSlot *hookSlot = slot;

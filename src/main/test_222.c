@@ -3,11 +3,10 @@
 
 void sjisToEuc(unsigned char *leadByte, unsigned char *trailByte);
 /* Bump pointer of the test heap. */
-extern int testHeapCursor;
+static int testHeapCursor;
 int xglDebFileSize(const char *name);
 int xglDebFileRead(const char *name, void *loadAddress);
 void assertFailed(const char *message, const char *file, int line);
-extern const char gTestLoadAssertMessage[];
 extern const char gTestSourceFileName[];
 
 /* Reads the named debug file into the test heap at the cursor and returns its address, or 0 when the file is empty. */
@@ -21,7 +20,7 @@ int testLoadFile(int *bufferCursor, const char *name) {
         loadAddress = *bufferCursor;
         *bufferCursor = (loadAddress + fileSize + 0xF) & ~0xF;
         if (loadAddress == 0) {
-            assertFailed(gTestLoadAssertMessage, gTestSourceFileName, 159);
+            assertFailed("pData", gTestSourceFileName, 159);
         }
         xglDebFileRead(name, (void *) loadAddress);
     }
@@ -74,3 +73,13 @@ int testHeapAlloc(int allocationBytes) {
     testHeapCursor = cursorAfter;
     return allocAddress;
 }
+
+const char gTestSourceFileName[328] =
+    "test.euc.c\0\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/nep.pxy\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/nep.txy\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/nep.xhr\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/kosmos01.xap\0\0\0\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/shionH00.pxy\0\0\0\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/shionH00.txy\0\0\0\0\0\0\0\0"
+    "host0:/home/xeno/work/iwase/shionH00.xhr\0\0\0\0\0\0\0\0";

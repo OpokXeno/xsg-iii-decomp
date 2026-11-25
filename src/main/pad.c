@@ -4,8 +4,6 @@
 typedef int s32;
 typedef unsigned int u32;
 
-extern char gPadPortAssertMessage[];
-extern char gPadSourceFile[];
 extern PadRecord PadData[];
 void assertFailed(const char *message, const char *file, int line);
 
@@ -13,7 +11,7 @@ void assertFailed(const char *message, const char *file, int line);
 
 PadRecord *padGetPortData(u32 port) {
     if (port >= PAD_PORT_COUNT) {
-        assertFailed(gPadPortAssertMessage, gPadSourceFile, 0x19A);
+        assertFailed("(0<= nPort) && (nPort < 8)", "pad.euc.c", 0x19A);
     }
     return &PadData[port];
 }

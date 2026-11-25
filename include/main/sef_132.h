@@ -20,7 +20,7 @@ typedef struct SefEffectEntryRecord {
 } SefEffectEntryRecord;
 typedef struct SefEntryTableShort {
     SefEntry effectEntries[24];
-    unsigned char unmodeled_20700[0x10];
+    AlignedVector4 originVector;                /* +0x20700 */
     int effectEntryCount;                       /* +0x20710 */
 } SefEntryTableShort;
 typedef struct SefPartPlacement {

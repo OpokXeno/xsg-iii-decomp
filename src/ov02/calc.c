@@ -2,38 +2,7 @@
  * OV02 original TU 59: 0x00a982e8..0x00a98ec8 (16 functions)
  */
 #include "common.h"
-
-/* One 232-byte entry of the two lookup pools of this TU; its lookup key is the halfword at +62. */
-typedef struct BattlePoolLookup {
-    unsigned char unmodeled_00[8];
-    int word56;
-    unsigned short half60;
-    short key;
-    unsigned char unmodeled_10[64];
-    unsigned char unmodeled_50[2];
-    unsigned short half130;
-    unsigned char unmodeled_54[4];
-    unsigned short half136;
-    unsigned char unmodeled_5C[4];
-    unsigned short half142;
-    unsigned char unmodeled_60[88];
-} BattlePoolLookup;
-
-typedef struct BattlePoolEntry {
-    unsigned char unmodeled_00[6];
-    short unk_06;
-    short unk_08;
-    short unk_0A;
-    short unk_0C;
-    unsigned char unmodeled_0E[2];
-    signed char unk_10;
-    signed char unk_11;
-    signed char unk_12;
-    signed char unk_13;
-    unsigned char unk_14;
-    unsigned char unmodeled_15[27];
-    BattlePoolLookup keyBlock;
-} BattlePoolEntry;
+#include "main/battle_shared.h"
 
 /* Owner record; its pool entry pointer sits at +688. */
 typedef struct BattlePoolOwner {
@@ -62,8 +31,6 @@ typedef int s32;
 void battleEntryNoop(void) {
 
 }
-
-extern BattlePoolEntry gBattleKeySlots[];
 
 BattlePoolEntry * battleEntrySlot(int key) {
     if (!(key < BATTLE_KEY_LIMIT)) {

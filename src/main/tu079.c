@@ -84,10 +84,16 @@ typedef struct FootstepEffectEntry {
     s32 effectId;
 } FootstepEffectEntry;
 
-extern FootstepEffectEntry D_00531560[4];
 void sefObjectSetStatePlay(SefObjectPlayArgs *args);
 struct SefEffectObject *sefSpawnEffectFromRequest(SefObjectPlayArgs *args);
 void linkedObjectSetFloat(struct SefEffectObject *object, f32 value);
+
+const FootstepEffectEntry D_00531560[4] = {
+    { 0x0000000D, 0x1014D003 },
+    { 0x0000000E, 0x1014B003 },
+    { 0x0000000F, 0x1014A003 },
+    { 0x00000010, 0x1014C003 },
+};
 
 /* Starts the footstep effect of the surface type in checkKey (table D_00531560), silent until faded in. */
 void func_001C5180(SoundActor *actor) {
@@ -321,7 +327,7 @@ static inline void VectorSubXyz(Vector4 *destination, Vector4 *left, Vector4 *ri
                          : "memory");
 }
 
-extern f32 D_0054F440;
+extern s16 D_003E4820[];
 void MMathRotateMatrixY(Matrix4Rows*,Matrix4Rows*,f32);
 
 /*
@@ -363,7 +369,7 @@ void playerProbeForwardPoint(SoundActor *actor) {
             continue;
         }
         if (__builtin_fabsf(model->position.y - otherModel->position.y) >
-            gGameLoopRuntimeView.gameScale * D_0054F440) {
+            gGameLoopRuntimeView.gameScale * 0.4f) {
             continue;
         }
         VectorSubXyz(&directionToOther, &otherModel->position, &model->position);
@@ -738,7 +744,6 @@ void playerCueSelectUpdate(SoundActor *actor) {
     }
 }
 
-extern s16 D_003E4820[];
 s32 Get_Rnd_001B8CD0(s32 low, s32 high);
 void flatSlotSpawn(s32 *block);
 void func_001B8D08(s32 a, s32 b, s32 c);
@@ -835,8 +840,6 @@ void playerButtonLatchUpdate(SoundActorFlagsView *actor) {
     }
 }
 
-extern f32 gPlayerTurnStepMax;
-extern f32 gPlayerTurnStepMin;
 f32 srsAtan2(f32, f32);
 void mapProbeFlagOn(void *, void *, void *);
 void func_0027E838(void *, void *, void *, void *);
@@ -881,11 +884,11 @@ void playerWalkModeUpdate(SoundActor *actor) {
         if (!(actor->activeFlags & 0x40000)) {
             angle = srsAtan2(sound->moveVector.x, sound->moveVector.z);
             turn = MMathCalcRotNear(model->rotation.y, angle);
-            if (gPlayerTurnStepMax < turn) {
-                turn = gPlayerTurnStepMax;
+            if (0.261799395f < turn) {
+                turn = 0.261799395f;
             }
-            if (turn < gPlayerTurnStepMin) {
-                turn = gPlayerTurnStepMin;
+            if (turn < -0.261799395f) {
+                turn = -0.261799395f;
             }
             model->rotation.y += turn;
         }
@@ -1165,7 +1168,9 @@ typedef struct FocusIdTable {
     s32 ids[4];
 } FocusIdTable;
 
-extern const FocusIdTable D_005315F0;
+const FocusIdTable D_005315F0 = {
+    { 0x02040189, 0x0204018A, 0x0204018B, 0x0204018C },
+};
 
 /* Creates the focus debug slot object for a request and gives it a model sized by the game scale; 0 when it cannot. */
 int func_001C6830(FocusRequest *focusRequest) {
@@ -1220,3 +1225,7 @@ int func_001C6830(FocusRequest *focusRequest) {
     actorSetId(focusObject, -1);
     return 1;
 }
+
+short D_003E4820[] = { 0 };
+unsigned char D_003E4822[38] = { 0 };
+unsigned char vmPayloadBuffer[24] = { 0 };

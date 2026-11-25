@@ -101,7 +101,6 @@ void _Error(const char *pExpression, const void *unused, struct RgHeap *pHeap,
                    const char *pSourceFile, int line);
 
 extern unsigned char *heapMagicStringPtr;
-extern const char heapAssertHeadSizeBelowBlockSize[];
 extern const char heapMakeBlockComment[];
 
 struct RgHeapBlock *_SetHeapHead(struct RgHeapBlock *heapBlock, u32 blockLength);
@@ -113,15 +112,13 @@ struct RgHeapSlot {
 };
 
 /* InstanceOfRgHeapById: the heap heapId (0x20 bytes apart); its 0x800-byte arena is set up by the first call, tracked by a word flag per id. */
-extern struct RgHeapSlot heapInstances[HEAP_MAX];
+static struct RgHeapSlot heapInstances[HEAP_MAX];
 
-extern unsigned char heapArenas[HEAP_MAX][HEAP_ARENA_SIZE];
+static unsigned char heapArenas[HEAP_MAX][HEAP_ARENA_SIZE];
 extern int heapArenaInitialized[HEAP_MAX];
 
 struct RgHeap *InstanceOfRgHeapById(u32 heapId);
 
-extern const char heapAssertBufSizeAligned[];
-extern char heapInitStageComment[];
 
 void *memset(void *destination, int value, unsigned int count);
 
@@ -146,7 +143,9 @@ struct HeapWindowRow {
         struct RgHeap *pHeap;
         u32 heapId;
     } heap;
-    unsigned char unmodeled_38[0x18];
+    unsigned char unmodeled_38[0x8];
+    void *windowCallback;
+    unsigned char unmodeled_44[0xc];
 };
 
 /* A 0xa0-byte template: the HeapWindowRow the code copies, then 0x50 more bytes. */
@@ -174,46 +173,30 @@ void testWindowShow(int window);
 
 int testWindowCreate(struct WindowCreateParam *pParam, int parentWindow);
 
-extern const char heapAssertHeaderFormat[40];
-extern const char heapAssertExpressionFormat[24];
-extern const char heapAssertHeapInfoFormat[32];
-extern const char heapAssertDumpComment[16];
-extern const char heapSourcePath[16];
 extern const char heapAssertHeapNilFormat[40];
-extern const char heapAssertHeadSizeBelowBlockSize[24];
-extern const char heapMakeBlockComment[40];
-extern const char heapAssertBufSizeAligned[24];
-extern const char heapDumpSeparatorFormat[40];
-extern const char heapDumpHeadFormat[32];
-extern const char heapDumpFreeMapFormat[40];
-extern const char heapDumpFreeBlockFormat[32];
-extern const char heapDumpAllocMapFormat[40];
-extern const char heapDumpAllocBlockFormat[48];
-extern const char heapDumpBlockHeaderFormat[24];
-extern const char heapDumpBlockLinksFormat[16];
-extern const char heapDumpBlockSizeMarkFormat[24];
-extern const char heapDumpBlockModuleFormat[24];
-extern const char heapDumpBlockNotInHeapFormat[32];
+extern const char heapMakeBlockComment[48];
 
 /* The title of the allocation position window (the original string is Japanese). */
 extern char heapWindowAllocTitle[16];
 
-extern char heapInitStageComment[8];
 
 void _Error(const char *pExpression, const void *unused, struct RgHeap *pHeap,
                    const char *pSourceFile, int line)
 {
-    printf(heapAssertHeaderFormat);
-    printf(heapAssertExpressionFormat, pExpression, pSourceFile, line);
+    printf("-------- Heap Assert %s ---------\n");
+    printf("%s (in %s at %d)\n\n", pExpression, pSourceFile, line);
     if (pHeap != 0) {
-        printf(heapAssertHeapInfoFormat, pHeap, pHeap->top, pHeap->arenaSize);
-        RgHeapDump_sub(pHeap, heapAssertDumpComment, heapSourcePath, 41);
+        printf("heap = %p top = %p size = %d\n\n", pHeap, pHeap->top, pHeap->arenaSize);
+        RgHeapDump_sub(pHeap, "heap-dump", "test.euc.c", 41);
     } else {
         printf(heapAssertHeapNilFormat);
     }
     for (;;) {
     }
 }
+
+/* Format of the assert dump when there is no heap; the "gAMe sHoW" stamp at +0x10 is heapMagicStringPtr. */
+const char heapAssertHeapNilFormat[40] = "heap = NIL\n\0\0\0\0\0gAMe sHoW 2001.10.15";
 
 void _Link(struct RgHeapBlock *heapBlock, struct RgHeapBlock *pPre,
                   struct RgHeapBlock *followingBlock)
@@ -287,12 +270,15 @@ int _IsCollectMagicString(struct RgHeapBlock *heapBlock)
 struct RgHeapBlock *_SetHeapHead(struct RgHeapBlock *heapBlock, u32 blockLength)
 {
     if (blockLength < HEAP_MIN_BLOCK_SIZE) {
-        _Error(heapAssertHeadSizeBelowBlockSize, heapMakeBlockComment, 0, heapSourcePath, 149);
+        _Error("HEAD_SIZE < nBlockSize", heapMakeBlockComment, 0, "test.euc.c", 149);
     }
     _Link(heapBlock, heapBlock, heapBlock);
     heapBlock->blockLength = blockLength;
     return heapBlock;
 }
+
+/* Block comment of _SetHeapHead; the bytes after it are the other rodata strings the original keeps here. */
+const char heapMakeBlockComment[48] = "make block\0\0\0\0\0\0(HEAD_SIZE & 0xf) == 0\0\0init-1";
 
 /*
  * Walks the circular free list once and folds every block that ends exactly
@@ -337,7 +323,7 @@ void InitRgHeap(struct RgHeap *pHeap, void *pMemory, int arenaSize)
     struct RgHeapBlock *initialFreeBlock;
 
     if (arenaSize & (HEAP_PAYLOAD_ALIGN - 1)) {
-        _Error(heapAssertBufSizeAligned, heapInitStageComment, 0, heapSourcePath, 201);
+        _Error("(nBufSize & 0xf) == 0", "init-2", 0, "test.euc.c", 201);
     }
     memset(pMemory, 0, arenaSize);
     pHeap->arenaSize = arenaSize;
@@ -350,16 +336,6 @@ void InitRgHeap(struct RgHeap *pHeap, void *pMemory, int arenaSize)
 
 int GameMpeg2Play(char *destination, const char *format, ...);
 
-extern const char heapAllocZeroSizeFormat[];
-extern const char heapAssertHeapNotNilParenthesized[];
-extern const char heapAllocEntryHeapPtrComment[];
-extern const char heapAllocNoHeapFormat[];
-extern const char heapNoHeapIdFormat[];
-extern const char heapAllocTooBigDataHeapFormat[];
-extern const char heapAssertMatchBlockSizeEnough[];
-extern const char heapBlockAlignComment[];
-extern const char heapAssertAllocAligned[];
-extern const char heapNotAlignedBlockComment[];
 
 void func_0030ED88(char *pDest, const char *pSrc, u32 count);
 
@@ -378,14 +354,14 @@ void *RgHeapAllocById(u32 heapId, u32 requestedBytes, const char *pSourceFile, i
 
     pHeap = InstanceOfRgHeapById(heapId);
     if (requestedBytes == 0) {
-        printf(heapAllocZeroSizeFormat, pSourceFile, line);
+        printf("size <= 0 error allocated at %s,%d", pSourceFile, line);
     }
     if (pHeap == 0) {
-        _Error(heapAssertHeapNotNilParenthesized, heapAllocEntryHeapPtrComment, 0, heapSourcePath, 227);
+        _Error("(pHeap != NIL)", "alloc-entry-heap-ptr", 0, "test.euc.c", 227);
     }
     pFreeHead = pHeap->freeHead;
     if (pFreeHead == 0) {
-        printf(heapAllocNoHeapFormat, pSourceFile, line);
+        printf("there is no heap for allocation at %s,%d", pSourceFile, line);
         return 0;
     }
     pFit = 0;
@@ -402,13 +378,13 @@ void *RgHeapAllocById(u32 heapId, u32 requestedBytes, const char *pSourceFile, i
         heapBlock = heapBlock->chainNext;
     } while (heapBlock != pFreeHead);
     if (pFit == 0) {
-        GameMpeg2Play(dumpComment, heapNoHeapIdFormat, heapId);
-        RgHeapDump_sub(pHeap, dumpComment, heapSourcePath, 255);
-        printf(heapAllocTooBigDataHeapFormat, requestedBytes, pSourceFile, line);
+        GameMpeg2Play(dumpComment, "no heap %d\n", heapId);
+        RgHeapDump_sub(pHeap, dumpComment, "test.euc.c", 255);
+        printf("too big size (%d) of allocation\nat %s,%d\nfrom data heap", requestedBytes, pSourceFile, line);
         return 0;
     }
     if (bestSize < requiredBlockSize) {
-        _Error(heapAssertMatchBlockSizeEnough, heapBlockAlignComment, pHeap, heapSourcePath, 265);
+        _Error("(nMatchBlockSiz >= nNeedBlockSiz)", "block align", pHeap, "test.euc.c", 265);
     }
     remainder = bestSize - requiredBlockSize;
     if (remainder >= HEAP_MIN_BLOCK_SIZE) {
@@ -445,20 +421,11 @@ void *RgHeapAllocById(u32 heapId, u32 requestedBytes, const char *pSourceFile, i
     }
     payloadAddress = pFit + 1;
     if (((u32)payloadAddress & (HEAP_PAYLOAD_ALIGN - 1)) != 0) {
-        _Error(heapAssertAllocAligned, heapNotAlignedBlockComment, pHeap, heapSourcePath, 309);
+        _Error("(((int)(u_char*)pAlloc + HEAD_SIZE) & 0xf) == 0", "not aligned block", pHeap, "test.euc.c", 309);
     }
     return payloadAddress;
 }
 
-extern const char heapAssertHeapNotNil[];
-extern const char heapFreeEntryComment[];
-extern const char heapFreeNilAddressFormat[];
-extern const char heapErrorComment[];
-extern const char heapAlreadyFreeFormat[];
-extern const char heapNotAllocatedFreeFormat[];
-extern const char heapBlockDestroyedFormat[];
-extern const char heapPtrNotInAreaFormat[];
-extern const char heapAllocListNodeFreeBlockMismatchFormat[];
 
 void RgHeapFree(void *payloadAddress, const char *pSourceFile, int line)
 {
@@ -471,30 +438,30 @@ void RgHeapFree(void *payloadAddress, const char *pSourceFile, int line)
     heapBlock = (struct RgHeapBlock *)payloadAddress - 1;
     pHeap = InstanceOfRgHeapById(heapBlock->module[0]);
     if (pHeap == 0) {
-        _Error(heapAssertHeapNotNil, heapFreeEntryComment, 0, heapSourcePath, 323);
+        _Error("pHeap != NIL", "free entry", 0, "test.euc.c", 323);
     }
     if (payloadAddress == 0) {
-        printf(heapFreeNilAddressFormat, pSourceFile, line);
+        printf("free NIL address at %s,%d", pSourceFile, line);
     }
     if (_IsAllocated(heapBlock) == 0) {
         if (_IsCollectMagicString(heapBlock) != 0) {
-            RgHeapDump_sub(pHeap, heapErrorComment, heapSourcePath, 336);
-            printf(heapAlreadyFreeFormat, payloadAddress, pSourceFile, line, heapBlock->module + 1, heapBlock->line);
+            RgHeapDump_sub(pHeap, "heap error", "test.euc.c", 336);
+            printf("%p is already free at %s,%d\n(MAYBE allocated at %s,%d !?)", payloadAddress, pSourceFile, line, heapBlock->module + 1, heapBlock->line);
         } else {
-            printf(heapNotAllocatedFreeFormat, payloadAddress, pSourceFile, line);
+            printf("not allocated %p free at %s,%d", payloadAddress, pSourceFile, line);
         }
     }
     if (_IsCollectMagicString(heapBlock) == 0) {
-        printf(heapBlockDestroyedFormat, payloadAddress, pSourceFile, line);
+        printf("heap block is destroyed or not in heap %p free at %s,%d", payloadAddress, pSourceFile, line);
     }
     if (RgHeapIsInSelf(pHeap, heapBlock) == 0) {
-        printf(heapPtrNotInAreaFormat, pSourceFile, pHeap, pSourceFile, line);
+        printf("%s is not in %p HEAP memory area\nfree at %s %d", pSourceFile, pHeap, pSourceFile, line);
     }
     pAllocHead = pHeap->allocHead;
     blockAfterAllocHead = pAllocHead->chainNext;
     if (blockAfterAllocHead == pAllocHead) {
         if (heapBlock != blockAfterAllocHead) {
-            printf(heapAllocListNodeFreeBlockMismatchFormat);
+            printf("alloc list node 1 && free block is not this");
         }
         pHeap->allocHead = 0;
     } else {
@@ -558,18 +525,18 @@ void RgHeapDump_sub(struct RgHeap *pHeap, const char *pComment, const char *pSou
     struct RgHeapBlock *heapBlock;
 
     heapBlock = pHeap->freeHead;
-    printf(heapDumpSeparatorFormat);
-    printf(heapDumpHeadFormat, pHeap, pSourceFile, line);
-    printf(heapDumpFreeMapFormat, heapBlock, pComment);
+    printf("\n\n---------------------------------\n");
+    printf("HEAD DUMP %p from %s %d\n", pHeap, pSourceFile, line);
+    printf("***** FREE MAP top %p (comment %s)\n", heapBlock, pComment);
     do {
-        printf(heapDumpFreeBlockFormat, heapBlock, heapBlock->blockLength, heapBlock->blockLength, heapBlock->chainNext);
+        printf("%p : size = %x(%d) next:%p\n", heapBlock, heapBlock->blockLength, heapBlock->blockLength, heapBlock->chainNext);
         heapBlock = heapBlock->chainNext;
     } while (heapBlock != pHeap->freeHead);
     heapBlock = pHeap->allocHead;
-    printf(heapDumpAllocMapFormat, heapBlock, pComment);
+    printf("***** ALLOC MAP top %p (comment %s)\n", heapBlock, pComment);
     if (heapBlock != 0) {
         do {
-            printf(heapDumpAllocBlockFormat, heapBlock, heapBlock->blockLength - sizeof(struct RgHeapBlock), heapBlock->blockLength, heapBlock->chainNext,
+            printf("%p : size = %x(%d) next:%p allocated at %s,%d\n", heapBlock, heapBlock->blockLength - sizeof(struct RgHeapBlock), heapBlock->blockLength, heapBlock->chainNext,
                    heapBlock->module + 1, heapBlock->line);
             heapBlock = heapBlock->chainNext;
         } while (heapBlock != pHeap->allocHead);
@@ -580,19 +547,18 @@ void RgHeapDumpBlock(struct RgHeap *pHeap, void *payloadAddress)
 {
     struct RgHeapBlock *heapBlock;
 
-    printf(heapDumpBlockHeaderFormat);
+    printf("------------ dump %p\n");
     heapBlock = (struct RgHeapBlock *) payloadAddress - 1;
     if (RgHeapIsInSelf(pHeap, payloadAddress) != 0) {
-        printf(heapDumpBlockLinksFormat, heapBlock->chainPrev, heapBlock->chainNext);
-        printf(heapDumpBlockSizeMarkFormat, heapBlock->blockLength, heapBlock->mark);
-        printf(heapDumpBlockModuleFormat, heapBlock->module + 1, heapBlock->line);
+        printf("pre %p next %p\n", heapBlock->chainPrev, heapBlock->chainNext);
+        printf("size %d mark %d\n", heapBlock->blockLength, heapBlock->mark);
+        printf("module '%s' line %d\n", heapBlock->module + 1, heapBlock->line);
         return;
     }
-    printf(heapDumpBlockNotInHeapFormat, pHeap);
+    printf("  this block is not in heap %p\n", pHeap);
 }
 
-/* Formats the heap id (heapDumpHeapIdFormat) and dumps the heap under that comment. */
-extern const char heapDumpHeapIdFormat[16];
+/* Formats the heap id ("heapId %d") and dumps the heap under that comment. */
 
 void RgHeapDumpById(u32 heapId)
 {
@@ -601,8 +567,8 @@ void RgHeapDumpById(u32 heapId)
 
     if (heapId < HEAP_MAX) {
         pHeap = InstanceOfRgHeapById(heapId);
-        GameMpeg2Play(comment, heapDumpHeapIdFormat, heapId);
-        RgHeapDump_sub(pHeap, comment, heapSourcePath, 491);
+        GameMpeg2Play(comment, "heapId %d", heapId);
+        RgHeapDump_sub(pHeap, comment, "test.euc.c", 491);
     }
 }
 
@@ -729,10 +695,9 @@ void heapWindowRefresh(int window)
     heapWindowAddAllocRows(window);
 }
 
-extern char *heapWindowTitles[HEAP_MAX];
+extern char *heapWindowTitles[8];
 extern struct HeapWindowRowTemplate heapWindowRowTemplate;
 extern char heapWindowEmptyModuleName[4];
-extern const char heapWindowIdAssertText[];
 
 void assertFailed(const char *pText, const char *pSourceFile, int line);
 
@@ -745,7 +710,7 @@ void heapWindowCreate(int parentWindow)
 
     nId = (u32) testWindowGetUserData(parentWindow);
     if (nId >= HEAP_MAX) {
-        assertFailed(heapWindowIdAssertText, heapSourcePath, 680);
+        assertFailed("nId>=0 && nId < HEAP_MAX", "test.euc.c", 680);
     }
     window = testWindowFindByName(parentWindow, heapWindowTitles[nId]);
     if (window >= 0) {
@@ -785,16 +750,15 @@ void heapWindowOpen(int parentWindow)
     }
 }
 
-extern char heapOverviewTitle[24];
+extern char heapOverviewTitle[8];
 extern char heapWindowTitleHeapZero[24];
 extern char heapWindowTitleHeapOne[24];
 extern char heapWindowTitleHeapTwo[24];
 extern char heapWindowTitleHeapThree[24];
 extern char heapWindowTitleSystem[24];
 extern char heapWindowTitleMatrix[24];
-extern unsigned char heapOverviewWindowColumnTable[0xa0];
+extern struct HeapWindowRowTemplate heapOverviewWindowColumnTable;
 extern struct HeapWindowRowTemplate heapOverviewRowTemplate;
-extern const char heapOverviewWindowCloseFormat[32];
 
 void testWindowSetColumnTable(int window, const unsigned char *pTable);
 void func_AB46E8(const char *pText, int window);
@@ -816,7 +780,7 @@ void heapOverviewWindowOpen(int parentWindow)
     windowSpec.height = 140;
     strcpy(windowSpec.name, heapOverviewTitle);
     window = testWindowCreate(&windowSpec, parentWindow);
-    testWindowSetColumnTable(window, heapOverviewWindowColumnTable);
+    testWindowSetColumnTable(window, (const unsigned char *) &heapOverviewWindowColumnTable);
     row = heapOverviewRowTemplate.row;
     row.pModuleName = heapWindowTitleHeapZero;
     row.heap.heapId = 0;
@@ -841,5 +805,52 @@ void heapOverviewWindowOpen(int parentWindow)
     row.pModuleName = heapWindowTitleMatrix;
     row.heap.heapId = 5;
     testWindowAddRow(window, &row);
-    func_AB46E8(heapOverviewWindowCloseFormat, window);
+    func_AB46E8("window close not %d", window);
 }
+
+/* Heap windows: the heap-state flags, the window titles and the row templates the windows copy. */
+int heapArenaInitialized[HEAP_MAX] = { 0 };
+
+char heapOverviewTitle[8] = "\xa5" "\xe1" "\xa5" "\xe2" "\xa5" "\xea" "";
+char heapWindowAllocTitle[16] = "\xa5" "\xe1" "\xa5" "\xe2" "\xa5" "\xea" "\xb3" "\xce" "\xca" "\xdd" "\xb0" "\xcc" "\xc3" "\xd6" "";
+char heapWindowTitleHeapZero[24] = "\xa5" "\xe1" "\xa5" "\xe2" "\xa5" "\xea" "\xa3" "\xb0" "\xc7" "\xdb" "\xc3" "\xd6" "\xbe" "\xf5" "\xb6" "\xb7" "";
+char heapWindowTitleHeapOne[24] = "\xa5" "\xe1" "\xa5" "\xe2" "\xa5" "\xea" "\xa3" "\xb1" "\xc7" "\xdb" "\xc3" "\xd6" "\xbe" "\xf5" "\xb6" "\xb7" "";
+char heapWindowTitleHeapTwo[24] = "\xa5" "\xe1" "\xa5" "\xe2" "\xa5" "\xea" "\xa3" "\xb2" "\xc7" "\xdb" "\xc3" "\xd6" "\xbe" "\xf5" "\xb6" "\xb7" "";
+char heapWindowTitleHeapThree[24] = "\xa5" "\xe1" "\xa5" "\xe2" "\xa5" "\xea" "\xa3" "\xb3" "\xc7" "\xdb" "\xc3" "\xd6" "\xbe" "\xf5" "\xb6" "\xb7" "";
+char heapWindowTitleSystem[24] = "\xa5" "\xb7" "\xa5" "\xb9" "\xa5" "\xc6" "\xa5" "\xe0" "\xc7" "\xdb" "\xc3" "\xd6" "\xbe" "\xf5" "\xb6" "\xb7" "";
+char heapWindowTitleMatrix[24] = "\xa5" "\xde" "\xa5" "\xc8" "\xa5" "\xea" "\xa5" "\xaf" "\xa5" "\xb9" "\xc7" "\xdb" "\xc3" "\xd6" "\xbe" "\xf5" "\xb6" "\xb7" "";
+char *heapWindowTitles[8] = {
+    heapWindowTitleHeapZero, heapWindowTitleHeapOne, heapWindowTitleHeapTwo,
+    heapWindowTitleHeapThree, heapWindowTitleSystem, heapWindowTitleMatrix, 0, 0,
+};
+
+/* Row templates: a HeapWindowRow (callbacks, module name, line pointer, the bytes the code does not read,
+ * the window callback at +0x40) followed by 0x50 more bytes; the -1 word at +0x58 is in that tail. */
+struct HeapWindowRowTemplate heapWindowAllocRowTemplate = {
+    { { 0, 0 }, heapWindowEmptyModuleName, (u16 *) &heapWindowEmptyModuleName[2], { 4 }, { 0 }, { 0 }, 0, { 0 } },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+};
+
+struct HeapWindowRowTemplate heapOverviewMenuColumnTable = {
+    { { 0, 0 }, heapOverviewTitle, 0, { 18 }, { 0 }, { 0 }, (void *) heapOverviewWindowOpen, { 0 } },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+};
+
+struct HeapWindowRowTemplate heapOverviewWindowColumnTable = {
+    { { 0, 0 }, heapWindowAllocTitle, 0, { 18 }, { 0 }, { 0 }, (void *) heapWindowOpen, { 0 } },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+};
+
+struct HeapWindowRowTemplate heapOverviewRowTemplate = {
+    { { 0, 0 }, heapWindowTitleHeapZero, 0, { 18 }, { 0 }, { 0 }, (void *) heapWindowCreate, { 0 } },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+};
+
+struct HeapWindowRowTemplate heapWindowRowTemplate = {
+    { { (void *) textScaleApplyOptions, (void *) heapWindowPaintMap }, heapWindowTitleHeapZero, 0, { 20 }, { 0 }, { 0 }, 0, { 0 } },
+    { 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff, 0xff, 0xff },
+};
+
+/* Magic stamp of the block headers: the 15 bytes at heapAssertHeapNilFormat + 0x10. */
+unsigned char *heapMagicStringPtr = (unsigned char *) &heapAssertHeapNilFormat[0x10];
+char heapWindowEmptyModuleName[4] = "";

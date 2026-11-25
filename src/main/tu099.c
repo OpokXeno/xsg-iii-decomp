@@ -8,8 +8,10 @@ void sbNativeSlotsClear(void);
 s32 sbClearVmTables();
 s32 memset(s32 *, s32, s32);
 
+/* [0] the number of the loaded file, [1] the owner of the block. */
+static s32 gSbNativeOwnerFlags[2];
+
 void sbNativeOwnersReset(void) {
-    extern s32 gSbNativeOwnerFlags[];
     memset(gSbNativeOwnerFlags, 0, 8);
     sbNativeSlotsClear();
     sbClearVmTables();
@@ -21,32 +23,25 @@ extern s32 gSbMathNativeTable[];
 extern s32 gSbObjxNativeTable[];
 extern s32 gSbRuntimeNativeTable[];
 extern s32 gSbSoundNativeTable[];
-extern s32 gSbRuntimeModuleName[];
-extern s32 gSbObjxModuleName[];
-extern s32 gSbCfmapModuleName[];
-extern s32 gSbMathModuleName[];
-extern s32 gSbSoundModuleName[];
-extern s32 gSbDebugModuleName[];
 s32 sbNativeOwnerAdd(s32 *, s32 *);
 
 void sbNativeOwnersInit(void) {
     sbNativeSlotsClear();
     sbClearVmTables();
-    sbNativeOwnerAdd(gSbDebugModuleName, gSbDebugNativeTable);
-    sbNativeOwnerAdd(gSbRuntimeModuleName, gSbRuntimeNativeTable);
-    sbNativeOwnerAdd(gSbObjxModuleName, gSbObjxNativeTable);
-    sbNativeOwnerAdd(gSbCfmapModuleName, gSbCfmapNativeTable);
-    sbNativeOwnerAdd(gSbMathModuleName, gSbMathNativeTable);
-    sbNativeOwnerAdd(gSbSoundModuleName, gSbSoundNativeTable);
+    sbNativeOwnerAdd("deb", gSbDebugNativeTable);
+    sbNativeOwnerAdd("runtime", gSbRuntimeNativeTable);
+    sbNativeOwnerAdd("objx", gSbObjxNativeTable);
+    sbNativeOwnerAdd("cfmap", gSbCfmapNativeTable);
+    sbNativeOwnerAdd("math", gSbMathNativeTable);
+    sbNativeOwnerAdd("sound", gSbSoundNativeTable);
 }
 
 void sbNativeOwnersAddExtra(void) {
-    sbNativeOwnerAdd(gSbDebugModuleName, gSbDebugNativeTable);
-    sbNativeOwnerAdd(gSbSoundModuleName, gSbSoundNativeTable);
+    sbNativeOwnerAdd("deb", gSbDebugNativeTable);
+    sbNativeOwnerAdd("sound", gSbSoundNativeTable);
 }
 
 s32 sbNativeOwnerGetValue(s32 ownerIndex) {
-    extern s32 gSbNativeOwnerFlags[];
     return gSbNativeOwnerFlags[ownerIndex];
 }
 
@@ -71,8 +66,6 @@ unsigned char *sbNativeBufferGet(s32 nativeBufferId) {
 
 #include "main/tu105.h"
 
-extern s32 gSbNativeOwnerFlags[];
-extern unsigned char gSbNativeFileNameFormat[];
 
 struct CdFileRequest {
     s32 channel;
@@ -99,7 +92,7 @@ s32 sbNativeFileLoad(short fileNumber, s32 channel) {
     struct CdFilePath filePath;
     s32 succeeded;
 
-    GameMpeg2Play(filePath.fileName, gSbNativeFileNameFormat, fileNumber);
+    GameMpeg2Play(filePath.fileName, "%04d", fileNumber);
     func_001B6FF8(filePath.path, 0x6000000, filePath.fileName);
     xglCdFileRequestClear(&nativeFileRequest);
     nativeFileRequest.channel = channel;
@@ -174,3 +167,7 @@ s32 sbNativeHandlerMessagePost(s32 messageKind, s32 messageFirstWord, s32 messag
     sbThreadEnqueue(gSbNativeFileBuffer, entryPc, &message, 0);
     return 1;
 }
+
+unsigned char gSbNativeFileBuffer[0x14000];
+unsigned char gSbNativeBlockBuffer[0x10000];
+s32 gSbNativeTableWords[7];

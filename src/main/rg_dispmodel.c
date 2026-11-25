@@ -128,7 +128,7 @@ extern RgDispModel gRgDispModelTable[RG_DISPMODEL_SLOT_COUNT];
 
 void *memset(void *clearedVector, int value, unsigned int size);
 /* Scaffold data of rg_dispmodel, named by its splat label (no config/symbols name exists). */
-extern int sefActiveCount;
+static int sefActiveCount;
 
 /* Clears the active count and the whole resource slot table. */
 void sefResetResourceTable(void)
@@ -330,10 +330,9 @@ void MMathCalcDirVector(AlignedVector4 *clearedVector, void *source, AlignedVect
 float MMathVectorDotProduct(AlignedVector4 *left, AlignedVector4 *right);
 s32 MMathRotTransPersClip(s32 *screen, RgCamera *camera, void *left, void *right);
 void GameMpeg2Play(void *clearedVector, void *source, s32 actorId);
-extern char D_00531520[];
-extern char D_00531528[];
+extern const char D_00531520[];
+extern const char D_00531528[];
 void xglFontDebugPrintf(s32 x, s32 y, void *text, ...);
-extern float D_0054F3F8;
 
 /* Debug labels: draws the slot lookup key and state bits at its projected screen position when the camera sees it. */
 void func_001BFC50(RgDispModel *model) {
@@ -349,7 +348,7 @@ void func_001BFC50(RgDispModel *model) {
 
     MMathCalcDirVector(&direction, loopRuntime->camera->cameraViewBlock, &model->position);
     dot = MMathVectorDotProduct(&loopRuntime->viewDirection, &direction);
-    if (dot + loopRuntime->camera->depthBias * D_0054F3F8 < 1.0f) {
+    if (dot + loopRuntime->camera->depthBias * 0.15915495f < 1.0f) {
         return;
     }
     if (MMathRotTransPersClip(projected, loopRuntime->camera, &loopRuntime->clipPoint,
@@ -723,7 +722,7 @@ RgDispModel *RgDispModelFindByActor(XenoActor *actor) {
     return 0;
 }
 
-extern RgDispModel D_00581390[]; /* one past the end of gRgDispModelTable */
+extern unsigned char D_00581390[]; /* one past the end of gRgDispModelTable */
 
 /* Next live, unreleased slot after previousModel (or from the table start) whose kind has a bit of kindMask. */
 RgDispModel *RgDispModelNextByKind(s32 kindMask, RgDispModel *previousModel) {
@@ -732,7 +731,7 @@ RgDispModel *RgDispModelNextByKind(s32 kindMask, RgDispModel *previousModel) {
     s32 liveFlags;
 
     modelSlot = previousModel ? previousModel + 1 : gRgDispModelTable;
-    modelsEnd = D_00581390;
+    modelsEnd = (RgDispModel *) D_00581390;
     while (modelSlot != modelsEnd) {
         liveFlags = modelSlot->modelFlags;
         if ((liveFlags & 1) != 0 && (modelSlot->spawnKind & kindMask) != 0) {
@@ -777,3 +776,14 @@ void RgDispModelLink(RgDispModel *model, RgDispModel *partner) {
         partner->partnerModel = model;
     }
 }
+
+/* Read-only strings of the debug label text (the 8-byte packet heads are followed by a printf format). */
+const char D_00531520[8] = "\x12\x08\x08%03d";
+const char D_00531528[8] = "\x12\x08\x08%08X";
+
+/* Slot table and its end sentinel, the model pointers of RgDispModelFindByKey, the counters. */
+RgDispModel gRgDispModelTable[RG_DISPMODEL_SLOT_COUNT];
+unsigned char D_00581390[384];
+RgDispModel *D_003E47B0[27] = { 0 };
+float D_003E481C[] = { 0.0f };
+s32 rgDispModelIdCounter = 0;

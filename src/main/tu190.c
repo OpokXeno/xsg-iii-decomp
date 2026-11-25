@@ -9,7 +9,11 @@ typedef unsigned int u32;
 
 typedef int s32;
 
-extern s8 glyphIndexTable[];
+const s8 glyphIndexTable[24] = {
+    -1, 0, 6, 3, 4, 1, 5, 2,
+    8, 9, 7, -1, -1, 10, 11, 12,
+    13, -1, 0, 0, 0, 0, 0, 0,
+};
 
 s8 glyphIndexGet(u32 glyphCode) {
     if (!(glyphCode < 0x16U)) {
@@ -19,19 +23,31 @@ s8 glyphIndexGet(u32 glyphCode) {
 
 }
 
-extern unsigned char glyphPairOffsetTable[];
+const u8 glyphPairOffsetTable[16] = {
+    40, 44, 56, 60, 72, 76, 88, 92,
+    84, 80, 0, 0, 0, 0, 0, 0,
+};
 
 s32 glyphPairOffsetGet(s32 glyphIndex) {
     return glyphPairOffsetTable[glyphIndex >> 1] + 0x320;
 }
 
-extern unsigned char glyphAttrTable[];
+const u8 glyphAttrTable[24] = {
+    8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 0, 0, 0, 0, 0, 0,
+};
 
 u8 glyphAttrGet(s32 glyphIndex) {
     return glyphAttrTable[glyphIndex];
 }
 
-extern unsigned char D_00538E40[];
+const u8 D_00538E40[32] = {
+    10, 10, 10, 10, 8, 8, 8, 8,
+    8, 8, 8, 8, 8, 8, 8, 8,
+    8, 8, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+};
 
 u8 glyphAltAttrGet(s32 glyphIndex) {
     return D_00538E40[glyphIndex];

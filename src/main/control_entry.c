@@ -5,17 +5,6 @@ void xglSleep(void);
 void xglRenderFrame(void);
 void xglStudioUpdate(void);
 void xglCdControlThread(void);
-extern const char iopRebootImagePath[];
-extern const char sio2manModuleName[];
-extern const char mcmanModuleName[];
-extern const char mcservModuleName[];
-extern const char padmanModuleName[];
-extern const char libsdModuleName[];
-extern const char sdrdrvModuleName[];
-extern const char adxiModuleName[];
-extern const char adxiModuleArgs[];
-extern const char sndfiModuleName[];
-extern const char iopsubModuleName[];
 void func_002E7750(unsigned int mode);
 void func_002F7718(unsigned int mode);
 int func_002ED8C0(const char *image);
@@ -41,6 +30,18 @@ void func_0019ADD8(void);
 void func_00185D58(void);
 void moviePlayerSetSize(void);
 void initScratchpadBuffers(void);
+
+const char iopRebootImagePath[32] = "cdrom0:\\IOP\\IOPRP300.IMG;1";
+const char sio2manModuleName[8] = "sio2man";
+const char mcmanModuleName[8] = "mcman";
+const char mcservModuleName[8] = "mcserv";
+const char padmanModuleName[8] = "padman";
+const char libsdModuleName[8] = "libsd";
+const char sdrdrvModuleName[8] = "sdrdrv";
+const char adxiModuleName[16] = "cri_adxi";
+const char adxiModuleArgs[24] = "sdinit=0\0spucore=2";
+const char sndfiModuleName[8] = "sndfi";
+const char iopsubModuleName[16] = "iopsub";
 
 void InitializeSystem(void) {
     func_002E7750(0);
@@ -142,3 +143,6 @@ void xglSleep(void) {
     xglCdControlThread();
     xglStudioUpdate();
 }
+
+int mainParamArgc = 0;
+char **mainParamArgv = 0;

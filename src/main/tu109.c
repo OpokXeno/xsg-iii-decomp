@@ -275,7 +275,6 @@ void MMathRotateMatrixX(SlotMatrix*,SlotMatrix*,f32);
 void slotSetValueSelector();
 void func_0027AB00();
 
-extern char gEntryNameLargePrefix[];
 s32 func_0030EBD0();
 
 
@@ -328,7 +327,7 @@ int slotEntryDoorCreate(TableSlotRequest *request) {
     entry->flags = 0;
     entry->mode = 0;
     entry->rateCopy = 0;
-    if (func_0030EBD0(entry->name, gEntryNameLargePrefix, 6) == 0) {
+    if (func_0030EBD0(entry->name, "door_c", 6) == 0) {
         entry->voiceA = 0x60;
         entry->voiceB = 0x61;
         entry->flags |= ENTRY_FLAG_NORMAL;
@@ -473,7 +472,6 @@ void slotEntryMotionStep(SpawnerSlot *slot) {
 f32 MMathCalcDist(void *, void *);
 f32 actorFacingError(void *state, void *vector);
 s32 sbNativeHandlerMessagePost(s32 mode, s32 count, s32 flag);
-extern f32 gPadTriggerMaxAngle;
 extern u16 gPadDataPressed[];
 
 /* Starts the shorter slot limit of the pair when the pad button is pressed within reach of the leader slot. */
@@ -499,7 +497,7 @@ void slotEntryPadTriggerCheck(SpawnerSlot *slot) {
     if (slot->halfScale < distance - leaderModel->extents.size.x) {
         return;
     }
-    if (gPadTriggerMaxAngle < actorFacingError(leaderModel, position)) {
+    if (1.04719758f < actorFacingError(leaderModel, position)) {
         return;
     }
     if (slot->flags & 0x800) {

@@ -29,7 +29,7 @@ typedef struct TaskRecord {
     unsigned char unmodeled_0C[0x1C - 0x0C];
 } TaskRecord;
 
-extern TaskRecord battleTaskTable[BATTLE_TASK_COUNT];
+static TaskRecord battleTaskTable[BATTLE_TASK_COUNT];
 
 /* Clears all 32 task records (battleTaskClearAll), called by battleClearTaskAndSlotTables. */
 void battleTaskClearAll(void)

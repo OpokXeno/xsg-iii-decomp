@@ -817,3 +817,9 @@ s32 emitterActorAttachChild(SpawnModel *parentModel, s32 resourceKey, s32 jointI
     childModel->drawFlags |= 4;
     return (s32) childModel;
 }
+
+unsigned char gEmitterModelTable[32768] = { 0 };
+unsigned char gFontBuffer[266240] = { 0 };
+char D_003635C0[196608] = { 0 };
+char D_003935C0[196608] = { 0 };
+unsigned char gBufferArena[16384] = { 0 };

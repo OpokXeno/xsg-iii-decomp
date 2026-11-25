@@ -490,7 +490,7 @@
    "0x00537598": "gDebugCursorString",
    "0x005375c0": "gDebugAngleFormat",
    "0x005375e8": "gDebugFlagFormat",
-   "0x004caba8": "gSbThreadBlockStorage",
+   "0x004caba8": "gSbThreadBlock",
    "0x004b349a": "gPadDataPressed",
    "0x005312e8": "gDebugValueFormat",
    "0x0055d230": "gSlotIdTable",

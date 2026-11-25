@@ -410,9 +410,9 @@ typedef struct ShardField {
     unsigned char label[0x10];
 } ShardField;
 
-extern Vector4 gShardSeedX;
-extern Vector4 gShardSeedY;
-extern unsigned char gShardFieldTitleText[];
+extern const Vector4 gShardSeedX;
+extern const Vector4 gShardSeedY;
+extern const unsigned char gShardFieldTitleText[];
 extern s32 gXcFirstSection;
 extern s32 gXcSecondSection;
 extern u16 movieBackdropBasePage[];
@@ -617,3 +617,12 @@ void shardFieldUpdate(ShardField *shardField) {
 
     fontQueueSpriteBlack();
 }
+
+f32 gQuadDepthCounter = 0.0f;
+
+const Vector4 gShardSeedX = { -1.0f, 1.0f, -1.0f, 1.0f };
+const Vector4 gShardSeedY = { -1.0f, -1.0f, 1.0f, 1.0f };
+const unsigned char gShardFieldTitleText[16] = {
+    21, 2, 1, 8, 18, 5, 4, 0,
+    0, 0, 0, 0, 0, 0, 0, 0
+};

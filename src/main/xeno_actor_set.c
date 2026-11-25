@@ -50,3 +50,16 @@ int xenoActorTransformPoint(struct XenoActor *actor, Vector4 *transformedPoint) 
 void xenoActorSetShadowB2Flag(struct XenoActor *actor) {
     *(int *)actor->shadowB2 |= 0x80;
 }
+
+float gFocusDirectionOffsets[][2] = {
+    { 0.0f, 0.0f },
+    { 0.0f, -0.100000001f },
+    { 0.0f, 0.150000006f },
+    { 0.100000001f, 0.0f },
+    { -0.100000001f, 0.0f },
+    { 0.100000001f, -0.100000001f },
+    { -0.100000001f, -0.100000001f },
+    { 0.100000001f, 0.150000006f },
+    { -0.100000001f, 0.150000006f },
+    { 0.0f, 0.0f },
+};

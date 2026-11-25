@@ -4291,7 +4291,7 @@ def main():
                     require(sha(linker)==common['linker_sha256'],entry['tu']+': allocation linker pin differs')
                     check_path=args.output.parent/(entry['tu'].replace('/','-')+'.verified-alloc.o')
                     require(not check_path.exists(),entry['tu']+': allocation verification output already exists')
-                    argv=[str(linker),'-r','-d','-EL','-m','elf32lr5900','-o',str(check_path),str(derive_obj)]
+                    argv=[str(linker),'-r','-d','-G','4','-EL','-m','elf32lr5900','-o',str(check_path),str(derive_obj)]
                     process=subprocess.Popen(argv,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True)
                     try:
                         stdout,stderr=process.communicate(timeout=30)

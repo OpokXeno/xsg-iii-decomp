@@ -987,6 +987,45 @@ s32 func_001BF7C8(f32 value, f32 scale);
 
 s32 angleWrapTurns(f32 angle, f32 scale);
 
+/* A native method row: the script name, the native and an argument count; a table ends with a null name. */
+typedef struct SbNativeMethod {
+    const char *name;
+    int (*func)();
+    s32 argCount;
+} SbNativeMethod;
+
+/* Map-collision natives, in table order (14 rows and the end row). */
+SbNativeMethod gSbCfmapNativeTable[15] = {
+    { "setGravity", func_001C7F68, 0 },
+    { "setFloorLightID", func_001C8068, 0 },
+    { "setFloorLightRatio", sbNativeReturnZero, 0 },
+    { "setFloorLightRatio2", func_001C8100, 2 },
+    { "setLight", sbNativeSetLight, 1 },
+    { "setPointLight", func_001C85C8, 8 },
+    { "unsetPointLight", sbNativeLightClear, 1 },
+    { "setFootEffect", func_001C87B0, 2 },
+    { "setAnimFlg", sbNativeSetPartsFlags, 2 },
+    { "setAnimFrame", sbNativeSetPartsFirstFraction, 2 },
+    { "setAnimSpeed", sbNativeSetPartsSecondFraction, 2 },
+    { "visibleMapParts", func_001C8AF8, 2 },
+    { "transparentMapParts", func_001C8BC0, 2 },
+    { "setShootParams", func_001C8CD0, 0 },
+    { 0, 0, 0 },
+};
+
+SbNativeMethod gSbDebugNativeTable[2] = {
+    { "put", sbNativeReturnOne, 1 },
+    { 0, 0, 0 },
+};
+
+SbNativeMethod gSbMathNativeTable[5] = {
+    { "atan", func_001C8DC0, 2 },
+    { "cos", sbNativeCosine, 1 },
+    { "sin", sbNativeSine, 1 },
+    { "random", sbNativeRandomRange, 2 },
+    { 0, 0, 0 },
+};
+
 /* Script native: return position, angle or scale component (selected by field 0-8) of a slot object, scaled by 100. */
 int sbNativeGetObjectTransform(s32 thread) {
     SlotObject *slotObject;
@@ -1399,11 +1438,10 @@ s32 func_001CA3E8(s32 thread) {
     return 1;
 }
 
-extern float D_0054F57C;
 
 void stepRatioStart(SlotObject *slotObject, s32 value, float scale);
 
-/* Script native: call stepRatioStart with a slot, a value and argument 3 scaled by D_0054F57C. */
+/* Script native: call stepRatioStart with a slot, a value and argument 3 scaled by 0.01f. */
 s32 func_001CA560(s32 thread) {
     SlotObject *slotObject;
     s32 value;
@@ -1417,7 +1455,7 @@ s32 func_001CA560(s32 thread) {
         return 0;
     }
     value = vmArgGet(thread, 2);
-    stepRatioStart(slotObject, value, vmArgGet(thread, 3) * D_0054F57C);
+    stepRatioStart(slotObject, value, vmArgGet(thread, 3) * 0.01f);
     return 1;
 }
 
@@ -1918,3 +1956,32 @@ s32 nativeInvokePairVia6E10(s32 firstNativeArg, s32 secondNativeArg) {
     nativeArgs.secondNativeArg = secondNativeArg;
     return childTableSlotSpawn(&nativeArgs.firstNativeArg);
 }
+
+/* Object natives, in table order (24 rows and the end row). */
+SbNativeMethod gSbObjxNativeTable[25] = {
+    { "setSize", sbNativeSetModelSize, 1 },
+    { "setOffsetPivot", func_001C91F0, 1 },
+    { "setAttr", func_001C9370, 2 },
+    { "setAttr2", func_001C94F0, 2 },
+    { "setUnduID", func_001C95D0, 1 },
+    { "setFootID", func_001C96C8, 2 },
+    { "setParent", func_001C9778, 2 },
+    { "setCollision", func_001C9850, 2 },
+    { "getParam", sbNativeGetObjectTransform, 2 },
+    { "setParam", func_001C99F8, 3 },
+    { "setRGB", sbNativeSetEffectVector, 4 },
+    { "delete", func_001C9E50, 1 },
+    { "move", func_001C9F68, 2 },
+    { "moveOffset", func_001CA0D8, 2 },
+    { "rotate", func_001CA260, 2 },
+    { "scale", func_001CA3E8, 2 },
+    { "transparent", func_001CA560, 3 },
+    { "progress", func_001CA618, 2 },
+    { "pause", func_001CA758, 2 },
+    { "isModelPC", func_001CA7F0, 1 },
+    { "setTargetOffset", func_001CA880, 1 },
+    { "sendSignal", sbNativeEntrySetFlag, 2 },
+    { "trapEffect", func_001CAA48, 1 },
+    { "sikomi", func_001CAAC0, 2 },
+    { 0, 0, 0 },
+};

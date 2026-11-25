@@ -111,7 +111,6 @@ void XrgMatrixToQuaternion(float quat[4], Matrix4 matrix) {
 
 void xglVectorOuter(Vector4 *destination, const Vector4 *left, const Vector4 *right);
 void xglVectorInner(float *result, const Vector4 *left, const Vector4 *right);
-extern const float xglQuatLengthEpsilon;
 
 int XrgQuaternionFromVectors(Vector4 *quaternion, const Vector4 *left, const Vector4 *right) {
     Vector4 cross;
@@ -122,7 +121,7 @@ int XrgQuaternionFromVectors(Vector4 *quaternion, const Vector4 *left, const Vec
     xglVectorOuter(&cross, left, right);
     xglVectorInner(&dot, left, right);
     length = __builtin_sqrtf((dot + 1.0f) * 2.0f);
-    if (__builtin_fabsf(length) < xglQuatLengthEpsilon) {
+    if (__builtin_fabsf(length) < 0.01f) {
         cross.y = 1.0f;
         cross.x = 0.0f;
         cross.z = 0.0f;
@@ -331,11 +330,11 @@ void xglCurSetScaleXYZ(const Vector4 *scale) {
     xglCurMatrixSet(xglScaleXYZMatrix);
 }
 
-extern f32 xglLowerLeftMatrix[4];
+extern Matrix4 xglLowerLeftMatrix;
 
 void xglCurMatrixSetLowerLeft(const f32 *lowerLeft)
 {
-  Matrix4 *matrix = (Matrix4 *) xglLowerLeftMatrix;
+  Matrix4 *matrix = &xglLowerLeftMatrix;
   (*matrix)[1][0] = lowerLeft[0];
   (*matrix)[2][0] = lowerLeft[1];
   (*matrix)[2][1] = lowerLeft[2];
@@ -427,3 +426,95 @@ void xglCurMulInvScaleXYZ(f32 scale[3]) {
     }
     xglCurMatrixMul(xglMulInvScaleMatrix);
 }
+
+/* Matrix data in .data (address order); each starts as the identity. */
+Matrix4 tiVu0IdentityMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglRotMatrixX = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglRotMatrixY = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglRotMatrixZ = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglTranslateMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglScaleMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglScaleXYZMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglLowerLeftMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulRotMatrixX = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulRotMatrixY = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulRotMatrixZ = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulTranslateMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulScaleMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulScaleXYZMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+Matrix4 xglMulInvScaleMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};

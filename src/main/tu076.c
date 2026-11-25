@@ -429,7 +429,7 @@ int spawnDisplayRecordBind(SpawnSlotRequest *bindRequest) {
     }
 }
 
-extern unsigned char gDispModelProbeDelta[];
+extern f32 gDispModelProbeDelta[];
 s32 func_002A6FA8();
 void func_002A70E8();
 void func_002AA490();
@@ -551,3 +551,7 @@ void spawnDisplayRecordUpdate(SpawnActor *spawnActor) {
         }
     }
 }
+
+f32 gDispModelProbeDelta[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+
+f32 gEmitterStartDelta[4] = { 0.0f, 0.0f, 0.0f, 1.0f };

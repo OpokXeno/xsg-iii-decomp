@@ -394,3 +394,5 @@ void func_001F3A98(SdvPacketOwner *owner, int scriptBase, int elapsed) {
         }
     }
 }
+
+SdvPacketTable gSdvPacketTable[1];

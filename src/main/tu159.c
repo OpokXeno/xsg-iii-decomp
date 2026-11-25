@@ -86,3 +86,7 @@ s32 xcLoadPayloadSections(void) {
     gXcSecondSection = secondSection;
     return secondSectionOffset;
 }
+
+void *gXcFirstSection = 0;
+void *gXcSecondSection = 0;
+unsigned char D_003C75C0[40960] = { 0 };

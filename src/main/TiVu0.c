@@ -17,17 +17,26 @@ void tiVu0CurMatrixLoadVec3Mul(f32 *vector)
 #include "shared.h"
 
 void assertFailed(const char *message, const char *file, int line);
-extern const char tiVu0UnreachableAssertText[];
-extern const char tiVu0AssertFile[];
 
 /* Unconditional assert(0) at TiVu0.euc.c line 802: the expression text is "0" and the file name is "TiVu0.euc.c". */
 void tiVu0AssertLine802(void)
 {
-    assertFailed(tiVu0UnreachableAssertText, tiVu0AssertFile, 802);
+    assertFailed("0", "TiVu0.euc.c", 802);
 }
 
 /* Unconditional assert(0) at TiVu0.euc.c line 821: the expression text is "0" and the file name is "TiVu0.euc.c". */
 void tiVu0AssertLine821(void)
 {
-    assertFailed(tiVu0UnreachableAssertText, tiVu0AssertFile, 821);
+    assertFailed("0", "TiVu0.euc.c", 821);
 }
+
+/* The identity matrix with the vector rows used by tiVu0CurMatrixLoadVec3Mul. */
+f32 gTiVu0Vec3Matrix[16] = {
+    1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+    0.0f, 0.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f
+};
+
+/* The end point of a capsule, at the origin with w = 1 (used by tiDynamicsCollPushOutCapsule). */
+f32 gCapsuleEndCenter[4] = {
+    0.0f, 0.0f, 0.0f, 1.0f
+};

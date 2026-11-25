@@ -2,8 +2,8 @@
 
 typedef int s32;
 
-extern s32 gSbNativeValueSlotIndex;
-extern s32 gSbNativeValueRepeatRequest;
+static s32 gSbNativeValueSlotIndex;
+static s32 gSbNativeValueRepeatRequest;
 extern s32 gSbNativeValueSlots[];
 void *memset(void *s, int c, unsigned int n);
 
@@ -71,3 +71,6 @@ s32 sbNativeValueSlotRun(void) {
     } while (gSbNativeValueRepeatRequest != 0);
     return 1;
 }
+
+s32 gSbNativeValueSlots[8];
+SbNativeValueFrame gSbNativeValueFrames[9];

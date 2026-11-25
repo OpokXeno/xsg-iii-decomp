@@ -68,7 +68,7 @@ typedef struct Position8 {
     s64 zw;
 } Position8;
 
-extern Position8 D_00538EF0;
+extern const Position8 D_00538EF0;
 void xglMatrixStackUnit(void);
 void xglMatrixStackTrans(Position8 *translation);
 void xglMatrixStackRotX(float angle);
@@ -102,3 +102,15 @@ void optionalBlocksDraw(void) {
     }
     fontQueueSpriteBlack();
 }
+
+const Position8 D_00538EF0 = { 0xBF80000000000000, 0x3F80000041800000 };
+
+unsigned char gOptionalBlocksBlob[45056] = { 0 };
+
+u8 *gOptionalBlocksSource = 0;
+
+void *gOptionalSecondaryBlock = 0;
+
+void *gOptionalPrimaryBlock = 0;
+
+s8 gOptionalBlocksLoadState = 0;

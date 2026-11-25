@@ -155,6 +155,13 @@ segments:
       - [0x388E8, data, ov02/unsplit]
       - [0x3DCD0]
       - { type: bss, vram: 0x00ABCCD0, name: ov02/unsplit }
+      - { type: bss, vram: 0x00ABFA70, name: ov02/battle_slot }
+      - { type: bss, vram: 0x00ABFB30, name: ov02/battle_task }
+      - { type: bss, vram: 0x00ABFEB0, name: ov02/mons_slot_run }
+      - { type: bss, vram: 0x00ABFF70, name: ov02/unit_side_table }
+      - { type: bss, vram: 0x00AC1B00, name: ov02/unsplit_1 }
+      - { type: bss, vram: 0x00AC51F0, name: ov02/unit_tbl }
+      - { type: bss, vram: 0x00AC5218, name: ov02/unsplit_2 }
   - [0x3DCD0, pad, ov02_bss_file_image]
   - [0x4A0D4, bin, elf_shstrtab]
   - [0x4A0F4, bin, elf_section_headers]

@@ -1,6 +1,7 @@
 #include "common.h"
 
 #include "shared.h"
+#include "main/battle_shared.h"
 typedef signed char s8;
 
 typedef unsigned char u8;
@@ -125,7 +126,6 @@ s32 func_00A85160(u8 itemId, u8 quantity);
 s32 *func_A87550(s32 recordNumber);
 const char *messageTextGet(s32 id);
 void GameMpeg2Play(char *moviePath, const char *format, s32 movieName);
-extern u8 D_00550C40[];
 extern char *gFontEscapeBuffer;
 
 /* Draws one row of the battle result list for entry `slot`: the message with its fade-in when the entry has
@@ -133,7 +133,6 @@ extern char *gFontEscapeBuffer;
 void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 fade) {
     extern StateBlock *gBudgetDisplayBlock;
     extern char *gFontEscapeBuffer;
-    extern unsigned char D_00550C40[];
     short rect[4];
     s32 rectLeft;
     s32 rectMid;
@@ -264,8 +263,8 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
         xglFontSetColor(128, 0xFF & gaugeGreen, gaugeBlue & 0xFF);
     }
     if (gBudgetDisplayBlock->mode == 0) {
-        xglFontPrintIndexed(406, (((baseX - 0x71F8) >> 4)) + 6, D_00550C40);
-        xglFontPrintIndexed(406, (((baseX - 0x71F8) >> 4)) + 26, D_00550C40);
+        xglFontPrintIndexed(406, (((baseX - 0x71F8) >> 4)) + 6, "+");
+        xglFontPrintIndexed(406, (((baseX - 0x71F8) >> 4)) + 26, "+");
     }
     xglFontDrawUnsignedNumber(0x8A18, (baseX + 0x60) & 0xFFFF, amount, 16);
 
@@ -302,7 +301,6 @@ s32 xglFontTextWidth(void *text, s32 b);
 s32 xglFontDrawDigitsMinTwo(s32 x, s32 y, s32 value, s32 digits);
 void xglFontDrawDigits(s32 x, s32 y, s32 value, s32 digits);
 extern unsigned char gBattleRosterTable[];
-extern u8 D_00550C48[];
 
 /* Draws the whole result page: the fonts, the entry rows (activeEntryCount rows highlighted), the record list,
  * the budget figures and the play-time line at the bottom. */
@@ -416,7 +414,7 @@ void budgetDisplayDrawPage(void) {
                 if (text != 0) {
                     xglFontPrintIndexed(74, rect[1], text);
                 }
-                GameMpeg2Play(gFontEscapeBuffer, D_00550C48, gBudgetDisplayBlock->recordAmount[i]);
+                GameMpeg2Play(gFontEscapeBuffer, "%d", gBudgetDisplayBlock->recordAmount[i]);
                 xglFontPrintIndexed(400, rect[1], gFontEscapeBuffer);
                 text = messageTextGet(154);
                 xglFontPrintIndexed(417, rect[1], text);
@@ -459,7 +457,7 @@ void budgetDisplayDrawPage(void) {
         if (gBudgetDisplayBlock->mode == 2) {
             xglFontPrintEscapeByte(13);
             xglFontPrintExtendedColorByte(0, 0, 0, 2);
-            xglFontPrintIndexed(250, 348, D_00550C40);
+            xglFontPrintIndexed(250, 348, "+");
         }
 
         budget = gBudgetDisplayBlock->budget;
@@ -1112,11 +1110,10 @@ void budgetDisplayUpdate(void) {
 }
 
 s32 runAfterCompletionIdle(s32 value);
-extern s32 D_004CABC4[];
 s32 memPoolInit();
 s32 memPoolReset();
 
-/* Runs runAfterCompletionIdle once (guarded by gVsyncsPerFrame and the mode word at D_004CABC4 != 2). */
+/* Runs runAfterCompletionIdle once (guarded by gVsyncsPerFrame and the resume action of gSbThreadBlock != 2). */
 s32 runWithStateBlockOnce(s32 runArgument) {
     extern s32 runAfterCompletionIdle();
     s32 runOutcome;
@@ -1125,7 +1122,7 @@ s32 runWithStateBlockOnce(s32 runArgument) {
 
     runOutcome = 0;
     savedRunGuard = gVsyncsPerFrame;
-    if (D_004CABC4[0] != 2) {
+    if (gSbThreadBlock.resumeAction != 2) {
         gVsyncsPerFrame = 1;
         memPoolInit(0x980000, 0x10000);
         blockRunOutcome = runAfterCompletionIdle(runArgument);
@@ -1344,3 +1341,5 @@ s32 budgetDisplayRun(s32 flags) {
     swapWordsRestore();
     return 0;
 }
+
+StateBlock *gBudgetDisplayBlock = 0;

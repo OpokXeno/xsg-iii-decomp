@@ -719,3 +719,5 @@ s32 func_001EA050(SefEffectObject *effectObject) {
     }
     return isFlagged;
 }
+
+s32 sefListedOwnerKeys[] = { 0x00136014, 0x00136015, -1, 0 };

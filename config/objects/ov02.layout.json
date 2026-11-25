@@ -5,7 +5,7 @@
    "0x00a80000",
    "0x00a81558"
   ],
-  "ov02/tu001": [
+  "ov02/boost_gauge": [
    "0x00a81558",
    "0x00a81920"
   ],
@@ -49,7 +49,7 @@
    "0x00a852d8",
    "0x00a859a0"
   ],
-  "ov02/tu012": [
+  "ov02/scene_load": [
    "0x00a859a0",
    "0x00a86508"
   ],
@@ -73,7 +73,7 @@
    "0x00a874a0",
    "0x00a88a08"
   ],
-  "ov02/tu018": [
+  "ov02/mons_slot": [
    "0x00a88a08",
    "0x00a88e28"
   ],
@@ -81,7 +81,7 @@
    "0x00a88e28",
    "0x00a89128"
   ],
-  "ov02/tu020": [
+  "ov02/data_vpad": [
    "0x00a89128",
    "0x00a89f50"
   ],
@@ -101,23 +101,23 @@
    "0x00a8ac10",
    "0x00a8b2d0"
   ],
-  "ov02/tu025": [
+  "ov02/battle_slot": [
    "0x00a8b2d0",
    "0x00a8b4b0"
   ],
-  "ov02/tu026": [
+  "ov02/battle_task": [
    "0x00a8b4b0",
    "0x00a8b620"
   ],
-  "ov02/tu027": [
+  "ov02/mons_slot_run": [
    "0x00a8b620",
    "0x00a8b7a8"
   ],
-  "ov02/tu028": [
+  "ov02/unit_side_table": [
    "0x00a8b7a8",
    "0x00a8b9e8"
   ],
-  "ov02/tu029": [
+  "ov02/obj_slot": [
    "0x00a8b9e8",
    "0x00a8baa0"
   ],
@@ -129,7 +129,7 @@
    "0x00a8c5e8",
    "0x00a8cfb0"
   ],
-  "ov02/tu032": [
+  "ov02/sb_natives": [
    "0x00a8cfb0",
    "0x00a8d018"
   ],
@@ -141,7 +141,7 @@
    "0x00a8d0f8",
    "0x00a8d218"
   ],
-  "ov02/tu035": [
+  "ov02/sb_natives_unit_035": [
    "0x00a8d218",
    "0x00a8d710"
   ],
@@ -149,7 +149,7 @@
    "0x00a8d710",
    "0x00a8d900"
   ],
-  "ov02/tu037": [
+  "ov02/sb_natives_unit_037": [
    "0x00a8d900",
    "0x00a8ddb8"
   ],
@@ -157,7 +157,7 @@
    "0x00a8ddb8",
    "0x00a8dee8"
   ],
-  "ov02/tu039": [
+  "ov02/sb_natives_unit_039": [
    "0x00a8dee8",
    "0x00a8e120"
   ],
@@ -237,11 +237,11 @@
    "0x00a975d8",
    "0x00a982e8"
   ],
-  "ov02/tu059": [
+  "ov02/calc": [
    "0x00a982e8",
    "0x00a98ec8"
   ],
-  "ov02/tu060": [
+  "ov02/unit_tbl": [
    "0x00a98ec8",
    "0x00a99230"
   ],
@@ -399,6 +399,41 @@
    [
     "ov02/unsplit",
     "0x00abccd0",
+    "0x00abfa70"
+   ],
+   [
+    "ov02/battle_slot",
+    "0x00abfa70",
+    "0x00abfb30"
+   ],
+   [
+    "ov02/battle_task",
+    "0x00abfb30",
+    "0x00abfeb0"
+   ],
+   [
+    "ov02/mons_slot_run",
+    "0x00abfeb0",
+    "0x00abff70"
+   ],
+   [
+    "ov02/unit_side_table",
+    "0x00abff70",
+    "0x00ac1b00"
+   ],
+   [
+    "ov02/unsplit_1",
+    "0x00ac1b00",
+    "0x00ac51f0"
+   ],
+   [
+    "ov02/unit_tbl",
+    "0x00ac51f0",
+    "0x00ac5218"
+   ],
+   [
+    "ov02/unsplit_2",
+    "0x00ac5218",
     "0x00ac90d4"
    ]
   ]

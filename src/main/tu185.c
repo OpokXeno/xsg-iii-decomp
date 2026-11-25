@@ -264,7 +264,7 @@ s32 pagedTableUpdateCursorFromStatus(PagedTable *pagedTable, s32 *statusOut) {
 }
 
 extern s32 gPagedTablePoolHandle;
-extern s32 gPagedTablePoolCounter;
+static s32 gPagedTablePoolCounter;
 void *pagedTablePoolAlloc(s32 size);
 
 /* Bump allocator inside the table pool: returns the next block of `bytes` (rounded up to 4) or 0 for size 0. */
@@ -803,3 +803,5 @@ s32 pagedTableFlush(void) {
     func_00221C50();
     return 1;
 }
+
+s32 gPagedTablePoolHandle = 0;

@@ -127,9 +127,25 @@ typedef struct TrackedPoint {
 
 #define SLOT_COUNT 16
 
-extern unsigned char D_0055CC00[];
+extern GameStateBlock D_0055CC00;
 
-#define gGameStateBlock (*(GameStateBlock *) D_0055CC00)
+#define gGameStateBlock D_0055CC00
+
+const unsigned int D_00531388[100] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0x101F4029, 0x101F4029, 0x101F4029, 0x101F402C, 0x101F402C, 0x101F402C, 0x101F402F,
+    0x101F402F, 0x101F402F, 0x101F4032, 0x101F4032, 0x101F4032, 0x101F4035, 0x101F4035, 0x101F4035,
+    0x101F4038, 0x101F4038, 0x101F4038, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0x101F4047,
+    0x101F4047, 0x101F4047, 0x101F404A, 0x101F404A, 0x101F404A, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0
+};
 
 void *memset();
 
@@ -155,7 +171,6 @@ typedef struct CdReadRequest {
 } CdReadRequest;
 
 extern struct { s16 loadedId; u8 unmodeled_02[0x40]; } D_0055CC04;
-extern char D_00531518[];
 extern u8 D_0055DDC0[];
 void func_001BE5B0();
 void xglCdFileRequestClear();
@@ -184,13 +199,13 @@ int func_001BE470(s16 id, s32 isPositive) {
     request.dest = D_0055DDC0;
     request.onDone = func_001BE5B0;
     request.signedId = isPositive ? id : -id;
-    GameMpeg2Play(names.name, D_00531518, id);
+    GameMpeg2Play(names.name, "%04d", id);
     func_001B6FF8(names.path, 0x1020000, names.name);
     if (xglCdReadRecordPrepare(&request) != 0) {
         gGameStateBlock.pendingValue = id;
         return 1;
     }
-    GameMpeg2Play(names.name, D_00531518, id);
+    GameMpeg2Play(names.name, "%04d", id);
     func_001B6FF8(names.path, 0x1030000, names.name);
     if (xglCdReadRecordPrepare(&request) != 0) {
         gGameStateBlock.pendingValue = id;
@@ -374,7 +389,6 @@ s32 func_001BE8E0(void) {
 
 void slotTableClearIds(void);
 void func_001BEF78(void);
-extern u8 D_00531388[];
 
 static inline void SetOne(Vector4 *destination) {
     __asm__ __volatile__("vmaxw.xyzw $vf1, $vf0, $vf0w\n sqc2 $vf1, 0(%0)" : : "r"(destination) : "memory");
@@ -895,7 +909,6 @@ typedef struct StudioCameraSetup {
     s32 unk_D8;
 } StudioCameraSetup;
 
-extern f32 D_0054F3F0;
 void setCurrentStudio(int studio);
 StudioCameraSetup *xglStudioGetCamera2(int camera_index);
 void xglCameraInit(void *camera);
@@ -919,7 +932,7 @@ void func_001BF688(void) {
     do {
         cameraScale = 2.5f;
     } while (0);
-    cameraOffsetA0 = D_0054F3F0;
+    cameraOffsetA0 = -0.104719758f;
     camera->active = isActive;
     camera->unk_A0 = cameraOffsetA0;
     camera->unk_D4 = cameraScale;
@@ -950,7 +963,6 @@ void func_001BF6F8(Vector4 *position, Vector4 *probe, CollisionContext *collisio
     collisionContext->mode = savedMode;
 }
 
-extern f32 gAngleUnitsToDegrees;
 s32 func_001BF7C8(f32 firstFactor, f32 secondFactor);
 
 /* Wraps the rounded angle (in angle units scaled by gAngleUnitsToDegrees) into 0..period, period = turns * 360. */
@@ -959,7 +971,7 @@ s32 angleWrapTurns(f32 angle, f32 turns) {
     s32 period;
     s32 remainder;
 
-    scaled = func_001BF7C8(angle * gAngleUnitsToDegrees, turns);
+    scaled = func_001BF7C8(angle * 57.2957802f, turns);
     period = turns * 360.0f;
     remainder = scaled % period;
     return ((remainder < 0) * period) + remainder;
@@ -996,3 +1008,7 @@ f32 actorFacingError(FacingActor *actor) {
     angleDelta = MMathCalcRotNear(actor->rotation.y, direction);
     return __builtin_fabsf(angleDelta);
 }
+
+GameStateBlock D_0055CC00;
+unsigned char D_0055DDA0[32];
+unsigned char D_0055DDC0[2048];

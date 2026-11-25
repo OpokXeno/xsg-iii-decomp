@@ -319,6 +319,17 @@ s32 scriptGameStateQuery(s32 scriptThread) {
     }
 }
 
+/* Names of the seven entries of the scene table: space0000 to space0006. */
+const char D_005379F8[7][16] = {
+    "space0000",
+    "space0001",
+    "space0002",
+    "space0003",
+    "space0004",
+    "space0005",
+    "space0006"
+};
+
 s32 scriptRuntimeFlagToggle(s32 scriptThread) {
     s32 *dispModelSlot;
     s32 flagToggleKind;
@@ -412,3 +423,8 @@ s32 sbNativeCallKeyedEntry(s32 vm) {
     func_001B3858(keyedEntryText);
     return 1;
 }
+
+s16 gSaveTags[] = { 0 };
+s16 D_003E46BA[] = { 0 };
+s16 D_003E46BC[14] = { 0 };
+void *gRgSceneRoot[54] = { 0 };

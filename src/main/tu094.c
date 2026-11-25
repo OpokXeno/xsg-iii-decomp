@@ -56,3 +56,5 @@ s32 sbNativeStoreValueAndStartFx(s32 vm) {
     func_001B7A60(storedArg, thirdArg, secondArg, secondArg);
     return 1;
 }
+
+s32 gScriptStoredValue[5] = { 0 };

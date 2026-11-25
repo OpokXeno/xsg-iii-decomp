@@ -24,7 +24,7 @@ int battleSlotClaim(int *flags);
 
 
 
-extern CallbackSlot D_00ABFEB0[BATTLE_CALLBACK_SLOT_COUNT];
+static CallbackSlot D_00ABFEB0[BATTLE_CALLBACK_SLOT_COUNT];
 
 /* Clears both entries of the callback table (battleSlotClear on each). */
 void monsSlotClearAll(void)

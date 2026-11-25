@@ -82,7 +82,7 @@ typedef struct StreamPlayer {
     u8 unmodeled_7e3b3[0x7E3C0 - 0x7E3B3];
 } StreamPlayer;
 
-extern StreamPlayer *gStreamPlayerBlock;
+static StreamPlayer *gStreamPlayerBlock;
 
 #define gStreamPlayer (*gStreamPlayerBlock)
 
@@ -810,3 +810,34 @@ s32 runDecodePipeline(void) {
     streamPlayerShutdown();
     return pipelineResult;
 }
+
+u16 gStreamTrackTable[][4] = {
+    { 1010, 1, 0, 0 },
+    { 1150, 101, 102, 0 },
+    { 1810, 100, 102, 0 },
+    { 18494, 3, 116, 0 },
+    { 2670, 101, 257, 0 },
+    { 20094, 101, 269, 0 },
+    { 3830, 100, 284, 0 },
+    { 20394, 100, 314, 0 }
+};
+
+u8 gFontVifBlock[112] = {
+    0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 6, 0, 0, 81,
+    4, 0, 0, 0, 0, 0, 0, 16,
+    14, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 56, 8, 0,
+    80, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    81, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    82, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0,
+    83, 0, 0, 0, 0, 0, 0, 0,
+    0, 112, 0, 0, 0, 0, 0, 8,
+    0, 0, 0, 0, 0, 0, 0, 0
+};
+
+u8 gStreamTrackIndex = 0xFF;
+s32 D_00550C34 = 0;

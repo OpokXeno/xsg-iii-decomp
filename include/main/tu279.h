@@ -5,9 +5,9 @@ typedef unsigned char u8;
 
 typedef int s32;
 
-typedef signed char s8;
-
 typedef short s16;
+
+typedef signed char s8;
 
 typedef float f32;
 

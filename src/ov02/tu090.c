@@ -11,7 +11,7 @@ typedef struct SeEmitter {
     void *boundUnit;
 } SeEmitter;
 
-extern s32 gSeInitialized;
+static s32 gSeInitialized = 0;
 
 void seResetInitialized(void) {
     gSeInitialized = 0;

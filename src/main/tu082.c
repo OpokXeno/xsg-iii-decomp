@@ -280,8 +280,13 @@ static inline void BroadcastScalarXYZ(Vector4 *destination, f32 value) {
         : "$8");
 }
 
-extern SpawnCallbackTable gDescriptorSlotCallbacks;
-extern u8 gLoadedResourceTable[];
+void modeSlotWaitHandler();
+void modeSlotActivate();
+void XenoActorSwitchHandler();
+const SpawnCallbackTable gDescriptorSlotCallbacks = {
+    { modeSlotWaitHandler, modeSlotActivate, XenoActorSwitchHandler },
+};
+extern u32 gLoadedResourceTable[];
 void slotSetValueSelector();
 void func_0027AB00();
 s32 func_0028D760();
@@ -410,3 +415,12 @@ void objectSetDefaults(SpawnSlot *spawnSlot)
     spawnSlot->flags = updatedFlagBits;
     slotChildStateSelect(spawnSlot, 1);
 }
+
+unsigned int gLoadedResourceTable[48] = {
+    0x20434158u, 0x3FD9999Au, 0, 0x42160000u, 4, 0, 0, 0,
+    0, 0, 0, 0, 80, 192, 192, 192,
+    192, 192, 192, 192, 511, 16384, 0, 16384,
+    0, 16384, 0, 16384, 0, 16384, 0, 16384,
+    0, 16384, 0x3F800000u, 16384, 0x3F800000u, 16384, 0x3F800000u, 0x10000u,
+    0x10000u, 0x10020u, 2, 0x3E999864u, 0, 0x1E4002u, 0x3EB9A50Bu, 0x3FE429F9u
+};

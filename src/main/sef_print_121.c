@@ -11,7 +11,6 @@ typedef char *va_list;
 
 extern int printf(const char *format, ...);
 extern int vsprintf(char *output, const char *format, va_list formatArgs);
-extern const char tracePrintFormat[8];
 
 void tracePrint(const char *format, ...) {
     va_list formatArgs;
@@ -19,7 +18,7 @@ void tracePrint(const char *format, ...) {
 
     va_start(formatArgs, format);
     vsprintf(formattedText, format, formatArgs);
-    printf(tracePrintFormat, formattedText);
+    printf("%s", formattedText);
     va_end(formatArgs);
 }
 

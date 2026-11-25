@@ -181,3 +181,13 @@ s32 completionRequestStart(s32 address, s32 parameter, s32 doneFlag) {
     }
     return succeeded;
 }
+
+/* Pool and completion state kept in .sdata (address order). */
+s32 memPoolSize = 0;
+s32 memPoolInitialSize = 0;
+s32 D_00550B58 = 0;
+s32 memPoolTop = 0;
+s32 memPoolLastBlock = 0;
+s32 memPoolBase = 0;
+s32 completionDoneFlags = 0;
+unsigned char *gBufferCursor = 0;

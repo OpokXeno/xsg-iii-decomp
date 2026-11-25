@@ -49,7 +49,7 @@ struct UnitSideSlot {
     unsigned char unmodeled_0c[0x304];
 };
 
-extern struct UnitSideSlot gUnitSideSlotTable[UNIT_SIDE_COUNT];
+static struct UnitSideSlot gUnitSideSlotTable[UNIT_SIDE_COUNT];
 
 void unitSideClearAll(void)
 {

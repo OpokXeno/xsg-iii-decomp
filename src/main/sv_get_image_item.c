@@ -214,7 +214,7 @@ void sceVif1PkOpenUpkCode(XglPacket *packet, unsigned int address, unsigned int 
                           unsigned int a4);
 void sceVif1PkCloseUpkCode(XglPacket *packet);
 void sceVif1PkAddUpkData128N(XglPacket *packet, const void *data, unsigned int count);
-extern int svDrawMode;
+static int svDrawMode;
 void svDrawListAppend(int code, int operandA, int operandB);
 void svDrawListEmit(XglPacket *packet, DrawListEntry *entry, int pendingCount);
 
@@ -226,14 +226,19 @@ extern DrawList svDrawList;
 /* The record at the end cursor: svDrawList.entries is the base of the 16-byte slots, begin_index a slot count. */
 #define SV_DRAW_LIST_BEGIN_RECORD ((DrawListEntry *) (svDrawList.entries + svDrawList.begin_index))
 
-extern u32 svDrawModeTagTable[];
+/* The VU1 program address and the quadwords per record of each draw mode. */
+typedef struct SvDrawMode {
+    u32 programAddress;
+    u32 recordQuadwords;
+} SvDrawMode;
+
+extern SvDrawMode svDrawModeTagTable[16];
 extern int svStaticRefQuadwordCount[];
 extern unsigned char svStaticRefQuadwords[];
 extern DrawStatePacket *svDrawStatePacket;
 void sceVif1PkAddUpkData128(XglPacket *packet, Quadword word);
 extern u8 D_00000080[];
 extern u8 D_00000110[];
-extern u32 svDrawRecordDivisors[];
 
 /* VRAM size svAddImage reserves for a square 4-bit image of at most 16 pixels. */
 #define SV_IMAGE_SQUARE_4BIT_VRAM 0x100
@@ -245,7 +250,14 @@ extern u32 svDrawRecordDivisors[];
  * indexes them by 5084 bytes (one SvTypeList). svImageListCreate clears one 5084-byte list at 0x4AC2C0. */
 extern SvTypeList svResourceTypeLists[];
 extern SvTypeList svResourceTypeListScratch;
-extern u64 svAlphaTestTable[];
+const u64 svAlphaTestTable[4] = { 0x0000000000000044ULL, 0x0000000000000048ULL, 0x0000008000000042ULL, 0x000000000000006AULL };
+const u64 svPairAlphaTable[5] = { 0x0000000000000054ULL, 0x0000000000000058ULL, 0x0000008000000052ULL, 0x000000000000006AULL, 0x0000000000000000ULL };
+const Matrix4 svUnitQuadCornerMatrix = {
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 1.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 1.0f, 1.0f, 0.0f },
+    { 1.0f, 1.0f, 1.0f, 0.0f }
+};
 SvTypeList *svGetTypeList(int type);
 SvTypeListEntry *svGetImageListItemSub(int type, unsigned int flags);
 int sceVif1PkRefLoadImage(void *packet, u16 basePointer, int psm, int bufferWidth, const void *data, int quadwordCount, int, int, int, int);
@@ -256,7 +268,6 @@ int svAddScript(SvTypeList *resourceTypeList, SvResourceBlob *chunk);
 int svAddImage(SvTypeList *list, SvImageBlob *image);
 /* Adds a CLUT chunk as a list entry and advances savedSize by 256 (8 bits per pixel) or 128. Returns the entry * index, or -1 when the list is full. */ int svAddClut(SvTypeList *resourceTypeList, SvClutBlob *chunk);
 int svAddScript2(SvTypeList *resourceTypeList, SvResourceBlob *script);
-extern u32 svDrawRecordDivisors[31];
 
 /* The two buffer addresses sefEffectTallyAt hands back: the first one is used when the flag is set, the second one otherwise. */
 typedef struct DrawBufferPair {
@@ -386,7 +397,7 @@ void svDrawListEmit(XglPacket *packet, DrawListEntry *pendingRecords, int pendin
 
     drawMode = svDrawMode;
     recordsAddress = (const void *) ((u32) pendingRecords & 0xfffffff);
-    divisor = svDrawRecordDivisors[drawMode * 2];
+    divisor = svDrawModeTagTable[drawMode].recordQuadwords;
     batchUnpackRecord = SV_DRAW_LIST_BEGIN_RECORD;
     drawSlots = (DrawListSlot *) batchUnpackRecord;
     countMinusOne = pendingCount - 1;
@@ -441,7 +452,7 @@ void svDrawListFlush(int pendingCount)
         svDrawListEmit(packet, SV_DRAW_LIST_BEGIN_RECORD, pendingCount);
         sceVif1PkCnt(packet, 0);
         sceVif1PkAddCode(packet, 0x11000000);
-        tag = svDrawModeTagTable[svDrawMode * 2];
+        tag = svDrawModeTagTable[svDrawMode].programAddress;
         sceVif1PkAddCode(packet, (tag >> 3) | 0x14000000);
         sceVif1PkAddCode(packet, 0x11000000);
         flushRecord = SV_DRAW_LIST_BEGIN_RECORD;
@@ -471,9 +482,16 @@ void svDrawSendStaticRef(void)
 }
 
 extern s16 D_004C8390[];
-extern u64 D_00475540;
-extern s16 D_00475550[];
-extern Vector4 D_00475450[];
+/* One GS register setting of a packed A+D packet. */
+typedef struct SvGsRegister {
+    u64 value;
+    u64 address;
+} SvGsRegister;
+
+/* The GIF tag of the view frame packet, its five constant registers, FRAME_1 and SCISSOR_1 (filled for each frame). */
+extern SvGsRegister D_004754E0[8];
+/* The 2D view offset and view scale. */
+extern Vector4 D_00475440[2];
 extern int svEffectSceneFlag;
 extern const Matrix4 MMathUnitMatrix;
 extern const Matrix4 svUnitQuadCornerMatrix;
@@ -488,6 +506,7 @@ typedef struct SvViewUpload {
 } SvViewUpload;
 
 extern SvViewUpload svViewUpload;
+DrawList svDrawList;
 
 typedef union {
     float f;
@@ -524,6 +543,7 @@ void svUploadViewFrame(void) {
     u16 lowHalf;
     s16 scaled;
     int highByte;
+    s16 *scissor;
 
     camera = (SvViewCamera *) xglStudioGetActiveCamera();
     packet = xglPacketGetCurrent();
@@ -534,21 +554,22 @@ void svUploadViewFrame(void) {
         scaled = D_004C8390[2] / 64;
         lowHalf = ((u16 *) D_004C8390)[7];
         highByte = D_004C8390[1];
-        D_00475540 = lowHalf | ((u64) scaled << 16) | ((u64) highByte << 24);
+        D_004754E0[6].value = lowHalf | ((u64) scaled << 16) | ((u64) highByte << 24);
     } else {
         scaled = D_004C8390[2] / 64;
         lowHalf = ((u16 *) D_004C8390)[11];
         highByte = D_004C8390[1];
-        D_00475540 = lowHalf | ((u64) scaled << 16) | ((u64) highByte << 24);
+        D_004754E0[6].value = lowHalf | ((u64) scaled << 16) | ((u64) highByte << 24);
     }
 
-    D_00475550[0] = (s16) camera->unk_60.f;
-    D_00475550[1] = (s16) ((int) camera->unk_68.f - 1);
-    D_00475550[2] = (s16) camera->unk_64.f;
-    D_00475550[3] = (s16) ((int) camera->unk_6C.f - 1);
+    scissor = (s16 *) &D_004754E0[7].value;
+    scissor[0] = (s16) camera->unk_60.f;
+    scissor[1] = (s16) ((int) camera->unk_68.f - 1);
+    scissor[2] = (s16) camera->unk_64.f;
+    scissor[3] = (s16) ((int) camera->unk_6C.f - 1);
 
     sceVif1PkOpenUpkCode(packet, 0, 0x6C, 4, 4);
-    sceVif1PkAddUpkData128N(packet, (u8 *) D_00475550 - 0x70, 8);
+    sceVif1PkAddUpkData128N(packet, D_004754E0, 8);
     sceVif1PkCloseUpkCode(packet);
 
     __asm__ __volatile__("lqc2 vf1, 32(%1)\n"
@@ -563,8 +584,8 @@ void svUploadViewFrame(void) {
                          : "memory");
     QuadwordCopyMatrixT0(svViewUpload.viewMatrix, svUnitQuadCornerMatrix);
     if (_draw3D == 1) {
-        svViewCopyQuadword(&svViewUpload.scale, &D_00475450[0]);
-        svViewCopyQuadword(&svViewUpload.offset, &D_00475450[-1]);
+        svViewCopyQuadword(&svViewUpload.scale, &D_00475440[1]);
+        svViewCopyQuadword(&svViewUpload.offset, &D_00475440[0]);
     } else {
         svViewCopyQuadword(&svViewUpload.scale, &camera->viewScale);
         svViewCopyQuadword(&svViewUpload.offset, &camera->viewOffset);
@@ -940,6 +961,13 @@ int svAddScript2(SvTypeList *resourceTypeList, SvResourceBlob *scriptResource)
     return resourceEntryIndex;
 }
 
+const DrawStateWords D_0053F2E0 = { { 0x3F800000BF800000ULL, 0x3F80000000000000ULL, 0x3F8000003F800000ULL, 0x3F80000000000000ULL, 0xBF800000BF800000ULL, 0x3F80000000000000ULL, 0xBF8000003F800000ULL, 0x3F80000000000000ULL } };
+const DrawStateWords D_0053F320 = { { 0x00000000BF800000ULL, 0x3F8000003F800000ULL, 0x000000003F800000ULL, 0x3F8000003F800000ULL, 0x00000000BF800000ULL, 0x3F800000BF800000ULL, 0x000000003F800000ULL, 0x3F800000BF800000ULL } };
+const DrawStateWords D_0053F360 = { { 0x3F80000000000000ULL, 0x3F800000BF800000ULL, 0x3F80000000000000ULL, 0x3F8000003F800000ULL, 0xBF80000000000000ULL, 0x3F800000BF800000ULL, 0xBF80000000000000ULL, 0x3F8000003F800000ULL } };
+const DrawStateWords D_0053F3A0 = { { 0x42C80000C2C80000ULL, 0x3F80000000000000ULL, 0x42C8000042C80000ULL, 0x3F80000000000000ULL, 0xC2C80000C2C80000ULL, 0x3F80000000000000ULL, 0xC2C8000042C80000ULL, 0x3F80000000000000ULL } };
+const Vector4 D_0053F3E0 = { 0.0f, 0.0f, 0.0f, 1.0f };
+const u64 D_0053F3F0[2] = { 0xC02A400000008000ULL, 0x0000525252521EEEULL };
+
 /* Adds each chunk of a resource file to the list from firstResource on, until a kind 0 or an unknown kind. */
 void svAnalyzeChunk(SvTypeList *resourceTypeList, SvResourceBlob **firstResource)
 {
@@ -983,6 +1011,7 @@ void svAnalyzeChunk(SvTypeList *resourceTypeList, SvResourceBlob **firstResource
     }
 }
 
+
 /* Clears the 44 type lists of svResourceTypeLists and sets each one's storage size and capacity. */
 void svInitImageMapper(void)
 {
@@ -1022,6 +1051,8 @@ typedef struct SvFileRequest {
 
 #define SV_FIRST_PART_LIST 4
 #define SV_PART_LIST_COUNT 40
+
+
 
 /*
  * Registers a resource file. A plain file becomes the type list `type`; in a file of nested lists every part chunk
@@ -1111,7 +1142,7 @@ typedef struct SvDrawSlot {
  * an SvScenePart, and the object sefGlobalTransform. */
 typedef struct SefPartTransform {
     Matrix4 matrix;   /* +0x00 */
-    Vector4 position; /* +0x40 */
+    AlignedVector4 position; /* +0x40 */
     float scale;      /* +0x50 */
     short scaled;     /* +0x54: nonzero when scale applies */
     short kind;       /* +0x56 */
@@ -1215,11 +1246,11 @@ void vu0RotateCurrentZ(float angle);
 void vu0TransformPoint(Vector4 *point);
 void vu0CurMatrixMul(Matrix4 matrix);
 
-extern u64 svZTestWord;
+static u64 svZTestWord;
 /* Scaffold .sbss int svZTestEnable: the Z-test enable flag written by svSetZTestEnv. */
-extern int svZTestEnable;
+static int svZTestEnable;
 /* Scaffold .sbss pointer svVertexScale (4 bytes): the optional scale vector of the draw records, null when unset. */
-extern const Vector4 *svVertexScale;
+static const Vector4 *svVertexScale;
 
 /* One depth-sort item (svSortItems, 12 bytes): the next item index in its bucket, -1 at the end, then the id, flags and depth. */
 typedef struct SortItem {
@@ -1255,12 +1286,13 @@ int svLoadImageList(SvTypeList *resourceTypeList);
 void sefInitClipViewVolume(void *clipVolume);
 
 /* * Draws the scene. List 0 is loaded first. In 2D with flag 1 of svSceneFlags every visible effect record is drawn in * depth order, switching type lists as the records need them; otherwise each list 2..43 that has images is loaded and * its entries and alters are drawn. The records' shadow blocks come last, outside the effect scene. */ void svDrawScene(void);
-extern unsigned char svMapperPacketEnv[];
+extern u64 svMapperPacketEnv[6];
 
 typedef struct SvDrawTagArea {
-    unsigned char unmodeled_00[0x20];
-    u64 tag;
-    unsigned char unmodeled_28[0x18];
+    u64 tags[4]; /* +0x00: the VIF and GIF tags */
+    u64 tag;     /* +0x20: the TEST_1 value */
+    u64 tagAddress;
+    u64 zbuf[2];
 } SvDrawTagArea;
 
 /* Scaffold .data object svDrawStateTagArea (0x40 bytes): the draw-state tag area; its tag at +0x20 starts as the ON word. */
@@ -1557,7 +1589,6 @@ extern const u64 svStencilTable[3];
 /* .data of this TU: definitions in address order (data recovery pass 2). */
 extern const float svSortOffsetScale;
 extern unsigned int svViewSetupPacket[36];
-extern unsigned char svMapperPacketEnv[48];
 
 typedef int s32;
 
@@ -1835,7 +1866,7 @@ void vu0CurMatrixMulRightAffine(Matrix4 rows);
 extern Matrix4 svEffectMatrix;
 extern Vector4 svEffectScaleVector;
 extern int svFogValue;
-extern Matrix4 *svRecordMatrix;
+static Matrix4 *svRecordMatrix;
 
 /* Builds the current matrix of one item like svBuildItemMatrix: the fixed matrix svEffectMatrix, the record matrix svRecordMatrix or
  * the identity, times transform->matrix, then the scale rows. useItemRows also applies the rotation rows of transform->rotation. */
@@ -1936,8 +1967,7 @@ void func_0020A320(Vector4 *point, SvItemTransform *transform, int useFixedMatri
 
 /* Splat labels of the scaffold objects svSetModelRenderState reads (the X3 .data, .sbss, .sdata and .rodata objects). */
 extern void *svCurrentVertexViewBlock;
-extern int svModelDrawFlags;
-extern const f32 D_0054FD88;
+static int svModelDrawFlags;
 /* Callees of the other units, prototyped from their call sites. */
 void pxyAddRenderLevel(int level);
 void nmlModelSetFogDist(float d0, float d1, float d2, float d3);
@@ -2033,7 +2063,7 @@ void svSetModelRenderState(SvRenderItem *renderItem, Matrix4 *matrix, int scale)
             }
         }
         if (scale > 0) {
-            nmlModelSetSortOffset(scale * D_0054FD88);
+            nmlModelSetSortOffset(scale * -0.1f);
         }
         nmlModelSetScale(&renderItem->scale);
         pxySubmitModel(renderItem->part->submitBlock);
@@ -2253,9 +2283,8 @@ typedef struct SvPolygonRecord {
 /* Scaffold data of svDrawPolygonItem by splat names (gp-relative words: the clip flag, the record and view matrix pointers, the
  * axes mode, the vertex scale pointer, the fog value above; the two alpha tables are 64-bit words). */
 extern int D_005510D4;
-extern Matrix4 *svBattleLinkedMatrix;
-extern int svPolygonAxesMode;
-extern u64 svPairAlphaTable[];
+static Matrix4 *svBattleLinkedMatrix;
+static int svPolygonAxesMode;
 extern SefPartTransform gSdvCameraPartTransform;
 
 /* The next free vertex slot of svDrawList, where a polygon packet starts. */
@@ -2453,7 +2482,7 @@ void svDrawPolygonItem(SvPolygonRecord *polygonItem, Vector4 *position, SvDrawCa
     }
 }
 
-extern int D_00551544;
+static int D_00551544;
 
 void svDrawListAppendRecordB(SvDrawState *drawState, Vector4 *point, SvDrawCall *drawCall, int useScale);
 
@@ -3088,17 +3117,17 @@ void svDrawListAppendRecordBPair(SvDrawState *state, Vector4 *point, SvDrawCall 
 void svDrawListAppendRecordA(SvDrawState *state, Vector4 *point, SvDrawCall *quadRef, int useFixedMatrix);
 struct SvPolygonRecord; struct SvDrawCall;
 void svDrawPolygonItem(struct SvPolygonRecord *item, Vector4 *position, struct SvDrawCall *call, int scaled);
-extern Matrix4 *svViewMatrix;
-extern Vector4 *svRecordScale;
-extern struct SefRecordOwner *svRecordFlagOwner;
-extern int D_00551530;
+static Matrix4 *svViewMatrix;
+static Vector4 *svRecordScale;
+static struct SefRecordOwner *svRecordFlagOwner;
+static int D_00551530;
 extern const DrawStateWords D_0053F2E0;
 extern const DrawStateWords D_0053F320;
 extern const DrawStateWords D_0053F360;
 extern const DrawStateWords D_0053F3A0;
 extern const Vector4 D_0053F3E0;
 extern const u64 D_0053F3F0[2];
-extern const Vector4 D_004755E0[3];
+extern Vector4 D_004755E0[2];
 extern Matrix4 D_00770ED0[2];
 extern Matrix4 D_00770F10;
 extern Vector4 D_0076D7E0[24];
@@ -4011,9 +4040,9 @@ typedef struct SvDrawItemFlags {
     int flags;
 } SvDrawItemFlags;
 
-extern struct SefRecordOwner *svRecordOwnedObject;
+static struct SefRecordOwner *svRecordOwnedObject;
 extern Matrix4 svEffectScaledMatrix;
-extern int svLineEffectPending;
+static int svLineEffectPending;
 void func_002018E8(struct SefRecordOwner *source, struct SefRecordOwner *target, struct SefRecordOwner *actor0,
     struct SefRecordOwner *actor1, struct SefRecordOwner *actor2, struct SefRecordOwner *actor3);
 int sefBuildEffectMatrix(const Vector4 *rotation, const Vector4 *translation, const Vector4 *scale, Matrix4 *effectMatrix);
@@ -4397,7 +4426,7 @@ void svDrawSceneEffects(void) {
 }
 
 void MMathInvertAffineMatrix(Matrix4 *out, float *src);
-extern Matrix4 D_0053F460;
+extern const Matrix4 D_0053F460;
 
 /* Original names that no function of this file uses. */
 void *nmlPacketSetAttributeAlloc16N(int count);
@@ -4409,6 +4438,13 @@ typedef struct SvImageMapperStorage {
     unsigned char unmodeled_tail[0x2420];
 } SvImageMapperStorage;
 extern SvImageMapperStorage _imageMapper;
+
+const Matrix4 D_0053F460 = {
+    { 0.264445007f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.343434989f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, -1.00000203f, -1.0f },
+    { 0.0f, 0.0f, -0.0199999996f, 0.0f }
+};
 
 /* Draws the effect records in 3D mode: sets the camera matrices, culls the records, then draws each visible kind. */
 void svDrawEffectRecords3D(void) {
@@ -4434,3 +4470,52 @@ void svDrawEffectRecords3D(void) {
 }
 
 /* <<< CHUNK sv_get_image_item */
+
+Vector4 D_00475440[2] = { { 2048.0f, 2048.0f, 268435360.0f, 0.0f }, { 1.0f, -1.14285719f, 0.0625f, 1.0f } };
+SvDrawMode svDrawModeTagTable[16] = {
+    { 0, 0 },      { 0x6D0, 14 }, { 0x9D8, 28 }, { 0x1D8, 14 },  { 0x430, 28 },  { 0xD28, 17 }, { 0xD58, 34 }, { 0xD38, 17 },
+    { 0xD68, 34 }, { 0xD48, 17 }, { 0xD78, 34 }, { 0x1688, 14 }, { 0x18D8, 28 }, { 0xD88, 3 },  { 0xDD8, 3 },  { 0, 14 },
+};
+SvGsRegister D_004754E0[8] = {
+    { 0x1000000000008007ULL, 0xE },
+    { 0x5000D, 0x47 },        /* TEST_1 */
+    { 0x60, 0x14 },           /* TEX1_1 */
+    { 5, 0x08 },              /* CLAMP_1 */
+    { 0x131000000ULL, 0x4E }, /* ZBUF_1 */
+    { 0, 0x4A },              /* FBA_1 */
+    { 0, 0x4C },              /* FRAME_1 */
+    { 0, 0x40 },              /* SCISSOR_1 */
+};
+/* VIF direct of two quadwords: TEXFLUSH. */
+u64 svMapperPacketEnv[6] = { 0, 0x5100000200000000ULL, 0x1000000000008001ULL, 0xE, 0, 0x3F };
+/* VIF direct of three quadwords: TEST_1 and ZBUF_1. */
+SvDrawTagArea svDrawStateTagArea = {
+    { 0, 0x5100000300000000ULL, 0x1000000000008002ULL, 0xE }, 0x5000D, 0x47, { 0x131000000ULL, 0x4E }
+};
+Vector4 svScaledVertexClampMax = { 255.0f, 255.0f, 255.0f, 255.0f };
+Vector4 D_004755E0[2] = { { 1.0f, 1.0f, 1.0f, 1.0f }, { 0.0f, 0.0f, 0.0f, 0.0f } };
+SvTypeList svResourceTypeLists[44] = { 0 };
+SefPartTransform gSdvCameraPartTransform = { 0 };
+SvDrawSlot svVisibleSlots[82] = { 0 };
+SvTypeList svResourceTypeListScratch = { 0 };
+
+void *svCurrentVertexViewBlock = D_0076D7E0;
+int svDepthNodeCount = 0;
+int _draw3D = 0;
+int svFogValue = -1;
+extern DrawStatePacket D_00770FE0;
+DrawStatePacket *svDrawStatePacket = &D_00770FE0;
+int D_005510D4 = 0;
+int svVisibleEntryCount = 0;
+
+XglLightSet D_0076D4E0;
+XglLightSet sefActiveLightSet;
+Vector4 D_0076D7E0[24];
+SvDepthNode svDepthNodes[1100];
+SvDepthNode svDepthBuckets[40];
+Matrix4 D_00770ED0[2];
+Matrix4 svEffectScaledMatrix;
+Matrix4 svEffectMatrix;
+Vector4 svEffectScaleVector;
+DrawStatePacket D_00770FE0;
+SvViewUpload svViewUpload;

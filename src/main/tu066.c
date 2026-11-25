@@ -3,6 +3,7 @@
 
 #include "main/xgl_render.h"
 #include "quadword.h"
+#include "main/battle_shared.h"
 typedef signed char s8;
 
 typedef int s32;
@@ -75,35 +76,6 @@ typedef struct RuntimeStateBlock {
     u8 *fogBlock;                         /* +0x830: fog parameters, 704 and 720 bytes in */
 } RuntimeStateBlock;
 
-/* Thread block at .data 0x4CABA8. */
-typedef struct SbThreadEntry {
-    s32 entryWord0;                   /* +0x00 */
-    s32 entryWord4;                   /* +0x04: copied into SbThreadBlock.unk_00 */
-    s32 threadSlot;                   /* +0x08 */
-} SbThreadEntry;
-
-/* The thread table made by RgDispModelFindByActor; its SbThreadEntry array starts at +0x150. */
-typedef struct SbThreadEntryTable {
-    s32 tableFlags;                   /* +0x00 */
-    u8 unk_004[0x10 - 0x4];
-    s32 tableTypeId;                   /* +0x10: must be 4 to start the threads */
-    u8 unk_014[0x28 - 0x14];
-    s32 unk_28;                       /* +0x28: passed to sbNativeHandlerMessagePost */
-    u8 unk_2C[0x150 - 0x2C];
-    SbThreadEntry threadEntries[1];   /* +0x150 */
-} SbThreadEntryTable;
-
-typedef struct SbThreadBlock {
-    s32 unk_00;                       /* +0x00 */
-    s32 unk_04;                       /* +0x04 */
-    s32 unk_08[4];                    /* +0x08: 16 bytes copied from the game loop runtime */
-    s32 threadFlags;                  /* +0x18 */
-    s32 unk_1C;                       /* +0x1C: selects the resume action in func_001BDEC8 */
-    s32 threadMode;                   /* +0x20 */
-    s32 currentThreadSlot;            /* +0x24 */
-    SbThreadEntryTable *threadEntryTable; /* +0x28 */
-} SbThreadBlock;
-
 typedef struct ActorStatusRecord {
     s32 key;     /* +0x00: passed to RgDispModelFindByActor */
     f32 float04; /* +0x04: compared with 0.0f */
@@ -136,13 +108,11 @@ typedef struct ActorSlotRecord {
 } ActorSlotRecord;
 
 extern unsigned char gGameLoopRuntimeStorage[];
-extern unsigned char gSbThreadBlockStorage[];
 extern u16 gPadDataPressed[];
 extern unsigned char PadData[];
 
 /* Typed views of the unsized objects: the extern stays unsized, so the symbols and their addressing are unchanged. */
 #define gGameLoopRuntime (*(GameLoopRuntime *) gGameLoopRuntimeStorage)
-#define gSbThreadBlock (*(SbThreadBlock *) gSbThreadBlockStorage)
 #define gPadData (*(PadRecord *) PadData)
 
 s32 Vibration_Stop();
@@ -267,16 +237,7 @@ typedef struct StatePlacement {
 
 extern StatePlacement gSavedPlacement;
 void stateRestore();
-extern DebugMenuEntry gDebugMenuEntries[];
 extern char *D_003E5290[];
-extern char D_00531288[];
-extern char D_005312A0[];
-extern char D_005312B0[];
-extern char D_005312C0[];
-extern char D_005312C8[];
-extern char D_005312D8[];
-extern char D_005312E0[];
-extern char D_005509B0[];
 void gameResetRuntimeState(void);
 void gameEnterPadRepeatState(void);
 
@@ -304,6 +265,7 @@ s32 xglFontDebugPrintf();
 
 /* Debug stage menu: four rows (mode, map number, table entry, restore). Circle on the number row hands the map to gameStartSelectedMap. */
 void debugStageMenuStep(DebugSelection *selection) {
+    extern DebugMenuEntry gDebugMenuEntries[];
     char title[64];
     s32 held = gPadData.held | gPadData.directionHeld;
     s32 pressed = gPadData.pressed | gPadData.directionPressed;
@@ -367,13 +329,13 @@ void debugStageMenuStep(DebugSelection *selection) {
         }
         break;
     }
-    GameMpeg2Play(title, D_00531288, D_005312A0, D_005312B0);
+    GameMpeg2Play(title, "\022\010\010Compiled on %s %s", "Jul 12 2006", "13:22:53");
     xglFontDebugPrintf(16, 16, title);
-    xglFontDebugPrintf(16, 32, D_005312C0, D_003E5290[gDebugMenuMode]);
-    xglFontDebugPrintf(16, 42, D_005312C8, gDebugMenuNumber);
-    xglFontDebugPrintf(16, 52, D_005312D8, gDebugMenuEntries[gDebugMenuEntryIndex].name);
-    ((void (*)()) xglFontDebugPrintf)(16, 62, D_005312E0);
-    xglFontDebugPrintf(8, gDebugMenuRow * 10 + 32, D_005509B0);
+    xglFontDebugPrintf(16, 32, "Map :%s", D_003E5290[gDebugMenuMode]);
+    xglFontDebugPrintf(16, 42, "No. :%4d", gDebugMenuNumber);
+    xglFontDebugPrintf(16, 52, "MDL :%s", gDebugMenuEntries[gDebugMenuEntryIndex].name);
+    ((void (*)()) xglFontDebugPrintf)(16, 62, "MCLOAD");
+    xglFontDebugPrintf(8, gDebugMenuRow * 10 + 32, ">");
 }
 
 s32 battleRosterPairReset();
@@ -527,7 +489,8 @@ void func_001BC808(void) {
     sbNativeValueSlotSet(func_001BC918, 0);
 }
 
-extern unsigned char gDebugValueFormat[];
+
+const char gDebugValueFormat[24] = "NO MAP [%4d]";
 
 /* Prints the value at the debug position; start or circle returns to the loop. */
 void debugPrintValue(s16 *printedValue) {
@@ -929,7 +892,7 @@ void gameStartSbImage(void) {
     }
 }
 
-extern unsigned char D_003E52A0[];
+extern s32 D_003E52A0[];
 void padCheckResetCombo(void);
 void scratchpadSendCmd27Mode2(s32 *sendParams);
 
@@ -1050,6 +1013,8 @@ static inline s32 gameLoopPlaneFlagSet() {
 void *RgDispModelFindByKey();
 
 /* Main play step: updates the plane hook, handles the triangle button and the pending requests that switch to other steps. */
+const s32 D_00531340[2] = { 0x14, 0x01 };
+
 void func_001BD450() {
     SlotEnumView *slot = (SlotEnumView *) RgDispModelFindByKey(0);
     u16 pressedButtons = gPadDataPressed[0];
@@ -1117,9 +1082,11 @@ void func_001BD450() {
 
 s32 func_001B9228();
 void func_001BD7B8(AlignedVector4 *restoredVector);
-extern unsigned char D_00531348[];
+extern const s32 D_00531348[];
 
 /* Copies the current slot's vector at +0x50 into dst, runs func_001B9228 under loop flag 0x40000000 and waits in func_001BD7B8. */
+const s32 D_00531348[6] = { 5, 0, 0, 0, 0x80, 0 };
+
 void func_001BD730(AlignedVector4 *savedVector) {
     ActorSlotRecord *slot;
     AlignedVector4 *slotVector;
@@ -1383,9 +1350,9 @@ void func_001BDDD8(void) {
     sbThreadsResume(sbNativeBufferGet(0));
     gGameLoopRuntime.loopFlags &= 0x7FFFFFFF;
     if (gGameLoopRuntime.loopFlags & 0x10000) {
-        sbNativeHandlerMessagePost(3, threadBlock->unk_1C, gGameLoopRuntime.unk_160);
+        sbNativeHandlerMessagePost(3, threadBlock->resumeAction, gGameLoopRuntime.unk_160);
     } else {
-        sbNativeHandlerMessagePost(3, threadBlock->unk_1C, threadBlock->threadEntryTable->unk_28);
+        sbNativeHandlerMessagePost(3, threadBlock->resumeAction, threadBlock->threadEntryTable->unk_28);
     }
     sbNativeValueSlotSet(func_001BDEC8, 0);
 }
@@ -1405,7 +1372,7 @@ void func_001BDEC8(void) {
     sceneStateBlock = stateBlockGet();
     slot = (ActorSlotRecord *) RgDispModelFindByKey(0);
     threadBlock = &gSbThreadBlock;
-    switch (threadBlock->unk_1C) {
+    switch (threadBlock->resumeAction) {
     case 0:
     case 3:
     case 4:
@@ -1463,6 +1430,8 @@ void scQueueDefaultRequest();
 void gameResetFlagsAndAdvance(void);
 
 /* Applies the map's color to the environment (or clears depth for the 6000 maps) and shuts the movie down. */
+const s32 D_00531378[2] = { 0x1E, 0x01 };
+
 void func_001BE060() {
     SceneStateRecord *sceneRecord = &stateBlockGet()->sceneRecord;
     gGameLoopPlacement.loopFlags |= 0x80000000;
@@ -1507,9 +1476,11 @@ void gameResetFlagsAndAdvance(void) {
 
 void gameResetFlagsAndWait(void);
 s32 func_001B6018();
-extern unsigned char D_00531380[];
+extern const s32 D_00531380[];
 
 /* Scene-end step: clears the environment color and the movie, then goes to gameResetFlagsAndWait. */
+const s32 D_00531380[2] = { 0x1E, 0x01 };
+
 void func_001BE1E0(void) {
     s32 skipShutdown;
 
@@ -1598,3 +1569,36 @@ void gameFinishSceneReset(void) {
     mapCollisionInit(0);
     sbNativeValueSlotSet(gameResetRuntimeState, 0);
 }
+
+unsigned char D_003E4874[44] = { 0 };
+s32 gDebugFlagWords[4] = { 0 };
+s32 gSaveBitmapA[32] = { 0 };
+unsigned char gSaveFlagBytes[32] = { 0 };
+s32 gSaveWordTable[128] = { 0 };
+s32 gSaveBitmapB[32] = { 0 };
+signed char gSaveRndTable[1728] = { 0 };
+char *D_003E5290[4] = { "NORMAL", "TEST", "CHECK", 0 };
+s32 D_003E52A0[8] = { 0x1E, 0, 0, 0, 0x80, 0, 0, 0 };
+
+const DebugMenuEntry gDebugMenuEntries[15] = {
+    { 1, 0, "SHION" },
+    { 2, 0, "JIN" },
+    { 3, 0, "MOMO" },
+    { 4, 0, "ZIGGY" },
+    { 5, 0, "KOSMOS" },
+    { 6, 0, "CHAOS" },
+    { 7, 0, "JR" },
+    { 8, 0, "MIYUKI" },
+    { 9, 0, "CANNAN" },
+    { 10, 0, "ALLEN" },
+    { 13, 0, "ASHER" },
+    { 14, 0, "ZEBULUN" },
+    { 15, 0, "DINAN" },
+    { 16, 0, "REUBEN" },
+    { -1, -1, "NO CHANGE" },
+};
+
+s32 gDebugMenuRow = 1;
+s32 gDebugMenuMode = 0;
+s32 gDebugMenuNumber = 0;
+s32 gDebugMenuEntryIndex = 0;

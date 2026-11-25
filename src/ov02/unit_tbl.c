@@ -79,9 +79,9 @@ BattleUnit *unitTblEntryGet(int index);
 #define UNIT_TBL_SLOTS 8
 
 /* The unit objects of the battle: players first, then enemies. */
-extern BattleUnit *unitTbl[UNIT_TBL_SLOTS];
-extern int unitPlNum;
-extern int unitEnNum;
+static BattleUnit *unitTbl[UNIT_TBL_SLOTS];
+static int unitPlNum;
+static int unitEnNum;
 
 typedef struct ObjectTask ObjectTask;
 

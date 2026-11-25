@@ -72,7 +72,7 @@ typedef struct ScSpawnedEffect {
     DoublewordAlignedVector4 position;
 } ScSpawnedEffect;
 
-extern s32 scSoundCueTable[2];
+extern const s32 scSoundCueTable[8];
 extern s32 scEffectSpawnCounter;
 s32 mapStaticObjectProbe(void *position, f32 *distance);
 void sefObjectSetStatePlay(void *effectObject);
@@ -220,7 +220,7 @@ void scQueueDefaultRequest(void) {
     soundCueSeCommand(0, -3, 0, 0);
 }
 
-extern s32 scSampleEnabled;
+static s32 scSampleEnabled;
 
 /* Sets bit 0 of the request flags (scSampleEnabled). */
 void scSampleEnableSet(void) {
@@ -251,7 +251,7 @@ typedef struct ScKeyRecord {
     u8 unmodeled_24[0x0C];
 } ScKeyRecord;
 
-extern ScKeyRecord scKeyRecords[18];
+static ScKeyRecord scKeyRecords[18];
 void *memset(void *, int, unsigned int);
 
 /* Clears the 18-entry key table (scKeyRecords), sets every range y to 10000.0f, stores mode in scCrossingEffectMode and
@@ -510,3 +510,12 @@ int scOfsToAdr(int encodedOffset)
     }
     return encodedOffset;
 }
+
+const s32 scSoundCueTable[8] = { 35, 36, 36, 35, 2, 3, 0, 1 };
+
+s32 scCrossingEffectMode = 0;
+s32 scEffectSpawnCounter = 0;
+s32 sefSpawnMode = 0;
+s32 sefOwnerGroupScale = 0;
+int gSefExecSteps = 0;
+s32 sefOutputLinkEnabled = 0;

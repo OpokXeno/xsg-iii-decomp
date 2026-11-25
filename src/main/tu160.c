@@ -14,9 +14,9 @@ typedef unsigned char u8;
 
 typedef unsigned short u16;
 
-extern u16 gStatusBitsLow;
-extern u16 gStatusBitsHigh;
-extern unsigned char gPadStatusMasks[];
+static u16 gStatusBitsLow;
+static u16 gStatusBitsHigh;
+static unsigned char gPadStatusMasks[16];
 
 /* Status header record at gPadStatusMasks: the pad masks of the frame (+0x00 held, +0x02 pressed, +0x04 repeated,
  * +0x06 pressed in the previous frame) and the two group words at +0x08 and +0x0A. */
@@ -186,7 +186,7 @@ typedef struct Cmd8Block {
     unsigned char packet[8];
 } Cmd8Block;
 
-extern unsigned char gSwapCommandTemplate[];
+extern const unsigned char gSwapCommandTemplate[];
 void scratchpadSendCmd0A();
 
 /* kept: the one-byte struct store keeps the flag in its own alias set (a plain store of 1 schedules differently). */
@@ -352,3 +352,19 @@ void completionCallbacksRun(void) {
     completionCallbackAdd(0);
     func_00185A20();
 }
+
+/* Command template of swapWordsSendCommand: the 8-byte packet header. */
+const unsigned char gSwapCommandTemplate[8] = { 0x00, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00 };
+
+/* Completion callbacks: a fixed table of six entries, cleared at boot. */
+CompletionCallback gCompletionCallbacks[6] = { 0 };
+
+/* Block status bits and the wave values, the swap flag and the font buffers. */
+u32 gBlockStatusBits = 0;
+u8 D_00550B88 = 0;
+u8 D_00550B89 = 0;
+u8 D_00550B8A = 0;
+s8 gSwapWordsFlag = 0;
+s32 gFontEscapeBuffer = 0;
+s32 gFontNumberBuffer = 0;
+int gCompletionCallbackCount = 0;

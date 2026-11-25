@@ -41,18 +41,9 @@ typedef struct BlendTestPathTable {
     const char *file[2][PATH_COUNT];
 } BlendTestPathTable;
 
-extern BlendTestPathTable D_00539F48;
+extern const char gTestSourceFileName[];
+extern const BlendTestPathTable D_00539F48;
 extern PadRecord PadData[2];
-extern const char D_00539F68[];
-extern const char D_00539F70[];
-extern const char D_00539F80[];
-extern const char D_00539FB0[];
-extern const char D_00539FE0[];
-extern const char D_0053A000[];
-extern const char D_0053A020[];
-extern const char D_0053A048[];
-extern const char D_0053A070[];
-extern const char D_0053A098[];
 XenoActor *func_0028D670(void);
 int func_0028D760(XenoActor *actor);
 void func_002911C0(void);
@@ -77,6 +68,13 @@ void studioCameraAt(XglCamera **camera, int index);
 void pxySetHeaderScanEnabled(int enabled);
 int testLoadFile(int *loadAddr, const char *path);
 
+const BlendTestPathTable D_00539F48 = {
+    {
+        { gTestSourceFileName + 0x10, gTestSourceFileName + 0x38, gTestSourceFileName + 0x60, gTestSourceFileName + 0x88 },
+        { gTestSourceFileName + 0xB8, gTestSourceFileName + 0xE8, gTestSourceFileName + 0x118, gTestSourceFileName + 0x88 },
+    },
+};
+
 /* Blend test: loads the test map and two actors, then runs the pad loop until SELECT+START. */
 void blendTestMain(void) {
     BlendTestPathTable actorPathTable;
@@ -100,15 +98,15 @@ void blendTestMain(void) {
 
     mapActor = func_0028D670();
     if (mapActor == 0) {
-        assertFailed(D_00539F68, D_00539F70, 62);
+        assertFailed("pMap", "BlendTest.euc.c", 62);
     }
-    mapActor->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadCursor, D_00539F80);
-    mapActor->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadCursor, D_00539FB0);
+    mapActor->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadCursor, "host0:/home/xeno/work/iwase/E2_MOM04_EVA.pxy");
+    mapActor->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadCursor, "host0:/home/xeno/work/iwase/E2_MOM04_EVA.txy");
     if (mapActor->rsrc[XAct_Rsrc_MDL] == 0) {
-        assertFailed(D_00539FE0, D_00539F70, 65);
+        assertFailed("pMap->rsrc[XAct_Rsrc_MDL]", "BlendTest.euc.c", 65);
     }
     if (mapActor->rsrc[XAct_Rsrc_TEX] == 0) {
-        assertFailed(D_0053A000, D_00539F70, 66);
+        assertFailed("pMap->rsrc[XAct_Rsrc_TEX]", "BlendTest.euc.c", 66);
     }
 
     for (i = 0; i < 2; i++) {
@@ -118,16 +116,16 @@ void blendTestMain(void) {
         actors[i]->rsrc[XAct_Rsrc_XHR] = testLoadFile(&loadCursor, actorPathTable.file[i][PATH_XHR]);
         actors[i]->rsrc[XAct_Rsrc_XAP] = testLoadFile(&loadCursor, actorPathTable.file[i][PATH_XAP]);
         if (actors[i]->rsrc[XAct_Rsrc_MDL] == 0) {
-            assertFailed(D_0053A020, D_00539F70, 77);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_MDL] != NULL", "BlendTest.euc.c", 77);
         }
         if (actors[i]->rsrc[XAct_Rsrc_TEX] == 0) {
-            assertFailed(D_0053A048, D_00539F70, 78);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_TEX] != NULL", "BlendTest.euc.c", 78);
         }
         if (actors[i]->rsrc[XAct_Rsrc_XHR] == 0) {
-            assertFailed(D_0053A070, D_00539F70, 79);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_XHR] != NULL", "BlendTest.euc.c", 79);
         }
         if (actors[i]->rsrc[XAct_Rsrc_XAP] == 0) {
-            assertFailed(D_0053A098, D_00539F70, 80);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_XAP] != NULL", "BlendTest.euc.c", 80);
         }
         ((DoublewordVector4 *) &actors[i]->position)->vector.x += (float) i;
         func_0028D760(actors[i]);
@@ -180,3 +178,4 @@ void blendTestMain(void) {
     XenoActorReleaseAll();
     xglRenderClearFrame();
 }
+

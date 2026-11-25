@@ -26,18 +26,7 @@ typedef struct CullingTestPathTable {
     CullingTestPaths actor[2];
 } CullingTestPathTable;
 
-extern CullingTestPathTable D_0053A3F8;
 extern PadRecord PadData[2];
-extern const char D_0053A418[];
-extern const char D_0053A420[];
-extern const char D_0053A438[];
-extern const char D_0053A468[];
-extern const char D_0053A498[];
-extern const char D_0053A4B8[];
-extern const char D_0053A4D8[];
-extern const char D_0053A500[];
-extern const char D_0053A528[];
-extern const char D_0053A550[];
 XenoActor *func_0028D670(void);
 int func_0028D760(XenoActor *actor);
 void func_0019C538(int rsrc);
@@ -64,7 +53,12 @@ int testLoadFile(int *loadAddr, const char *path);
 
 /* Culling test: loads the test map and two actors, then runs the pad loop until SELECT+START. */
 void cullingTestMain(void) {
-    CullingTestPathTable actorPathTable;
+    CullingTestPathTable actorPathTable = { {
+        { "host0:/home/xeno/work/iwase/boy400.pxy", "host0:/home/xeno/work/iwase/boy400.txy",
+          "host0:/home/xeno/work/iwase/boy400.xhr", "host0:/home/xeno/work/iwase/kosmos01.xap" },
+        { "host0:/home/xeno/work/iwase/kosmos01.pxy", "host0:/home/xeno/work/iwase/kosmos01.txy",
+          "host0:/home/xeno/work/iwase/kosmos01.xhr", "host0:/home/xeno/work/iwase/kosmos01.xap" }
+    } };
     int loadCursor;
     XglCamera *camera;
     XenoActor *mapActor;
@@ -75,7 +69,6 @@ void cullingTestMain(void) {
     int holdMode;
 
     loadCursor = 0xE00000;
-    actorPathTable = D_0053A3F8;
     holdMode = 0;
     XenoActorPoolInitDefault();
     xglStudioReset();
@@ -87,15 +80,15 @@ void cullingTestMain(void) {
 
     mapActor = func_0028D670();
     if (mapActor == 0) {
-        assertFailed(D_0053A418, D_0053A420, 65);
+        assertFailed("pMap", "CullingTest.euc.c", 65);
     }
-    mapActor->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadCursor, D_0053A438);
-    mapActor->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadCursor, D_0053A468);
+    mapActor->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadCursor, "host0:/home/xeno/work/iwase/anim_test.pxy");
+    mapActor->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadCursor, "host0:/home/xeno/work/iwase/anim_test.txy");
     if (mapActor->rsrc[XAct_Rsrc_MDL] == 0) {
-        assertFailed(D_0053A498, D_0053A420, 68);
+        assertFailed("pMap->rsrc[XAct_Rsrc_MDL]", "CullingTest.euc.c", 68);
     }
     if (mapActor->rsrc[XAct_Rsrc_TEX] == 0) {
-        assertFailed(D_0053A4B8, D_0053A420, 69);
+        assertFailed("pMap->rsrc[XAct_Rsrc_TEX]", "CullingTest.euc.c", 69);
     }
     func_0028D760(mapActor);
 
@@ -108,16 +101,16 @@ void cullingTestMain(void) {
         (*actorSlot)->rsrc[XAct_Rsrc_XHR] = testLoadFile(&loadCursor, actorPaths->xhr);
         (*actorSlot)->rsrc[XAct_Rsrc_XAP] = testLoadFile(&loadCursor, actorPaths->xap);
         if ((*actorSlot)->rsrc[XAct_Rsrc_MDL] == 0) {
-            assertFailed(D_0053A4D8, D_0053A420, 81);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_MDL] != NULL", "CullingTest.euc.c", 81);
         }
         if ((*actorSlot)->rsrc[XAct_Rsrc_TEX] == 0) {
-            assertFailed(D_0053A500, D_0053A420, 82);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_TEX] != NULL", "CullingTest.euc.c", 82);
         }
         if ((*actorSlot)->rsrc[XAct_Rsrc_XHR] == 0) {
-            assertFailed(D_0053A528, D_0053A420, 83);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_XHR] != NULL", "CullingTest.euc.c", 83);
         }
         if ((*actorSlot)->rsrc[XAct_Rsrc_XAP] == 0) {
-            assertFailed(D_0053A550, D_0053A420, 84);
+            assertFailed("pAct[i]->rsrc[XAct_Rsrc_XAP] != NULL", "CullingTest.euc.c", 84);
         }
         ((DoublewordVector4 *) &(*actorSlot)->position)->vector.x += (float) i;
         func_0028D760(*actorSlot);

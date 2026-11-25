@@ -5,7 +5,7 @@
 
 #include "main/gifState.h"
 
-extern GifStatusBlock gifStatus;
+GifStatusBlock gifStatus = { 0 };
 
 void gifStateSetDepth(int depth);
 void nmlModelSetMulColor(Vector4 *color);

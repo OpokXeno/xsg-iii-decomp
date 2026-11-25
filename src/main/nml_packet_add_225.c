@@ -338,3 +338,19 @@ void tiWaterSendGrid(WaterStripGrid *grid, const void *gifTagBlock) {
         }
     }
 }
+
+/* The three axis rows of tiWaterSendOrientedMatrix and the fixed matrix of tiWaterSendFixedMatrix. */
+Vector4 tiWaterAxes[3] = {
+    { -0.5f, -0.100000001f, 0.0f, 1.0f },
+    { 0.5f, 0.100000001f, 0.5f, 1.0f },
+    { 0.0f, 1.0f, 0.0f, 1.0f },
+};
+Matrix4 tiWaterFixedMatrix = {
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+    { 128.0f, 128.0f, 128.0f, 1.0f },
+};
+
+int tiWaterStripColumns = 29;
+XglPacket *xglCurrentPacket = 0;

@@ -2,6 +2,7 @@
  * OV02 original TU 57: 0x00a96e70..0x00a975d8 (9 functions)
  */
 #include "common.h"
+#include "main/battle_shared.h"
 
 typedef int s32;
 typedef unsigned int u32;
@@ -13,13 +14,6 @@ typedef struct Ov02PlayerCounter { s32 battleEntryCount; s32 pad[5]; } Ov02Playe
 typedef struct Ov02WideCounter { s32 battleEntryCount; s32 pad[8]; } Ov02WideCounter;
 typedef struct Ov02PlayerCounterTable { unsigned char unk_000[0xC]; Ov02PlayerCounter records[10]; } Ov02PlayerCounterTable;
 typedef struct Ov02WideCounterTable { unsigned char unk_000[0xF8]; Ov02WideCounter records[4]; } Ov02WideCounterTable;
-typedef struct Ov02BattleCounterBlock {
-    unsigned char unk_000[0x564];
-    s32 eventCountA;            /* +0x564 */
-    s32 eventCountB;            /* +0x568 */
-} Ov02BattleCounterBlock;
-
-extern Ov02BattleCounterBlock gOv02BattleCounters;
 
 void ov02BattleCountersClear(void) {
     memset(&gOv02BattleCounters, 0, 0x56C);

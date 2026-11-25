@@ -156,7 +156,9 @@ void xglFontQueueGlyphRect(FontRect *rect) {
     xglDirectQueueSubmitRef();
 }
 
-extern u16 gFontRowFlagTable[];
+const unsigned short gFontRowFlagTable[8] = {
+    32, 64, 16, 128, 4, 1, 8, 2
+};
 
 /* Draws a row of the menu frame: the row is the first of the 8 flag entries of gFontRowFlagTable that matches the mask. */
 void xglFontQueueFlaggedRow(u16 x, u16 y, s32 rowFlagMask) {
@@ -264,7 +266,17 @@ s32 xglFontGlyphIndex(s8 character) {
 }
 
 /* Width table of the font glyphs, indexed by glyph index. */
-extern s8 gFontGlyphWidthTable[];
+const signed char gFontGlyphWidthTable[72] = {
+    15, 13, 13, 14, 12, 12, 14, 13,
+    8, 14, 13, 12, 15, 13, 14, 13,
+    15, 14, 13, 14, 13, 14, 14, 14,
+    14, 13, 11, 10, 8, 8, 17, 8,
+    14, 13, 13, 13, 14, 12, 13, 14,
+    8, 13, 12, 9, 14, 13, 13, 13,
+    13, 13, 13, 11, 14, 13, 14, 13,
+    13, 13, 0, 0, 0, 0, 0, 0,
+    8, 0, 0, 0, 0, 0, 0, 0
+};
 
 s8 xglFontGlyphWidth(s8 character) {
     return gFontGlyphWidthTable[xglFontGlyphIndex(character)];
@@ -398,6 +410,7 @@ void xglFontDrawRightAlignedHalfCell(s32 baseX, s32 baseY, s8 *text, s32 scale) 
 
 /* Horizontal step of one digit at scale 1, in 1/16 pixel units. */
 extern u16 gFontDigitStep;
+
 
 void xglFontSetDigitStep(s16 digitStep) {
     gFontDigitStep = digitStep;
@@ -596,3 +609,5 @@ s32 xglFontDrawDigitsMinTwo(s32 x, s32 y, u32 number, s32 scale)
   while (remaining != 0 || passes < 2);
   return totalAdvance >> 4;
 }
+
+u16 gFontDigitStep = 10;

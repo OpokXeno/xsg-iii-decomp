@@ -33,12 +33,11 @@ int vmArgGet(SbThread *thread, int argumentNumber)
     return frameTop[-2 - (argumentCount - argumentNumber)];
 }
 
-extern f32 gSbArgFloatScale;
 
 /* Returns argument argumentNumber (1-based) of the current call as a float, scaled by gSbArgFloatScale. */
 f32 vmArgFloatGet(SbThread *thread, int argumentNumber)
 {
-    return vmArgGet(thread, argumentNumber) * gSbArgFloatScale;
+    return vmArgGet(thread, argumentNumber) * 0.01f;
 }
 
 /* Returns the tag byte of argument argumentNumber (1-based) of the current call. */
@@ -270,15 +269,14 @@ void slotReleaseFixedSlots();
 
 void func_001E8550();
 
-void sbNativeOwnerAdd(s32 *, s32 *);
+int sbNativeOwnerAdd(const char *name, SbNativeMethod *methods);
 
-extern s32 D_00407D00[];
+extern SbNativeMethod D_00407D00[];
 
-extern s32 D_00407D48[];
+extern SbNativeMethod D_00407D48[];
 
-extern s32 D_0053E418[];
-
-extern s32 D_0053E420[];
+extern const char D_0053E420[];
+extern const char D_0053E418[];
 
 /* VM native: word 1 is 2, words 0 and 2 are VM args; sent with cmd 0x1F. */
 s32 vmSpadSubmitTypedPair(s32 vm) {
@@ -541,3 +539,37 @@ void sbNativeOwnersRegister(void) {
     sbNativeOwnerAdd(D_0053E418, D_00407D00);
     sbNativeOwnerAdd(D_0053E420, D_00407D48);
 }
+
+const char D_0053E3B8[8] = "Clear";
+const char D_0053E3C0[8] = "Cross";
+const char D_0053E3C8[8] = "Wipe";
+const char D_0053E3D0[16] = "GradFrame";
+const char D_0053E3E0[16] = "Gradation";
+const char D_0053E3F0[8] = "Correct";
+const char D_0053E3F8[16] = "Negaposi";
+const char D_0053E408[16] = "Monochrome";
+const char D_0053E418[8] = "fade";
+
+SbNativeMethod D_00407D00[] = {
+    { D_0053E3C8, vmSpadSubmitTypedPair, { 2, 0, 0, 0 } },
+    { D_0053E3C0, vmSpadSubmitTypedOne, { 1, 0, 0, 0 } },
+    { "In", vmSpadSubmitFiveWords, { 4, 0, 0, 0 } },
+    { "Out", vmSpadSubmitFiveWordsAlt, { 4, 0, 0, 0 } },
+    { D_0053E3B8, vmSpadFlush, { 0, 0, 0, 0 } },
+    { 0, 0, { 0, 0, 0, 0 } },
+};
+
+SbNativeMethod D_00407D48[] = {
+    { D_0053E408, vmSpadCommand49, { 5, 0, 0, 0 } },
+    { D_0053E3F8, func_001D47A0, { 3, 0, 0, 0 } },
+    { D_0053E3F0, vmSpadCommand5D, { 4, 0, 0, 0 } },
+    { D_0053E3E0, vmSpadCommand60, { 6, 0, 0, 0 } },
+    { D_0053E3D0, func_001D49E8, { 9, 0, 0, 0 } },
+    { "Fog", vmSpadCommand64, { 4, 0, 0, 0 } },
+    { D_0053E3B8, vmSpadPoll, { 0, 0, 0, 0 } },
+    { 0, 0, { 0, 0, 0, 0 } },
+};
+
+const char D_0053E420[800] = "filter\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "BLUR\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "MOSAIC\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "NEGAPOSI\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "MONOTONE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "CROSS FADE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "SWELL2\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "WAVY BLUR\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TORUS\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "DIR BLUR\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "RIPPLE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "RIPPLE2\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "DISTORT\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "SWELL\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "DOF\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "NOISE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "NOISE2\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "SPECULER\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "SHIMMER\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "REFRACT\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "CORRECT\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "SOFTFOCUS\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "WIPE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "GRADATION\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "SCR BLUR\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "COLOR\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "GLOBAL FADE\x00" "\x00" "\x00" "\x00" "\x00" "PLANE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "DOF2\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "WAVY BLUR2\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "PREV FADE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "POST FADE\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "CUT IN\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST2\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST3\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST4\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST5\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST6\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "\x00" "TEST7";
+
+f32 D_00550FFC = 0.0f;

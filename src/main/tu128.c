@@ -1053,7 +1053,6 @@ typedef struct SefBurstRefCount {
 
 extern SefBurstRefCount sefReferenceCounts[];
 extern s32 sefOutputLinkEnabled;
-extern const char D_0053EEC8[];
 s16 *scScriptLookup(s32, s32 *, s32, s32 *);
 s32 sefCreateScheduler(s16 *, SefBurstKey *, s32, s16 *, s32);
 SefBurstScheduler *sefGetScheduler(void);
@@ -1201,7 +1200,7 @@ s32 func_001F6698(SefBurstRequest *burstRequest) {
         sefGetCurrentRotation(&rotation);
         /* Resource kind 100 spawns into several groups; every other kind is one groupPick. */
         if (((burstRequest->resourceId >> 12) & 0x3FF) == 100) {
-            LOG(volume, D_0053EEC8, scale);
+            LOG(volume, "\245\326\245\355\245\303\245\257\245\265\245\244\245\272 scale %f", scale);
             for (spawnIndex = 0; spawnIndex < burstRequest->groupCount; spawnIndex++) {
                 groupSpawns[spawnIndex] = 1;
             }
@@ -1812,3 +1811,10 @@ static inline SefSlotFull *findSlotByKeyFourth(s32 key) {
 s32 func_001F7870(s32 key) {
     return objectHasFlag5E(findSlotByKeyFourth(key));
 }
+
+/* The whole effect table (SefEffectTable); D_0043A1F0, gSefKeyUsed and the override tables are addresses inside it. */
+unsigned char gSefEffectTable[0x494C0] = { 0 };
+EffectRecordCell gSefEffectTransforms[40] = { 0 };
+unsigned char gEffectTable[3216] = { 0 };
+/* The studio block: the studio mode bits, the camera select flags (+0x10) and the slot delay flags (+0x2C). */
+u64 gSbStudioBlock[8] = { 0 };

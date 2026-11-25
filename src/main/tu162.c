@@ -1023,8 +1023,8 @@ typedef struct LabelBlob {
     u8 suffix;
 } LabelBlob;
 
-extern LabelBlob D_00538EB0;
-extern char xglFontTitleString[];
+extern const LabelBlob D_00538EB0;
+extern const char xglFontTitleString[];
 void xglFontPrintTitle(void);
 void xglFontPrintEscapeByte(s32 code);
 void xglFontPrintExtendedColor(s32 a, s32 b, s32 c);
@@ -1070,3 +1070,8 @@ void xglFontPrintTitledText(s32 x, s32 y, char *text, s32 labelValue) {
         }
     }
 }
+
+/* Label prefix and the title string (read-only), and the font state mask (sdata). */
+const LabelBlob D_00538EB0 = { { 0x15, 0x03, 0x03 }, 0, 0, 0 };
+const char xglFontTitleString[8] = { 0x15, 0x02, 0x01, 0x16, 0x00, 0x00, 0x00, 0x00 };
+s32 gFontStateMask = 0;

@@ -1,6 +1,7 @@
 #include "common.h"
 #include "shared.h"
 #include "main/tu105.h"
+#include "main/battle_shared.h"
 
 /* One entry of an image's name table: the name (offset from the header) and its value. */
 typedef struct SbNameEntry {
@@ -90,7 +91,6 @@ extern void func_A85C68(void);
 extern void runWithStateBlockOnce(int mode);
 extern int D_00551304;
 extern int D_004C83D0[];
-extern int gSbThreadBlockStorage[];
 
 /* Resets the render, sound and VM block state, then runs the state block once unless D_00551304 is set. */
 void func_001D1108(void)
@@ -108,7 +108,7 @@ void func_001D1108(void)
     func_A8E160();
     func_AB1A38();
     D_00551304 = 0;
-    if (gSbThreadBlockStorage[6] & 1) {
+    if (gSbThreadBlock.threadFlags & 1) {
         func_A9FF88();
         func_AA00F8();
         func_AA0910();
@@ -127,7 +127,7 @@ void func_001D1108(void)
     soundSlotSetDriverParam(1, 1);
     func_A85C68();
     D_004C83D0[0] = 0;
-    blockStatusWord = gSbThreadBlockStorage[6];
+    blockStatusWord = gSbThreadBlock.threadFlags;
     stateMode = 0;
     if (blockStatusWord & 1) {
         stateMode = 1;
@@ -152,7 +152,7 @@ u8 *sbBaseBlockIdGet(void) {
 extern SbThread D_0060E140[32];
 void sbNativeTablesReset(void);
 extern SbThread *sbThreadRing[32];
-extern s32 sbVmStateWord;
+static s32 sbVmStateWord;
 extern unsigned char sbThreadTagBytes[];
 void *memset(void *dest, int value, unsigned int count);
 
@@ -173,7 +173,9 @@ void sbClearVmTables(void)
     sbNativeTablesReset();
 }
 
-extern int sbNativeMethodCount;
+static int sbNativeMethodCount;
+
+static int sbNativeOwnerCount;
 
 /* Empties the native method table and the owner table (sbNativeOwnerAdd appends to both). */
 void sbNativeTablesReset(void)
@@ -1823,3 +1825,53 @@ int sbOpSwitch(SbThread *thread)
     thread->pc += sbCodeReadUnsigned(thread, thread->pc + 2, 4);
     return 0;
 }
+
+int D_00551304 = 0;
+
+signed char sbOpLengthTable[104] = {
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 5, 2, 3, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 3, 2, 3, 2, 1, 3, 2,
+    3, 2, 3, 3, 3, 3, 3, 2, 2, 2, 2, 2, 3,
+    3, 3, 3, 3, 2, 2, 2, 2, 2, 1, 1, 1, 1,
+    3, 3, 3, 1, 3, 2, 1, 1, 3, 2, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0
+};
+
+int (*sbOpHandlers[100])(SbThread *, int) = {
+    sbOpSkipInstruction, sbOpNegate, sbOpBinary, sbOpBinary,
+    sbOpBinary, sbOpBinary, sbOpBinary, sbOpBinary,
+    sbOpBinary, sbOpBinary, sbOpBinary, sbOpBinary,
+    sbOpBinary, sbOpBinary, sbOpBinary, sbOpBinary,
+    sbOpBinary, sbOpBinary, sbOpBinary, sbOpPushSmallConstant,
+    sbOpPushSmallConstant, sbOpPushSmallConstant, sbOpPushSmallConstant, sbOpPushSmallConstant,
+    sbOpPushSmallConstant, sbOpPushSmallConstant, sbOpPushSmallConstant, sbOpPushSmallConstant,
+    sbOpPushSmallConstant, sbOpPushSmallConstant, sbOpPushSmallConstant, sbOpPushSmallConstant,
+    sbOpPushImmediate, sbOpPushImmediate, sbOpPushNameEntryPc, sbOpPushNameEntryPc,
+    sbOpPushNull, sbOpPushTaggedWord, sbOpPushTaggedWord, sbOpPushGlobalId,
+    sbOpPushGlobalId, sbOpPushGlobalVariable, sbOpPushGlobalVariable, sbOpPushGlobalVariable,
+    sbOpPushGlobalVariable, sbOpPushGlobalVariable, sbOpPushGlobalVariable, sbOpPushGlobalVariable,
+    sbOpPushGlobalVariable, sbOpPushGlobalVariable, sbOpPushGlobalVariable, sbOpPushLocalVariable,
+    sbOpPushLocalVariable, sbOpPushLocalVariable, sbOpPushLocalVariable, sbOpPushLocalVariable,
+    sbOpPushLocalVariable, sbOpPushLocalVariable, sbOpPushLocalVariable, sbOpPushLocalVariable,
+    sbOpPushLocalVariable, sbOpAssignGlobal, sbOpAssignLocal, sbOpStoreGlobalKeep,
+    sbOpStoreLocalKeep, sbOpJump, sbOpJumpIfNotZero, sbOpJumpIfZero,
+    sbOpEnterFrame, sbOpCallNamed, sbOpCallNamed, sbOpReturn,
+    sbOpReturnValue, sbOpCallNative, sbOpCallNative, sbOpPushIndirect,
+    sbOpSpawn, sbOpKillThread, sbOpDrop, sbOpPushGlobalFromStack,
+    sbOpPushGlobalFromStack, sbOpPushGlobalFromStack, sbOpPushGlobalFromStack, sbOpPushGlobalFromStack,
+    sbOpLoadLocalFromStack, sbOpLoadLocalFromStack, sbOpLoadLocalFromStack, sbOpLoadLocalFromStack,
+    sbOpLoadLocalFromStack, sbOpRewindToEntry, sbOpYield, sbOpWaitFrames,
+    sbOpSend, sbOpReceive, sbOpIncGlobal, sbOpIncLocal,
+    sbOpDecGlobal, sbOpDecLocal, sbOpSwitch, 0
+};
+
+SbThread *sbThreadRing[32];
+SbThread D_0060E140[32];
+int sbStacks[32][128];
+unsigned char sbThreadTagBytes[4096];
+SbSlot sbThreadSlotTables[32][8];
+SbQueue sbChains[32];
+SbNativeOwner sbNativeOwners[128];
+SbNativeMethod sbNativeMethodTable[1024];

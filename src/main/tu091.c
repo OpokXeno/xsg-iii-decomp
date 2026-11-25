@@ -18,6 +18,9 @@ int Get_Rnd_001B8CD0(int min, int max);
 
 int mathRandom(SbThread *thread);
 
+extern const char D_005379F8[7][16];
+extern const char D_00537D38[16];
+
 extern u16 gMovieAutoSelectFlags[];
 
 int scriptMovieAutoSelectFlagGet(SbThread *thread) {
@@ -389,7 +392,9 @@ typedef struct HidePartNames {
     const char *names[8];
 } HidePartNames;
 
-extern HidePartNames gActorHidePartNames[];
+const HidePartNames gActorHidePartNames[] = {
+    { D_005379F8[0], D_005379F8[1], D_005379F8[2], D_005379F8[3], D_005379F8[4], D_005379F8[5], D_005379F8[6], 0 },
+};
 
 ActorOwnerBlock *stateBlockGet(void);
 
@@ -522,3 +527,100 @@ s32 sbNativeWaitArg(s32 thread) {
     }
     return 1;
 }
+
+typedef struct RuntimeNativeMethod {
+    const char *name;
+    int (*func)();
+    s32 argCount;
+} RuntimeNativeMethod;
+
+s32 func_001CAC00();
+s32 func_001CC678();
+s32 sbNativeAlwaysSucceed();
+s32 sbNativeCallKeyedEntry();
+s32 sbNativeCdUpdateMaxByte();
+s32 sbNativeGetStoredValue();
+s32 sbNativeJumpToKeyedEntry();
+s32 sbNativeNoop();
+s32 sbNativeQueueObjectRequest();
+s32 sbNativeSetBit();
+s32 sbNativeSetStoredValue();
+s32 sbNativeSetTableEntry();
+s32 sbNativeTestBit();
+s32 scriptCameraTargetFlagSet();
+s32 scriptDeferredCallRequest();
+s32 scriptDispModelSlotPairHide();
+s32 scriptDispModelSlotPairVisibleSet();
+s32 scriptEffectParamsSetChained();
+s32 scriptEffectParamsSetDefault();
+s32 scriptFogOverrideSet();
+s32 scriptGameStateQuery();
+s32 scriptObjectSetupRequestSubmit();
+s32 scriptRuntimeFlagToggle();
+s32 scriptRuntimeParamsSet();
+s32 scriptSlotObjectFlagBitsSet();
+s32 scriptSlotObjectPropertySet();
+s32 scriptSlotObjectScaleOffsetSet();
+s32 scriptSlotObjectScaledArgSet();
+s32 vmSetColor();
+s32 vmSetFlag2000();
+s32 vmSetGlobalColorBytes();
+s32 vmSetGlobalTag();
+
+RuntimeNativeMethod gSbRuntimeNativeTable[] = {
+    { D_00537D38, func_001CAC00, 2 },
+    { "setPos", scriptSlotObjectScaleOffsetSet, 1 },
+    { "setLocator", scriptObjectSetupRequestSubmit, 8 },
+    { "setPcSpeed", scriptSlotObjectScaledArgSet, 1 },
+    { "setFog", scriptFogOverrideSet, 8 },
+    { "setColorFilter", scriptRuntimeParamsSet, 1 },
+    { "setMapAlphaInvert", vmSetFlag2000, 1 },
+    { "setMapColor", vmSetColor, 3 },
+    { "setFadeColor", vmSetGlobalColorBytes, 3 },
+    { "setBattleMap", vmSetGlobalTag, 1 },
+    { "setDoorAttr", scriptSlotObjectFlagBitsSet, 3 },
+    { "setDoorParam", scriptSlotObjectPropertySet, 2 },
+    { "openDoor", scriptDispModelSlotPairVisibleSet, 1 },
+    { "closeDoor", scriptDispModelSlotPairHide, 1 },
+    { "loadEnemy", sbNativeNoop, 1 },
+    { "encount", scriptEffectParamsSetDefault, 1 },
+    { "encountBoss", scriptEffectParamsSetChained, 1 },
+    { "message", sbNativeSetTableEntry, 2 },
+    { "jumpPos", func_001CC678, 3 },
+    { "jumpLocator", sbNativeQueueObjectRequest, 1 },
+    { "mapPreload", scriptCameraTargetFlagSet, 1 },
+    { "mapJump", scriptDeferredCallRequest, 1 },
+    { "getSceneFlag", sbNativeGetStoredValue, 0 },
+    { "setSceneFlag", sbNativeSetStoredValue, 1 },
+    { "getFlag", sbNativeTestBit, 1 },
+    { "setFlag", sbNativeSetBit, 2 },
+    { "getSysParam", scriptGameStateQuery, 1 },
+    { "setSysParam", scriptRuntimeFlagToggle, 2 },
+    { "event", sbNativeJumpToKeyedEntry, 1 },
+    { "openingNarr", sbNativeAlwaysSucceed, 0 },
+    { "mpeg2", sbNativeCallKeyedEntry, 1 },
+    { "padRead", scriptMovieAutoSelectFlagGet, 1 },
+    { "analogRead", scriptMovieFlagByteGet, 1 },
+    { "setNextMap", sbDeferredCallStore, 1 },
+    { "jumpToNext", sbDeferredCallRun, 0 },
+    { "getItem", mathRandom, 2 },
+    { "setItem", func_001CD248, 3 },
+    { "kisekae", mathArgsTest, 2 },
+    { "chgTarget", scriptDispModelValueStore, 1 },
+    { "setTrap", func_001CD490, 3 },
+    { "shootTrap", vmShootTrap, 0 },
+    { "clearTrap", vmClearTrap, 0 },
+    { "minigame", vmMinigame, 0 },
+    { "setIntermis", func_001CD5B0, 1 },
+    { "vibration", sbNativeVibrationStart, 0 },
+    { "abort", sbNativeSynopsisSkip, 0 },
+    { "exist", sbNativeArgFlagIsSet, 0 },
+    { "shadowRange", sbNativeLoopScaleSet, 2 },
+    { "setKonishi", sbNativeActorPartsHide, 0 },
+    { "dynamaki", sbNativeModelsTimeoutSet, 0 },
+    { "warningOff", sbNativeWaitArg, 0 },
+    { "waitRead", sbNativeCdUpdateMaxByte, 0 },
+    { 0, 0, 0 },
+};
+
+const char D_00537D38[16] = "setNumber";

@@ -69,3 +69,9 @@ s32 ioRpcFetchBlock(s32 command, s32 firstOperand, s32 secondOperand) {
     func_002E7C30(&replyBlock[0], ioRpcReply, firstOperand, secondOperand, 0);
     return ioRpcReply;
 }
+
+/* The input words of the rpc calls (query operands). */
+s32 gIoRpcInputBlock[16];
+
+/* The reply words of the rpc calls; ioRpcReply reads word 0. */
+s32 gIoRpcReplyBlock[16];

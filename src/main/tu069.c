@@ -31,7 +31,6 @@ typedef struct ActorBlock {
     u8 unmodeled_20[0x90 - 0x20];
 } ActorBlock;
 
-extern f32 gActorExtentInitial;
 void actorChildNoop(void);
 void actorChildBindMode(ActorOwner *self, s32 handleId);
 void RgDispModelSetLocal(ActorOwner *owner);
@@ -69,7 +68,7 @@ s32 actorChildSlotCreate(s32 *slotRequest) {
     }
     __asm__ __volatile__("sqc2 vf0, 0(%0)" : : "r"(actorBlock->unmodeled_00 + 0x10) : "memory");
     actorBlock->zeroedFloat04 = 0.0f;
-    actorExtent = gActorExtentInitial;
+    actorExtent = 0.64f;
     actorBlock->extentX = actorExtent;
     actorBlock->extentY = 1.5f;
     actorBlock->extentW = actorExtent;

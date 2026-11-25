@@ -5,6 +5,9 @@ typedef unsigned char u8;
 typedef unsigned int u32;
 
 extern u8 gFontColorScale;
+extern u8 gFontAlphaScale;
+extern int gFontColorIndex;
+
 
 /* Scales the red, green and blue bytes of a packed RGBA32 color by gFontColorScale (1/128 units, saturated to 0xFF)
  * and keeps its alpha byte. */
@@ -31,7 +34,6 @@ int fontColorModulateRgb(unsigned int color) {
     return (int) packedColor;
 }
 
-extern u8 gFontAlphaScale;
 
 /* Scales the red, green and blue bytes by gFontColorScale and the alpha byte by gFontAlphaScale (1/128 units,
  * saturated to 0xFF). */
@@ -104,7 +106,6 @@ int colorModulateByte(int sourceChannel, int scaleByte) {
 }
 
 extern char *gFontEscapeBuffer;
-extern int gFontColorIndex;
 void xglFontPrint(int x, int y, unsigned int color, const char *text);
 
 /* Writes a color escape (0xC) with the scaled red, green and blue into the text buffer at
@@ -249,14 +250,14 @@ void xglFontPrintAlphaCommand(int alphaMode, int alphaIndex, int alpha) {
     xglFontPrint(0, 0, gFontColorIndex, gFontEscapeBuffer);
 }
 
-extern unsigned char gFontTitleText[];
+extern const unsigned char gFontTitleText[];
 
 void xglFontPrintTitle(void) {
     xglFontPrint(0, 0, gFontColorIndex, gFontTitleText);
     xglFontPrintAlphaCommand(0x44, 0, 0x80);
 }
 
-extern unsigned char gFontFormatString[];
+extern const unsigned char gFontFormatString[];
 int GameMpeg2Play();
 
 void xglFontPrintLabel(int x, int y) {
@@ -274,3 +275,14 @@ void xglFontPrintUnsignedRight(int x, int y, int charWidth, int unsignedValue) {
     advance = unsignedDecimalDigits(unsignedValue);
     xglFontPrint(x - (charWidth * advance), y, gFontColorIndex + 2, gFontNumberBuffer);
 }
+
+/* Font command bytes and the format string (a 0 ends each), read-only. */
+const unsigned char gFontTitleText[16] = {
+    0x0B, 0x0D, 0x00, 0x19, 0x03, 0x0C, 0x62, 0x62, 0x62, 0x15, 0x02, 0x01, 0x18, 0x00, 0x00, 0x00,
+};
+const unsigned char gFontFormatString[8] = { 0x15, 0x02, 0x04, 0x01, 0x25, 0x75, 0x00, 0x00 };
+
+/* Alpha and color scales (1/128 units) and the color index of the font printer. */
+u8 gFontAlphaScale = 0x80;
+u8 gFontColorScale = 0x80;
+int gFontColorIndex = 1;

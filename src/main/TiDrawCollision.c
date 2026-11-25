@@ -101,9 +101,6 @@ void tiDrawCollisionBuildRing(float scale)
 
 /* Assert strings of tiDrawCollisionDrawRing: the scaffold data at 0x542770 ("pCol"), 0x542778 (the file name)
  * and 0x542790 ("pTransMat"). */
-extern const char tiDrawCollisionAssertPCol[];
-extern const char tiDrawCollisionSourceFile[];
-extern const char tiDrawCollisionAssertTransMat[];
 /* Scaffold data after tiDrawCollisionRing (0x4C9220: the transform buffer, 0x4C9520: the screen buffer). */
 extern Vector4 D_004C9220[48];
 extern ScreenVector4 D_004C9520[48];
@@ -113,10 +110,10 @@ extern ScreenVector4 D_004C9520[48];
 void tiDrawCollisionDrawRing(Matrix4 pTransMat, const unsigned int *pCol)
 {
     if (pCol == 0) {
-        assertFailed(tiDrawCollisionAssertPCol, tiDrawCollisionSourceFile, 51);
+        assertFailed("pCol", "TiDrawCollision.euc.c", 51);
     }
     if (pTransMat == 0) {
-        assertFailed(tiDrawCollisionAssertTransMat, tiDrawCollisionSourceFile, 52);
+        assertFailed("pTransMat", "TiDrawCollision.euc.c", 52);
     }
     tiDrawJointTransformPoints(TI_COLLISION_RING_POINTS, pTransMat, tiDrawCollisionRing, D_004C9220);
     tiDrawJointScreenPoints(TI_COLLISION_RING_POINTS, D_004C9220, D_004C9520);
@@ -134,3 +131,7 @@ void tiDrawCollisionDrawObjectRing(const Vector4 *position, const unsigned int *
     xglCurMatrixGet(trans_mat);
     tiDrawCollisionDrawRing(trans_mat, pCol);
 }
+
+Vector4 tiDrawCollisionRing[TI_COLLISION_RING_POINTS] = { 0 };
+Vector4 D_004C9220[48] = { 0 };
+ScreenVector4 D_004C9520[48] = { 0 };

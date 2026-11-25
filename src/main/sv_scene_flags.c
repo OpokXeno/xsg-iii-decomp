@@ -20,12 +20,7 @@ typedef struct LightSet {
 } LightSet;
 
 /* "sDir", "sCol", "sSha", "sPntP", "sPntC" */
-extern const char lightLogDirectionLabel[];
 
-extern const char lightLogColorLabel[];
-extern const char lightLogShadowLabel[];
-extern const char lightLogPointPositionLabel[];
-extern const char lightLogPointColorLabel[];
 
 void svSceneFlagsSet(u32 mask) {
     svSceneFlags |= mask;
@@ -45,18 +40,21 @@ void lightSetLogDump(LightSet *lights)
     int i;
 
     for (i = 0; i < 7; i++) {
-        LOG(&lights->direction[i], lightLogDirectionLabel, i);
+        LOG(&lights->direction[i], "sDir", i);
     }
     for (i = 0; i < 8; i++) {
-        LOG(&lights->color[i], lightLogColorLabel, i);
+        LOG(&lights->color[i], "sCol", i);
     }
     for (i = 0; i < 3; i++) {
-        LOG(&lights->shadow[i], lightLogShadowLabel, i);
+        LOG(&lights->shadow[i], "sSha", i);
     }
     for (i = 0; i < 3; i++) {
-        LOG(&lights->pointPosition[i], lightLogPointPositionLabel, i);
+        LOG(&lights->pointPosition[i], "sPntP", i);
     }
     for (i = 0; i < 3; i++) {
-        LOG(&lights->pointColor[i], lightLogPointColorLabel, i);
+        LOG(&lights->pointColor[i], "sPntC", i);
     }
 }
+
+u32 svSceneFlags = 0;
+int svEffectSceneFlag = 0;

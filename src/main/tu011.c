@@ -31,10 +31,10 @@ typedef struct PadVibrationTimers {
 } PadVibrationTimers;
 
 extern unsigned char gPadLatchBlocked[];
-extern PadVibrationTimers gPadLatchedValue;
-extern s16 padVibrationFadeFrames; /* fade length in frames */
-extern u8 padVibrationFadeStart; /* large motor value at the start of the fade */
-extern u8 padVibrationFadeEnd; /* large motor value at the end of the fade */
+static u8 padVibrationFadeStart; /* large motor value at the start of the fade */
+static u8 padVibrationFadeEnd; /* large motor value at the end of the fade */
+static PadVibrationTimers gPadLatchedValue;
+static s16 padVibrationFadeFrames; /* fade length in frames */
 
 void Vibration_Stop(void)
 {
@@ -85,3 +85,6 @@ void VibrationEngine(void)
         }
     }
 }
+
+/* The movie flag bytes (gMovieFlagBytes, read by scriptMovieFlagByteGet in tu091) start at 0x4B34D4 inside this array. */
+signed char D_004B34C0[176] = { 0 };

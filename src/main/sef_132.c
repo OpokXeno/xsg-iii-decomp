@@ -2410,4 +2410,25 @@ void sefClearOwnerGroupFlags(int owner, unsigned short key, int mask)
     }
 }
 
+/* Scratch and noise state, zero until sefNoiseInit and the first draw. */
+Matrix4 sefScratchMatrix;
+SefNoiseTable sefNoiseTable;
+
+/* Shared with other TUs: the camera's travel matrix, the fog override flag and vectors. */
+int sefEffectFlags = 0;
+unsigned int sefRandSeed = 0x0027A9EB;
+int sefNoiseReady = 0;
+
+Vector4 D_00475380 = { 0.0f, 0.0f, 0.5f, 1.0f };
+unsigned int sefRandVectorSeeds[4] = { 0x0005CFED, 0x00198DBB, 0x000EC96F, 0x00000001 };
+unsigned int sefRandVectorIncrements[4] = { 0x0000303B, 0x0000303B, 0x0000303B, 0 };
+Matrix4 sefCameraMatrix[1] = { { { 0.0f } } };
+unsigned char sefOverrideFlag[16] = { 0 };
+AlignedVector4 sefOverrideVectorA = { 0.0f, 0.0f, 0.0f, 0.0f };
+AlignedVector4 sefOverrideVectorB[3] = {
+    { 0.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 0.0f },
+};
+
 /* <<< CHUNK sef_135 */

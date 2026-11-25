@@ -389,7 +389,7 @@ typedef struct SefEffectRequest {
     void *spawnKey;
     void *spawnKey2;
     u8 unk_08[0x20];
-    void *unk_28; /* set to D_0053E8F0 by sefSpawnLinkedEffect */
+    void *unk_28; /* set to "ce100_042.esd" by sefSpawnLinkedEffect */
     s32 owner;
     u8 unk_30[4];
     s32 effectSlot;
@@ -630,7 +630,6 @@ void objectSetLinkedFlag(LinkedObject *linkedObject, s32 linkEnabled)
 }
 
 
-extern u8 D_0053E8F0[];
 
 
 s32 sefRunEffectRecords(SefEffectRecord *effectRecord);
@@ -650,7 +649,7 @@ s32 sefSpawnLinkedEffect(LinkedObject *linkedObject, f32 scale)
     spawnRequest[17] = -(((f32) rect[1] - 224.0f) + (f32) rect[3] * 0.5f) * 0.875f;
     spawnRequest[24] = (f32) rect[2] * 0.03125f;
     spawnRequest[25] = (f32) rect[3] * 0.03125f;
-    ((SefFloatBits *) spawnRequest)[10].asWord = (s32) D_0053E8F0;
+    ((SefFloatBits *) spawnRequest)[10].asWord = (s32) "ce100_042.esd";
 
     spawned = sefSpawnEffectFromRequest(spawnRequest);
     if (spawned != 0) {
@@ -1200,3 +1199,9 @@ void sceneShatterTransitionUpdate(void)
     drawAreaSetWindow(0x80, 1, 0, 0, 0x200, 0x1C0, 0, 0, 0x200, 0x1C0);
     func_001D55E8();
 }
+
+unsigned int gSceneLoadState = 3;
+int gShatterActiveShardCount = 0;
+
+SefBufferedEffect gEffectBuffer[40];
+ShatterShard gShatterShards[SHATTER_ROWS][SHATTER_COLUMNS];

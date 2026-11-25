@@ -2,22 +2,13 @@
  * OV02 original TU 17: 0x00a874a0..0x00a88a08 (23 functions)
  */
 #include "common.h"
+#include "main/battle_shared.h"
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu017", func_00A874A0);
 
 typedef int s32;
 
 typedef unsigned char u8;
-
-typedef struct Ov02ExpRecord {
-    unsigned char unk_00[0x8];
-    s32 expPoints;
-    unsigned char unmodeled_0C[0x38 - 0x0C];
-    unsigned char flagBits[15];
-    unsigned char unmodeled_47[0x58 - 0x47];
-} Ov02ExpRecord;
-
-extern Ov02ExpRecord gOv02ExpRecords[];
 
 /* The class flags byte at +0x09 of the slot returned by ov02BattleSlotGet. */
 typedef struct Ov02ClassSlot {

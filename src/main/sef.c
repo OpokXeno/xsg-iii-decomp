@@ -976,6 +976,7 @@ typedef struct SefMotionFloorView {
     float floorY;
     unsigned char unmodeled_10[8];
     SefHermiteKeyPoint *keys;
+    unsigned char unmodeled_1C[4];
 } SefMotionFloorView;
 
 extern SefMotionFloorView sefMotionFloorCurve;
@@ -1134,7 +1135,7 @@ float func_0025A910(const Vector4 *a, const Vector4 *b);
 void rotationMatrixToQuaternion(void *output, void *input);
 extern s32 sefVectorMode;
 extern SefMotionObject *D_005510A4;
-extern Vector4 sefDefaultAxis;
+extern const Vector4 sefDefaultAxis[2];
 extern const Vector4 sefDefaultPoint;
 
 static inline void sefBlendBasis(Vector4 *basis, float blend) {
@@ -2690,14 +2691,14 @@ typedef struct SefLineData {
     unsigned char unmodeled_8AA[0x8B0 - 0x8AA];
 } SefLineData;
 
-extern s32 D_00551514;
+static s32 D_00551514;
 extern s32 D_004749E0[];
 extern s32 D_0045417C[9];
 
 #define SEF_QUARTER_PI 0.7853982f
 
-extern DoublewordAlignedVector4 D_0053EF10;
-extern DoublewordAlignedVector4 D_0053EF20;
+extern const DoublewordAlignedVector4 D_0053EF10;
+extern const DoublewordAlignedVector4 D_0053EF20;
 int scGetImmAdrImmIdx2(int scriptBase, unsigned short *immediateTable, int immediateIndex);
 int MMathIsVectorEqual(const Vector4 *first, const Vector4 *second);
 void quaternionFromAngleZ(SefLineData *line, f32 angle);
@@ -3705,7 +3706,7 @@ typedef struct SefLineVectorBits {
 
 extern SefLinePart *D_005510A4_1FE6F0;
 extern int D_005510A8;
-extern AlignedVector4 D_00453E90;
+extern SefCameraMatrixBlock sefCameraMatrixBlock;
 extern unsigned short D_00453D88[];
 extern unsigned short D_00453DC8[];
 
@@ -3812,7 +3813,7 @@ int sefEmitLocalEffectSteps(SefLineDataView *localData, int slotIndex) {
     D_005510A8 = -1;
     sefLineVuStoreZero(&localData->v90);
     if (key0Params[-2] == 1 || key0Params[-2] == 2) {
-        sefLineVecCopy(&localData->v90, &D_00453E90);
+        sefLineVecCopy(&localData->v90, &sefCameraMatrixBlock.v80);
     } else if (key0Params[-2] == 3 || key0Params[-2] == 7) {
         sefLineVuStoreZero(&localData->v90);
     }
@@ -4230,7 +4231,7 @@ int sefUpdateLineRecord(short *lineHandles, SefSlotLineRecord *line, int unusedA
     if (line->lifeTime >= 0.0f || done) {
         sefEmitLocalEffectSteps(line, lineSlot);
     } else if (line->k160[-2] == 1 || line->k160[-2] == 2) {
-        SefVectorCopy(&line->v90, &D_00453E90);
+        SefVectorCopy(&line->v90, &sefCameraMatrixBlock.v80);
     } else if (line->k160[-2] == 3 || line->k160[-2] == 7) {
         SefVectorZero(&line->v90);
     }
@@ -5047,6 +5048,15 @@ static inline void PbCp(AlignedVector4 *destination, AlignedVector4 *source) {
 
 void sefSetMatrixOrUnit(void *destinationMatrix, const void *sourceMatrix);
 int sefActorMulLocalMatrix(XenoActor *actor, void *actorNodeArg, Matrix4 *combinedMatrix, int multiplyLocal);
+
+const Vector4 sefDefaultPoint = { 0.0f, 0.0f, 0.0f, 1.0f };
+const Vector4 sefDefaultAxis[2] = {
+    { 0.0f, 0.0f, 1.0f, 1.0f },
+    { 0.0f, 0.0f, -1.0f, 1.0f }
+};
+const DoublewordAlignedVector4 D_0053EF10 = { 1.0f, 1.0f, 0.0f, 0.0f };
+const DoublewordAlignedVector4 D_0053EF20 = { 1.0f, -1.0f, 0.0f, 0.0f };
+
 
 /* Updates the hit flags and matrices of effect record recordIndex from the slot items of its 32 slots: one-bit flags
  * per key kind, then the slot matrices, direction and scale (not run when the camera select mode is set or the record is flagged 0x1000). */
@@ -6708,8 +6718,44 @@ typedef struct EpStudio {
 
 #define SEF_STUDIO (*(EpStudio *)&(*(SbStudioView *)&gSbStudioBlock))
 
-extern EpVector sefStudioPatternOdd[16];
-extern EpVector sefStudioPatternEven[16];
+const EpVector sefStudioPatternEven[16] = {
+    { 0.0f, 2.0f, 2.0f, 1.0f },
+    { 0.400000006f, 0.800000012f, 2.0f, 1.0f },
+    { -0.200000003f, 1.10000002f, 2.0f, 1.0f },
+    { 0.400000006f, 0.800000012f, 2.0f, 1.0f },
+    { 0.200000003f, 1.10000002f, 2.0f, 1.0f },
+    { -0.100000001f, 0.0f, 2.0f, 1.0f },
+    { -0.100000001f, 0.600000024f, 2.0f, 1.0f },
+    { 0.100000001f, 0.0f, 2.0f, 1.0f },
+    { 0.100000001f, 0.600000024f, 2.0f, 1.0f },
+    { 0.0f, 0.0f, 2.0f, 1.0f },
+    { 0.0f, 0.0f, 2.0f, 1.0f },
+    { 0.0f, 0.0f, 2.0f, 1.0f },
+    { 0.0f, 0.0f, 2.0f, 1.0f },
+    { 0.0f, 1.70000005f, 2.0f, 1.0f },
+    { 0.0f, 1.54999995f, 2.1500001f, 1.0f },
+    { 0.0f, 1.29999995f, 2.1500001f, 1.0f }
+};
+const EpVector sefStudioPatternOdd[16] = {
+    { 0.0f, 2.0f, -2.0f, 1.0f },
+    { 0.400000006f, 0.800000012f, -2.0f, 1.0f },
+    { -0.200000003f, 1.10000002f, -2.0f, 1.0f },
+    { 0.400000006f, 0.800000012f, -2.0f, 1.0f },
+    { 0.200000003f, 1.10000002f, -2.0f, 1.0f },
+    { -0.100000001f, 0.0f, -2.0f, 1.0f },
+    { -0.100000001f, 0.600000024f, -2.0f, 1.0f },
+    { 0.100000001f, 0.0f, -2.0f, 1.0f },
+    { 0.100000001f, 0.600000024f, -2.0f, 1.0f },
+    { 0.0f, 0.0f, -2.0f, 1.0f },
+    { 0.0f, 0.0f, -2.0f, 1.0f },
+    { 0.0f, 0.0f, -2.0f, 1.0f },
+    { 0.0f, 0.0f, -2.0f, 1.0f },
+    { 0.0f, 1.70000005f, -2.0f, 1.0f },
+    { 0.0f, 1.54999995f, -1.85000002f, 1.0f },
+    { 0.0f, 1.29999995f, -1.85000002f, 1.0f }
+};
+extern const Matrix4 vu0IdentityMatrix;
+
 
 #define SEF_EFFECT_ENTRY_TABLE (*(EpTable (*))&sefEffectEntryTable)
 #define SEF_ACTOR_MUL_LOCAL_MATRIX ((s32(*)(void *, s32, EpMatrix *, s32))sefActorMulLocalMatrix)
@@ -6800,8 +6846,6 @@ f32 sefGetEntryScale(s32 id) {
     return scale;
 }
 
-extern unsigned char sefEffectOwner[];
-extern unsigned char sefSetupArg[];
 extern s32 sefSetupPending;
 void func_001936F0(void *owner, s32 message, void *argument);
 void sefSetSceneMode(s32 mode);
@@ -6809,23 +6853,29 @@ void sefSetSceneMode(s32 mode);
 /* Runs the pending setup callback (message 0x1709) when one is pending, then sets scene mode 1. */
 void sefFlushPendingEffectSetup(void) {
     if (sefSetupPending != 0) {
-        func_001936F0(sefEffectOwner, 0x1709, sefSetupArg);
+        func_001936F0("seft.euc.c", 0x1709, "sefInitEffectCf(void)\244\362ymInitTypeEffect(YMINIT_CF_TYPE)\244\313\312\321\244\250\244\306\244\257\244\300\244\265\244\244");
     }
     sefSetSceneMode(1);
 }
 
-extern unsigned char sefTeardownArg[];
 extern s32 sefTeardownPending;
 void sefResetEffectWorld(void);
 
 /* Runs the pending teardown callback (message 0x1719) once when pending, then resets the effect world. */
 void sefFlushPendingEffectTeardown(void) {
     if (sefTeardownPending != 0) {
-        func_001936F0(sefEffectOwner, 0x1719, sefTeardownArg);
+        func_001936F0("seft.euc.c", 0x1719, "sefDestroyEffectCf(void)\244\362ymDestroyEffect(void)\244\313\312\321\244\250\244\306\244\257\244\300\244\265\244\244");
         sefTeardownPending = 0;
     }
     sefResetEffectWorld();
 }
+
+const Matrix4 vu0IdentityMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f }
+};
 
 void sefAdvanceStepCounter(void);
 void sdvExecAlters(void);
@@ -7178,3 +7228,202 @@ void sefSetSlotDirectionBetweenDefaultAxis(void *slotMatrix, Vector4 *minuend, V
 void sefMemFillWords(void *dest, int value, int size);
 float sefNoiseNext(void);
 float sefRandf(void);
+
+/* The pools the .sdata pointers address: effect records, effect slots, line data and the part ring with its entries. */
+SefEffectRecord D_0065DB20[40];
+unsigned char sefEffectSlots[250 * 0x6C];
+unsigned char sefLineDataBlock[170 * 0x8B0];
+unsigned char D_006C3E00[0x10 + 1100 * 0x270];
+short sefPtFreeSlots[1104];
+AlignedVector4 D_0076BFF0;
+/* The draw flags the getters return are fields of the last tally. */
+SefEffectTally sefEffectTallies[45];
+AlignedVector4 D_0076C440;
+AlignedVector4 D_0076C450;
+AlignedVector4 D_0076C460;
+AlignedVector4 D_0076C470;
+
+/* The arc tangent of n / 1024, n = 0..1024; srsAtan2 reads it through the uncached mirror. */
+float D_00452D80[1025] = {
+    0.0f, 0.000977f, 0.001953f, 0.00293f, 0.003906f, 0.004883f, 0.005859f, 0.006836f,
+    0.007812f, 0.008789f, 0.009765f, 0.010742f, 0.011718f, 0.012695f, 0.013671f, 0.014647f,
+    0.015624f, 0.0166f, 0.017576f, 0.018553f, 0.019529f, 0.020505f, 0.021481f, 0.022457f,
+    0.023433f, 0.024409f, 0.025385f, 0.026361f, 0.027337f, 0.028313f, 0.029288f, 0.030264f,
+    0.03124f, 0.032215f, 0.033191f, 0.034166f, 0.035142f, 0.036117f, 0.037092f, 0.038068f,
+    0.039043f, 0.040018f, 0.040993f, 0.041968f, 0.042942f, 0.043917f, 0.044892f, 0.045866f,
+    0.046841f, 0.047815f, 0.048789f, 0.049764f, 0.050738f, 0.051712f, 0.052686f, 0.053659f,
+    0.054633f, 0.055607f, 0.05658f, 0.057554f, 0.058527f, 0.0595f, 0.060473f, 0.061446f,
+    0.062419f, 0.063392f, 0.064364f, 0.065337f, 0.066309f, 0.067281f, 0.068253f, 0.069225f,
+    0.070197f, 0.071169f, 0.07214f, 0.073112f, 0.074083f, 0.075054f, 0.076025f, 0.076996f,
+    0.077967f, 0.078937f, 0.079908f, 0.080878f, 0.081848f, 0.082818f, 0.083788f, 0.084757f,
+    0.085727f, 0.086696f, 0.087665f, 0.088634f, 0.089603f, 0.090572f, 0.09154f, 0.092509f,
+    0.093477f, 0.094445f, 0.095413f, 0.09638f, 0.097348f, 0.098315f, 0.099282f, 0.100249f,
+    0.101215f, 0.102182f, 0.103148f, 0.104114f, 0.10508f, 0.106046f, 0.107012f, 0.107977f,
+    0.108942f, 0.109907f, 0.110872f, 0.111836f, 0.1128f, 0.113764f, 0.114728f, 0.115692f,
+    0.116655f, 0.117619f, 0.118582f, 0.119544f, 0.120507f, 0.121469f, 0.122431f, 0.123393f,
+    0.124355f, 0.125316f, 0.126278f, 0.127239f, 0.128199f, 0.12916f, 0.13012f, 0.13108f,
+    0.13204f, 0.132999f, 0.133959f, 0.134918f, 0.135876f, 0.136835f, 0.137793f, 0.138751f,
+    0.139709f, 0.140666f, 0.141624f, 0.142581f, 0.143537f, 0.144494f, 0.14545f, 0.146406f,
+    0.147361f, 0.148317f, 0.149272f, 0.150227f, 0.151181f, 0.152136f, 0.15309f, 0.154043f,
+    0.154997f, 0.15595f, 0.156903f, 0.157855f, 0.158808f, 0.15976f, 0.160711f, 0.161663f,
+    0.162614f, 0.163565f, 0.164515f, 0.165465f, 0.166415f, 0.167365f, 0.168314f, 0.169263f,
+    0.170212f, 0.17116f, 0.172108f, 0.173056f, 0.174004f, 0.174951f, 0.175898f, 0.176844f,
+    0.17779f, 0.178736f, 0.179682f, 0.180627f, 0.181572f, 0.182516f, 0.18346f, 0.184404f,
+    0.185348f, 0.186291f, 0.187234f, 0.188177f, 0.189119f, 0.190061f, 0.191002f, 0.191943f,
+    0.192884f, 0.193825f, 0.194765f, 0.195705f, 0.196644f, 0.197583f, 0.198522f, 0.199461f,
+    0.200399f, 0.201336f, 0.202274f, 0.203211f, 0.204147f, 0.205083f, 0.206019f, 0.206955f,
+    0.20789f, 0.208825f, 0.209759f, 0.210693f, 0.211627f, 0.21256f, 0.213493f, 0.214426f,
+    0.215358f, 0.216289f, 0.217221f, 0.218152f, 0.219083f, 0.220013f, 0.220943f, 0.221872f,
+    0.222801f, 0.22373f, 0.224658f, 0.225586f, 0.226514f, 0.227441f, 0.228367f, 0.229294f,
+    0.23022f, 0.231145f, 0.23207f, 0.232995f, 0.233919f, 0.234843f, 0.235767f, 0.23669f,
+    0.237612f, 0.238535f, 0.239456f, 0.240378f, 0.241299f, 0.242219f, 0.24314f, 0.244059f,
+    0.244979f, 0.245898f, 0.246816f, 0.247734f, 0.248652f, 0.249569f, 0.250486f, 0.251402f,
+    0.252318f, 0.253233f, 0.254149f, 0.255063f, 0.255977f, 0.256891f, 0.257804f, 0.258717f,
+    0.25963f, 0.260542f, 0.261453f, 0.262364f, 0.263275f, 0.264185f, 0.265095f, 0.266004f,
+    0.266913f, 0.267821f, 0.268729f, 0.269637f, 0.270544f, 0.27145f, 0.272357f, 0.273262f,
+    0.274167f, 0.275072f, 0.275976f, 0.27688f, 0.277784f, 0.278687f, 0.279589f, 0.280491f,
+    0.281392f, 0.282293f, 0.283194f, 0.284094f, 0.284994f, 0.285893f, 0.286791f, 0.28769f,
+    0.288587f, 0.289485f, 0.290381f, 0.291278f, 0.292173f, 0.293069f, 0.293963f, 0.294858f,
+    0.295752f, 0.296645f, 0.297538f, 0.29843f, 0.299322f, 0.300214f, 0.301105f, 0.301995f,
+    0.302885f, 0.303774f, 0.304663f, 0.305552f, 0.30644f, 0.307327f, 0.308214f, 0.3091f,
+    0.309986f, 0.310872f, 0.311757f, 0.312641f, 0.313525f, 0.314409f, 0.315291f, 0.316174f,
+    0.317056f, 0.317937f, 0.318818f, 0.319698f, 0.320578f, 0.321458f, 0.322336f, 0.323215f,
+    0.324092f, 0.32497f, 0.325846f, 0.326723f, 0.327598f, 0.328474f, 0.329348f, 0.330222f,
+    0.331096f, 0.331969f, 0.332842f, 0.333714f, 0.334585f, 0.335456f, 0.336327f, 0.337197f,
+    0.338066f, 0.338935f, 0.339803f, 0.340671f, 0.341538f, 0.342405f, 0.343271f, 0.344137f,
+    0.345002f, 0.345867f, 0.346731f, 0.347594f, 0.348457f, 0.34932f, 0.350182f, 0.351043f,
+    0.351904f, 0.352764f, 0.353624f, 0.354483f, 0.355342f, 0.3562f, 0.357057f, 0.357914f,
+    0.358771f, 0.359627f, 0.360482f, 0.361337f, 0.362191f, 0.363045f, 0.363898f, 0.36475f,
+    0.365602f, 0.366454f, 0.367305f, 0.368155f, 0.369005f, 0.369854f, 0.370703f, 0.371551f,
+    0.372398f, 0.373245f, 0.374092f, 0.374938f, 0.375783f, 0.376628f, 0.377472f, 0.378316f,
+    0.379159f, 0.380001f, 0.380843f, 0.381684f, 0.382525f, 0.383365f, 0.384205f, 0.385044f,
+    0.385883f, 0.386721f, 0.387558f, 0.388395f, 0.389231f, 0.390067f, 0.390902f, 0.391736f,
+    0.39257f, 0.393403f, 0.394236f, 0.395068f, 0.3959f, 0.396731f, 0.397562f, 0.398391f,
+    0.399221f, 0.40005f, 0.400878f, 0.401705f, 0.402532f, 0.403359f, 0.404184f, 0.40501f,
+    0.405834f, 0.406658f, 0.407482f, 0.408305f, 0.409127f, 0.409949f, 0.41077f, 0.41159f,
+    0.41241f, 0.41323f, 0.414049f, 0.414867f, 0.415684f, 0.416501f, 0.417318f, 0.418134f,
+    0.418949f, 0.419764f, 0.420578f, 0.421391f, 0.422204f, 0.423016f, 0.423828f, 0.424639f,
+    0.42545f, 0.42626f, 0.427069f, 0.427878f, 0.428686f, 0.429493f, 0.4303f, 0.431107f,
+    0.431912f, 0.432717f, 0.433522f, 0.434326f, 0.435129f, 0.435932f, 0.436734f, 0.437536f,
+    0.438337f, 0.439137f, 0.439937f, 0.440736f, 0.441534f, 0.442332f, 0.44313f, 0.443926f,
+    0.444722f, 0.445518f, 0.446313f, 0.447107f, 0.447901f, 0.448694f, 0.449486f, 0.450278f,
+    0.45107f, 0.45186f, 0.45265f, 0.45344f, 0.454229f, 0.455017f, 0.455805f, 0.456592f,
+    0.457378f, 0.458164f, 0.458949f, 0.459734f, 0.460518f, 0.461301f, 0.462084f, 0.462866f,
+    0.463648f, 0.464429f, 0.465209f, 0.465989f, 0.466768f, 0.467546f, 0.468324f, 0.469101f,
+    0.469878f, 0.470654f, 0.47143f, 0.472204f, 0.472979f, 0.473752f, 0.474525f, 0.475298f,
+    0.476069f, 0.47684f, 0.477611f, 0.478381f, 0.47915f, 0.479919f, 0.480687f, 0.481454f,
+    0.482221f, 0.482988f, 0.483753f, 0.484518f, 0.485283f, 0.486046f, 0.486809f, 0.487572f,
+    0.488334f, 0.489095f, 0.489856f, 0.490616f, 0.491375f, 0.492134f, 0.492893f, 0.49365f,
+    0.494407f, 0.495164f, 0.495919f, 0.496674f, 0.497429f, 0.498183f, 0.498936f, 0.499689f,
+    0.500441f, 0.501192f, 0.501943f, 0.502693f, 0.503443f, 0.504192f, 0.50494f, 0.505688f,
+    0.506435f, 0.507181f, 0.507927f, 0.508673f, 0.509417f, 0.510161f, 0.510905f, 0.511647f,
+    0.512389f, 0.513131f, 0.513872f, 0.514612f, 0.515352f, 0.516091f, 0.516829f, 0.517567f,
+    0.518304f, 0.519041f, 0.519777f, 0.520512f, 0.521247f, 0.521981f, 0.522715f, 0.523447f,
+    0.52418f, 0.524911f, 0.525642f, 0.526373f, 0.527102f, 0.527832f, 0.52856f, 0.529288f,
+    0.530015f, 0.530742f, 0.531468f, 0.532193f, 0.532918f, 0.533642f, 0.534366f, 0.535089f,
+    0.535811f, 0.536533f, 0.537254f, 0.537975f, 0.538694f, 0.539414f, 0.540132f, 0.54085f,
+    0.541568f, 0.542284f, 0.543001f, 0.543716f, 0.544431f, 0.545145f, 0.545859f, 0.546572f,
+    0.547284f, 0.547996f, 0.548707f, 0.549418f, 0.550128f, 0.550837f, 0.551546f, 0.552254f,
+    0.552962f, 0.553668f, 0.554375f, 0.55508f, 0.555785f, 0.55649f, 0.557194f, 0.557897f,
+    0.558599f, 0.559301f, 0.560003f, 0.560703f, 0.561403f, 0.562103f, 0.562802f, 0.5635f,
+    0.564198f, 0.564895f, 0.565591f, 0.566287f, 0.566982f, 0.567676f, 0.56837f, 0.569064f,
+    0.569756f, 0.570449f, 0.57114f, 0.571831f, 0.572521f, 0.573211f, 0.5739f, 0.574588f,
+    0.575276f, 0.575963f, 0.57665f, 0.577336f, 0.578021f, 0.578706f, 0.57939f, 0.580073f,
+    0.580756f, 0.581439f, 0.58212f, 0.582801f, 0.583482f, 0.584162f, 0.584841f, 0.58552f,
+    0.586198f, 0.586875f, 0.587552f, 0.588228f, 0.588903f, 0.589578f, 0.590253f, 0.590927f,
+    0.5916f, 0.592272f, 0.592944f, 0.593615f, 0.594286f, 0.594956f, 0.595626f, 0.596295f,
+    0.596963f, 0.597631f, 0.598298f, 0.598964f, 0.59963f, 0.600295f, 0.60096f, 0.601624f,
+    0.602287f, 0.60295f, 0.603612f, 0.604274f, 0.604935f, 0.605595f, 0.606255f, 0.606914f,
+    0.607573f, 0.608231f, 0.608888f, 0.609545f, 0.610201f, 0.610857f, 0.611512f, 0.612166f,
+    0.61282f, 0.613473f, 0.614126f, 0.614778f, 0.615429f, 0.61608f, 0.61673f, 0.61738f,
+    0.618029f, 0.618677f, 0.619325f, 0.619972f, 0.620619f, 0.621265f, 0.62191f, 0.622555f,
+    0.623199f, 0.623843f, 0.624486f, 0.625128f, 0.62577f, 0.626411f, 0.627052f, 0.627692f,
+    0.628332f, 0.62897f, 0.629609f, 0.630246f, 0.630883f, 0.63152f, 0.632156f, 0.632791f,
+    0.633426f, 0.63406f, 0.634694f, 0.635327f, 0.635959f, 0.636591f, 0.637222f, 0.637852f,
+    0.638482f, 0.639112f, 0.639741f, 0.640369f, 0.640996f, 0.641623f, 0.64225f, 0.642876f,
+    0.643501f, 0.644126f, 0.64475f, 0.645373f, 0.645996f, 0.646619f, 0.647241f, 0.647862f,
+    0.648482f, 0.649102f, 0.649722f, 0.650341f, 0.650959f, 0.651577f, 0.652194f, 0.65281f,
+    0.653426f, 0.654042f, 0.654657f, 0.655271f, 0.655884f, 0.656497f, 0.65711f, 0.657722f,
+    0.658333f, 0.658944f, 0.659554f, 0.660164f, 0.660773f, 0.661381f, 0.661989f, 0.662596f,
+    0.663203f, 0.663809f, 0.664415f, 0.66502f, 0.665624f, 0.666228f, 0.666831f, 0.667434f,
+    0.668036f, 0.668638f, 0.669239f, 0.669839f, 0.670439f, 0.671038f, 0.671637f, 0.672235f,
+    0.672833f, 0.67343f, 0.674026f, 0.674622f, 0.675217f, 0.675812f, 0.676406f, 0.677f,
+    0.677593f, 0.678185f, 0.678777f, 0.679368f, 0.679959f, 0.680549f, 0.681139f, 0.681728f,
+    0.682317f, 0.682904f, 0.683492f, 0.684079f, 0.684665f, 0.685251f, 0.685836f, 0.68642f,
+    0.687005f, 0.687588f, 0.688171f, 0.688753f, 0.689335f, 0.689916f, 0.690497f, 0.691077f,
+    0.691657f, 0.692236f, 0.692814f, 0.693392f, 0.693969f, 0.694546f, 0.695122f, 0.695698f,
+    0.696273f, 0.696848f, 0.697422f, 0.697995f, 0.698568f, 0.699141f, 0.699712f, 0.700284f,
+    0.700854f, 0.701425f, 0.701994f, 0.702563f, 0.703132f, 0.7037f, 0.704267f, 0.704834f,
+    0.7054f, 0.705966f, 0.706532f, 0.707096f, 0.70766f, 0.708224f, 0.708787f, 0.70935f,
+    0.709912f, 0.710473f, 0.711034f, 0.711594f, 0.712154f, 0.712713f, 0.713272f, 0.71383f,
+    0.714388f, 0.714945f, 0.715502f, 0.716058f, 0.716613f, 0.717168f, 0.717723f, 0.718277f,
+    0.71883f, 0.719383f, 0.719935f, 0.720487f, 0.721038f, 0.721589f, 0.722139f, 0.722689f,
+    0.723238f, 0.723786f, 0.724334f, 0.724882f, 0.725429f, 0.725975f, 0.726521f, 0.727066f,
+    0.727611f, 0.728156f, 0.728699f, 0.729243f, 0.729785f, 0.730328f, 0.730869f, 0.731411f,
+    0.731951f, 0.732491f, 0.733031f, 0.73357f, 0.734109f, 0.734646f, 0.735184f, 0.735721f,
+    0.736257f, 0.736793f, 0.737329f, 0.737864f, 0.738398f, 0.738932f, 0.739465f, 0.739998f,
+    0.74053f, 0.741062f, 0.741593f, 0.742124f, 0.742654f, 0.743184f, 0.743713f, 0.744242f,
+    0.74477f, 0.745298f, 0.745825f, 0.746352f, 0.746878f, 0.747403f, 0.747928f, 0.748453f,
+    0.748977f, 0.749501f, 0.750024f, 0.750546f, 0.751068f, 0.75159f, 0.752111f, 0.752631f,
+    0.753151f, 0.753671f, 0.75419f, 0.754708f, 0.755226f, 0.755744f, 0.756261f, 0.756777f,
+    0.757293f, 0.757809f, 0.758324f, 0.758838f, 0.759352f, 0.759865f, 0.760378f, 0.760891f,
+    0.761403f, 0.761914f, 0.762425f, 0.762936f, 0.763446f, 0.763955f, 0.764464f, 0.764973f,
+    0.76548f, 0.765988f, 0.766495f, 0.767001f, 0.767507f, 0.768013f, 0.768518f, 0.769022f,
+    0.769526f, 0.77003f, 0.770533f, 0.771036f, 0.771538f, 0.772039f, 0.77254f, 0.773041f,
+    0.773541f, 0.774041f, 0.77454f, 0.775038f, 0.775537f, 0.776034f, 0.776531f, 0.777028f,
+    0.777524f, 0.77802f, 0.778515f, 0.77901f, 0.779504f, 0.779998f, 0.780491f, 0.780984f,
+    0.781477f, 0.781968f, 0.78246f, 0.782951f, 0.783441f, 0.783931f, 0.784421f, 0.78491f,
+    0.785398f,
+};
+unsigned short D_00453D88[32] = {
+    0x104, 0x105, 0x106, 0x107, 0x108, 0x109, 0x10A, 0x10B,
+    0x10C, 0x10D, 0x10E, 0x10F, 0x110, 0x111, 0x112, 0x113,
+    0x114, 0x115, 0x116, 0x117, 0x118, 0x119, 0x11A, 0x11B,
+    0x11C, 0x11D, 0x11E, 0x11F, 0x0, 0x0, 0x0, 0x0
+};
+unsigned short D_00453DC8[20] = {
+    0x106, 0x108, 0x109, 0x10A, 0x10B, 0x10C, 0x10D, 0x10E,
+    0x10F, 0x110, 0x111, 0x112, 0x113, 0x114, 0x115, 0x116,
+    0x0, 0x0, 0x0, 0x0
+};
+unsigned int D_00453DF0[5] = { 0x136004, 0x136001, 0x136003, 0x136002, 0x136005 };
+SefCameraMatrixBlock sefCameraMatrixBlock = { 0 };
+/* The frame step in milliseconds, in seconds, scaled and for the tracks (gSdvFrameDelta and sefTrackFrameStep are its last words). */
+unsigned char sefKeyframeStepBlock[16] = { 0 };
+/* The request key block (sevInitPtAllocator clears its 736 bytes). */
+int sefRequestKeyBlock[184] = { 0 };
+SefEntryTableShort sefEffectEntryTable = { 0 };
+unsigned char sefGroupTimers[256] = { 0 };
+SefMotionFloorView sefMotionFloorCurve = { 0 };
+s32 D_004749E0[2] = { 0 };
+int D_004749E8[2] = { 0 };
+SefEffectTableSlot gSefDirectionSlots[36] = { 0 };
+unsigned char D_004752F0[144] = { 0 };
+s32 D_00551040 = 0;
+s32 sefVectorMode = 0;
+s32 sefDraw3DForced = 0;
+SefEffectRecord *sefEffectRecords = D_0065DB20;
+s32 D_00551050 = 0;
+void *D_00551054 = sefEffectSlots;
+s32 D_00551058 = 0;
+SefLocalData *sefLineDataRecords = (SefLocalData *) sefLineDataBlock;
+SefPtRingControl *sefPtAllocatorState = (SefPtRingControl *) D_006C3E00;
+int sefEffectRecordCount = 40;
+int sefEffectSlotCount = 250;
+int sefLineDataCount = 170;
+int sefPtAllocCount = 1100;
+unsigned short D_00551074 = 0xFFFF;
+unsigned short D_00551076 = 0xFFFF;
+s32 sefActiveLineIndex = -1;
+int sefDrawEnabled = 0;
+int D_00551080 = 0;
+int D_00551084 = 0;
+int gSdvHitReceived = 0;
+float *srsAtanTable = (float *) ((char *) D_00452D80 + 0x20000000); /* uncached */
+s32 sefSetupPending = 1;
+s32 sefTeardownPending = 1;
+SefEffectEntryRecord *sefCurrentEffectRecord = 0;
+int D_0055109C = 0;
+s32 D_005510A0 = 0;
+SefMotionObject *D_005510A4 = 0;
+int D_005510A8 = 0;

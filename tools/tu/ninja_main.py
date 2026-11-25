@@ -871,7 +871,7 @@ def main(argv=None):
          "# several C runs in one data section: one input section per run (tools/tu/data_carve.py split)",
          "rule carvesplit", f"  command = {T} $py {HERE}/data_carve.py split --root {ROOT} --unit main "
          f"--unit-dir {unit_dir} --registry {registry_path} --tu $tu --obj $in --out $out", "  description = CARVE-SPLIT $out",
-         "rule alloccommon", f"  command = {T} $ld -r -d -EL -m elf32lr5900 -o $obj $in && "
+         "rule alloccommon", f"  command = {T} $ld -r -d -G 4 -EL -m elf32lr5900 -o $obj $in && "
          f"{T} cp $in.s $obj.s && {T} cp $in.i $obj.i",
          "  description = LD-ALLOC $out",
          "# splat's undefined_*_auto.txt minus every name a linked object defines (review finding F8)",

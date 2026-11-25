@@ -8,14 +8,6 @@ typedef signed char s8;
 
 typedef unsigned short u16;
 
-extern unsigned char gDefaultNativeMethods[];
-extern unsigned char gDefaultNativeOwnerName[];
-s32 sbNativeOwnerAdd();
-
-void addDefaultNativeOwner(void) {
-    sbNativeOwnerAdd(gDefaultNativeOwnerName, gDefaultNativeMethods);
-}
-
 typedef struct SeTableBlock {
     u8 unk000[0x200];
     u8 cells[9];
@@ -25,7 +17,8 @@ typedef struct SeTableBlock {
     u16 tailC;
 } SeTableBlock;
 
-extern u8 D_00550BE0;
+u8 D_00550BE0 = 0;
+u8 gSeVoiceCallbackFlag = 0;
 
 /* Clears a SeTableBlock: its nine cells, the tail bytes and D_00550BE0. The second cell view starts 8 bytes in. */
 void seMenuBlockClear(SeTableBlock *cellBlock) {
@@ -116,7 +109,7 @@ typedef struct SeVoiceState {
     u8 unk9CA[6];
 } SeVoiceState;
 
-extern SeVoiceState *gSeVoiceState;
+static SeVoiceState *gSeVoiceState;
 s32 slotKindResolve(s32);
 s32 func_00222C60(s32, s32);
 s32 pagedTableGetCurrentEntry();
@@ -259,10 +252,9 @@ typedef struct GameLoopRuntime {
     u8 unk174[4];
 } GameLoopRuntime;
 
-extern SeTableBlock *gSeMenuBlock;
-extern u8 gSeVoiceCallbackFlag;
-extern CdPath gSeVoiceCdFilePath;
-extern CdCommand gSeVoiceCdCommand;
+static SeTableBlock *gSeMenuBlock;
+extern const CdPath gSeVoiceCdFilePath;
+extern const CdCommand gSeVoiceCdCommand;
 extern GameLoopRuntime gGameLoopRuntimeStorage;
 
 static inline void voiceTableMarkKey(VoiceTable *table, s32 index) {
@@ -515,6 +507,10 @@ static inline void sheetSet(VoiceSheet *sheet) {
 }
 
 /* Sets the voice unit's mode (low nibble of ctrl; the old mode moves to the next nibble) and runs that mode's setup. */
+const CdPath gSeVoiceCdFilePath = { "mnu\\shop\\%02d.shp" };
+
+const CdCommand gSeVoiceCdCommand = { { 0x0a }, 0x80 };
+
 void seVoiceUnitSetMode(s32 unitMode) {
     SeVoiceUnit *unit;
     s32 i;
@@ -1368,8 +1364,6 @@ typedef struct SeVoiceFrameView {
     s16 rowStep;    /* 0x9C6 */
 } SeVoiceFrameView;
 
-extern char D_00550BE8[];
-extern char D_00550BF0[];
 s32 sheetFramePosition(TiFramePos *position, TiFrameSheet *sheet, s32 animationTick);
 void sheetFrameDrawBox(TiFrameSheet *sheet);
 void sheetFrameDrawText(TiFrameSheet *sheet, s32 animationTick, u32 color, s32 text);
@@ -1587,7 +1581,7 @@ void seVoicePanelDraw(s32 alpha) {
         }
         xglFontDrawDigits(0x8DD8, 0x8908, maxValue, 16);
         xglFontPrintIndexed(
-            371, 351, (((SeVoiceFrameView *) gSeVoiceState)->voiceFlags & 1) ? D_00550BE8 : D_00550BF0);
+            371, 351, (((SeVoiceFrameView *) gSeVoiceState)->voiceFlags & 1) ? "+" : "-");
         xglFontDrawDigits(0x8DD8, 0x87E8, rowValue * ((SeVoiceFrameView *) gSeVoiceState)->rowStep, 16);
         if (((SeVoiceFrameView *) gSeVoiceState)->rowMode == 1) {
             fontQueueColorState(((unsigned long long) (((statusByte0Get() >> 2) & 0xFF) + 32) << 24) |
@@ -1608,7 +1602,7 @@ void seVoicePanelDraw(s32 alpha) {
             xglFontSetColor(90, 92, 120);
         }
         xglFontPrintIndexed(
-            371, 288, (((SeVoiceFrameView *) gSeVoiceState)->voiceFlags & 1) ? D_00550BF0 : D_00550BE8);
+            371, 288, (((SeVoiceFrameView *) gSeVoiceState)->voiceFlags & 1) ? "-" : "+");
     }
 
     if (((SeVoiceFrameView *) gSeVoiceState)->voiceFlags & 2) {
@@ -2366,3 +2360,5 @@ s32 seVoiceScreenRun(void) {
     }
     return (s8) ((SeVoiceScreenView *) gSeVoiceState)->resetFlag;
 }
+
+u8 D_003E71C0[16] = { 0x04, 0x02, 0x01, 0x00 };

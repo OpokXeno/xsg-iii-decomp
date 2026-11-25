@@ -131,13 +131,13 @@ typedef signed char s8;
 
 typedef unsigned int u32;
 
-extern s32 gSrsEffectFileSuffixKindThree[];
+const s8 gSrsEffectFileSuffixKindThree[8] = ".esp";
 
-extern s32 gSrsEffectFileSuffixKindBelowThree[];
+const s8 gSrsEffectFileSuffixKindBelowThree[8] = ".esd";
 
-extern s8 gSrsEffectNameBuffer[];
+static s8 gSrsEffectNameBuffer[24];
 
-s32 func_0030E3D0(s8 *stemBuffer, s32 *format);
+s32 func_0030E3D0(s8 *stemBuffer, const s8 *format);
 
 s8 *srsEffectNameGet(s32 effectNo) {
     if (!(effectNo > 0)) {
@@ -152,17 +152,17 @@ s8 *srsEffectNameGet(s32 effectNo) {
     return gSrsEffectNameBuffer;
 }
 
-extern const s8 gSrsAssetFormatCeRepeatTag[];
+const s8 gSrsAssetFormatCeRepeatTag[16] = "ef\\esd\\%c%c\\%s";
 
-extern const s8 gSrsAssetFormatCdChars[];
+const s8 gSrsAssetFormatCdChars[24] = "ef\\esd\\%c%c%c00\\%s";
 
-extern const s8 gSrsAssetFormatEfPosition[];
+const s8 gSrsAssetFormatEfPosition[16] = "ef\\map\\%c%c\\%s";
 
-extern const s8 gSrsAssetFormatEfFallback[];
+const s8 gSrsAssetFormatEfFallback[16] = "ef\\map\\%s";
 
-extern const s8 gSrsAssetFormatNameOnly[];
+const s8 gSrsAssetFormatNameOnly[16] = "ef\\esp\\%s";
 
-extern s8 gSrsAssetNameBuffer[];
+static s8 gSrsAssetNameBuffer[64];
 
 u32 func_00181C18();
 
@@ -249,9 +249,9 @@ typedef struct BattleWinEntry {
     BattleWinLoadState loadedState;
 } BattleWinEntry;
 
-extern BattleWinEntry gBattleResetTableStorage[2];
+static BattleWinEntry gBattleResetTableStorage[2];
 
-extern s32 gBattleWinNextRecord;
+static s32 gBattleWinNextRecord;
 
 void eBattleWinReset(void);
 
@@ -740,3 +740,13 @@ s32 srsReleaseEffectRecordsByResource(s32 resourceHandle, s32 shouldRelease) {
         return 0;
     }
 }
+
+char *srsEffectKindPrefix[4] = { "pe", "ce", "ee", "ef" };
+
+char xglDebFileNameBuffer[256] = { 0 };
+
+const signed char gSrsEffectFileExtension[4] = "esp";
+
+s32 gCdPrimaryCommandSent = 0;
+
+s32 gCdSecondaryCommandSent = 0;

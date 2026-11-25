@@ -332,7 +332,6 @@ void soundParamRecordCreate(s32 vm) {
     soundParamRecord->isActive = 1;
 }
 
-extern unsigned char gMoviePathFormat[];
 
 void GameMpeg2Play(void *moviePath, const unsigned char *format, s32 movieName);
 
@@ -361,7 +360,7 @@ void soundSlotPlayMovie(s32 vm) {
     movieName = vmKeyedEntryGet(vm, movieKey);
     soundSlot = vmArgGetOrDefault(vm, 2, 1);
     moviePath = &gSoundSlotPaths[soundSlot];
-    GameMpeg2Play(moviePath, gMoviePathFormat, movieName);
+    GameMpeg2Play(moviePath, "mev/%s", movieName);
     soundSlotSetPause(soundSlot, 1);
     soundSlotSetVolume(soundSlot, -1, 0);
     soundSlotStartNumbered(soundSlot, moviePath);
@@ -500,3 +499,45 @@ s32 sbNativeMapProbeRequest(s32 vm) {
     }
     return 1;
 }
+
+s32 sbNativeStoreValueArg(s32 vm);
+s32 sbNativeStoreValueAndStartFx(s32 vm);
+s32 soundOriginRecordCreate(s32 vm);
+s32 directionRecordCreate(s32 vm);
+void soundParamRecordCreate(s32 vm);
+void soundSlotPlayMovie(s32 vm);
+s32 soundSlotMovieControl(s32 vm);
+void soundSlotSetVolumeVm(s32 vm);
+void soundRecordSelect(s32 vm);
+void soundRecordDefine(s32 vm);
+void soundRecordApply(s32 vm);
+s32 sbNativeMapProbeRequest(s32 vm);
+
+/* One record of the sound native table: the script name, the native and its argument count. */
+typedef struct SoundNativeRecord {
+    const char *name;
+    int (*func)();
+    s32 argCount;
+} SoundNativeRecord;
+
+SoundNativeRecord gSbSoundNativeTable[17] = {
+    { "setBGM", sbNativeStoreValueArg, 1 },
+    { "changeBGM", sbNativeStoreValueAndStartFx, 1 },
+    { "se", sbNativePlaySound, 1 },
+    { "seStop", vmNativeSetKind1Value, 1 },
+    { "seFade", func_001CDDD8, 3 },
+    { "sePan", func_001CDEB0, 3 },
+    { "sePos", soundOriginRecordCreate, 5 },
+    { "seLine", directionRecordCreate, 8 },
+    { "seID", soundParamRecordCreate, 2 },
+    { "adxLoad", soundSlotPlayMovie, 1 },
+    { "adxPlay", soundSlotMovieControl, 0 },
+    { "adxFade", soundSlotSetVolumeVm, 2 },
+    { "panMode", soundRecordSelect, 1 },
+    { "panPos", soundRecordDefine, 1 },
+    { "fx", soundRecordApply, 1 },
+    { "roboFoot", sbNativeMapProbeRequest, 1 },
+    { 0, 0, 0 },
+};
+
+SoundSlotPath gSoundSlotPaths[4];

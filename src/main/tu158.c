@@ -1,7 +1,7 @@
 #include "common.h"
 
 extern unsigned char *gBufferCursor;
-extern unsigned char *gBufferArenaStart;
+unsigned char *gBufferArenaStart = 0;
 
 void bufferCursorClear(void) {
     gBufferArenaStart = 0;
@@ -16,15 +16,14 @@ void bufferPointersRewind(void)
     gBufferArenaStart = gBufferArena;
 }
 
-extern char D_00550B78[];
 
 /* Text of message index from the table at gBufferArenaStart: word 0 is the count, word index + 1 the offset of the text
- * from the table. A missing table or an index out of range gives the empty string at D_00550B78. */
+ * from the table. A missing table or an index out of range gives the empty string. */
 char *messageTextGet(int index) {
     unsigned int *table = (unsigned int *) gBufferArenaStart;
 
     if (table == 0 || index < 0 || index >= table[0]) {
-        return D_00550B78;
+        return "";
     }
     return (char *) table + table[index + 1];
 }

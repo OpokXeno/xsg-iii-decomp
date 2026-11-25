@@ -162,19 +162,11 @@
     },
     {
      "c_split": false,
-     "end": "0x003E3358",
+     "end": "0x003E3360",
      "ordinal": 244,
      "piece": "tu244",
      "start": "0x003E3340",
      "tu": "tu244"
-    },
-    {
-     "c_split": false,
-     "end": "0x003E3360",
-     "ordinal": 262,
-     "piece": "tu262",
-     "start": "0x003E3358",
-     "tu": "tu262"
     },
     {
      "c_split": false,
@@ -194,11 +186,19 @@
     },
     {
      "c_split": false,
-     "end": "0x003E3830",
+     "end": "0x003E3710",
      "ordinal": 257,
      "piece": "tu257",
      "start": "0x003E35C0",
      "tu": "tu257"
+    },
+    {
+     "c_split": false,
+     "end": "0x003E3830",
+     "ordinal": 262,
+     "piece": "tu262",
+     "start": "0x003E3710",
+     "tu": "tu262"
     },
     {
      "c_split": false,
@@ -354,19 +354,11 @@
     },
     {
      "c_split": false,
-     "end": "0x003E48A0",
+     "end": "0x003E52C0",
      "ordinal": 66,
      "piece": "tu066",
      "start": "0x003E4874",
      "tu": "tu066"
-    },
-    {
-     "c_split": false,
-     "end": "0x003E52C0",
-     "ordinal": 73,
-     "piece": "tu073",
-     "start": "0x003E48A0",
-     "tu": "tu073"
     },
     {
      "c_split": false,
@@ -418,11 +410,27 @@
     },
     {
      "c_split": false,
-     "end": "0x003E69E0",
-     "ordinal": 99,
-     "piece": "tu099",
+     "end": "0x003E6690",
+     "ordinal": 86,
+     "piece": "find_native_method",
      "start": "0x003E6450",
-     "tu": "tu099"
+     "tu": "find_native_method"
+    },
+    {
+     "c_split": false,
+     "end": "0x003E6910",
+     "ordinal": 91,
+     "piece": "tu091",
+     "start": "0x003E6690",
+     "tu": "tu091"
+    },
+    {
+     "c_split": false,
+     "end": "0x003E69E0",
+     "ordinal": 95,
+     "piece": "tu095",
+     "start": "0x003E6910",
+     "tu": "tu095"
     },
     {
      "c_split": false,
@@ -474,10 +482,18 @@
     },
     {
      "c_split": false,
+     "end": "0x003E71C0",
+     "ordinal": 186,
+     "piece": "tu186",
+     "start": "0x003E70B8",
+     "tu": "tu186"
+    },
+    {
+     "c_split": false,
      "end": "0x003E71D0",
      "ordinal": 187,
      "piece": "tu187",
-     "start": "0x003E70B8",
+     "start": "0x003E71C0",
      "tu": "tu187"
     },
     {
@@ -490,7 +506,7 @@
     },
     {
      "c_split": false,
-     "end": "0x003E8B90",
+     "end": "0x003E7300",
      "ordinal": 166,
      "piece": "tu166",
      "start": "0x003E7280",
@@ -501,7 +517,7 @@
      "end": "0x003EB490",
      "ordinal": 211,
      "piece": "XenoActorEvent",
-     "start": "0x003E8B90",
+     "start": "0x003E7300",
      "tu": "XenoActorEvent"
     },
     {
@@ -522,7 +538,7 @@
     },
     {
      "c_split": false,
-     "end": "0x003EB814",
+     "end": "0x003EB800",
      "ordinal": 221,
      "piece": "tu221",
      "start": "0x003EB7C0",
@@ -533,23 +549,15 @@
      "end": "0x003EB860",
      "ordinal": 220,
      "piece": "gif_state_model",
-     "start": "0x003EB814",
+     "start": "0x003EB800",
      "tu": "gif_state_model"
-    },
-    {
-     "c_split": false,
-     "end": "0x003EB9D0",
-     "ordinal": 196,
-     "piece": "tu196",
-     "start": "0x003EB860",
-     "tu": "tu196"
     },
     {
      "c_split": false,
      "end": "0x003EBA10",
      "ordinal": 195,
      "piece": "CFLLightTest",
-     "start": "0x003EB9D0",
+     "start": "0x003EB860",
      "tu": "CFLLightTest"
     },
     {
@@ -651,10 +659,10 @@
     {
      "c_split": false,
      "end": "0x00402680",
-     "ordinal": 363,
-     "piece": "tu363",
+     "ordinal": 362,
+     "piece": "tu362",
      "start": "0x004025C0",
-     "tu": "tu363"
+     "tu": "tu362"
     },
     {
      "c_split": false,
@@ -802,7 +810,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00407E30",
+     "end": "0x00407DB0",
      "ordinal": 106,
      "piece": "sb_natives",
      "start": "0x00407D00",
@@ -813,7 +821,7 @@
      "end": "0x00408080",
      "ordinal": 108,
      "piece": "filter",
-     "start": "0x00407E30",
+     "start": "0x00407DB0",
      "tu": "filter"
     },
     {
@@ -834,7 +842,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0042F350",
+     "end": "0x004081F0",
      "ordinal": 129,
      "piece": "tu129",
      "start": "0x00408180",
@@ -842,10 +850,10 @@
     },
     {
      "c_split": false,
-     "end": "0x00453D88",
+     "end": "0x00452D80",
      "ordinal": 128,
      "piece": "tu128",
-     "start": "0x0042F350",
+     "start": "0x004081F0",
      "tu": "tu128"
     },
     {
@@ -853,12 +861,12 @@
      "end": "0x00475380",
      "ordinal": 131,
      "piece": "sef",
-     "start": "0x00453D88",
+     "start": "0x00452D80",
      "tu": "sef"
     },
     {
      "c_split": false,
-     "end": "0x00475450",
+     "end": "0x00475440",
      "ordinal": 132,
      "piece": "sef_132",
      "start": "0x00475380",
@@ -866,19 +874,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00475628",
+     "end": "0x004AD6A0",
      "ordinal": 141,
      "piece": "sv_get_image_item",
-     "start": "0x00475450",
+     "start": "0x00475440",
      "tu": "sv_get_image_item"
-    },
-    {
-     "c_split": false,
-     "end": "0x004AD6A0",
-     "ordinal": 154,
-     "piece": "tu154",
-     "start": "0x00475628",
-     "tu": "tu154"
     },
     {
      "c_split": false,
@@ -906,7 +906,7 @@
     },
     {
      "c_split": false,
-     "end": "0x004ADFD4",
+     "end": "0x004ADFD0",
      "ordinal": 326,
      "piece": "xeno_actor_set",
      "start": "0x004ADF80",
@@ -917,7 +917,7 @@
      "end": "0x004B1B60",
      "ordinal": 329,
      "piece": "xenoActorLight",
-     "start": "0x004ADFD4",
+     "start": "0x004ADFD0",
      "tu": "xenoActorLight"
     },
     {
@@ -962,7 +962,7 @@
     },
     {
      "c_split": false,
-     "end": "0x004B34D4",
+     "end": "0x004B3570",
      "ordinal": 11,
      "piece": "tu011",
      "start": "0x004B34C0",
@@ -970,18 +970,10 @@
     },
     {
      "c_split": false,
-     "end": "0x004B3584",
-     "ordinal": 91,
-     "piece": "tu091",
-     "start": "0x004B34D4",
-     "tu": "tu091"
-    },
-    {
-     "c_split": false,
      "end": "0x004B3698",
      "ordinal": 12,
      "piece": "xgl_cd",
-     "start": "0x004B3584",
+     "start": "0x004B3570",
      "tu": "xgl_cd"
     },
     {
@@ -1162,7 +1154,7 @@
     },
     {
      "c_split": false,
-     "end": "0x004CABC4",
+     "end": "0x004CABA8",
      "ordinal": 354,
      "piece": "tu354",
      "start": "0x004CAB20",
@@ -1170,18 +1162,26 @@
     },
     {
      "c_split": false,
-     "end": "0x004EC8CC",
-     "ordinal": 155,
-     "piece": "tu155",
-     "start": "0x004CABC4",
-     "tu": "tu155"
+     "end": "0x004CAC00",
+     "ordinal": 409,
+     "piece": "sb_thread_block",
+     "start": "0x004CABA8",
+     "tu": "sb_thread_block"
+    },
+    {
+     "c_split": false,
+     "end": "0x004EC8C0",
+     "ordinal": 408,
+     "piece": "battle_shared",
+     "start": "0x004CAC00",
+     "tu": "battle_shared"
     },
     {
      "c_split": false,
      "end": "0x004EE050",
      "ordinal": 406,
      "piece": "sce_sdk",
-     "start": "0x004EC8CC",
+     "start": "0x004EC8C0",
      "tu": "sce_sdk"
     },
     {
@@ -1217,11 +1217,19 @@
    "order": [
     {
      "c_split": false,
-     "end": "0x005278E0",
+     "end": "0x00527890",
      "ordinal": 3,
      "piece": "control_entry",
      "start": "0x00527800",
      "tu": "control_entry"
+    },
+    {
+     "c_split": false,
+     "end": "0x005278E0",
+     "ordinal": 226,
+     "piece": "m_math",
+     "start": "0x00527890",
+     "tu": "m_math"
     },
     {
      "c_split": false,
@@ -1249,7 +1257,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00530A50",
+     "end": "0x005309F8",
      "ordinal": 238,
      "piece": "tu238",
      "start": "0x00530830",
@@ -1257,10 +1265,26 @@
     },
     {
      "c_split": false,
-     "end": "0x00530AC8",
+     "end": "0x00530A28",
+     "ordinal": 239,
+     "piece": "tu239",
+     "start": "0x005309F8",
+     "tu": "tu239"
+    },
+    {
+     "c_split": false,
+     "end": "0x00530A40",
+     "ordinal": 240,
+     "piece": "tu240",
+     "start": "0x00530A28",
+     "tu": "tu240"
+    },
+    {
+     "c_split": false,
+     "end": "0x00530A88",
      "ordinal": 242,
      "piece": "tu242",
-     "start": "0x00530A50",
+     "start": "0x00530A40",
      "tu": "tu242"
     },
     {
@@ -1268,7 +1292,7 @@
      "end": "0x00530AD0",
      "ordinal": 243,
      "piece": "tu243",
-     "start": "0x00530AC8",
+     "start": "0x00530A88",
      "tu": "tu243"
     },
     {
@@ -1313,11 +1337,19 @@
     },
     {
      "c_split": false,
-     "end": "0x00530CB8",
+     "end": "0x00530C00",
      "ordinal": 255,
      "piece": "tu255",
      "start": "0x00530B88",
      "tu": "tu255"
+    },
+    {
+     "c_split": false,
+     "end": "0x00530CB8",
+     "ordinal": 257,
+     "piece": "tu257",
+     "start": "0x00530C00",
+     "tu": "tu257"
     },
     {
      "c_split": false,
@@ -1401,7 +1433,7 @@
     },
     {
      "c_split": false,
-     "end": "0x005311A0",
+     "end": "0x00531188",
      "ordinal": 65,
      "piece": "tu065",
      "start": "0x00531170",
@@ -1412,7 +1444,7 @@
      "end": "0x00531388",
      "ordinal": 66,
      "piece": "tu066",
-     "start": "0x005311A0",
+     "start": "0x00531188",
      "tu": "tu066"
     },
     {
@@ -1481,11 +1513,19 @@
     },
     {
      "c_split": false,
-     "end": "0x00532F40",
+     "end": "0x005316D0",
      "ordinal": 100,
      "piece": "tu100",
      "start": "0x00531680",
      "tu": "tu100"
+    },
+    {
+     "c_split": false,
+     "end": "0x00532F40",
+     "ordinal": 101,
+     "piece": "tu101",
+     "start": "0x005316D0",
+     "tu": "tu101"
     },
     {
      "c_split": false,
@@ -1521,7 +1561,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00537820",
+     "end": "0x00537710",
      "ordinal": 63,
      "piece": "tu063",
      "start": "0x005373F8",
@@ -1532,7 +1572,7 @@
      "end": "0x005379C0",
      "ordinal": 86,
      "piece": "find_native_method",
-     "start": "0x00537820",
+     "start": "0x00537710",
      "tu": "find_native_method"
     },
     {
@@ -1609,11 +1649,19 @@
     },
     {
      "c_split": false,
-     "end": "0x00538BF0",
+     "end": "0x00538AA0",
      "ordinal": 184,
      "piece": "res_get_path",
      "start": "0x005389A0",
      "tu": "res_get_path"
+    },
+    {
+     "c_split": false,
+     "end": "0x00538BF0",
+     "ordinal": 186,
+     "piece": "tu186",
+     "start": "0x00538AA0",
+     "tu": "tu186"
     },
     {
      "c_split": false,
@@ -1761,7 +1809,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0053A110",
+     "end": "0x0053A0C0",
      "ordinal": 194,
      "piece": "BlendTest",
      "start": "0x00539F48",
@@ -1769,26 +1817,18 @@
     },
     {
      "c_split": false,
-     "end": "0x0053A1F8",
+     "end": "0x0053A2C0",
      "ordinal": 195,
      "piece": "CFLLightTest",
-     "start": "0x0053A110",
+     "start": "0x0053A0C0",
      "tu": "CFLLightTest"
-    },
-    {
-     "c_split": false,
-     "end": "0x0053A3F8",
-     "ordinal": 196,
-     "piece": "tu196",
-     "start": "0x0053A1F8",
-     "tu": "tu196"
     },
     {
      "c_split": false,
      "end": "0x0053A580",
      "ordinal": 197,
      "piece": "CullingTest",
-     "start": "0x0053A3F8",
+     "start": "0x0053A2C0",
      "tu": "CullingTest"
     },
     {
@@ -1970,10 +2010,10 @@
     {
      "c_split": false,
      "end": "0x0053D4E0",
-     "ordinal": 363,
-     "piece": "tu363",
+     "ordinal": 362,
+     "piece": "tu362",
      "start": "0x0053D450",
-     "tu": "tu363"
+     "tu": "tu362"
     },
     {
      "c_split": false,
@@ -2113,7 +2153,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0053E418",
+     "end": "0x0053E3B8",
      "ordinal": 105,
      "piece": "sb_vm",
      "start": "0x0053E2B0",
@@ -2124,7 +2164,7 @@
      "end": "0x0053E740",
      "ordinal": 106,
      "piece": "sb_natives",
-     "start": "0x0053E418",
+     "start": "0x0053E3B8",
      "tu": "sb_natives"
     },
     {
@@ -3049,10 +3089,10 @@
     {
      "c_split": false,
      "end": "0x0054F718",
-     "ordinal": 196,
-     "piece": "tu196",
+     "ordinal": 195,
+     "piece": "CFLLightTest",
      "start": "0x0054F708",
-     "tu": "tu196"
+     "tu": "CFLLightTest"
     },
     {
      "c_split": false,
@@ -3217,10 +3257,10 @@
     {
      "c_split": false,
      "end": "0x0054FA14",
-     "ordinal": 363,
-     "piece": "tu363",
+     "ordinal": 362,
+     "piece": "tu362",
      "start": "0x0054FA00",
-     "tu": "tu363"
+     "tu": "tu362"
     },
     {
      "c_split": false,
@@ -3743,7 +3783,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00550810",
+     "end": "0x005505E0",
      "ordinal": 56,
      "piece": "xc_decode",
      "start": "0x005505C8",
@@ -3751,7 +3791,39 @@
     },
     {
      "c_split": false,
-     "end": "0x00550840",
+     "end": "0x00550708",
+     "ordinal": 238,
+     "piece": "tu238",
+     "start": "0x005505E0",
+     "tu": "tu238"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550780",
+     "ordinal": 239,
+     "piece": "tu239",
+     "start": "0x00550708",
+     "tu": "tu239"
+    },
+    {
+     "c_split": false,
+     "end": "0x005507F0",
+     "ordinal": 240,
+     "piece": "tu240",
+     "start": "0x00550780",
+     "tu": "tu240"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550810",
+     "ordinal": 243,
+     "piece": "tu243",
+     "start": "0x005507F0",
+     "tu": "tu243"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550818",
      "ordinal": 245,
      "piece": "game_camera",
      "start": "0x00550810",
@@ -3759,11 +3831,27 @@
     },
     {
      "c_split": false,
-     "end": "0x00550848",
+     "end": "0x00550820",
+     "ordinal": 252,
+     "piece": "tu252",
+     "start": "0x00550818",
+     "tu": "tu252"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550844",
      "ordinal": 257,
      "piece": "tu257",
-     "start": "0x00550840",
+     "start": "0x00550820",
      "tu": "tu257"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550848",
+     "ordinal": 258,
+     "piece": "tu258",
+     "start": "0x00550844",
+     "tu": "tu258"
     },
     {
      "c_split": false,
@@ -3887,11 +3975,19 @@
     },
     {
      "c_split": false,
-     "end": "0x00550A60",
+     "end": "0x005509C8",
      "ordinal": 99,
      "piece": "tu099",
      "start": "0x005509C0",
      "tu": "tu099"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550A60",
+     "ordinal": 100,
+     "piece": "tu100",
+     "start": "0x005509C8",
+     "tu": "tu100"
     },
     {
      "c_split": false,
@@ -3919,7 +4015,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00550B50",
+     "end": "0x00550B28",
      "ordinal": 63,
      "piece": "tu063",
      "start": "0x00550AB8",
@@ -3927,7 +4023,23 @@
     },
     {
      "c_split": false,
-     "end": "0x00550B6C",
+     "end": "0x00550B40",
+     "ordinal": 86,
+     "piece": "find_native_method",
+     "start": "0x00550B28",
+     "tu": "find_native_method"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550B50",
+     "ordinal": 95,
+     "piece": "tu095",
+     "start": "0x00550B40",
+     "tu": "tu095"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550B70",
      "ordinal": 157,
      "piece": "tu157",
      "start": "0x00550B50",
@@ -3935,15 +4047,23 @@
     },
     {
      "c_split": false,
-     "end": "0x00550B84",
+     "end": "0x00550B7C",
      "ordinal": 158,
      "piece": "tu158",
-     "start": "0x00550B6C",
+     "start": "0x00550B70",
      "tu": "tu158"
     },
     {
      "c_split": false,
-     "end": "0x00550BA0",
+     "end": "0x00550B84",
+     "ordinal": 159,
+     "piece": "tu159",
+     "start": "0x00550B7C",
+     "tu": "tu159"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550B98",
      "ordinal": 160,
      "piece": "tu160",
      "start": "0x00550B84",
@@ -3951,11 +4071,27 @@
     },
     {
      "c_split": false,
-     "end": "0x00550BB4",
+     "end": "0x00550BA0",
+     "ordinal": 161,
+     "piece": "tu161",
+     "start": "0x00550B98",
+     "tu": "tu161"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550BA8",
      "ordinal": 162,
      "piece": "tu162",
      "start": "0x00550BA0",
      "tu": "tu162"
+    },
+    {
+     "c_split": false,
+     "end": "0x00550BB4",
+     "ordinal": 176,
+     "piece": "tu176",
+     "start": "0x00550BA8",
+     "tu": "tu176"
     },
     {
      "c_split": false,
@@ -3991,10 +4127,18 @@
     },
     {
      "c_split": false,
+     "end": "0x00550BE0",
+     "ordinal": 186,
+     "piece": "tu186",
+     "start": "0x00550BD8",
+     "tu": "tu186"
+    },
+    {
+     "c_split": false,
      "end": "0x00550BF8",
      "ordinal": 187,
      "piece": "tu187",
-     "start": "0x00550BD8",
+     "start": "0x00550BE0",
      "tu": "tu187"
     },
     {
@@ -4103,18 +4247,10 @@
     },
     {
      "c_split": false,
-     "end": "0x00550D3C",
-     "ordinal": 196,
-     "piece": "tu196",
-     "start": "0x00550D28",
-     "tu": "tu196"
-    },
-    {
-     "c_split": false,
-     "end": "0x00550D50",
+     "end": "0x00550D48",
      "ordinal": 195,
      "piece": "CFLLightTest",
-     "start": "0x00550D3C",
+     "start": "0x00550D28",
      "tu": "CFLLightTest"
     },
     {
@@ -4122,7 +4258,7 @@
      "end": "0x00550D58",
      "ordinal": 200,
      "piece": "Gtest",
-     "start": "0x00550D50",
+     "start": "0x00550D48",
      "tu": "Gtest"
     },
     {
@@ -4303,11 +4439,19 @@
     },
     {
      "c_split": false,
-     "end": "0x00551000",
+     "end": "0x00550FE8",
      "ordinal": 401,
      "piece": "tu401",
      "start": "0x00550FDC",
      "tu": "tu401"
+    },
+    {
+     "c_split": false,
+     "end": "0x00551000",
+     "ordinal": 106,
+     "piece": "sb_natives",
+     "start": "0x00550FE8",
+     "tu": "sb_natives"
     },
     {
      "c_split": false,
@@ -4351,7 +4495,7 @@
     },
     {
      "c_split": false,
-     "end": "0x005510C0",
+     "end": "0x005510B8",
      "ordinal": 132,
      "piece": "sef_132",
      "start": "0x005510AC",
@@ -4359,7 +4503,15 @@
     },
     {
      "c_split": false,
-     "end": "0x00551100",
+     "end": "0x005510C0",
+     "ordinal": 140,
+     "piece": "sv_scene_flags",
+     "start": "0x005510B8",
+     "tu": "sv_scene_flags"
+    },
+    {
+     "c_split": false,
+     "end": "0x005510E0",
      "ordinal": 141,
      "piece": "sv_get_image_item",
      "start": "0x005510C0",
@@ -4370,7 +4522,7 @@
      "end": "0x00551110",
      "ordinal": 151,
      "piece": "srs",
-     "start": "0x00551100",
+     "start": "0x005510E0",
      "tu": "srs"
     },
     {
@@ -4678,11 +4830,19 @@
     },
     {
      "c_split": false,
-     "end": "0x005513D8",
+     "end": "0x005513D4",
      "ordinal": 142,
      "piece": "tu142",
      "start": "0x005513CC",
      "tu": "tu142"
+    },
+    {
+     "c_split": false,
+     "end": "0x005513D8",
+     "ordinal": 253,
+     "piece": "tu253",
+     "start": "0x005513D4",
+     "tu": "tu253"
     },
     {
      "c_split": false,
@@ -4750,11 +4910,19 @@
     },
     {
      "c_split": false,
-     "end": "0x0055142C",
+     "end": "0x00551428",
      "ordinal": 160,
      "piece": "tu160",
      "start": "0x00551424",
      "tu": "tu160"
+    },
+    {
+     "c_split": false,
+     "end": "0x0055142C",
+     "ordinal": 183,
+     "piece": "tu183",
+     "start": "0x00551428",
+     "tu": "tu183"
     },
     {
      "c_split": false,
@@ -4774,7 +4942,7 @@
     },
     {
      "c_split": false,
-     "end": "0x00551444",
+     "end": "0x0055143C",
      "ordinal": 193,
      "piece": "tu193",
      "start": "0x00551438",
@@ -4785,7 +4953,7 @@
      "end": "0x00551458",
      "ordinal": 174,
      "piece": "tu174",
-     "start": "0x00551444",
+     "start": "0x0055143C",
      "tu": "tu174"
     },
     {
@@ -5046,7 +5214,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0055159C",
+     "end": "0x00551598",
      "ordinal": 35,
      "piece": "xgl_studio",
      "start": "0x00551590",
@@ -5057,7 +5225,7 @@
      "end": "0x005515A4",
      "ordinal": 352,
      "piece": "undulate",
-     "start": "0x0055159C",
+     "start": "0x00551598",
      "tu": "undulate"
     },
     {
@@ -5390,10 +5558,10 @@
     {
      "c_split": false,
      "end": "0x005A7CF0",
-     "ordinal": 196,
-     "piece": "tu196",
+     "ordinal": 195,
+     "piece": "CFLLightTest",
      "start": "0x005A7860",
-     "tu": "tu196"
+     "tu": "CFLLightTest"
     },
     {
      "c_split": false,
@@ -5470,10 +5638,10 @@
     {
      "c_split": false,
      "end": "0x005C5980",
-     "ordinal": 363,
-     "piece": "tu363",
+     "ordinal": 362,
+     "piece": "tu362",
      "start": "0x005C25C0",
-     "tu": "tu363"
+     "tu": "tu362"
     },
     {
      "c_split": false,
@@ -5709,7 +5877,7 @@
     },
     {
      "c_split": false,
-     "end": "0x0065D4C0",
+     "end": "0x0065CBC0",
      "ordinal": 122,
      "piece": "sdv",
      "start": "0x0062F830",
@@ -5717,18 +5885,18 @@
     },
     {
      "c_split": false,
-     "end": "0x00667920",
-     "ordinal": 127,
-     "piece": "tu127",
-     "start": "0x0065D4C0",
-     "tu": "tu127"
+     "end": "0x0065DB20",
+     "ordinal": 126,
+     "piece": "sdv_packet",
+     "start": "0x0065CBC0",
+     "tu": "sdv_packet"
     },
     {
      "c_split": false,
      "end": "0x0076C480",
      "ordinal": 131,
      "piece": "sef",
-     "start": "0x00667920",
+     "start": "0x0065DB20",
      "tu": "sef"
     },
     {
@@ -5741,19 +5909,11 @@
     },
     {
      "c_split": false,
-     "end": "0x00771184",
+     "end": "0x00771198",
      "ordinal": 141,
      "piece": "sv_get_image_item",
      "start": "0x0076D4D0",
      "tu": "sv_get_image_item"
-    },
-    {
-     "c_split": false,
-     "end": "0x00771198",
-     "ordinal": 144,
-     "piece": "draw_list",
-     "start": "0x00771184",
-     "tu": "draw_list"
     },
     {
      "c_split": false,
@@ -5829,11 +5989,19 @@
     },
     {
      "c_split": false,
-     "end": "0x008BBFC0",
+     "end": "0x008BBFB0",
      "ordinal": 25,
      "piece": "tu025",
      "start": "0x008BBF30",
      "tu": "tu025"
+    },
+    {
+     "c_split": false,
+     "end": "0x008BBFC0",
+     "ordinal": 27,
+     "piece": "xgl_camera",
+     "start": "0x008BBFB0",
+     "tu": "xgl_camera"
     },
     {
      "c_split": false,
@@ -5917,11 +6085,19 @@
     },
     {
      "c_split": false,
-     "end": "0x008E5D30",
+     "end": "0x008E5D10",
      "ordinal": 344,
      "piece": "TiWindBase",
      "start": "0x008E5A90",
      "tu": "TiWindBase"
+    },
+    {
+     "c_split": false,
+     "end": "0x008E5D30",
+     "ordinal": 347,
+     "piece": "tu347",
+     "start": "0x008E5D10",
+     "tu": "tu347"
     },
     {
      "c_split": false,
@@ -6152,7 +6328,6 @@
   "tu193",
   "BlendTest",
   "CFLLightTest",
-  "tu196",
   "CullingTest",
   "EventViewer",
   "tu199",
@@ -6286,7 +6461,6 @@
   "tu360",
   "tu361",
   "tu362",
-  "tu363",
   "tu364",
   "tu365",
   "tu366",
@@ -36647,18 +36821,18 @@
       "0x00527800",
       "0x005278e0"
      ],
-     "end": "0x005278E0",
+     "end": "0x00527890",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x005278E0",
+       "end": "0x00527890",
        "name": "control_entry",
        "start": "0x00527800"
       }
      ],
-     "size": 224,
+     "size": 144,
      "splat_type": "rodata",
      "start": "0x00527800"
     },
@@ -38479,18 +38653,18 @@
       "0x004b34a3",
       "0x004b34d4"
      ],
-     "end": "0x004B34D4",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x004B3570",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu011)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x004B34D4",
+       "end": "0x004B3570",
        "name": "tu011",
        "start": "0x004B34C0"
       }
      ],
-     "size": 20,
+     "size": 176,
      "splat_type": "data",
      "start": "0x004B34C0"
     },
@@ -38990,19 +39164,19 @@
       "0x004b3698"
      ],
      "end": "0x004B3698",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu091)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x004B3698",
        "name": "xgl_cd",
-       "start": "0x004B3584"
+       "start": "0x004B3570"
       }
      ],
-     "size": 276,
+     "size": 296,
      "splat_type": "data",
-     "start": "0x004B3584"
+     "start": "0x004B3570"
     },
     ".rodata": {
      "anchored": [
@@ -42054,18 +42228,18 @@
       "0x0089bf01",
       "0x008bbfc0"
      ],
-     "end": "0x008BBFC0",
+     "end": "0x008BBFB0",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x008BBFC0",
+       "end": "0x008BBFB0",
        "name": "tu025",
        "start": "0x008BBF30"
       }
      ],
-     "size": 144,
+     "size": 128,
      "splat_type": "bss",
      "start": "0x008BBF30"
     }
@@ -42523,7 +42697,8 @@
     ".text": "c",
     ".data": "asm",
     ".rodata": "asm",
-    ".lit4": "asm"
+    ".lit4": "asm",
+    ".bss": "asm"
    },
    "sections": {
     ".data": {
@@ -42597,6 +42772,27 @@
      "size": 136,
      "splat_type": "lit4",
      "start": "0x0054FEA4"
+    },
+    ".bss": {
+     "anchored": [],
+     "bounds": [
+      "0x008BBFB0",
+      "0x008BBFC0"
+     ],
+     "end": "0x008BBFC0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x008BBFB0 referenced by xgl_camera)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x008BBFC0",
+       "name": "xgl_camera",
+       "start": "0x008BBFB0"
+      }
+     ],
+     "size": 16,
+     "splat_type": "bss",
+     "start": "0x008BBFB0"
     }
    },
    "text": {
@@ -45351,18 +45547,18 @@
       "0x0055158d",
       "0x0055159c"
      ],
-     "end": "0x0055159C",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00551598",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by xgl_studio)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0055159C",
+       "end": "0x00551598",
        "name": "xgl_studio",
        "start": "0x00551590"
       }
      ],
-     "size": 12,
+     "size": 8,
      "splat_type": "sbss",
      "start": "0x00551590"
     },
@@ -51401,18 +51597,18 @@
       "0x0055029d",
       "0x00550810"
      ],
-     "end": "0x00550810",
+     "end": "0x005505E0",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550810",
+       "end": "0x005505E0",
        "name": "xc_decode",
        "start": "0x005505C8"
       }
      ],
-     "size": 584,
+     "size": 24,
      "splat_type": "sdata",
      "start": "0x005505C8"
     },
@@ -52900,18 +53096,18 @@
       "0x005373e1",
       "0x00537820"
      ],
-     "end": "0x00537820",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00537710",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu063)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00537820",
+       "end": "0x00537710",
        "name": "tu063",
        "start": "0x005373F8"
       }
      ],
-     "size": 1064,
+     "size": 792,
      "splat_type": "rodata",
      "start": "0x005373F8"
     },
@@ -52924,18 +53120,18 @@
       "0x00550ab1",
       "0x00550b50"
      ],
-     "end": "0x00550B50",
+     "end": "0x00550B28",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550B50",
+       "end": "0x00550B28",
        "name": "tu063",
        "start": "0x00550AB8"
       }
      ],
-     "size": 152,
+     "size": 112,
      "splat_type": "sdata",
      "start": "0x00550AB8"
     },
@@ -53394,18 +53590,18 @@
       "0x00537701",
       "0x005311a0"
      ],
-     "end": "0x005311A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00531188",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu065)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x005311A0",
+       "end": "0x00531188",
        "name": "tu065",
        "start": "0x00531170"
       }
      ],
-     "size": 48,
+     "size": 24,
      "splat_type": "rodata",
      "start": "0x00531170"
     }
@@ -53852,18 +54048,18 @@
       "0x003e4861",
       "0x003e48a0"
      ],
-     "end": "0x003E48A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x003E52C0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu066)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x003E48A0",
+       "end": "0x003E52C0",
        "name": "tu066",
        "start": "0x003E4874"
       }
      ],
-     "size": 44,
+     "size": 2636,
      "splat_type": "data",
      "start": "0x003E4874"
     },
@@ -53877,19 +54073,19 @@
       "0x00531388"
      ],
      "end": "0x00531388",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu065)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00531388",
        "name": "tu066",
-       "start": "0x005311A0"
+       "start": "0x00531188"
       }
      ],
-     "size": 488,
+     "size": 512,
      "splat_type": "rodata",
-     "start": "0x005311A0"
+     "start": "0x00531188"
     },
     ".lit4": {
      "anchored": [
@@ -55552,30 +55748,6 @@
     ".lit4": "asm"
    },
    "sections": {
-    ".data": {
-     "anchored": [
-      "0x003e48a0",
-      "0x003e48a1"
-     ],
-     "bounds": [
-      "0x003e52a1",
-      "0x003e52c0"
-     ],
-     "end": "0x003E52C0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003E52C0",
-       "name": "tu073",
-       "start": "0x003E48A0"
-      }
-     ],
-     "size": 2592,
-     "splat_type": "data",
-     "start": "0x003E48A0"
-    },
     ".lit4": {
      "anchored": [
       "0x0054f400",
@@ -58594,7 +58766,9 @@
    "owners": {
     ".text": "c",
     ".rodata": "asm",
-    ".lit4": "asm"
+    ".lit4": "asm",
+    ".data": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".rodata": {
@@ -58607,19 +58781,19 @@
       "0x005379c0"
      ],
      "end": "0x005379C0",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-24",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu063)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005379C0",
        "name": "find_native_method",
-       "start": "0x00537820"
+       "start": "0x00537710"
       }
      ],
-     "size": 416,
+     "size": 688,
      "splat_type": "rodata",
-     "start": "0x00537820"
+     "start": "0x00537710"
     },
     ".lit4": {
      "anchored": [
@@ -58644,6 +58818,48 @@
      "size": 216,
      "splat_type": "lit4",
      "start": "0x0054F4B4"
+    },
+    ".data": {
+     "anchored": [],
+     "bounds": [
+      "0x003E6450",
+      "0x003E6694"
+     ],
+     "end": "0x003E6690",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by find_native_method)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x003E6690",
+       "name": "find_native_method",
+       "start": "0x003E6450"
+      }
+     ],
+     "size": 576,
+     "splat_type": "data",
+     "start": "0x003E6450"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550B28",
+      "0x00550B50"
+     ],
+     "end": "0x00550B40",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550B28 referenced by find_native_method)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550B40",
+       "name": "find_native_method",
+       "start": "0x00550B28"
+      }
+     ],
+     "size": 24,
+     "splat_type": "sdata",
+     "start": "0x00550B28"
     }
    },
    "text": {
@@ -59561,30 +59777,6 @@
     ".rodata": "asm"
    },
    "sections": {
-    ".data": {
-     "anchored": [
-      "0x004b34d4",
-      "0x004b34d8"
-     ],
-     "bounds": [
-      "0x004b34c2",
-      "0x004b3586"
-     ],
-     "end": "0x004B3584",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-24",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x004B3584",
-       "name": "tu091",
-       "start": "0x004B34D4"
-      }
-     ],
-     "size": 176,
-     "splat_type": "data",
-     "start": "0x004B34D4"
-    },
     ".lit4": {
      "anchored": [
       "0x0054f5dc",
@@ -59634,6 +59826,27 @@
      "size": 736,
      "splat_type": "rodata",
      "start": "0x00537A68"
+    },
+    ".data": {
+     "anchored": [],
+     "bounds": [
+      "0x003E6694",
+      "0x003E69E0"
+     ],
+     "end": "0x003E6910",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by find_native_method)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x003E6910",
+       "name": "tu091",
+       "start": "0x003E6690"
+      }
+     ],
+     "size": 640,
+     "splat_type": "data",
+     "start": "0x003E6690"
     }
    },
    "text": {
@@ -59989,7 +60202,9 @@
    "owners": {
     ".text": "c",
     ".rodata": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".data": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".rodata": {
@@ -60039,6 +60254,48 @@
      "size": 256,
      "splat_type": "bss",
      "start": "0x005A6AC0"
+    },
+    ".data": {
+     "anchored": [],
+     "bounds": [
+      "0x003E6910",
+      "0x003E69E0"
+     ],
+     "end": "0x003E69E0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x003E6910 referenced by tu095)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x003E69E0",
+       "name": "tu095",
+       "start": "0x003E6910"
+      }
+     ],
+     "size": 208,
+     "splat_type": "data",
+     "start": "0x003E6910"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550B40",
+      "0x00550B50"
+     ],
+     "end": "0x00550B50",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550B40 referenced by tu095)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550B50",
+       "name": "tu095",
+       "start": "0x00550B40"
+      }
+     ],
+     "size": 16,
+     "splat_type": "sdata",
+     "start": "0x00550B40"
     }
    },
    "text": {
@@ -60405,30 +60662,6 @@
     ".bss": "asm"
    },
    "sections": {
-    ".data": {
-     "anchored": [
-      "0x003e6450",
-      "0x003e6911"
-     ],
-     "bounds": [
-      "0x003e6441",
-      "0x003e69e0"
-     ],
-     "end": "0x003E69E0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003E69E0",
-       "name": "tu099",
-       "start": "0x003E6450"
-      }
-     ],
-     "size": 1424,
-     "splat_type": "data",
-     "start": "0x003E6450"
-    },
     ".rodata": {
      "anchored": [
       "0x00531650",
@@ -60462,18 +60695,18 @@
       "0x005509bd",
       "0x00550a60"
      ],
-     "end": "0x00550A60",
+     "end": "0x005509C8",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550A60",
+       "end": "0x005509C8",
        "name": "tu099",
        "start": "0x005509C0"
       }
      ],
-     "size": 160,
+     "size": 8,
      "splat_type": "sdata",
      "start": "0x005509C0"
     },
@@ -60699,7 +60932,8 @@
     ".rodata": "asm",
     ".lit4": "asm",
     ".sbss": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".data": {
@@ -60735,18 +60969,18 @@
       "0x00531679",
       "0x00532f40"
      ],
-     "end": "0x00532F40",
+     "end": "0x005316D0",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00532F40",
+       "end": "0x005316D0",
        "name": "tu100",
        "start": "0x00531680"
       }
      ],
-     "size": 6336,
+     "size": 80,
      "splat_type": "rodata",
      "start": "0x00531680"
     },
@@ -60821,6 +61055,27 @@
      "size": 3280,
      "splat_type": "bss",
      "start": "0x005A55F0"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x005509C8",
+      "0x00550A60"
+     ],
+     "end": "0x00550A60",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005509C8 referenced by tu100)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550A60",
+       "name": "tu100",
+       "start": "0x005509C8"
+      }
+     ],
+     "size": 152,
+     "splat_type": "sdata",
+     "start": "0x005509C8"
     }
    },
    "text": {
@@ -60935,7 +61190,8 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm"
+    ".data": "asm",
+    ".rodata": "asm"
    },
    "sections": {
     ".data": {
@@ -60961,6 +61217,27 @@
      "size": 3472,
      "splat_type": "data",
      "start": "0x003E54F0"
+    },
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x005316D0",
+      "0x00532F40"
+     ],
+     "end": "0x00532F40",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005316D0 referenced by tu101)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00532F40",
+       "name": "tu101",
+       "start": "0x005316D0"
+      }
+     ],
+     "size": 6256,
+     "splat_type": "rodata",
+     "start": "0x005316D0"
     }
    },
    "text": {
@@ -62602,18 +62879,18 @@
       "0x0053e291",
       "0x0053e418"
      ],
-     "end": "0x0053E418",
+     "end": "0x0053E3B8",
      "evidence_source": "cut_audit",
-     "rule": "reference cut 2026-11-20 (cut_audit.py: function-local items referenced by sb_vm)",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sb_vm)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0053E418",
+       "end": "0x0053E3B8",
        "name": "sb_vm",
        "start": "0x0053E2B0"
       }
      ],
-     "size": 360,
+     "size": 264,
      "splat_type": "rodata",
      "start": "0x0053E2B0"
     },
@@ -63030,7 +63307,8 @@
     ".text": "c",
     ".lit4": "asm",
     ".data": "asm",
-    ".rodata": "asm"
+    ".rodata": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".lit4": {
@@ -63066,18 +63344,18 @@
       "0x004c83d1",
       "0x00407e30"
      ],
-     "end": "0x00407E30",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-24",
+     "end": "0x00407DB0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sb_natives)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00407E30",
+       "end": "0x00407DB0",
        "name": "sb_natives",
        "start": "0x00407D00"
       }
      ],
-     "size": 304,
+     "size": 176,
      "splat_type": "data",
      "start": "0x00407D00"
     },
@@ -63091,19 +63369,40 @@
       "0x0053e740"
      ],
      "end": "0x0053E740",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-24",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sb_vm)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053E740",
        "name": "sb_natives",
-       "start": "0x0053E418"
+       "start": "0x0053E3B8"
       }
      ],
-     "size": 808,
+     "size": 904,
      "splat_type": "rodata",
-     "start": "0x0053E418"
+     "start": "0x0053E3B8"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550FE8",
+      "0x00551000"
+     ],
+     "end": "0x00551000",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550FE8 referenced by sb_natives)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00551000",
+       "name": "sb_natives",
+       "start": "0x00550FE8"
+      }
+     ],
+     "size": 24,
+     "splat_type": "sdata",
+     "start": "0x00550FE8"
     }
    },
    "text": {
@@ -64603,19 +64902,19 @@
       "0x00408080"
      ],
      "end": "0x00408080",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-24",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sb_natives)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00408080",
        "name": "filter",
-       "start": "0x00407E30"
+       "start": "0x00407DB0"
       }
      ],
-     "size": 592,
+     "size": 720,
      "splat_type": "data",
-     "start": "0x00407E30"
+     "start": "0x00407DB0"
     }
    },
    "text": {
@@ -66713,18 +67012,18 @@
       "0x0062f4d1",
       "0x00630850"
      ],
-     "end": "0x0065D4C0",
+     "end": "0x0065CBC0",
      "evidence_source": "merge",
      "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0065D4C0",
+       "end": "0x0065CBC0",
        "name": "sdv",
        "start": "0x0062F830"
       }
      ],
-     "size": 187536,
+     "size": 185232,
      "splat_type": "bss",
      "start": "0x0062F830"
     }
@@ -66885,9 +67184,32 @@
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".bss": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".bss": {
+     "anchored": [],
+     "bounds": [
+      "0x0065CBC0",
+      "0x0065D4C0"
+     ],
+     "end": "0x0065DB20",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sdv_packet)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0065DB20",
+       "name": "sdv_packet",
+       "start": "0x0065CBC0"
+      }
+     ],
+     "size": 3936,
+     "splat_type": "bss",
+     "start": "0x0065CBC0"
+    }
+   },
    "text": {
     "start": "0x001f36c0",
     "end": "0x001f4048",
@@ -67027,30 +67349,6 @@
      "size": 1080,
      "splat_type": "rodata",
      "start": "0x0053EA90"
-    },
-    ".bss": {
-     "anchored": [
-      "0x0065d4c0",
-      "0x0065d4c1"
-     ],
-     "bounds": [
-      "0x00630851",
-      "0x00667920"
-     ],
-     "end": "0x00667920",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00667920",
-       "name": "tu127",
-       "start": "0x0065D4C0"
-      }
-     ],
-     "size": 42080,
-     "splat_type": "bss",
-     "start": "0x0065D4C0"
     }
    },
    "text": {
@@ -67449,20 +67747,20 @@
       "0x00408181",
       "0x00453d88"
      ],
-     "end": "0x00453D88",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00452D80",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu128)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00453D88",
+       "end": "0x00452D80",
        "name": "tu128",
-       "start": "0x0042F350"
+       "start": "0x004081F0"
       }
      ],
-     "size": 150072,
+     "size": 306064,
      "splat_type": "data",
-     "start": "0x0042F350"
+     "start": "0x004081F0"
     },
     ".rodata": {
      "anchored": [
@@ -67800,18 +68098,18 @@
       "0x00408111",
       "0x0042f350"
      ],
-     "end": "0x0042F350",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x004081F0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu129)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0042F350",
+       "end": "0x004081F0",
        "name": "tu129",
        "start": "0x00408180"
       }
      ],
-     "size": 160208,
+     "size": 112,
      "splat_type": "data",
      "start": "0x00408180"
     },
@@ -69123,19 +69421,19 @@
       "0x00453e50"
      ],
      "end": "0x00475380",
-     "evidence_source": "cut",
-     "rule": "TU cut 2026-11-24",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu128)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00475380",
        "name": "sef",
-       "start": "0x00453D88"
+       "start": "0x00452D80"
       }
      ],
-     "size": 136696,
+     "size": 140800,
      "splat_type": "data",
-     "start": "0x00453D88"
+     "start": "0x00452D80"
     },
     ".rodata": {
      "anchored": [
@@ -69236,29 +69534,25 @@
      "start": "0x00551514"
     },
     ".bss": {
-     "anchored": [
-      "0x00667920",
-      "0x0076c471",
-      "0x0076c480"
-     ],
+     "anchored": [],
      "bounds": [
-      "0x0065d4c1",
-      "0x0076c480"
+      "0x0065DB20",
+      "0x0076C480"
      ],
      "end": "0x0076C480",
-     "evidence_source": "cut",
-     "rule": "TU cut 2026-11-24",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25: items to 0x0076C480 belong to sef",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0076C480",
        "name": "sef",
-       "start": "0x00667920"
+       "start": "0x0065DB20"
       }
      ],
-     "size": 1067872,
+     "size": 1108320,
      "splat_type": "bss",
-     "start": "0x00667920"
+     "start": "0x0065DB20"
     }
    },
    "text": {
@@ -69867,18 +70161,18 @@
       "0x004520d1",
       "0x00453e50"
      ],
-     "end": "0x00475450",
-     "evidence_source": "cut",
-     "rule": "TU cut 2026-11-24",
+     "end": "0x00475440",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sef_132)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00475450",
+       "end": "0x00475440",
        "name": "sef_132",
        "start": "0x00475380"
       }
      ],
-     "size": 208,
+     "size": 192,
      "splat_type": "data",
      "start": "0x00475380"
     },
@@ -69917,18 +70211,18 @@
       "0x0055103d",
       "0x005510ac"
      ],
-     "end": "0x005510C0",
+     "end": "0x005510B8",
      "evidence_source": "cut",
      "rule": "TU cut 2026-11-24",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x005510C0",
+       "end": "0x005510B8",
        "name": "sef_132",
        "start": "0x005510AC"
       }
      ],
-     "size": 20,
+     "size": 12,
      "splat_type": "sdata",
      "start": "0x005510AC"
     },
@@ -70634,7 +70928,8 @@
    ],
    "owners": {
     ".text": "c",
-    ".rodata": "asm"
+    ".rodata": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".rodata": {
@@ -70657,6 +70952,27 @@
      "size": 40,
      "splat_type": "rodata",
      "start": "0x0053F230"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x005510B8",
+      "0x005510C0"
+     ],
+     "end": "0x005510C0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005510B8 referenced by sv_scene_flags)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005510C0",
+       "name": "sv_scene_flags",
+       "start": "0x005510B8"
+      }
+     ],
+     "size": 8,
+     "splat_type": "sdata",
+     "start": "0x005510B8"
     }
    },
    "text": {
@@ -71394,18 +71710,18 @@
       "0x005510b5",
       "0x005510c4"
      ],
-     "end": "0x00551100",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "end": "0x005510E0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sv_get_image_item)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00551100",
+       "end": "0x005510E0",
        "name": "sv_get_image_item",
        "start": "0x005510C0"
       }
      ],
-     "size": 64,
+     "size": 32,
      "splat_type": "sdata",
      "start": "0x005510C0"
     },
@@ -71420,20 +71736,20 @@
       "0x004753f1",
       "0x00475560"
      ],
-     "end": "0x00475628",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "end": "0x004AD6A0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sef_132)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00475628",
+       "end": "0x004AD6A0",
        "name": "sv_get_image_item",
-       "start": "0x00475450"
+       "start": "0x00475440"
       }
      ],
-     "size": 472,
+     "size": 229984,
      "splat_type": "data",
-     "start": "0x00475450"
+     "start": "0x00475440"
     },
     ".rodata": {
      "anchored": [
@@ -71520,18 +71836,18 @@
       "0x0076c4c1",
       "0x0076d660"
      ],
-     "end": "0x00771184",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "end": "0x00771198",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sv_get_image_item)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00771184",
+       "end": "0x00771198",
        "name": "sv_get_image_item",
        "start": "0x0076D4D0"
       }
      ],
-     "size": 15540,
+     "size": 15560,
      "splat_type": "bss",
      "start": "0x0076D4D0"
     }
@@ -71738,30 +72054,6 @@
      "size": 8,
      "splat_type": "rodata",
      "start": "0x0053F4A0"
-    },
-    ".bss": {
-     "anchored": [
-      "0x00771184",
-      "0x00771185"
-     ],
-     "bounds": [
-      "0x007710e1",
-      "0x00771198"
-     ],
-     "end": "0x00771198",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00771198",
-       "name": "draw_list",
-       "start": "0x00771184"
-      }
-     ],
-     "size": 20,
-     "splat_type": "bss",
-     "start": "0x00771184"
     }
    },
    "text": {
@@ -72865,19 +73157,19 @@
       "0x00551110"
      ],
      "end": "0x00551110",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-24",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by sv_get_image_item)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00551110",
        "name": "srs",
-       "start": "0x00551100"
+       "start": "0x005510E0"
       }
      ],
-     "size": 16,
+     "size": 48,
      "splat_type": "sdata",
-     "start": "0x00551100"
+     "start": "0x005510E0"
     },
     ".bss": {
      "anchored": [
@@ -73044,32 +73336,7 @@
     ".text": "c",
     ".data": "asm"
    },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x00475628",
-      "0x00475629"
-     ],
-     "bounds": [
-      "0x004ac021",
-      "0x004ad6a0"
-     ],
-     "end": "0x004AD6A0",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x004AD6A0",
-       "name": "tu154",
-       "start": "0x00475628"
-      }
-     ],
-     "size": 229496,
-     "splat_type": "data",
-     "start": "0x00475628"
-    }
-   },
+   "sections": {},
    "text": {
     "start": "0x002108e8",
     "end": "0x002109d0",
@@ -73335,36 +73602,11 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm",
     ".rodata": "asm",
     ".lit4": "asm",
     ".sdata": "asm"
    },
    "sections": {
-    ".data": {
-     "anchored": [
-      "0x004cabc4",
-      "0x004cabc5"
-     ],
-     "bounds": [
-      "0x004cab21",
-      "0x004ec8cc"
-     ],
-     "end": "0x004EC8CC",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x004EC8CC",
-       "name": "tu155",
-       "start": "0x004CABC4"
-      }
-     ],
-     "size": 138504,
-     "splat_type": "data",
-     "start": "0x004CABC4"
-    },
     ".rodata": {
      "anchored": [
       "0x00538e90",
@@ -73766,18 +74008,18 @@
       "0x00550ad1",
       "0x00550b6c"
      ],
-     "end": "0x00550B6C",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00550B70",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu157)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550B6C",
+       "end": "0x00550B70",
        "name": "tu157",
        "start": "0x00550B50"
       }
      ],
-     "size": 28,
+     "size": 32,
      "splat_type": "sdata",
      "start": "0x00550B50"
     }
@@ -73906,20 +74148,20 @@
       "0x00550b69",
       "0x00550b84"
      ],
-     "end": "0x00550B84",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00550B7C",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu157)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550B84",
+       "end": "0x00550B7C",
        "name": "tu158",
-       "start": "0x00550B6C"
+       "start": "0x00550B70"
       }
      ],
-     "size": 24,
+     "size": 12,
      "splat_type": "sdata",
-     "start": "0x00550B6C"
+     "start": "0x00550B70"
     }
    },
    "text": {
@@ -74034,7 +74276,8 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm"
+    ".data": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".data": {
@@ -74060,6 +74303,27 @@
      "size": 40960,
      "splat_type": "data",
      "start": "0x003C75C0"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550B7C",
+      "0x00550B84"
+     ],
+     "end": "0x00550B84",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550B7C referenced by tu159)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550B84",
+       "name": "tu159",
+       "start": "0x00550B7C"
+      }
+     ],
+     "size": 8,
+     "splat_type": "sdata",
+     "start": "0x00550B7C"
     }
    },
    "text": {
@@ -74462,18 +74726,18 @@
       "0x00550b71",
       "0x00550ba0"
      ],
-     "end": "0x00550BA0",
+     "end": "0x00550B98",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550BA0",
+       "end": "0x00550B98",
        "name": "tu160",
        "start": "0x00550B84"
       }
      ],
-     "size": 28,
+     "size": 20,
      "splat_type": "sdata",
      "start": "0x00550B84"
     },
@@ -74486,18 +74750,18 @@
       "0x00551421",
       "0x0055142c"
      ],
-     "end": "0x0055142C",
+     "end": "0x00551428",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0055142C",
+       "end": "0x00551428",
        "name": "tu160",
        "start": "0x00551424"
       }
      ],
-     "size": 8,
+     "size": 4,
      "splat_type": "sbss",
      "start": "0x00551424"
     },
@@ -74746,7 +75010,8 @@
    ],
    "owners": {
     ".text": "c",
-    ".rodata": "asm"
+    ".rodata": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".rodata": {
@@ -74772,6 +75037,27 @@
      "size": 24,
      "splat_type": "rodata",
      "start": "0x00537DD8"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550B98",
+      "0x00550BA0"
+     ],
+     "end": "0x00550BA0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550B98 referenced by tu161)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550BA0",
+       "name": "tu161",
+       "start": "0x00550B98"
+      }
+     ],
+     "size": 8,
+     "splat_type": "sdata",
+     "start": "0x00550B98"
     }
    },
    "text": {
@@ -75283,18 +75569,18 @@
       "0x00550b95",
       "0x00550bb4"
      ],
-     "end": "0x00550BB4",
+     "end": "0x00550BA8",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550BB4",
+       "end": "0x00550BA8",
        "name": "tu162",
        "start": "0x00550BA0"
       }
      ],
-     "size": 20,
+     "size": 8,
      "splat_type": "sdata",
      "start": "0x00550BA0"
     }
@@ -76059,18 +76345,18 @@
       "0x003e7211",
       "0x003e8b90"
      ],
-     "end": "0x003E8B90",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x003E7300",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu166)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x003E8B90",
+       "end": "0x003E7300",
        "name": "tu166",
        "start": "0x003E7280"
       }
      ],
-     "size": 6416,
+     "size": 128,
      "splat_type": "data",
      "start": "0x003E7280"
     },
@@ -77398,19 +77684,19 @@
       "0x00551458"
      ],
      "end": "0x00551458",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu193)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00551458",
        "name": "tu174",
-       "start": "0x00551444"
+       "start": "0x0055143C"
       }
      ],
-     "size": 20,
+     "size": 28,
      "splat_type": "sbss",
-     "start": "0x00551444"
+     "start": "0x0055143C"
     }
    },
    "text": {
@@ -78024,7 +78310,8 @@
    "owners": {
     ".text": "c",
     ".data": "asm",
-    ".rodata": "asm"
+    ".rodata": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".data": {
@@ -78074,6 +78361,27 @@
      "size": 16,
      "splat_type": "rodata",
      "start": "0x00537DF0"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550BA8",
+      "0x00550BB4"
+     ],
+     "end": "0x00550BB4",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550BA8 referenced by tu176)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550BB4",
+       "name": "tu176",
+       "start": "0x00550BA8"
+      }
+     ],
+     "size": 12,
+     "splat_type": "sdata",
+     "start": "0x00550BA8"
     }
    },
    "text": {
@@ -79820,7 +80128,8 @@
     ".text": "c",
     ".data": "asm",
     ".rodata": "asm",
-    ".sdata": "asm"
+    ".sdata": "asm",
+    ".sbss": "asm"
    },
    "sections": {
     ".data": {
@@ -79894,6 +80203,27 @@
      "size": 8,
      "splat_type": "sdata",
      "start": "0x00550BB8"
+    },
+    ".sbss": {
+     "anchored": [],
+     "bounds": [
+      "0x00551428",
+      "0x0055142C"
+     ],
+     "end": "0x0055142C",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00551428 referenced by tu183)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x0055142C",
+       "name": "tu183",
+       "start": "0x00551428"
+      }
+     ],
+     "size": 4,
+     "splat_type": "sbss",
+     "start": "0x00551428"
     }
    },
    "text": {
@@ -80595,18 +80925,18 @@
       "0x00538971",
       "0x00538bf0"
      ],
-     "end": "0x00538BF0",
+     "end": "0x00538AA0",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00538BF0",
+       "end": "0x00538AA0",
        "name": "res_get_path",
        "start": "0x005389A0"
       }
      ],
-     "size": 592,
+     "size": 256,
      "splat_type": "rodata",
      "start": "0x005389A0"
     },
@@ -81162,7 +81492,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.74",
-    "precision of this score band on X1, held out: 0.227 (17/75)"
+    "precision of this score band on X1, held out: 0.227 (17/75)",
+    "cut repair 2026-11-25: data-run evidence (cut_audit.py)"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -81199,7 +81530,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 21,
+    "of": 22,
     "migration_hints": [],
     "records": []
    },
@@ -81392,23 +81723,99 @@
      "va": "0x002379b8",
      "name_basis": "address",
      "provenance": "estimated"
+    },
+    {
+     "binding": "GLOBAL",
+     "name": "addDefaultNativeOwner",
+     "size": 36,
+     "splat_name": "addDefaultNativeOwner",
+     "va": "0x00237a08",
+     "name_basis": "address",
+     "provenance": "estimated"
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".data": "asm",
+    ".rodata": "asm",
+    ".sdata": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".data": {
+     "anchored": [],
+     "bounds": [
+      "0x003E70B8",
+      "0x003E71C0"
+     ],
+     "end": "0x003E71C0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25: items to 0x003E71C0 belong to tu186",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x003E71C0",
+       "name": "tu186",
+       "start": "0x003E70B8"
+      }
+     ],
+     "size": 264,
+     "splat_type": "data",
+     "start": "0x003E70B8"
+    },
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x00538AA0",
+      "0x00538BF0"
+     ],
+     "end": "0x00538BF0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00538AA0 referenced by tu186)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00538BF0",
+       "name": "tu186",
+       "start": "0x00538AA0"
+      }
+     ],
+     "size": 336,
+     "splat_type": "rodata",
+     "start": "0x00538AA0"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550BE0",
+      "0x00550BF8"
+     ],
+     "end": "0x00550BE0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu187)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550BE0",
+       "name": "tu186",
+       "start": "0x00550BD8"
+      }
+     ],
+     "size": 8,
+     "splat_type": "sdata",
+     "start": "0x00550BD8"
+    }
+   },
    "text": {
     "start": "0x00237188",
-    "end": "0x00237a08",
-    "code_end": "0x00237a04",
-    "size": 2176,
+    "end": "0x00237a30",
+    "code_end": "0x00237a2c",
+    "size": 2216,
     "splat": "c",
     "splat_range": [
      "0x00237188",
-     "0x00237a08"
+     "0x00237a30"
     ],
-    "note": null
+    "note": "text cut moved 2026-11-25 (cut_audit.py: one .lit4/.rodata run per object)"
    },
    "import": {
     "mode": "c",
@@ -81438,7 +81845,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -0.35",
-    "precision of this score band on X1, held out: 0.271 (16/59)"
+    "precision of this score band on X1, held out: 0.271 (16/59)",
+    "cut repair 2026-11-25: data-run evidence (cut_audit.py)"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -81475,20 +81883,11 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 24,
+    "of": 23,
     "migration_hints": [],
     "records": []
    },
    "functions": [
-    {
-     "binding": "GLOBAL",
-     "name": "addDefaultNativeOwner",
-     "size": 36,
-     "splat_name": "addDefaultNativeOwner",
-     "va": "0x00237a08",
-     "name_basis": "address",
-     "provenance": "estimated"
-    },
     {
      "binding": "GLOBAL",
      "name": "seMenuBlockClear",
@@ -81722,12 +82121,12 @@
        "c_split": false,
        "end": "0x003E71D0",
        "name": "tu187",
-       "start": "0x003E70B8"
+       "start": "0x003E71C0"
       }
      ],
-     "size": 280,
+     "size": 16,
      "splat_type": "data",
-     "start": "0x003E70B8"
+     "start": "0x003E71C0"
     },
     ".rodata": {
      "anchored": [
@@ -81763,19 +82162,19 @@
       "0x00550bf8"
      ],
      "end": "0x00550BF8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu187)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00550BF8",
        "name": "tu187",
-       "start": "0x00550BD8"
+       "start": "0x00550BE0"
       }
      ],
-     "size": 32,
+     "size": 24,
      "splat_type": "sdata",
-     "start": "0x00550BD8"
+     "start": "0x00550BE0"
     },
     ".sbss": {
      "anchored": [
@@ -81803,16 +82202,16 @@
     }
    },
    "text": {
-    "start": "0x00237a08",
+    "start": "0x00237a30",
     "end": "0x0023bbe8",
     "code_end": "0x0023bbe4",
-    "size": 16864,
+    "size": 16824,
     "splat": "c",
     "splat_range": [
-     "0x00237a08",
+     "0x00237a30",
      "0x0023bbe8"
     ],
-    "note": null
+    "note": "text cut moved 2026-11-25 (cut_audit.py: one .lit4/.rodata run per object)"
    },
    "import": {
     "mode": "c",
@@ -83047,18 +83446,18 @@
       "0x00551435",
       "0x00551444"
      ],
-     "end": "0x00551444",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x0055143C",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu193)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00551444",
+       "end": "0x0055143C",
        "name": "tu193",
        "start": "0x00551438"
       }
      ],
-     "size": 12,
+     "size": 4,
      "splat_type": "sbss",
      "start": "0x00551438"
     }
@@ -83196,18 +83595,18 @@
       "0x00539e01",
       "0x0053a110"
      ],
-     "end": "0x0053A110",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x0053A0C0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by BlendTest)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0053A110",
+       "end": "0x0053A0C0",
        "name": "BlendTest",
        "start": "0x00539F48"
       }
      ],
-     "size": 456,
+     "size": 376,
      "splat_type": "rodata",
      "start": "0x00539F48"
     }
@@ -83257,7 +83656,8 @@
     "dup_string: copies at 0x539fe0 and 0x53a498",
     "dup_string: copies at 0x53a000 and 0x53a4b8",
     "lit4_step: .lit4 0x54f620 -> 0x54f708",
-    "exact-gap precision of this kind on X1: 0.855"
+    "exact-gap precision of this kind on X1: 0.855",
+    "TU merge 2026-11-24: CFLLightTest, tu196"
    ],
    "boundary_confidence": "high",
    "provisional": true,
@@ -83286,7 +83686,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "4 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -83294,7 +83694,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 7,
+    "of": 20,
     "migration_hints": [],
     "records": []
    },
@@ -83361,170 +83761,7 @@
      "va": "0x00242420",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".data": "asm",
-    ".rodata": "asm",
-    ".sdata": "asm"
-   },
-   "sections": {
-    ".data": {
-     "anchored": [
-      "0x003eb9d0",
-      "0x003eb9d1"
-     ],
-     "bounds": [
-      "0x003eb8d1",
-      "0x003eba10"
-     ],
-     "end": "0x003EBA10",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003EBA10",
-       "name": "CFLLightTest",
-       "start": "0x003EB9D0"
-      }
-     ],
-     "size": 64,
-     "splat_type": "data",
-     "start": "0x003EB9D0"
     },
-    ".rodata": {
-     "anchored": [
-      "0x0053a110",
-      "0x0053a1d9"
-     ],
-     "bounds": [
-      "0x0053a049",
-      "0x0053a1f8"
-     ],
-     "end": "0x0053A1F8",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x0053A1F8",
-       "name": "CFLLightTest",
-       "start": "0x0053A110"
-      }
-     ],
-     "size": 232,
-     "splat_type": "rodata",
-     "start": "0x0053A110"
-    },
-    ".sdata": {
-     "anchored": [
-      "0x00550d3c",
-      "0x00550d3d"
-     ],
-     "bounds": [
-      "0x00550d41",
-      "0x00550d50"
-     ],
-     "end": "0x00550D50",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00550D50",
-       "name": "CFLLightTest",
-       "start": "0x00550D3C"
-      }
-     ],
-     "size": 20,
-     "splat_type": "sdata",
-     "start": "0x00550D3C"
-    }
-   },
-   "text": {
-    "start": "0x00241eb8",
-    "end": "0x00242508",
-    "code_end": "0x00242508",
-    "size": 1616,
-    "splat": "c",
-    "splat_range": [
-     "0x00241eb8",
-     "0x00242508"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/CFLLightTest.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu196",
-   "unit": "main",
-   "ordinal": 196,
-   "name": "tu196",
-   "path": "src/main/tu196.c",
-   "scaffold_path": "scaffold/src/main/tu196.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.08",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "50 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 13,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
     {
      "binding": "GLOBAL",
      "name": "movieTextWindowInit",
@@ -83647,58 +83884,88 @@
     ".text": "c",
     ".data": "asm",
     ".rodata": "asm",
-    ".lit4": "asm",
     ".sdata": "asm",
+    ".lit4": "asm",
     ".bss": "asm"
    },
    "sections": {
     ".data": {
      "anchored": [
       "0x003eb860",
-      "0x003eb8d1"
+      "0x003eb8d1",
+      "0x003eb9d0",
+      "0x003eb9d1"
      ],
      "bounds": [
       "0x003eb851",
       "0x003eb9d0"
      ],
-     "end": "0x003EB9D0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x003EBA10",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x003EB9D0",
-       "name": "tu196",
+       "end": "0x003EBA10",
+       "name": "CFLLightTest",
        "start": "0x003EB860"
       }
      ],
-     "size": 368,
+     "size": 432,
      "splat_type": "data",
      "start": "0x003EB860"
     },
     ".rodata": {
      "anchored": [
+      "0x0053a110",
+      "0x0053a1d9",
       "0x0053a1f8",
       "0x0053a289"
      ],
      "bounds": [
-      "0x0053a1d9",
-      "0x0053a3f8"
+      "0x0053a049",
+      "0x0053a1f8"
      ],
-     "end": "0x0053A3F8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x0053A2C0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by CFLLightTest)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x0053A3F8",
-       "name": "tu196",
-       "start": "0x0053A1F8"
+       "end": "0x0053A2C0",
+       "name": "CFLLightTest",
+       "start": "0x0053A0C0"
       }
      ],
      "size": 512,
      "splat_type": "rodata",
-     "start": "0x0053A1F8"
+     "start": "0x0053A0C0"
+    },
+    ".sdata": {
+     "anchored": [
+      "0x00550d28",
+      "0x00550d3c",
+      "0x00550d3d",
+      "0x00550d41"
+     ],
+     "bounds": [
+      "0x00550d25",
+      "0x00550d3c"
+     ],
+     "end": "0x00550D48",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by CFLLightTest)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550D48",
+       "name": "CFLLightTest",
+       "start": "0x00550D28"
+      }
+     ],
+     "size": 32,
+     "splat_type": "sdata",
+     "start": "0x00550D28"
     },
     ".lit4": {
      "anchored": [
@@ -83710,43 +83977,19 @@
       "0x0054f718"
      ],
      "end": "0x0054F718",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054F718",
-       "name": "tu196",
+       "name": "CFLLightTest",
        "start": "0x0054F708"
       }
      ],
      "size": 16,
      "splat_type": "lit4",
      "start": "0x0054F708"
-    },
-    ".sdata": {
-     "anchored": [
-      "0x00550d28",
-      "0x00550d41"
-     ],
-     "bounds": [
-      "0x00550d25",
-      "0x00550d3c"
-     ],
-     "end": "0x00550D3C",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x00550D3C",
-       "name": "tu196",
-       "start": "0x00550D28"
-      }
-     ],
-     "size": 20,
-     "splat_type": "sdata",
-     "start": "0x00550D28"
     },
     ".bss": {
      "anchored": [
@@ -83758,13 +84001,13 @@
       "0x005a7cf0"
      ],
      "end": "0x005A7CF0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005A7CF0",
-       "name": "tu196",
+       "name": "CFLLightTest",
        "start": "0x005A7860"
       }
      ],
@@ -83774,16 +84017,16 @@
     }
    },
    "text": {
-    "start": "0x00242508",
+    "start": "0x00241eb8",
     "end": "0x00243338",
     "code_end": "0x00243334",
-    "size": 3632,
+    "size": 5248,
     "splat": "c",
     "splat_range": [
-     "0x00242508",
+     "0x00241eb8",
      "0x00243338"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -83793,7 +84036,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu196.c"
+     "path": "src/main/CFLLightTest.c"
     }
    }
   },
@@ -83901,19 +84144,19 @@
       "0x0053a580"
      ],
      "end": "0x0053A580",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by CFLLightTest)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053A580",
        "name": "CullingTest",
-       "start": "0x0053A3F8"
+       "start": "0x0053A2C0"
       }
      ],
-     "size": 392,
+     "size": 704,
      "splat_type": "rodata",
-     "start": "0x0053A3F8"
+     "start": "0x0053A2C0"
     }
    },
    "text": {
@@ -84705,19 +84948,19 @@
       "0x00550d58"
      ],
      "end": "0x00550D58",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by CFLLightTest)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00550D58",
        "name": "Gtest",
-       "start": "0x00550D50"
+       "start": "0x00550D48"
       }
      ],
-     "size": 8,
+     "size": 16,
      "splat_type": "sdata",
-     "start": "0x00550D50"
+     "start": "0x00550D48"
     }
    },
    "text": {
@@ -87835,19 +88078,19 @@
       "0x003e8bd4"
      ],
      "end": "0x003EB490",
-     "evidence_source": "merge",
-     "rule": "TU merge 2026-11-20",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu166)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003EB490",
        "name": "XenoActorEvent",
-       "start": "0x003E8B90"
+       "start": "0x003E7300"
       }
      ],
-     "size": 10496,
+     "size": 16784,
      "splat_type": "data",
-     "start": "0x003E8B90"
+     "start": "0x003E7300"
     },
     ".rodata": {
      "anchored": [
@@ -89427,19 +89670,19 @@
       "0x003eb860"
      ],
      "end": "0x003EB860",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu221)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x003EB860",
        "name": "gif_state_model",
-       "start": "0x003EB814"
+       "start": "0x003EB800"
       }
      ],
-     "size": 76,
+     "size": 96,
      "splat_type": "data",
-     "start": "0x003EB814"
+     "start": "0x003EB800"
     }
    },
    "text": {
@@ -89577,18 +89820,18 @@
       "0x004c83b5",
       "0x003eb814"
      ],
-     "end": "0x003EB814",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x003EB800",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu221)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x003EB814",
+       "end": "0x003EB800",
        "name": "tu221",
        "start": "0x003EB7C0"
       }
      ],
-     "size": 84,
+     "size": 64,
      "splat_type": "data",
      "start": "0x003EB7C0"
     },
@@ -91143,7 +91386,8 @@
     ".data": "asm",
     ".sdata": "asm",
     ".bss": "asm",
-    ".lit4": "asm"
+    ".lit4": "asm",
+    ".rodata": "asm"
    },
    "sections": {
     ".data": {
@@ -91247,6 +91491,27 @@
      "size": 56,
      "splat_type": "lit4",
      "start": "0x0054F200"
+    },
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x00527890",
+      "0x005278E0"
+     ],
+     "end": "0x005278E0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00527890 referenced by m_math)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005278E0",
+       "name": "m_math",
+       "start": "0x00527890"
+      }
+     ],
+     "size": 80,
+     "splat_type": "rodata",
+     "start": "0x00527890"
     }
    },
    "text": {
@@ -92533,7 +92798,8 @@
     ".rodata": "asm",
     ".lit4": "asm",
     ".sbss": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".data": {
@@ -92569,18 +92835,18 @@
       "0x00530821",
       "0x00530a50"
      ],
-     "end": "0x00530A50",
+     "end": "0x005309F8",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00530A50",
+       "end": "0x005309F8",
        "name": "tu238",
        "start": "0x00530830"
       }
      ],
-     "size": 544,
+     "size": 456,
      "splat_type": "rodata",
      "start": "0x00530830"
     },
@@ -92655,6 +92921,27 @@
      "size": 96,
      "splat_type": "bss",
      "start": "0x0055AF40"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x005505E0",
+      "0x00550810"
+     ],
+     "end": "0x00550708",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005505E0 referenced by tu238)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550708",
+       "name": "tu238",
+       "start": "0x005505E0"
+      }
+     ],
+     "size": 296,
+     "splat_type": "sdata",
+     "start": "0x005505E0"
     }
    },
    "text": {
@@ -92805,7 +93092,9 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm"
+    ".data": "asm",
+    ".sdata": "asm",
+    ".rodata": "asm"
    },
    "sections": {
     ".data": {
@@ -92831,6 +93120,48 @@
      "size": 1632,
      "splat_type": "data",
      "start": "0x003E2330"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550708",
+      "0x00550810"
+     ],
+     "end": "0x00550780",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550708 referenced by tu239)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550780",
+       "name": "tu239",
+       "start": "0x00550708"
+      }
+     ],
+     "size": 120,
+     "splat_type": "sdata",
+     "start": "0x00550708"
+    },
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x005309F8",
+      "0x00530A50"
+     ],
+     "end": "0x00530A28",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005309F8 referenced by tu239)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00530A28",
+       "name": "tu239",
+       "start": "0x005309F8"
+      }
+     ],
+     "size": 48,
+     "splat_type": "rodata",
+     "start": "0x005309F8"
     }
    },
    "text": {
@@ -93018,7 +93349,9 @@
    ],
    "owners": {
     ".text": "c",
-    ".data": "asm"
+    ".data": "asm",
+    ".sdata": "asm",
+    ".rodata": "asm"
    },
    "sections": {
     ".data": {
@@ -93046,6 +93379,48 @@
      "size": 1896,
      "splat_type": "data",
      "start": "0x003E2990"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550780",
+      "0x00550810"
+     ],
+     "end": "0x005507F0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550780 referenced by tu240)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005507F0",
+       "name": "tu240",
+       "start": "0x00550780"
+      }
+     ],
+     "size": 112,
+     "splat_type": "sdata",
+     "start": "0x00550780"
+    },
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x00530A28",
+      "0x00530A50"
+     ],
+     "end": "0x00530A40",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu240)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00530A40",
+       "name": "tu240",
+       "start": "0x00530A28"
+      }
+     ],
+     "size": 24,
+     "splat_type": "rodata",
+     "start": "0x00530A28"
     }
    },
    "text": {
@@ -93288,20 +93663,20 @@
       "0x00530831",
       "0x00530ac8"
      ],
-     "end": "0x00530AC8",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00530A88",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu242)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00530AC8",
+       "end": "0x00530A88",
        "name": "tu242",
-       "start": "0x00530A50"
+       "start": "0x00530A40"
       }
      ],
-     "size": 120,
+     "size": 72,
      "splat_type": "rodata",
-     "start": "0x00530A50"
+     "start": "0x00530A40"
     },
     ".sbss": {
      "anchored": [
@@ -93441,7 +93816,8 @@
    "owners": {
     ".text": "c",
     ".data": "asm",
-    ".rodata": "asm"
+    ".rodata": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".data": {
@@ -93478,19 +93854,40 @@
       "0x00530ad0"
      ],
      "end": "0x00530AD0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu242)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00530AD0",
        "name": "tu243",
-       "start": "0x00530AC8"
+       "start": "0x00530A88"
       }
      ],
-     "size": 8,
+     "size": 72,
      "splat_type": "rodata",
-     "start": "0x00530AC8"
+     "start": "0x00530A88"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x005507F0",
+      "0x00550810"
+     ],
+     "end": "0x00550810",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005507F0 referenced by tu243)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550810",
+       "name": "tu243",
+       "start": "0x005507F0"
+      }
+     ],
+     "size": 32,
+     "splat_type": "sdata",
+     "start": "0x005507F0"
     }
    },
    "text": {
@@ -93718,18 +94115,18 @@
       "0x003e32a9",
       "0x003e3358"
      ],
-     "end": "0x003E3358",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x003E3360",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu244)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x003E3358",
+       "end": "0x003E3360",
        "name": "tu244",
        "start": "0x003E3340"
       }
      ],
-     "size": 24,
+     "size": 32,
      "splat_type": "data",
      "start": "0x003E3340"
     },
@@ -94199,18 +94596,18 @@
       "0x005505d9",
       "0x00550840"
      ],
-     "end": "0x00550840",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00550818",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by game_camera)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550840",
+       "end": "0x00550818",
        "name": "game_camera",
        "start": "0x00550810"
       }
      ],
-     "size": 48,
+     "size": 8,
      "splat_type": "sdata",
      "start": "0x00550810"
     },
@@ -94911,18 +95308,18 @@
       "0x005513CC",
       "0x005513D8"
      ],
-     "end": "0x005513D8",
+     "end": "0x005513D4",
      "evidence_source": "split",
      "rule": "TU split 2026-11-20 (cells 0x005513CC-0x005513D8 referenced by tu142)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x005513D8",
+       "end": "0x005513D4",
        "name": "tu142",
        "start": "0x005513CC"
       }
      ],
-     "size": 12,
+     "size": 8,
      "splat_type": "sbss",
      "start": "0x005513CC"
     }
@@ -95673,7 +96070,8 @@
     ".rodata": "asm",
     ".lit4": "asm",
     ".sbss": "asm",
-    ".bss": "asm"
+    ".bss": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".data": {
@@ -95795,6 +96193,27 @@
      "size": 16,
      "splat_type": "bss",
      "start": "0x0055A840"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550818",
+      "0x00550820"
+     ],
+     "end": "0x00550820",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550818 referenced by tu252)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550820",
+       "name": "tu252",
+       "start": "0x00550818"
+      }
+     ],
+     "size": 8,
+     "splat_type": "sdata",
+     "start": "0x00550818"
     }
    },
    "text": {
@@ -95984,7 +96403,8 @@
     ".text": "c",
     ".rodata": "asm",
     ".data": "asm",
-    ".lit4": "asm"
+    ".lit4": "asm",
+    ".sbss": "asm"
    },
    "sections": {
     ".rodata": {
@@ -96060,6 +96480,27 @@
      "size": 8,
      "splat_type": "lit4",
      "start": "0x0054F378"
+    },
+    ".sbss": {
+     "anchored": [],
+     "bounds": [
+      "0x005513D4",
+      "0x005513D8"
+     ],
+     "end": "0x005513D8",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x005513D4 referenced by tu253)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005513D8",
+       "name": "tu253",
+       "start": "0x005513D4"
+      }
+     ],
+     "size": 4,
+     "splat_type": "sbss",
+     "start": "0x005513D4"
     }
    },
    "text": {
@@ -96368,18 +96809,18 @@
       "0x00530b81",
       "0x00530cb8"
      ],
-     "end": "0x00530CB8",
+     "end": "0x00530C00",
      "evidence_source": "merge",
      "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00530CB8",
+       "end": "0x00530C00",
        "name": "tu255",
        "start": "0x00530B88"
       }
      ],
-     "size": 304,
+     "size": 120,
      "splat_type": "rodata",
      "start": "0x00530B88"
     },
@@ -96530,7 +96971,8 @@
    "owners": {
     ".text": "c",
     ".data": "asm",
-    ".sdata": "asm"
+    ".sdata": "asm",
+    ".rodata": "asm"
    },
    "sections": {
     ".data": {
@@ -96542,18 +96984,18 @@
       "0x003e34c1",
       "0x003e3830"
      ],
-     "end": "0x003E3830",
+     "end": "0x003E3710",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x003E3830",
+       "end": "0x003E3710",
        "name": "tu257",
        "start": "0x003E35C0"
       }
      ],
-     "size": 624,
+     "size": 336,
      "splat_type": "data",
      "start": "0x003E35C0"
     },
@@ -96566,20 +97008,41 @@
       "0x00550811",
       "0x00550848"
      ],
-     "end": "0x00550848",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x00550844",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by game_camera)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00550848",
+       "end": "0x00550844",
        "name": "tu257",
-       "start": "0x00550840"
+       "start": "0x00550820"
       }
      ],
-     "size": 8,
+     "size": 36,
      "splat_type": "sdata",
-     "start": "0x00550840"
+     "start": "0x00550820"
+    },
+    ".rodata": {
+     "anchored": [],
+     "bounds": [
+      "0x00530C00",
+      "0x00530CB8"
+     ],
+     "end": "0x00530CB8",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00530C00 referenced by tu257)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00530CB8",
+       "name": "tu257",
+       "start": "0x00530C00"
+      }
+     ],
+     "size": 184,
+     "splat_type": "rodata",
+     "start": "0x00530C00"
     }
    },
    "text": {
@@ -96848,7 +97311,8 @@
    ],
    "owners": {
     ".text": "c",
-    ".lit4": "asm"
+    ".lit4": "asm",
+    ".sdata": "asm"
    },
    "sections": {
     ".lit4": {
@@ -96874,6 +97338,27 @@
      "size": 16,
      "splat_type": "lit4",
      "start": "0x0054F2A8"
+    },
+    ".sdata": {
+     "anchored": [],
+     "bounds": [
+      "0x00550844",
+      "0x00550848"
+     ],
+     "end": "0x00550848",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x00550844 referenced by tu258)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x00550848",
+       "name": "tu258",
+       "start": "0x00550844"
+      }
+     ],
+     "size": 4,
+     "splat_type": "sdata",
+     "start": "0x00550844"
     }
    },
    "text": {
@@ -97908,30 +98393,6 @@
     ".bss": "asm"
    },
    "sections": {
-    ".data": {
-     "anchored": [
-      "0x003e3358",
-      "0x003e3f01"
-     ],
-     "bounds": [
-      "0x003e3341",
-      "0x003e3360"
-     ],
-     "end": "0x003E3360",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x003E3360",
-       "name": "tu262",
-       "start": "0x003E3358"
-      }
-     ],
-     "size": 8,
-     "splat_type": "data",
-     "start": "0x003E3358"
-    },
     ".rodata": {
      "anchored": [
       "0x00530cc0",
@@ -98051,6 +98512,27 @@
      "size": 48,
      "splat_type": "bss",
      "start": "0x0055A860"
+    },
+    ".data": {
+     "anchored": [],
+     "bounds": [
+      "0x003E3710",
+      "0x003E3830"
+     ],
+     "end": "0x003E3830",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x003E3710 referenced by tu262)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x003E3830",
+       "name": "tu262",
+       "start": "0x003E3710"
+      }
+     ],
+     "size": 288,
+     "splat_type": "data",
+     "start": "0x003E3710"
     }
    },
    "text": {
@@ -111584,18 +112066,18 @@
       "0x004adf71",
       "0x004adfd4"
      ],
-     "end": "0x004ADFD4",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "end": "0x004ADFD0",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by xeno_actor_set)",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x004ADFD4",
+       "end": "0x004ADFD0",
        "name": "xeno_actor_set",
        "start": "0x004ADF80"
       }
      ],
-     "size": 84,
+     "size": 80,
      "splat_type": "data",
      "start": "0x004ADF80"
     },
@@ -112221,19 +112703,19 @@
       "0x004b1b60"
      ],
      "end": "0x004B1B60",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by xeno_actor_set)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x004B1B60",
        "name": "xenoActorLight",
-       "start": "0x004ADFD4"
+       "start": "0x004ADFD0"
       }
      ],
-     "size": 15244,
+     "size": 15248,
      "splat_type": "data",
-     "start": "0x004ADFD4"
+     "start": "0x004ADFD0"
     },
     ".rodata": {
      "anchored": [
@@ -116525,18 +117007,18 @@
       "0x008e5991",
       "0x008e5d30"
      ],
-     "end": "0x008E5D30",
+     "end": "0x008E5D10",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x008E5D30",
+       "end": "0x008E5D10",
        "name": "TiWindBase",
        "start": "0x008E5A90"
       }
      ],
-     "size": 672,
+     "size": 640,
      "splat_type": "bss",
      "start": "0x008E5A90"
     }
@@ -117149,9 +117631,32 @@
     }
    ],
    "owners": {
-    ".text": "c"
+    ".text": "c",
+    ".bss": "asm"
    },
-   "sections": {},
+   "sections": {
+    ".bss": {
+     "anchored": [],
+     "bounds": [
+      "0x008E5D10",
+      "0x008E5D30"
+     ],
+     "end": "0x008E5D30",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: items from 0x008E5D10 referenced by tu347)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x008E5D30",
+       "name": "tu347",
+       "start": "0x008E5D10"
+      }
+     ],
+     "size": 32,
+     "splat_type": "bss",
+     "start": "0x008E5D10"
+    }
+   },
    "text": {
     "start": "0x002a4da0",
     "end": "0x002a4e60",
@@ -118528,19 +119033,19 @@
       "0x005515a4"
      ],
      "end": "0x005515A4",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by xgl_studio)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005515A4",
        "name": "undulate",
-       "start": "0x0055159C"
+       "start": "0x00551598"
       }
      ],
-     "size": 8,
+     "size": 12,
      "splat_type": "sbss",
-     "start": "0x0055159C"
+     "start": "0x00551598"
     },
     ".bss": {
      "anchored": [
@@ -118886,20 +119391,20 @@
      ],
      "bounds": [
       "0x004caad1",
-      "0x004cabc4"
+      "0x004caba8"
      ],
-     "end": "0x004CABC4",
+     "end": "0x004CABA8",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x004CABC4",
+       "end": "0x004CABA8",
        "name": "tu354",
        "start": "0x004CAB20"
       }
      ],
-     "size": 164,
+     "size": 136,
      "splat_type": "data",
      "start": "0x004CAB20"
     },
@@ -120605,7 +121110,8 @@
    "boundary_kind": "inferred",
    "boundary_evidence": [
     "model log-odds -1.47",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
+    "precision of this score band on X1, held out: 0.19 (19/100)",
+    "TU merge 2026-11-24: tu362, tu363"
    ],
    "boundary_confidence": "low",
    "provisional": true,
@@ -120634,7 +121140,7 @@
     "assembler_class": "LA29",
     "assembler_confidence": "medium",
     "g_flag": "-G4",
-    "g_basis": "1 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_basis": "TU merge 2026-11-24 of 2 TUs (flags were ['-G4'])",
     "g_confidence": "high",
     "optimization": "-O2",
     "source": "reports/x3-compiler-calibration.md"
@@ -120642,7 +121148,7 @@
    "accepted": {
     "all_functions_accepted": false,
     "functions": 0,
-    "of": 3,
+    "of": 46,
     "migration_hints": [],
     "records": []
    },
@@ -120673,120 +121179,7 @@
      "va": "0x002aee58",
      "name_basis": "address",
      "provenance": "estimated"
-    }
-   ],
-   "owners": {
-    ".text": "c",
-    ".sbss": "asm"
-   },
-   "sections": {
-    ".sbss": {
-     "anchored": [
-      "0x005514a0",
-      "0x005514a1"
-     ],
-     "bounds": [
-      "0x00551499",
-      "0x005514a1"
-     ],
-     "end": "0x005514B4",
-     "evidence_source": "map",
-     "rule": "anchored start",
-     "pieces": [
-      {
-       "c_split": false,
-       "end": "0x005514B4",
-       "name": "tu362",
-       "start": "0x005514A0"
-      }
-     ],
-     "size": 20,
-     "splat_type": "sbss",
-     "start": "0x005514A0"
-    }
-   },
-   "text": {
-    "start": "0x002aee20",
-    "end": "0x002aee60",
-    "code_end": "0x002aee60",
-    "size": 64,
-    "splat": "c",
-    "splat_range": [
-     "0x002aee20",
-     "0x002aee60"
-    ],
-    "note": null
-   },
-   "import": {
-    "mode": "c",
-    "note": "X3 bulk express integration (user 2026-11-21)",
-    "source": {
-     "include_dirs": [
-      "include"
-     ],
-     "kind": "file",
-     "path": "src/main/tu362.c"
-    }
-   }
-  },
-  {
-   "id": "main/tu363",
-   "unit": "main",
-   "ordinal": 363,
-   "name": "tu363",
-   "path": "src/main/tu363.c",
-   "scaffold_path": "scaffold/src/main/tu363.c",
-   "kind": "gcc",
-   "mode": "c",
-   "category": "game",
-   "map_class": "game",
-   "domain": null,
-   "in_scope": true,
-   "boundary_kind": "inferred",
-   "boundary_evidence": [
-    "model log-odds -1.09",
-    "precision of this score band on X1, held out: 0.19 (19/100)"
-   ],
-   "boundary_confidence": "low",
-   "provisional": true,
-   "name_basis": "no name evidence",
-   "name_confidence": "none",
-   "contract": {
-    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
-    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
-    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
-    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
-    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-    "compiler_profile": "ee-gcc2_96-realconv-lp7",
-    "flags": [
-     "-O2",
-     "-G4"
-    ],
-    "language": "c",
-    "source_class": "c",
-    "assembler_options": [
-     "-g"
-    ]
-   },
-   "contract_evidence": {
-    "compiler": "2.96",
-    "compiler_confidence": "medium",
-    "assembler_class": "LA29",
-    "assembler_confidence": "medium",
-    "g_flag": "-G4",
-    "g_basis": "24 gp-relative instructions in the code; was -G8, -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
-    "g_confidence": "high",
-    "optimization": "-O2",
-    "source": "reports/x3-compiler-calibration.md"
-   },
-   "accepted": {
-    "all_functions_accepted": false,
-    "functions": 0,
-    "of": 43,
-    "migration_hints": [],
-    "records": []
-   },
-   "functions": [
+    },
     {
      "binding": "GLOBAL",
      "name": "slotLayoutUpdate",
@@ -121177,12 +121570,37 @@
    ],
    "owners": {
     ".text": "c",
+    ".sbss": "asm",
     ".data": "asm",
     ".rodata": "asm",
     ".lit4": "asm",
     ".bss": "asm"
    },
    "sections": {
+    ".sbss": {
+     "anchored": [
+      "0x005514a0",
+      "0x005514a1"
+     ],
+     "bounds": [
+      "0x00551499",
+      "0x005514a1"
+     ],
+     "end": "0x005514B4",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x005514B4",
+       "name": "tu362",
+       "start": "0x005514A0"
+      }
+     ],
+     "size": 20,
+     "splat_type": "sbss",
+     "start": "0x005514A0"
+    },
     ".data": {
      "anchored": [
       "0x004025c0",
@@ -121193,13 +121611,13 @@
       "0x00402680"
      ],
      "end": "0x00402680",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x00402680",
-       "name": "tu363",
+       "name": "tu362",
        "start": "0x004025C0"
       }
      ],
@@ -121217,13 +121635,13 @@
       "0x0053d4e0"
      ],
      "end": "0x0053D4E0",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0053D4E0",
-       "name": "tu363",
+       "name": "tu362",
        "start": "0x0053D450"
       }
      ],
@@ -121241,13 +121659,13 @@
       "0x0054fa14"
      ],
      "end": "0x0054FA14",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x0054FA14",
-       "name": "tu363",
+       "name": "tu362",
        "start": "0x0054FA00"
       }
      ],
@@ -121265,13 +121683,13 @@
       "0x005c5980"
      ],
      "end": "0x005C5980",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "merge",
+     "rule": "TU merge 2026-11-24",
      "pieces": [
       {
        "c_split": false,
        "end": "0x005C5980",
-       "name": "tu363",
+       "name": "tu362",
        "start": "0x005C25C0"
       }
      ],
@@ -121281,16 +121699,16 @@
     }
    },
    "text": {
-    "start": "0x002aee60",
+    "start": "0x002aee20",
     "end": "0x002b3d90",
     "code_end": "0x002b3d8c",
-    "size": 20272,
+    "size": 20336,
     "splat": "c",
     "splat_range": [
-     "0x002aee60",
+     "0x002aee20",
      "0x002b3d90"
     ],
-    "note": null
+    "note": "TU merge 2026-11-24 (user order; tu_map)"
    },
    "import": {
     "mode": "c",
@@ -121300,7 +121718,7 @@
       "include"
      ],
      "kind": "file",
-     "path": "src/main/tu363.c"
+     "path": "src/main/tu362.c"
     }
    }
   },
@@ -133340,18 +133758,18 @@
       "0x00550fd9",
       "0x00551000"
      ],
-     "end": "0x00551000",
+     "end": "0x00550FE8",
      "evidence_source": "map",
      "rule": "anchored start",
      "pieces": [
       {
        "c_split": false,
-       "end": "0x00551000",
+       "end": "0x00550FE8",
        "name": "tu401",
        "start": "0x00550FDC"
       }
      ],
-     "size": 36,
+     "size": 12,
      "splat_type": "sdata",
      "start": "0x00550FDC"
     },
@@ -140785,19 +141203,19 @@
       "0x004ee050"
      ],
      "end": "0x004EE050",
-     "evidence_source": "map",
-     "rule": "anchored start",
+     "evidence_source": "cut_audit",
+     "rule": "reference cut 2026-11-25 (cut_audit.py: function-local items referenced by tu155)",
      "pieces": [
       {
        "c_split": false,
        "end": "0x004EE050",
        "name": "sce_sdk",
-       "start": "0x004EC8CC"
+       "start": "0x004EC8C0"
       }
      ],
-     "size": 6020,
+     "size": 6032,
      "splat_type": "data",
-     "start": "0x004EC8CC"
+     "start": "0x004EC8C0"
     },
     ".rodata": {
      "anchored": [
@@ -142905,6 +143323,220 @@
      "0x003172f0"
     ],
     "note": "splat range includes 8 zero bytes of fill before .vutext"
+   }
+  },
+  {
+   "id": "main/tu408",
+   "unit": "main",
+   "ordinal": 408,
+   "name": "battle_shared",
+   "path": "src/main/battle_shared.c",
+   "scaffold_path": "scaffold/src/main/battle_shared.c",
+   "kind": "data-only",
+   "mode": "c",
+   "category": "game",
+   "map_class": "game",
+   "domain": null,
+   "in_scope": true,
+   "boundary_kind": "inferred",
+   "boundary_evidence": [
+    "zero-initialized .data 0x4CAC00..0x4EC8C0, the last game .data before sce_sdk, starts 64-aligned after a 40-byte gap; referenced by main/tu177, main/tu178 and ov02 (user 2026-11-25)"
+   ],
+   "boundary_confidence": "low",
+   "provisional": true,
+   "name_basis": "objects shared by the ov02 battle overlay and the main save code",
+   "name_confidence": "low",
+   "contract": {
+    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
+    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
+    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
+    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
+    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
+    "compiler_profile": "ee-gcc2_96-realconv-lp7",
+    "flags": [
+     "-O2",
+     "-G4"
+    ],
+    "language": "c",
+    "source_class": "c",
+    "assembler_options": [
+     "-g"
+    ]
+   },
+   "contract_evidence": {
+    "compiler": "2.96",
+    "compiler_confidence": "medium",
+    "assembler_class": "LA29",
+    "assembler_confidence": "medium",
+    "g_flag": "-G4",
+    "g_basis": "one threshold for main; -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_confidence": "medium",
+    "optimization": "-O2",
+    "source": "reports/x3-compiler-calibration.md"
+   },
+   "accepted": {
+    "all_functions_accepted": false,
+    "functions": 0,
+    "of": 0,
+    "migration_hints": [],
+    "records": []
+   },
+   "functions": [],
+   "owners": {
+    ".data": "asm"
+   },
+   "sections": {
+    ".data": {
+     "anchored": [
+      "0x004cac00",
+      "0x004ec8bc"
+     ],
+     "bounds": [
+      "0x004cac00",
+      "0x004ec8c0"
+     ],
+     "end": "0x004EC8C0",
+     "evidence_source": "manual",
+     "rule": "data-only object (user 2026-11-25)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x004EC8C0",
+       "name": "battle_shared",
+       "start": "0x004CAC00"
+      }
+     ],
+     "size": 138432,
+     "splat_type": "data",
+     "start": "0x004CAC00"
+    }
+   },
+   "text": {
+    "start": "0x002ab260",
+    "end": "0x002ab260",
+    "code_end": "0x002ab260",
+    "size": 0,
+    "splat": null,
+    "splat_range": null,
+    "note": "data-only object: no .text"
+   },
+   "import": {
+    "mode": "c",
+    "note": "data pass 2026-11-25: data-only TU",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/battle_shared.c"
+    }
+   }
+  },
+  {
+   "id": "main/tu409",
+   "unit": "main",
+   "ordinal": 409,
+   "name": "sb_thread_block",
+   "path": "src/main/sb_thread_block.c",
+   "scaffold_path": "scaffold/src/main/sb_thread_block.c",
+   "kind": "data-only",
+   "mode": "c",
+   "category": "game",
+   "map_class": "game",
+   "domain": null,
+   "in_scope": true,
+   "boundary_kind": "inferred",
+   "boundary_evidence": [
+    "zero-initialized .data 0x4CABA8..0x4CABD4 after the last object of tu354, referenced by main/tu066, main/tu105, main/tu155 and ov02 but not by tu354; the next object is 64-aligned (user 2026-11-25)"
+   ],
+   "boundary_confidence": "low",
+   "provisional": true,
+   "name_basis": "its only object",
+   "name_confidence": "low",
+   "contract": {
+    "assembler": "LA29-vsqrt-swap-g (corrected ee-as with the per-object flag -g)",
+    "assembler_path": "tool:ee-as-la29-vsqrt-swap",
+    "assembler_sha256": "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494",
+    "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
+    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
+    "compiler_profile": "ee-gcc2_96-realconv-lp7",
+    "flags": [
+     "-O2",
+     "-G4"
+    ],
+    "language": "c",
+    "source_class": "c",
+    "assembler_options": [
+     "-g"
+    ]
+   },
+   "contract_evidence": {
+    "compiler": "2.96",
+    "compiler_confidence": "medium",
+    "assembler_class": "LA29",
+    "assembler_confidence": "medium",
+    "g_flag": "-G4",
+    "g_basis": "one threshold for main; -G4 by reports/x3-g4-threshold.md (user order 2026-11-24)",
+    "g_confidence": "medium",
+    "optimization": "-O2",
+    "source": "reports/x3-compiler-calibration.md"
+   },
+   "accepted": {
+    "all_functions_accepted": false,
+    "functions": 0,
+    "of": 0,
+    "migration_hints": [],
+    "records": []
+   },
+   "functions": [],
+   "owners": {
+    ".data": "asm"
+   },
+   "sections": {
+    ".data": {
+     "anchored": [
+      "0x004caba8",
+      "0x004cabd4"
+     ],
+     "bounds": [
+      "0x004caba8",
+      "0x004cac00"
+     ],
+     "end": "0x004CAC00",
+     "evidence_source": "manual",
+     "rule": "data-only object (user 2026-11-25)",
+     "pieces": [
+      {
+       "c_split": false,
+       "end": "0x004CAC00",
+       "name": "sb_thread_block",
+       "start": "0x004CABA8"
+      }
+     ],
+     "size": 88,
+     "splat_type": "data",
+     "start": "0x004CABA8"
+    }
+   },
+   "text": {
+    "start": "0x002ab260",
+    "end": "0x002ab260",
+    "code_end": "0x002ab260",
+    "size": 0,
+    "splat": null,
+    "splat_range": null,
+    "note": "data-only object: no .text"
+   },
+   "import": {
+    "mode": "c",
+    "note": "data pass 2026-11-25: data-only TU",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/sb_thread_block.c"
+    }
    }
   },
   {

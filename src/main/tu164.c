@@ -212,3 +212,6 @@ void loadingScreenDraw(void) {
     pos.y = 0x8798;
     loadingCardDraw(&pos, messageTextGet(0x179), messageTextGet(0x29), (void *) 0x80);
 }
+
+void *xglCdPreloadBuffer = 0;
+s8 xglCdPreloadState = 0;

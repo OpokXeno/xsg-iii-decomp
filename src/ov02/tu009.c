@@ -2,11 +2,11 @@
  * OV02 original TU 9: 0x00a84170..0x00a84998 (28 functions)
  */
 #include "common.h"
+#include "main/battle_shared.h"
 
 typedef unsigned char u8;
 typedef int s32;
 typedef unsigned int u32;
-extern unsigned char ov02DataSectionTable[];
 
 u8 *ov02DataSectionGet(s32 sectionOffset) {
     return &ov02DataSectionTable[*(s32 *) (0x4CC8C0 + sectionOffset)];

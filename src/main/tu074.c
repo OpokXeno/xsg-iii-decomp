@@ -214,7 +214,6 @@ void actorInit(ActorObject *actor) {
     actor->table = func_001C33D8;
 }
 
-extern unsigned char gIndexedTableDefault[];
 u8 *gIndexedTableFallback = (u8 *) "**unknown**";
 u8 *func_00A85208(s32 index);
 
@@ -224,7 +223,7 @@ u8 *indexedTableGet(s32 tableIndex) {
     if (tableIndex != 0xA) {
         selectedTable = func_00A85208(tableIndex + 1);
     } else {
-        selectedTable = gIndexedTableDefault;
+        selectedTable = "GOLD";
     }
     return (selectedTable != 0) ? selectedTable : gIndexedTableFallback;
 }

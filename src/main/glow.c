@@ -16,17 +16,6 @@ enum GlowRsrc {
 
 extern struct PadRecord PadData[2];
 extern void *gifStateModeHook[];
-extern const char glowAssertLandscapeActorMessage[];
-extern const char glowAssertFileName[];
-extern const char glowLandscapeModelPath[];
-extern const char glowLandscapeTexturePath[];
-extern const char glowAssertLandscapeModelMessage[];
-extern const char glowAssertLandscapeTextureMessage[];
-extern const char glowAssertChaosActorMessage[];
-extern const char glowChaosModelPath[];
-extern const char glowChaosTexturePath[];
-extern const char glowAssertChaosModelMessage[];
-extern const char glowAssertChaosTextureMessage[];
 struct XglCamera;
 float xglAtan2Angle(float x, float y);
 void assertFailed(const char *message, const char *file, int line);
@@ -71,28 +60,28 @@ void glowRunScene(void)
     XenoActorPoolInitDefault();
     pLandscape = func_0028D670();
     if (pLandscape == 0) {
-        assertFailed(glowAssertLandscapeActorMessage, glowAssertFileName, 167);
+        assertFailed("pLandscape", "glow.euc.c", 167);
     }
-    pLandscape->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadAddr, glowLandscapeModelPath);
-    pLandscape->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadAddr, glowLandscapeTexturePath);
+    pLandscape->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadAddr, "host0:/home/xeno/work/iwase/nep.pxy");
+    pLandscape->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadAddr, "host0:/home/xeno/work/iwase/nep.txy");
     if (pLandscape->rsrc[XAct_Rsrc_MDL] == 0) {
-        assertFailed(glowAssertLandscapeModelMessage, glowAssertFileName, 170);
+        assertFailed("pLandscape->rsrc[XAct_Rsrc_MDL]", "glow.euc.c", 170);
     }
     if (pLandscape->rsrc[XAct_Rsrc_TEX] == 0) {
-        assertFailed(glowAssertLandscapeTextureMessage, glowAssertFileName, 171);
+        assertFailed("pLandscape->rsrc[XAct_Rsrc_TEX]", "glow.euc.c", 171);
     }
 
     pChaos = func_0028D670();
     if (pChaos == 0) {
-        assertFailed(glowAssertChaosActorMessage, glowAssertFileName, 174);
+        assertFailed("pChaos", "glow.euc.c", 174);
     }
-    pChaos->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadAddr, glowChaosModelPath);
-    pChaos->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadAddr, glowChaosTexturePath);
+    pChaos->rsrc[XAct_Rsrc_MDL] = testLoadFile(&loadAddr, "host0:/home/xeno/work/iwase/shionH00.pxy");
+    pChaos->rsrc[XAct_Rsrc_TEX] = testLoadFile(&loadAddr, "host0:/home/xeno/work/iwase/shionH00.txy");
     if (pChaos->rsrc[XAct_Rsrc_MDL] == 0) {
-        assertFailed(glowAssertChaosModelMessage, glowAssertFileName, 177);
+        assertFailed("pChaos->rsrc[XAct_Rsrc_MDL]", "glow.euc.c", 177);
     }
     if (pChaos->rsrc[XAct_Rsrc_TEX] == 0) {
-        assertFailed(glowAssertChaosTextureMessage, glowAssertFileName, 178);
+        assertFailed("pChaos->rsrc[XAct_Rsrc_TEX]", "glow.euc.c", 178);
     }
     pChaos->position.x = 2.0f;
 

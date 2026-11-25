@@ -54,7 +54,7 @@ typedef struct StudioSlot {
     unsigned char unk_0000[0xD80];
 } StudioSlot;
 
-extern Studio *pCurrentStudio;
+static Studio *pCurrentStudio;
 
 typedef int s32;
 
@@ -68,7 +68,7 @@ void setCurrentStudio(s32 studio_index) {
     pCurrentStudio = studio;
 }
 
-extern s32 gSelectedStudioIndex;
+static s32 gSelectedStudioIndex;
 
 void setSelectedStudioIndex(s32 studio_index) {
     gSelectedStudioIndex = studio_index;
@@ -214,3 +214,9 @@ void xglStudioUpdate(void) {
         xglStudioMove();
     }
 }
+
+s32 gStudioSceneFlag = 1;
+s32 gStudioEntrySkip = 0;
+s32 D_00551224 = 0;
+s32 D_00551228 = 0;
+StudioSlot gStudioRecords[4];

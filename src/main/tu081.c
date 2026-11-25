@@ -128,7 +128,13 @@ typedef struct EffectSpawn {
     AlignedVector4 tableRow;
 } EffectSpawn;
 
-extern unsigned char D_00531600[];
+/* Sound table rows: each row is one (x, y, z, w) entry of the effect spawn table. */
+const AlignedVector4 D_00531600[4] = {
+    { 1.0f, 1.0f, 0.300000012f, 1.0f },
+    { 0.200000003f, 1.0f, 0.300000012f, 1.0f },
+    { 0.699999988f, 0.200000003f, 1.79999995f, 1.0f },
+    { 0.300000012f, 0.600000024f, 1.79999995f, 1.0f },
+};
 void sefObjectSetStatePlay(EffectSpawn *effectObject);
 void sefSpawnEffectFromRequest(EffectSpawn *effectObject);
 
@@ -154,7 +160,7 @@ void emitterSpawnEffectRecord(EmitterOwner *owner) {
                          :
                          : "r"(&spawn.scaleVector), "f"(params->scale)
                          : "$8", "memory");
-    QuadwordCopyT0(&spawn.tableRow, &D_00531600[params->soundTableRow << 4]);
+    QuadwordCopyT0(&spawn.tableRow, &D_00531600[params->soundTableRow]);
     sefSpawnEffectFromRequest(&spawn);
 }
 
@@ -164,9 +170,6 @@ typedef struct PlayerObject {
     AlignedVector4 position; /* +0x40: measured against the owner's position */
 } PlayerObject;
 
-extern f32 gEmitterRateInitial;
-extern f32 gEmitterRateDecay;
-extern f32 gEmitterRateFloor;
 extern s32 gGameLoopRuntimeStorage[];
 extern unsigned short gPadDataPressed[];
 PlayerObject *RgDispModelFindByKey(s32 mode);
@@ -193,7 +196,7 @@ void emitterSoundUpdate(EmitterOwner *owner) {
     } else {
         if ((params->flags & 1) == 0) {
             params->spawnCountdown = 0;
-            params->rate = gEmitterRateInitial;
+            params->rate = 0.6283185f;
             seVoiceStartDefault(0x19);
             if (params->soundTableRow == 0) {
                 func_00A83760();
@@ -210,9 +213,9 @@ void emitterSoundUpdate(EmitterOwner *owner) {
     }
     emitterState = owner->emitterState;
     emitterState->accumulatedRate += params->rate;
-    params->rate = params->rate * gEmitterRateDecay;
-    if (params->rate < gEmitterRateFloor) {
-        params->rate = gEmitterRateFloor;
+    params->rate = params->rate * 0.95f;
+    if (params->rate < 0.10471975f) {
+        params->rate = 0.10471975f;
     }
     if (params->waitFrames != 0) {
         params->waitFrames -= 1;

@@ -932,9 +932,9 @@ typedef struct VuLight {
     float colour[4];
 } VuLight;
 
-/* The upload block D_00408180: twelve 64-bit words the packet references. */
+/* The upload block D_00408180: seven GS register pairs; the packet references the first eleven words. */
 typedef struct VuUploadBlock {
-    unsigned long long words[12];
+    unsigned long long words[14];
 } VuUploadBlock;
 
 /* The VU draw block written into the packet (13 quadwords): tag, mode and light flags, scales, the matrix and the vectors. */
@@ -1653,3 +1653,7 @@ SdvSpecialRecord *sdvGetSpecialRecord(u32 specialRecordIndex) {
     }
     return &gSdvSpecialRecords[specialRecordIndex];
 }
+
+VuUploadBlock D_00408180 = {
+    { 0x1000000000008005ULL, 14, 0, 6, 0, 8, 0x5000DULL, 71, 0, 66, 0, 76, 0, 0 }
+};

@@ -3470,6 +3470,83 @@ def gp0(elf):
     return struct.unpack_from('<i', elf.data, reg.offset + 20)[0] if reg else 0
 
 
+def reaching_hi(elf, text, data, entries, offset, symbol_index, base_register):
+    """The HI16 every path from the function entry delivers in `base_register` at a LO16, or None.
+
+    The linear scan of section_references loses a LUI kept in a saved register when a path that never
+    reaches the LO16 overwrites that register (main/tu131 sefUpdateLineRecord). Backward reaching
+    definitions over the branches of the function; an indirect jump or a different base refuses.
+    """
+    owners = [s for s in elf.symbols if s.type == 2 and s.shndx == text.index
+              and s.value <= offset < s.value + s.size]
+    if len(owners) != 1 or not 16 <= base_register <= 23:
+        return None
+    start, end = owners[0].value, owners[0].value + owners[0].size
+    relocations = {off: (kind, index) for off, kind, index, _ in entries}
+    word_at = lambda pc: struct.unpack_from('<I', data, pc)[0]
+    predecessors = {}
+
+    def edge(source, target):
+        if start <= target < end:
+            predecessors.setdefault(target, set()).add(source)
+
+    delay_of = {}
+    for pc in range(start, end, 4):
+        word = word_at(pc)
+        opcode, funct = word >> 26, word & 63
+        likely = opcode in (20, 21, 22, 23) or (opcode == 1 and (word >> 16) & 2) or \
+            (opcode in (17, 18) and (word >> 21) & 31 == 8 and (word >> 16) & 2)
+        if opcode in (1, 4, 5, 6, 7, 20, 21, 22, 23) or (opcode in (17, 18) and (word >> 21) & 31 == 8):
+            if opcode == 1 and (word >> 16) & 31 not in (0, 1, 2, 3):
+                return None
+            taken = [pc + 4 + 4 * _sext16(word)]
+            if not (opcode == 4 and (word >> 21) & 31 == (word >> 16) & 31):
+                if likely:
+                    edge(pc, pc + 8)
+                else:
+                    taken.append(pc + 8)
+            delay_of[pc + 4] = taken
+        elif opcode == 3 or (opcode == 0 and funct == 9):
+            delay_of[pc + 4] = [pc + 8]         # a call keeps the saved registers
+        elif opcode == 0 and funct == 8:
+            if word != 0x03e00008:
+                return None
+            delay_of[pc + 4] = []
+        elif opcode == 2:
+            return None
+    for pc in range(start, end, 4):
+        for target in delay_of.get(pc, [pc + 4]):
+            edge(pc, target)
+    def may_write(word):
+        """Whether an instruction can write base_register; every field that may be a destination counts."""
+        opcode, rs, rt, rd = word >> 26, (word >> 21) & 31, (word >> 16) & 31, (word >> 11) & 31
+        if opcode in (0, 28):
+            return rd == base_register
+        if opcode in (16, 17, 18):
+            return rs in (0, 1, 2) and rt == base_register
+        return (8 <= opcode <= 15 or 24 <= opcode <= 27 or opcode in (30, 32, 33, 34, 35, 36, 37, 38, 39, 48, 52, 55)) \
+            and rt == base_register
+
+    found, seen, work = set(), set(), list(predecessors.get(offset, ()))
+    if offset == start:
+        return None
+    while work:
+        pc = work.pop()
+        if pc in seen:
+            continue
+        seen.add(pc)
+        word = word_at(pc)
+        if may_write(word):
+            if word >> 26 != 15 or relocations.get(pc) != (5, symbol_index):
+                return None
+            found.add((word & 0xffff) << 16)
+            continue
+        if pc == start:
+            return None
+        work.extend(predecessors.get(pc, ()))
+    return found.pop() if len(found) == 1 else None
+
+
 def delay_slot_hi(elf, text, data, entries, offset, symbol_index, base_register):
     """Prove the HI16 delivered by direct incoming branches to a LO16.
 
@@ -3734,6 +3811,10 @@ def section_references(elf, csec, allow_negative_base=False):
                                 branch_hi = delay_slot_hi(elf, tgt, tdata, entries, off, symi, lo_base)
                                 if branch_hi is not None:
                                     reused = branch_hi + _sext16(word)
+                                else:
+                                    branch_hi = reaching_hi(elf, tgt, tdata, entries, off, symi, lo_base)
+                                    if branch_hi is not None:
+                                        reused = branch_hi + _sext16(word)
                             if reused is None:
                                 raise CarveError(f'unpaired R_MIPS_LO16 at {where}: {csec.name} is 64 KiB or larger')
                             addend = reused
@@ -3747,6 +3828,8 @@ def section_references(elf, csec, allow_negative_base=False):
                     raise CarveError(f'relocation type {rtype} at {where} against {csec.name} is not supported '
                                      f'by the split')
             target = base + addend
+            if rtype == 2 and 0 <= target - 0x20000000 <= csec.size:
+                target -= 0x20000000        # a pointer to the uncached mirror of the object
             # GCC can bias a static array's section base below zero before
             # adding its runtime index. Preserve that native addend when the
             # splitter keeps the first native owner at section offset zero.
@@ -4750,6 +4833,14 @@ def split_plans(root, unit, unit_dir, tu_id, obj_elf, registry=None):
     return plans
 
 
+def nested_function_originals(symbol, originals):
+    """The original functions of a nested function, which cc1 names `name.N` (the function table has `name`)."""
+    if symbol.bind != 0 or not re.fullmatch(r'\w+\.\d+', symbol.name):
+        return []
+    stem = symbol.name.rpartition('.')[0]
+    return [x for (name, _), found in originals.items() if name == stem for x in found]
+
+
 def anonymous_coordinate_candidates(elf, csec, rels, data, want, length,
                                     target_parts, original, deadline, tu_id, sec):
     """Find eligible coordinates before bounding the complete span proofs.
@@ -4791,6 +4882,8 @@ def anonymous_coordinate_candidates(elf, csec, rels, data, want, length,
                     return
                 owner = owners[0]
                 mapped = originals.get((owner.name, owner.bind), [])
+                if not mapped:
+                    mapped = nested_function_originals(owner, originals)
                 if len(mapped) != 1:
                     return
                 value = (mapped[0].value + target - owner.value) & 0xffffffff
@@ -5400,7 +5493,7 @@ def refresh_initialized_spans(root, unit, unit_dir, tu_id, obj, elf, ctx, declar
         tail_lo = sym.value + sym.size
         # (An object that ends its C section has no fill of its own: the item's zero tail is then the
         # fill before the next piece, exactly as when the next input is pinned after absorbed padding.)
-        if 0 < pad < 16 and \
+        if 0 < pad < 16 and (csec_.type == 8 or tail_lo + pad <= csec_.size) and \
                 not any(elf.section_bytes(csec_)[tail_lo:tail_lo + pad]) and \
                 not any(o.shndx == csec_.index and o.type not in (3, 4) and tail_lo <= o.value < tail_lo + pad
                         for o in elf.symbols) and \
@@ -7530,8 +7623,14 @@ def _derive_current(root, unit, unit_dir, tu_id, source, obj, *, _declared=None,
         # cc1/source, original-byte/relocation and complete-input checks before
         # publishing coordinates; original alignment fill remains scaffold.
         try:
-            canonical, refresh = refresh_initialized_spans(
-                root, unit, unit_dir, tu_id, obj, elf, ctx, out['runs'], c_refs, per_func)
+            try:
+                canonical, refresh = refresh_initialized_spans(
+                    root, unit, unit_dir, tu_id, obj, elf, ctx, out['runs'], c_refs, per_func)
+            except CarveError:
+                # A fresh run mixing named OBJECTs and literals next to an explicit run (main/tu131).
+                canonical, refresh = refresh_initialized_spans(
+                    root, unit, unit_dir, tu_id, obj, elf, ctx, out['runs'], c_refs, per_func,
+                    split_mixed=True)
             result = derive(root, unit, unit_dir, tu_id, source, obj, _declared=canonical,
                             accepted_root=accepted_root, accepted_runs=accepted_runs)
             if normalize_runs(result['runs']) != normalize_runs(canonical):
@@ -7764,6 +7863,9 @@ def compare_bytes(elf, csec, pieces, ctx, target_pieces=None, original_elf=None)
             data[off:off + 4] = wants[k][pos:pos + 4]      # an external address: not checked here
             continue
         target = sym.value + struct.unpack_from('<I', data, off)[0]
+        # A pointer to the uncached mirror (0x2xxxxxxx) of an object carries the segment in its addend.
+        mirror = 0x20000000 if target >> 28 == 2 else 0
+        target -= mirror
         if mapped_targets:
             # A table can point to another explicit slice of its raw input
             # section, or to a different C section. Resolve against the entire
@@ -7779,14 +7881,14 @@ def compare_bytes(elf, csec, pieces, ctx, target_pieces=None, original_elf=None)
                 unresolved += 1
                 continue
             mapped = targets[0]
-            value = mapped['lo'] + target - mapped['offset']
+            value = mirror + mapped['lo'] + target - mapped['offset']
         elif sym.shndx == csec.index:
             try:
                 j = piece_of(pieces, target, 'a pointer')
             except CarveError:
                 unresolved += 1
                 continue
-            value = pieces[j]['lo'] + target - pieces[j]['offset']
+            value = mirror + pieces[j]['lo'] + target - pieces[j]['offset']
         else:
             if raw_function_symbols is None:
                 raw_function_symbols = [s for s in elf.symbols if s.shndx == text.index and s.type == 2]
@@ -7801,6 +7903,8 @@ def compare_bytes(elf, csec, pieces, ctx, target_pieces=None, original_elf=None)
                     if symbol.shndx != 0 and symbol.type == 2:
                         original_function_symbols.setdefault((symbol.name, symbol.bind), []).append(symbol)
             original_funcs = original_function_symbols.get((raw_func.name, raw_func.bind), [])
+            if not original_funcs:
+                original_funcs = nested_function_originals(raw_func, original_function_symbols)
             if len(original_funcs) > 1:
                 # Several TUs of one image can hold a local function of this
                 # name (ov12 _Disp, _PassTime). The one this word points into

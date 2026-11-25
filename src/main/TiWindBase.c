@@ -78,9 +78,9 @@ typedef struct DirWindOscillationSpeed {
     unsigned char unmodeled_0C[0x54];
 } DirWindOscillationSpeed;
 
-extern DirWind tiWindDirTable[DIR_WIND_MAX];
+static DirWind tiWindDirTable[DIR_WIND_MAX];
 extern DirWindOscillationSpeed tiWindDirOscillationSpeedTable[DIR_WIND_MAX];
-extern PointWind tiWindPointTable[POINT_WIND_MAX];
+static PointWind tiWindPointTable[POINT_WIND_MAX];
 
 /* The range setter addresses the point table through its own symbol at 0x8E5C40 (0x30 into the PointWind table,
  * stride 0x40): the partial type names the speed range triple it stores. */
@@ -114,16 +114,12 @@ void tiWindClearTables(void)
     }
 }
 
-extern const char tiWindDirIndexAssertText[24];
-extern const char D_00542BF8[24];
-extern const char tiWindPointIndexAssertText[24];
-extern const char D_00542C28[];
 
 /* Enables or disables directional wind `index`. */
 void tiWindDirSetEnabled(u32 windIndex, int enabled)
 {
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 30);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 30);
     }
     if (enabled != 0) {
         tiWindDirTable[windIndex].windFlags |= WIND_FLAG_ENABLED;
@@ -136,7 +132,7 @@ void tiWindDirSetEnabled(u32 windIndex, int enabled)
 void tiWindDirSetDirection(u32 windIndex, float x, float y, float z)
 {
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 43);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 43);
     }
     tiWindDirTable[windIndex].direction[0] = x;
     tiWindDirTable[windIndex].direction[1] = y;
@@ -153,7 +149,7 @@ void tiWindDirSetDirection(u32 windIndex, float x, float y, float z)
 void tiWindDirSetPosition(u32 windIndex, const float *position)
 {
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 61);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 61);
     }
     tiWindDirTable[windIndex].position[0] = position[0];
     tiWindDirTable[windIndex].position[1] = position[1];
@@ -167,7 +163,7 @@ void tiWindDirSetSpeed(u32 windIndex, float speed)
     DirWindOscillationSpeed *dirSpeedEntry;
 
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 74);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 74);
     }
     dirSpeedEntry = &tiWindDirOscillationSpeedTable[windIndex];
     if (dirSpeedEntry->speed != speed) {
@@ -182,7 +178,7 @@ void tiWindDirSetRange(u32 windIndex, float upper, float lower)
     DirWind *dirWind;
 
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 88);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 88);
     }
     dirWind = &tiWindDirTable[windIndex];
     dirWind->upper = upper;
@@ -193,7 +189,7 @@ void tiWindDirSetRange(u32 windIndex, float upper, float lower)
 void tiWindDirSetRadius(u32 windIndex, float radius, int isGlobalWind)
 {
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 99);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 99);
     }
     tiWindDirTable[windIndex].radius = radius;
     if (isGlobalWind != 0) {
@@ -207,7 +203,7 @@ void tiWindDirSetRadius(u32 windIndex, float radius, int isGlobalWind)
 void tiWindPointSetEnabled(u32 windIndex, int enabled)
 {
     if (windIndex >= POINT_WIND_MAX) {
-        assertFailed(tiWindPointIndexAssertText, D_00542BF8, 113);
+        assertFailed("num < POINT_WIND_MAX", "TiWindBase.euc.c", 113);
     }
     if (enabled != 0) {
         tiWindPointTable[windIndex].windFlags |= WIND_FLAG_ENABLED;
@@ -220,7 +216,7 @@ void tiWindPointSetEnabled(u32 windIndex, int enabled)
 void tiWindPointSetPosition(u32 windIndex, const float *position)
 {
     if (windIndex >= POINT_WIND_MAX) {
-        assertFailed(tiWindPointIndexAssertText, D_00542BF8, 126);
+        assertFailed("num < POINT_WIND_MAX", "TiWindBase.euc.c", 126);
     }
     tiWindPointTable[windIndex].position[0] = position[0];
     tiWindPointTable[windIndex].position[1] = position[1];
@@ -232,7 +228,7 @@ void tiWindPointSetPosition(u32 windIndex, const float *position)
 void tiWindPointSetSpeed(u32 windIndex, float speed)
 {
     if (windIndex >= POINT_WIND_MAX) {
-        assertFailed(tiWindPointIndexAssertText, D_00542BF8, 139);
+        assertFailed("num < POINT_WIND_MAX", "TiWindBase.euc.c", 139);
     }
     if (tiWindPointTable[windIndex].speedRange[0] != speed) {
         tiWindPointTable[windIndex].speedRange[0] = speed;
@@ -246,7 +242,7 @@ void tiWindPointSetRange(u32 windIndex, float upper, float lower)
     PointWindSpeedRange *pointRangeEntry;
 
     if (windIndex >= POINT_WIND_MAX) {
-        assertFailed(tiWindPointIndexAssertText, D_00542BF8, 153);
+        assertFailed("num < POINT_WIND_MAX", "TiWindBase.euc.c", 153);
     }
     pointRangeEntry = &tiWindPointSpeedRangeTable[windIndex];
     pointRangeEntry->speedRange[1] = upper;
@@ -257,7 +253,7 @@ void tiWindPointSetRange(u32 windIndex, float upper, float lower)
 void tiWindPointSetRadius(u32 windIndex, float radius, int isGlobalWind)
 {
     if (windIndex >= POINT_WIND_MAX) {
-        assertFailed(tiWindPointIndexAssertText, D_00542BF8, 164);
+        assertFailed("num < POINT_WIND_MAX", "TiWindBase.euc.c", 164);
     }
     tiWindPointTable[windIndex].radius = radius;
     if (isGlobalWind != 0) {
@@ -278,7 +274,7 @@ void tiWindDirApply(DirWind *dirWind, TiHrcDynamics *dynamicsNode, TiSolverState
     int gustRoll;
 
     if (dirWind == 0) {
-        assertFailed(D_00542C28, D_00542BF8, 178);
+        assertFailed("wind", "TiWindBase.euc.c", 178);
     }
     if (dirWind->oscillation == dirWind->upper) {
         gustRoll = xglSRand() % WIND_GUST_STEPS;
@@ -316,7 +312,7 @@ void tiWindPointApply(PointWind *pointWind, TiHrcDynamics *dynamicsNode, TiSolve
     int gustRoll;
 
     if (pointWind == 0) {
-        assertFailed(D_00542C28, D_00542BF8, 228);
+        assertFailed("wind", "TiWindBase.euc.c", 228);
     }
     delta[0] = solverState->position.vector.x - pointWind->position[0];
     delta[1] = solverState->position.vector.y - pointWind->position[1];
@@ -373,7 +369,7 @@ void tiWindDirAdvance(DirWind *dirWind)
     float nextOscillation;
 
     if (dirWind == 0) {
-        assertFailed(D_00542C28, D_00542BF8, 300);
+        assertFailed("wind", "TiWindBase.euc.c", 300);
     }
     if (dirWind->lower == dirWind->upper || dirWind->speed == 0.0f) {
         dirWind->oscillation = dirWind->lower;
@@ -399,7 +395,7 @@ void tiWindPointAdvance(PointWind *pointWind)
     float nextOscillation;
 
     if (pointWind == 0) {
-        assertFailed(D_00542C28, D_00542BF8, 331);
+        assertFailed("wind", "TiWindBase.euc.c", 331);
     }
     if (pointWind->speedRange[2] == pointWind->speedRange[1] || pointWind->speedRange[0] == 0.0f) {
         pointWind->oscillation = pointWind->speedRange[2];
@@ -451,7 +447,7 @@ void tiWindDisableAll(void)
 DirWind *tiWindDirGet(u32 windIndex)
 {
     if (windIndex >= DIR_WIND_MAX) {
-        assertFailed(tiWindDirIndexAssertText, D_00542BF8, 391);
+        assertFailed("num < DIR_WIND_MAX", "TiWindBase.euc.c", 391);
     }
     return &tiWindDirTable[windIndex];
 }
@@ -460,7 +456,7 @@ DirWind *tiWindDirGet(u32 windIndex)
 PointWind *tiWindPointGet(u32 windIndex)
 {
     if (windIndex >= POINT_WIND_MAX) {
-        assertFailed(tiWindPointIndexAssertText, D_00542BF8, 401);
+        assertFailed("num < POINT_WIND_MAX", "TiWindBase.euc.c", 401);
     }
     return &tiWindPointTable[windIndex];
 }

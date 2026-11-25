@@ -392,3 +392,14 @@ s32 func_001BAFB8();
 void globalCounterRefresh(void) {
     func_001BAFB8();
 }
+
+s32 gDispModelEventCount = 0;
+s32 gDispModelPreviousEventCount = 0;
+char D_00550A80[8] = "mot";
+char D_00550A88[8] = "mdl";
+char D_00550A90[8] = "ene";
+char D_00550A98[8] = "act";
+char D_00550AA0[4] = "map";
+
+EventSlot gDispModelEventSlots[20];
+DistanceModel *gDispModelEventSorted[20];

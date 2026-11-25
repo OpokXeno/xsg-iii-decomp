@@ -570,3 +570,6 @@ s32 gameRuntimeFullReset(void) {
         return clearRenderThenSlotSet();
     }
 }
+
+s16 gPreviousValueSlotIds[] = { 0, 0 };
+unsigned char gGameLoopRuntimeStorage[8] = { 0 };

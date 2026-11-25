@@ -94,3 +94,20 @@ void cameraActorAttach(CameraActor *actor, s32 kind, s32 row, s32 slot) {
     actor->previousRotation = actor->rotation = camera->rotation;
     camera->active = 1;
 }
+
+f32 D_003E7280[4] = {
+    2.0f, -2.0f, 6.0f, -6.0f
+};
+f32 D_003E7290[8] = {
+    0.0f, 1.5f, 0.5f, 0.0f, 0.0f, 0.5f, 1.5f, 0.0f
+};
+signed char D_003E72B0[8] = {
+    0, 13, 12, 14, 15, 0, 0, 0
+};
+unsigned int D_003E72B8[4] = {
+    0x5D317Fu, 0x7F285Du, 0x7B504Au, 0x7B504Au
+};
+unsigned int D_003E72C8[14] = {
+    0x717F2Fu, 0x6E587Fu, 0x7F4E6Cu, 0x7B504Au, 0x7B504Au, 0x717F2Fu, 0x65437Fu, 0x7F3562u,
+    0x7B504Au, 0x7B504Au, 0x767F4Cu, 0, 0, 0
+};

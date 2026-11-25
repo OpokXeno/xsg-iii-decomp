@@ -391,3 +391,43 @@ s32 vmStartSeVoiceFromArgGuarded(s32 vmThread) {
     func_0025F5C0(0);
     return seVoiceResult;
 }
+
+extern s32 pagedTableFlush();
+
+typedef struct NativeMethod {
+    const char *name;
+    s32 (*handler)();
+    s32 argCount;
+} NativeMethod;
+
+NativeMethod gDefaultNativeMethods[22] = {
+    { "ptInit", pagedTableFlush, 0 },
+    { "ptIn", vmCallEachArgument, 1 },
+    { "ptInTo", vmRaiseEntryKindTo, 2 },
+    { "ptOut", vmForEachArgCall, 0 },
+    { "ptSetAtk", vmUpdateEntryKinds, 3 },
+    { "ptSetLeader", vmApplyIndexedKindArg, 1 },
+    { "ptGetLeader", vmSetModeFromArgOrDefault, 0 },
+    { "ptChangeMode", vmSetFlagFromArgOrDefault, 0 },
+    { "ptGetNum", vmSetTableFromArgOrDefault, 0 },
+    { "ptGetMember", vmGetRecordSubEntryFromArgs, 1 },
+    { "ptGetMode", vmIsFlagSet, 0 },
+    { "ptIn_Load", vmRunNativeWithPluginFlush, 1 },
+    { "ptInTo_Load", vmRunSecondNativeWithPluginFlush, 2 },
+    { "ptOut_Load", vmForEachArgCallWithFlush, 0 },
+    { "ptSetAtk_Load", vmRunNativeFlushOnResult, 3 },
+    { "ptSetLeader_Load", vmApplyIndexedKindWithFlush, 1 },
+    { "ptChangeMode_Load", vmSetFlagFromArgWithFlush, 0 },
+    { "ptSaveUMNParty", battleRosterSnapshotTake, 0 },
+    { "ptSetGuest", vmInvokePairFromArgs, 2 },
+    { "EnSeg", vmSetRosterTableFlag, 0 },
+    { "OpenMenu", vmSetRosterFlagsFromArgs, 0 },
+    { "OpenShop", vmStartSeVoiceFromArgGuarded, 1 },
+};
+
+s32 sbNativeOwnerAdd(const char *name, NativeMethod *methods);
+
+/* Registers the default native module "mm". */
+void addDefaultNativeOwner(void) {
+    sbNativeOwnerAdd("mm", gDefaultNativeMethods);
+}

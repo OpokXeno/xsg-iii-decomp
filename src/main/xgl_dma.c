@@ -86,17 +86,10 @@ typedef struct XglDmaBuffer {
 } XglDmaBuffer;
 
 /* The drain channel of the memory FIFO. */
-struct MfifoDrainStorage {
-    XglDmaChannel *channel;
-};
-
 extern void FlushCache(int mode);
 extern int sceGsSyncPath(int mode, int timeout);
 extern XglDmaChannel *tbl[12];
-extern struct MfifoDrainStorage mfifo_drain;
-
-/* Declared here, not at the top: moving it up changes the original code. */
-#define mfifo_drain mfifo_drain.channel
+static XglDmaChannel *mfifo_drain;
 
 void xglDmaDirectNormal(u32 channel, u32 memoryAddress, u32 quadwordCount)
 {
@@ -196,6 +189,7 @@ void xglDmaBufferRequest(XglDmaBuffer *dmaBuffer, u32 channel)
 
 void xglDmaMFIFOSetup(u32 ringAddress, u32 ringSize, int channel)
 {
+    XglDmaChannel **drainSlot = &mfifo_drain;
     XglDmaChannel *drainChannel;
 
     if (channel >= XGL_DMA_DIRECT_CHANNELS)
@@ -204,7 +198,7 @@ void xglDmaMFIFOSetup(u32 ringAddress, u32 ringSize, int channel)
     *DMAC_RBOR = ringAddress;
     *DMAC_RBSR = ringSize - MFIFO_QUADWORD;
     drainChannel = tbl[channel];
-    mfifo_drain = drainChannel;
+    *drainSlot = drainChannel;
     *D8_MADR = ringAddress;
     drainChannel->tag_address = ringAddress;
     drainChannel->quadword_count = 0U;
@@ -214,6 +208,7 @@ void xglDmaMFIFOSetup(u32 ringAddress, u32 ringSize, int channel)
 u32 xglDmaMFIFOKick(u32 scratchpadAddress, u32 quadwordCount)
 {
     u32 ringSize = *DMAC_RBSR + MFIFO_QUADWORD;
+    XglDmaChannel **drainSlot = &mfifo_drain;
     XglDmaChannel *drainChannel;
     u32 ringFreeBytes;
 
@@ -221,7 +216,7 @@ u32 xglDmaMFIFOKick(u32 scratchpadAddress, u32 quadwordCount)
         ;
     *D8_SADR = scratchpadAddress & DMA_SADR_MASK;
     *D8_QWC = quadwordCount;
-    drainChannel = mfifo_drain;
+    drainChannel = *drainSlot;
     do {
         ringFreeBytes = (drainChannel->tag_address - *D8_MADR + ringSize) & (ringSize - MFIFO_QUADWORD);
         if (ringFreeBytes == 0)
@@ -248,3 +243,12 @@ void xglDmaMFIFOLeave(void)
 void xglDmaInitial(void)
 {
 }
+
+/* DMA channel registers by channel number: VIF0, VIF1, GIF, IPU, SIF0, SIF1, SIF2, SPR-from, SPR-to,
+ * then two unused slots. */
+XglDmaChannel *tbl[12] = {
+    (XglDmaChannel *) 0x10008000, (XglDmaChannel *) 0x10009000, (XglDmaChannel *) 0x1000A000,
+    (XglDmaChannel *) 0x1000B000, (XglDmaChannel *) 0x1000B400, (XglDmaChannel *) 0x1000C000,
+    (XglDmaChannel *) 0x1000C400, (XglDmaChannel *) 0x1000C800, (XglDmaChannel *) 0x1000D000,
+    (XglDmaChannel *) 0x1000D400, 0, 0,
+};

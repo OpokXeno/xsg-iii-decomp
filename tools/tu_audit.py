@@ -2007,7 +2007,7 @@ def build_assembly_recipe(unit_dir, obj):
         # than comparing the final object with an unallocated compiler object.
         inputs = edge.get('inputs') or []
         command = (document['rules'].get(rule) or {}).get('command', '')
-        expected = ('timeout -k 5 30 $ld -r -d -EL -m elf32lr5900 -o $obj $in && '
+        expected = ('timeout -k 5 30 $ld -r -d -G 4 -EL -m elf32lr5900 -o $obj $in && '
                     'timeout -k 5 30 cp $in.s $obj.s && timeout -k 5 30 cp $in.i $obj.i')
         if len(inputs) != 1 or command != expected or edge.get('obj') != target:
             raise AuditError('unsupported native MAIN COMMON-allocation recipe')
@@ -2098,7 +2098,7 @@ def compile_tu(contract, tu_rel, unit_dir, out_dir, asm_cwd=None, asm_includes=(
     if allocation:
         if sha256_file(allocation['linker']) != allocation['linker_sha256']:
             raise AuditError('native MAIN linker changed during the audit')
-        steps.append(('allocate_common', [allocation['linker'], '-r', '-d', '-EL', '-m', 'elf32lr5900',
+        steps.append(('allocate_common', [allocation['linker'], '-r', '-d', '-G', '4', '-EL', '-m', 'elf32lr5900',
                                          '-o', f'{stem}.o', assembled], unit_dir))
     log, messages = [], []
     for name, argv, cwd in steps:
@@ -2662,13 +2662,13 @@ def data_gate_row(args, tu_c):
                     Path(recipe.get('linker', '/nonexistent')).resolve() != linker or
                     recipe.get('linker_sha256') != sha256_file(linker)):
                 raise AuditError('native COMMON chain differs from the supported current build recipe')
-            expected_argv = [str(linker), '-r', '-d', '-EL', '-m', 'elf32lr5900',
+            expected_argv = [str(linker), '-r', '-d', '-G', '4', '-EL', '-m', 'elf32lr5900',
                              '-o', str(verification), str(raw)]
             if allocation.get('argv') != expected_argv:
                 raise AuditError('native COMMON chain verification command differs from the exact recipe')
             with tempfile.TemporaryDirectory(prefix='audit-common-', dir=code_input.parent) as directory:
                 independently_allocated = Path(directory) / 'allocated.o'
-                argv = [str(linker), '-r', '-d', '-EL', '-m', 'elf32lr5900',
+                argv = [str(linker), '-r', '-d', '-G', '4', '-EL', '-m', 'elf32lr5900',
                         '-o', str(independently_allocated), str(raw)]
                 status, log = run(argv, Path(args.unit_dir))
                 if status or not independently_allocated.is_file() or sha256_file(independently_allocated) != sha256_file(code_input):

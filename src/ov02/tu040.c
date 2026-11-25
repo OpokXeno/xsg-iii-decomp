@@ -2,6 +2,7 @@
  * OV02 original TU 40: 0x00a8e120..0x00a8e830 (10 functions)
  */
 #include "common.h"
+#include "main/battle_shared.h"
 
 typedef int s32;
 extern s32 bgmNativeTable;
@@ -26,13 +27,9 @@ void bgmResetState(void) {
     bgmIndex = 0;
 }
 
-extern s32 partyRecordTable[];
-
 s32 *partyRecordTableGet(void) {
     return partyRecordTable;
 }
-
-extern s32 enemyRecordTable[];
 
 s32 *enemyRecordTableGet(void) {
     return enemyRecordTable;
