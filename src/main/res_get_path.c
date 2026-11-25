@@ -1799,7 +1799,7 @@ void saveScreenEntriesReadState(s32 setup) {
     func_00221B40(&gSaveScreen->fileList, 1);
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void fontQueueSpriteReset(void);
 void shardFieldUpdate(void *fields);
@@ -1826,7 +1826,7 @@ void saveScreenDraw(void) {
     u8 clock[8];
     s32 text;
 
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();

@@ -28,7 +28,7 @@
 
 #define MOVIE_GIF_TAG_IMAGE_BLOCK (GIF_TAG_FLG_IMAGE | GIF_TAG_EOP | MOVIE_MACROBLOCK_QWORDS)
 
-/* BITBLTBUF destination: 896 pixels wide, placeholder until moviePlayerUpdate sets it. */
+/* BITBLTBUF destination: 896 pixels wide, placeholder until moviePlayerUpdate / moviePlayerPause set it. */
 #define MOVIE_BITBLTBUF_DBW_896 (0xe000ULL << 36)
 
 #define MOVIE_TRXREG_MACROBLOCK GS_SET_TRXREG(MOVIE_MACROBLOCK, MOVIE_MACROBLOCK)
@@ -201,10 +201,10 @@ void func_00131470(int playerHandle);
 void func_00130B50(int playerHandle, MovieCurrentFrame *frame);
 int func_00133F08(int playerHandle);
 
-/* XS2 moviePlayerUpdate: releases the frame taken last time, takes the next one and, when there
+/* Releases the frame taken last time, takes the next one and, when there
  * is one, builds its upload chain (with the previous display page as BITBLTBUF destination)
  * and queues it. Returns 1 at the end of the movie, -1 on a playback error, 0 otherwise. */
-int func_0018BB08(MoviePlayerRecord *player)
+int moviePlayerUpdate(MoviePlayerRecord *player)
 {
     MovieCurrentFrame frame;
     int packet;
@@ -239,7 +239,7 @@ int func_0018BB08(MoviePlayerRecord *player)
 /* Forwards `value` to func_00132E10 for the player's handle. When `value` is 0 and the player
  * has a frame, it stores the BITBLTBUF word (the previous display page as destination) at
  * offset 0x20 of the player's DMA packet, then calls func_002F49F8 on the packet. */
-int moviePlayerUpdate(MoviePlayerRecord *player, int value)
+int moviePlayerPause(MoviePlayerRecord *player, int value)
 {
     int packet;
     unsigned int dma_address;

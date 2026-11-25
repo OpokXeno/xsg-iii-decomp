@@ -6,18 +6,18 @@ typedef float f32;
 
 INCLUDE_ASM("asm/main/nonmatchings/tu038", func_0019CF80);
 
-unsigned int func_0030E8E4(const char *text);
+unsigned int strlen(const char *text);
 s32 func_0019CF80(unsigned char character, s32 x, s32 y, f32 weight, s32 kind, s32 count, s32 mode);
 
 /* Draws text from x: each character goes to func_0019CF80 at x plus the width so far times weight;
- * returns the total width. func_0030E8E4 (the length of text) is called again on every pass. */
+ * returns the total width. strlen (the length of text) is called again on every pass. */
 s32 func_0019D3F8(const char *text, s32 x, s32 y, f32 weight, s32 kind, s32 count, s32 mode)
 {
     unsigned int i;
     s32 width;
 
     width = 0;
-    for (i = 0; i < func_0030E8E4(text); i++) {
+    for (i = 0; i < strlen(text); i++) {
         width += func_0019CF80(text[i], (f32) x + width * weight, y, weight, kind, count, mode);
     }
     return width;
@@ -31,11 +31,11 @@ s32 func_0019D4E8(const char *text, s32 x, s32 y, f32 weight, s32 kind, s32 coun
     s32 width;
 
     width = 0;
-    for (i = 0; i < func_0030E8E4(text); i++) {
+    for (i = 0; i < strlen(text); i++) {
         width += func_0019CF80(text[i], (f32) (x + 1) + width * weight, y + 1, weight, 0, count, mode);
     }
     width = 0;
-    for (i = 0; i < func_0030E8E4(text); i++) {
+    for (i = 0; i < strlen(text); i++) {
         width += func_0019CF80(text[i], (f32) x + width * weight, y, weight, kind, count, mode);
     }
     return width;

@@ -1217,7 +1217,7 @@ void seVoiceRecordTableDraw(s32 voiceSlot, s32 kindSlot, s32 index) {
     }
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void xglFontSetAlphaScale(unsigned char scale);
 void fontQueueSpriteReset(void);
@@ -1235,7 +1235,7 @@ void mcStateSeekEntry(s32 value);
 /* Draws one frame of the voice screen: fade alpha from fadePhase, the sheets and glyph overlays, the
  * mode heading and the onFinish callback. */
 void seVoiceScreenDraw(void) {
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(128);
     fontQueueSpriteReset();

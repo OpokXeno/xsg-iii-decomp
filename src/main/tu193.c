@@ -434,7 +434,7 @@ typedef struct StreamWord {
     s32 channelWord;
 } StreamWord;
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32);
 void xglFontSetAlphaScale(s32);
 void xglFontSetColorScale(s32);
@@ -484,7 +484,7 @@ void streamPlayerDraw(void) {
     s32 messageText;
     u16 key;
 
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();

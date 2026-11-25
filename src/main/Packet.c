@@ -29,7 +29,7 @@ typedef struct XglTextureTransSet {
 #define TEXTURE_TRANS_SETUP_WORDS 28
 #define TEXTURE_TRANS_BITBLT_AD 6  /* +0x30: BITBLTBUF data */
 #define TEXTURE_TRANS_REGION_AD 10 /* +0x50: TRXREG data */
-extern u64 D_004C7DC0[TEXTURE_TRANS_SETUP_WORDS / 2];
+extern u64 xglPacketTextureTransSetup[TEXTURE_TRANS_SETUP_WORDS / 2];
 
 /* The render state; the texture transfer reads its texture buffer base page. */
 extern XglRenderStateBlock D_004C8390;
@@ -38,8 +38,8 @@ void sceVif1PkCnt(XglPacket *packet, u32 flag);
 void sceVif1PkAddDataN(XglPacket *packet, void *data, u32 count);
 void sceVif1PkRef(XglPacket *packet, void *data, u32 count, u32 opt1, u32 opt2, u32 flag);
 
-/* XS2 xglPacketTextureTrans: queues one BITBLTBUF/TRXREG setup and the image data of every texture of set. */
-void func_001997D0(XglTextureTransSet *set)
+/* Queues one BITBLTBUF/TRXREG setup and the image data of every texture of set. */
+void xglPacketTextureTrans(XglTextureTransSet *set)
 {
     XglTextureTransEntry *entry;
     int i;
@@ -54,11 +54,11 @@ void func_001997D0(XglTextureTransSet *set)
         } else {
             blockWidth = entry->size >> 16;
         }
-        D_004C7DC0[TEXTURE_TRANS_BITBLT_AD] = ((u64) (((D_004C8390.texture_base << 11) + entry->vramOffset) >> 6) << 32)
+        xglPacketTextureTransSetup[TEXTURE_TRANS_BITBLT_AD] = ((u64) (((D_004C8390.texture_base << 11) + entry->vramOffset) >> 6) << 32)
             | ((u64) blockWidth << 48);
-        D_004C7DC0[TEXTURE_TRANS_REGION_AD] = width | ((u64) entry->height << 32);
+        xglPacketTextureTransSetup[TEXTURE_TRANS_REGION_AD] = width | ((u64) entry->height << 32);
         sceVif1PkCnt(pCurrentPacket, 0);
-        sceVif1PkAddDataN(pCurrentPacket, D_004C7DC0, TEXTURE_TRANS_SETUP_WORDS);
+        sceVif1PkAddDataN(pCurrentPacket, xglPacketTextureTransSetup, TEXTURE_TRANS_SETUP_WORDS);
         sceVif1PkRef(pCurrentPacket, (u8 *) set + entry->dataOffset, entry->dataSize, 0, 0, 0);
         entry++;
     }
@@ -122,9 +122,9 @@ extern const char packetFullMessage[];
 #define PACKET_FULL_RATIO 0.99f
 #define PACKET_MOVE_ASSERT_LINE 132
 
-/* XS2 xglPacketMove: closes the current packet, checks (while sending is on) that it used less than 99 %
+/* Closes the current packet, checks (while sending is on) that it used less than 99 %
  * of its half, makes it the packet to send and resets the other half for the next frame. */
-void func_00199A20(void)
+void xglPacketMove(void)
 {
     float fPacket;
 

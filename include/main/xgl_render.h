@@ -70,9 +70,9 @@ typedef struct XglRenderStateBlock {
     unsigned short prev_dispfb_base;    /* +0x0C */
     /* +0x0E: the third full-screen page (X2 work_buffer_base; tu163.c reads it as movieBackdropBasePage) */
     unsigned short work_buffer_base;
-    unsigned short aux_page;            /* +0x10: a VRAM page func_0019A6F0 sets; no reader in this build */
+    unsigned short aux_page;            /* +0x10: a VRAM page xglRenderSetReso sets; no reader in this build */
     unsigned short texture_base;        /* +0x12: the texture buffer page (Packet.c's texture transfer) */
-    unsigned short aux_page2;           /* +0x14: a VRAM page func_0019A6F0 sets; no reader in this build */
+    unsigned short aux_page2;           /* +0x14: a VRAM page xglRenderSetReso sets; no reader in this build */
     /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame; read by the drop-shadow
      * packets of XenoActorUnpack.c */
     unsigned short display_buffer_base;

@@ -201,8 +201,8 @@ typedef struct XglLightCurve {
 
 float func_0019FA20(int count, Vector4 *keyframes, float time, float weight);
 
-/* XS2 xglLightPackSampleCurve: samples the curve at *cursor at time and moves *cursor past it. */
-f32 func_00197A00(XglLightStreamWord **cursor, f32 time)
+/* Samples the curve at *cursor at time and moves *cursor past it. */
+f32 xglLightPackSampleCurve(XglLightStreamWord **cursor, f32 time)
 {
     float result;
     XglLightCurve *record;
@@ -235,7 +235,7 @@ typedef struct XglLightEntry {
     XglLightStreamWord stream[1]; /* 0x30 */
 } XglLightEntry;
 
-f32 func_00197A00(XglLightStreamWord **cursor, f32 time);
+f32 xglLightPackSampleCurve(XglLightStreamWord **cursor, f32 time);
 
 void xglLightPackEvaluate(XglLightPack *pack, f32 curveTime)
 {
@@ -268,7 +268,7 @@ void xglLightPackEvaluate(XglLightPack *pack, f32 curveTime)
                 while (((s32)cursor & 0xf) != 0) {
                     cursor++;
                 }
-                keyValues[channel] = func_00197A00(&cursor, curveTime);
+                keyValues[channel] = xglLightPackSampleCurve(&cursor, curveTime);
                 break;
             }
         }

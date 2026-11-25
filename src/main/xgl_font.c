@@ -1682,10 +1682,10 @@ unsigned char *func_00184B30(FontDrawCursor *cursor, unsigned char *text);
 /* The two quadwords that end the font packet (X2 test_15). */
 extern unsigned char D_004B3410[];
 
-/* XS2 xglFontFlush: sets up the drawing cursor at the base of the scratchpad, starts the font packet,
+/* Sets up the drawing cursor at the base of the scratchpad, starts the font packet,
  * draws every text queued behind xglFontState (zero-separated, ended by an empty one), closes the packet
  * and empties the queue. */
-void func_00185A20(void)
+void xglFontFlush(void)
 {
     FontDrawCursor *cursor = (FontDrawCursor *) SCRATCHPAD_BASE;
     unsigned char *text;
@@ -1723,7 +1723,7 @@ void func_00185A20(void)
 
 void xglFontUpdateState(void)
 {
-    func_00185A20();
+    xglFontFlush();
 }
 
 /* The FontState flags halfword (0x007E7E04), read and written through the splat symbol. */

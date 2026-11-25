@@ -90,9 +90,9 @@ float pxyProfileEnd(const char *name)
     return elapsedMs;
 }
 
-/* XS2 pxyProfileEndMs: adds the ticks since the slot's start to its total and returns the total in
+/* Adds the ticks since the slot's start to its total and returns the total in
  * milliseconds, without formatting the text line; 0 when no slot has the name. */
-float func_0019CBB0(const char *name)
+float pxyProfileEndMs(const char *name)
 {
     int i;
     int profileSlot;

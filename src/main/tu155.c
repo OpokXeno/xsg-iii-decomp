@@ -278,7 +278,7 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
 
 typedef long long s64;
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void xglFontSetAlphaScale(u8 alpha);
 void fontQueueSpriteReset(void);
@@ -329,7 +329,7 @@ void budgetDisplayDrawPage(void) {
     void *text;
 
     totalSeconds = gBudgetDisplayBlock->totalSeconds;
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();

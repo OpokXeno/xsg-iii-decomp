@@ -509,7 +509,7 @@ typedef struct PxyCircleShadowTexture {
 extern PxyCircleShadowTexture pxyCircleShadowTexture;
 /* The palette upload header of the circle shadow; the colours are pxyBuildFadeRamp's table right after it. */
 extern PxyUploadHeader pxyCircleShadowClut;
-/* Set once func_0019E5B0 has built the circle shadow texture and its palette. */
+/* Set once CONSTRUCT_CIRCLR_SHADOW has built the circle shadow texture and its palette. */
 extern int pxyShadowTexturesReady;
 
 /* Radius (in texels) of the circle shadow and its fade width. */
@@ -520,9 +520,9 @@ extern int pxyShadowTexturesReady;
 /* The fade ramp spread of the shadow palette. */
 #define PXY_CIRCLE_SHADOW_RAMP_SPREAD 0.3f
 
-/* X2 CONSTRUCT_CIRCLR_SHADOW: builds the 64x64 circle shadow levels once (full inside radius 1, fading to 0 at
+/* Builds the 64x64 circle shadow levels once (full inside radius 1, fading to 0 at
  * radius 32), the upload headers of the texture and palette, and the palette's fade ramp. */
-void func_0019E5B0(void)
+void CONSTRUCT_CIRCLR_SHADOW(void)
 {
     int row;
     float maxLevel;

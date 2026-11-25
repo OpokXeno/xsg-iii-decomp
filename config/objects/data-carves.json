@@ -1443,7 +1443,7 @@
       "0x0054ffb4"
      ],
      "generated_by": [
-      "func_00197A00",
+      "xglLightPackSampleCurve",
       "xglLightBoxColor"
      ],
      "c_owned_symbols": [
@@ -1638,7 +1638,7 @@
       "0x0054ffec"
      ],
      "generated_by": [
-      "func_0019CBB0",
+      "pxyProfileEndMs",
       "pxyProfileDrawEntries",
       "pxyProfileEnd",
       "pxyProfileGetMs",
@@ -1726,7 +1726,7 @@
       "0x0054fff4"
      ],
      "generated_by": [
-      "func_0019E5B0",
+      "CONSTRUCT_CIRCLR_SHADOW",
       "pxyBuildFadeRamp"
      ],
      "c_owned_symbols": [
@@ -29034,7 +29034,7 @@
       "0x0054ffd4"
      ],
      "generated_by": [
-      "func_00199A20"
+      "xglPacketMove"
      ],
      "c_owned_symbols": [
       "D_0054FFD0"

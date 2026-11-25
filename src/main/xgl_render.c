@@ -623,9 +623,9 @@ void sceGsSetDefDispEnv(GsDispEnv *env, short psm, short width, short height, in
 /* 480p moves the picture down by 16 scan lines. */
 #define RENDER_PROGRESSIVE_DISPLAY_DY 0x10
 
-/* X2 xglRenderDispEnvInit: sets up the display environment from the render state (or the movie mode),
+/* Sets up the display environment from the render state (or the movie mode),
  * enables only the first circuit, and copies its DISPFB/DISPLAY into the second circuit and the base display. */
-void func_0019A280(void)
+void xglRenderDispEnvInit(void)
 {
     if (D_004C8390.movieMode) {
         if (D_004C8390.palMode == 0) {
@@ -737,7 +737,7 @@ void xglRenderStart(s32 renderStartMode) {
     D_004C8390.progressiveMode = renderStartMode;
     xglRenderScanLineInit();
     xglIntcEnable(5);
-    func_0019A280();
+    xglRenderDispEnvInit();
     xglRenderDispEnvFlagSet();
 }
 
@@ -760,7 +760,7 @@ void xglStudioMainCameraInit(void);
 
 /* The XS3 xglRenderSetReso: one fixed geometry (resolution is not read); the display page is the second
  * frame in movie mode (movieMode), else the first. Then the environments and the studio cameras. */
-void func_0019A6F0(int resolution)
+void xglRenderSetReso(int resolution)
 {
     D_004C8390.depth_psm = RENDER_DEPTH_PSM;
     D_004C8390.psm = RENDER_FRAME_PSM;
@@ -780,7 +780,7 @@ void func_0019A6F0(int resolution)
     }
     D_004C8390.flip_base = D_004C8390.prev_dispfb_base;
     func_00199FE8();
-    func_0019A280();
+    xglRenderDispEnvInit();
     func_0019A558();
     xglStudioReset();
     xglStudioMainCameraInit();
@@ -801,10 +801,10 @@ extern unsigned char xglRenderMovieActive;
 /* Builds the movie frame's GS packet in the scratchpad and returns its quadword count. */
 int func_0019A7C0(void *scratch);
 
-/* XS2 xglRenderSwapBase: swaps the display and flip pages and makes the old draw page the previous one;
+/* Swaps the display and flip pages and makes the old draw page the previous one;
  * in movie mode (movieMode set) the movie frame packet goes out instead, followed by the clear
  * environment unless rendering is locked. Then clears the render status and advances the frame count. */
-void func_0019AB00(void)
+void xglRenderSwapBase(void)
 {
     XglPacket *packet;
     int quadwords;
@@ -884,10 +884,10 @@ u8 stateExchangeOff(void);
 #define RENDER_FADE_NEUTRAL 0x80
 #define RENDER_DEFAULT_VSYNCS_PER_FRAME 2
 
-/* The render reset (cf. X2 xglRenderInit): neutral fade, scan line setup, the fixed display geometry
- * (func_0019A6F0; the resolution argument is 0), cleared counters and per-frame state, no final-packet
+/* The render reset: neutral fade, scan line setup, the fixed display geometry
+ * (xglRenderSetReso; the resolution argument is 0), cleared counters and per-frame state, no final-packet
  * callbacks, fade and state exchange reset, VSync interrupt on, unlocked and not held. */
-void func_0019ADD8(void)
+void xglRenderInit(void)
 {
     int i;
 
@@ -897,7 +897,7 @@ void func_0019ADD8(void)
     D_004C8390.progressiveMode = 0;
     D_004C8390.movieFullColor = 0;
     xglRenderScanLineInit();
-    func_0019A6F0(0);
+    xglRenderSetReso(0);
     xglRenderMoveCount = 0;
     LoopCount = 0;
     gVsyncsPerFrame = RENDER_DEFAULT_VSYNCS_PER_FRAME;
@@ -1036,7 +1036,7 @@ s32 moviePlayerInit();
 void xglRenderMovieBegin(void) {
     D_004C8390.movieMode = 1;
     xglRenderMovieActive = 1;
-    func_0019ADD8();
+    xglRenderInit();
     moviePlayerInit();
 }
 

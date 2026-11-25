@@ -23,14 +23,14 @@ int xglDebFileReadSize(void *fileBuffer, const char *name)
     return -1;
 }
 
-unsigned int func_0030E8E4(const char *text);
+unsigned int strlen(const char *text);
 
 /* Returns the file name stored at +0x14 of a resource, or 0 when the name is empty. */
 char *xglDebFileBufferSize(char *resource) {
     char *name;
 
     name = resource + 0x14;
-    return (func_0030E8E4(name) == 0) ? 0 : name;
+    return (strlen(name) == 0) ? 0 : name;
 }
 
 /* Sprintf-shaped varargs callee; the link name of 0x0030E1B8 (test_050.c declares it the same way). */
@@ -79,7 +79,7 @@ s32 srsParseEffectFileName(char *fileName) {
     if (fileName == 0) {
         return 0;
     }
-    fileNameLength = func_0030E8E4(fileName);
+    fileNameLength = strlen(fileName);
     if (fileNameLength == 0) {
         return 0;
     }
@@ -424,7 +424,7 @@ SvTypeListEntry *svFindEffectEntryByStem(int mapperIndex, int effectId, int *eff
         if (mapperTypeList->entries[mapperEntryIndex].used != 0 &&
             mapperTypeList->entries[mapperEntryIndex].resourceKind == 5 &&
             mapperTypeList->entries[mapperEntryIndex].name != (char *) -1) {
-            if (strncmp(stem, mapperTypeList->entries[mapperEntryIndex].name, func_0030E8E4(stem)) ==
+            if (strncmp(stem, mapperTypeList->entries[mapperEntryIndex].name, strlen(stem)) ==
                 0) {
                 if (effectTypeKind != 0) {
                     *effectTypeKind = mapperTypeList->typeKind;

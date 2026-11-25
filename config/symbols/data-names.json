@@ -85,6 +85,7 @@
    "0x004c7d20": "aaiVertexIndex",
    "0x004c7d40": "xglIdentityMatrix",
    "0x004c7d80": "xglUnit4sMatrix",
+   "0x004c7dc0": "xglPacketTextureTransSetup",
    "0x004c7ea0": "xglRenderMovieTex0Packet",
    "0x004c8250": "ClearEnv",
    "0x004c8386": "sRender",

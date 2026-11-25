@@ -129,7 +129,7 @@ void loadingCardDraw(struct Pos16 *origin, const char *title, const char *subtit
     }
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontQueueTextureBind(void *buffer);
 void fontQueueDepthTest(s32 value);
 void xglFontQueueGlyphRect(unsigned short *frame);
@@ -159,7 +159,7 @@ void loadingScreenDraw(void) {
         return;
     }
     image = xglCdPreloadBuffer;
-    func_00185A20();
+    xglFontFlush();
     if (image != 0) {
         xglFontQueueTextureBind(image);
     }

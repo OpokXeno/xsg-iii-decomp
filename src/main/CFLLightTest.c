@@ -503,7 +503,7 @@ s32 movieFileRequest(const char *fileName);
 
 s32 strcmp();
 
-s32 func_0030E8E4();
+s32 strlen();
 
 
 s32 memset();
@@ -523,7 +523,7 @@ void movieFileLoadNext(void) {
 
             GameMpeg2Play(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
             strcpy(gMovieSourceFileName, gMovieFileNameStorage);
-            baseNameStart = scanStart + func_0030E8E4(gMovieSourceFileName);
+            baseNameStart = scanStart + strlen(gMovieSourceFileName);
             while (baseNameStart != gMovieSourceFileName) {
                 if (*baseNameStart == '/') {
                     baseNameStart++;

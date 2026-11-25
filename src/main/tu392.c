@@ -162,7 +162,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu392", func_002D3D38);
 
 extern u8 D_00402858[];
 extern s32 gSoundUpdateMode[];
-s32 func_00185A20();
+s32 xglFontFlush();
 s32 func_002D4578();
 s32 func_002D48C8();
 void stateRefreshTables();
@@ -179,7 +179,7 @@ void frameStateUpdate(void) {
     if (D_00402858[0] & 8) {
         stateRefreshTables();
     }
-    func_00185A20();
+    xglFontFlush();
 }
 
 s32 memPoolFree(s32);

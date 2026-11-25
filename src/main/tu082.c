@@ -239,7 +239,7 @@ void sceneEmptyHook(void) {
 
 }
 
-s32 func_0030E8E4(s32 handle);
+s32 strlen(s32 handle);
 s32 strncmp(s32 ownerHandle, s32 childHandle, s32 value);
 SpawnSlot *RgDispModelNextByKind(s32 kind, SpawnSlot *from);
 void func_001C06F0(SpawnSlot *owner, SpawnSlot *child);
@@ -259,7 +259,7 @@ s32 slotAttachFind(SpawnSlot *owner) {
         }
         if (cursor != owner) {
             childHandle = cursor->state.attachHandles.attachHandle;
-            if (strncmp(ownerHandle, childHandle, func_0030E8E4(childHandle)) == 0) {
+            if (strncmp(ownerHandle, childHandle, strlen(childHandle)) == 0) {
                 func_001C06F0(owner, cursor);
                 return 1;
             }

@@ -115,7 +115,7 @@ INCLUDE_ASM("asm/main/nonmatchings/gs_packet_setup", func_00264898);
 extern unsigned char xglFontDebugTextFormat[];
 char *func_0030C440();
 s32 func_0030C498();
-s32 func_0030E8E4();
+s32 strlen();
 s32 vsprintf();
 s32 xglFontDebugPrintf();
 
@@ -127,7 +127,7 @@ void xglFontDebugPrintAt(s32 x, s32 y, const char *format, ...)
   s32 pixelY;
   pixelX = x;
   pixelY = y;
-  formatLength = func_0030E8E4(format);
+  formatLength = strlen(format);
   text = func_0030C440(formatLength + 10);
   vsprintf(text, format, ((va_list) __builtin_next_arg(format)) - ((8 - __builtin_args_info(2)) * 8));
   xglFontDebugPrintf(pixelX >> 1, pixelY >> 1, xglFontDebugTextFormat, text);

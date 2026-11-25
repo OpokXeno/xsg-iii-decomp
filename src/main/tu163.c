@@ -432,7 +432,7 @@ void fontQueueFrameBuffer(u16 page, s32 mode);
 void fontQueueSpriteReset(void);
 void fontQueueSpriteBlack(void);
 void fontQueueMovieFrameBuffer(void);
-void func_00185A20(void);
+void xglFontFlush(void);
 void func_001AA580(void);
 
 /* One frame of the shard field: steps the four springs, scrolls, draws the backdrop models and the label,
@@ -547,7 +547,7 @@ void shardFieldUpdate(ShardField *shardField) {
     xglFontSetColor(0x80, 0x80, 0x80);
     xglFontPrintIndexed(0, 0, gShardFieldTitleText);
     xglFontPrintIndexed(0, 0, shardField->label);
-    func_00185A20();
+    xglFontFlush();
     fontQueueMovieFrameBuffer();
     xglFontSetAlphaScale(fontAlphaScale);
 
