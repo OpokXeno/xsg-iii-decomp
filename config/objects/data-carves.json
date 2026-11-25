@@ -1418,7 +1418,7 @@
       "0x00541374"
      ],
      "generated_by": [
-      "func_00198570"
+      "xglLightPackBuildLightSet"
      ],
      "c_owned_symbols": [
       "jtbl_00541300",

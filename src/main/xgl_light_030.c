@@ -291,11 +291,11 @@ typedef struct XglLightSlots {
 
 #define LIGHT_SLOT_COUNT 6
 
-/* XS2 xglLightSlotsInsert: replaces the weakest of the six slots when color (strength = its largest
+/* Replaces the weakest of the six slots when color (strength = its largest
  * channel) is stronger, stores its normalised direction (+z when zero) and finds the new weakest slot.
  * The (&array[0])[index] form is the XS2 one: plain lightSlots->colors[index] makes GCC keep &colors[0].w
  * in an extra s-register (73 instead of 70 instructions). */
-void func_00197C98(XglLightSlots *lightSlots, Vector4 *color, Vector4 *lightDir)
+void xglLightSlotsInsert(XglLightSlots *lightSlots, Vector4 *color, Vector4 *lightDir)
 {
     float strength;
     int i;
@@ -333,9 +333,9 @@ void func_00197C98(XglLightSlots *lightSlots, Vector4 *color, Vector4 *lightDir)
     }
 }
 
-/* XS2 xglLightPointColor: the key's colour at the receiver, faded linearly between extent.x and
+/* The key's colour at the receiver, faded linearly between extent.x and
  * extent.y; 0 (and a zero colour) when the receiver is at extent.y or farther. */
-int func_00197DB0(Vector4 *color, XglLightKey *key, Vector4 *receiver)
+int xglLightPointColor(Vector4 *color, XglLightKey *key, Vector4 *receiver)
 {
     Vector4 toLight;
     float distance;
@@ -593,11 +593,11 @@ void *memset(void *destination, int value, unsigned int size);
 extern const DoublewordAlignedVector4 xglLightKeyAxisTemplate;
 void pxySetColorScale(Vector4 *color);
 
-/* X2 xglLightPackBuildLightSet: builds the light set of a receiver from the keys of a light pack. The keys
+/* Builds the light set of a receiver from the keys of a light pack. The keys
  * before XGL_LIGHT_SLOT_TYPES set the colour scale, the ambient colours, the view and shadow directions and
  * add point, cone, spot and box light to the ambient colours; the later keys fill the three point lights and
  * the six strongest light slots, which end up as the set's directions and colours. */
-void func_00198570(XglLightPack *pack, XglLightSet *lightSet, Vector4 *receiver)
+void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector4 *receiver)
 {
     int i;
     s32 *entryOffsets;
@@ -642,7 +642,7 @@ void func_00198570(XglLightPack *pack, XglLightSet *lightSet, Vector4 *receiver)
                 break;
             case XGL_LIGHT_AMBIENT_POINT:
                 lightColor = &pointColor;
-                lit = func_00197DB0(lightColor, key, receiver);
+                lit = xglLightPointColor(lightColor, key, receiver);
             addAmbientLight:
                 if (!lit) {
                     break;
@@ -668,7 +668,7 @@ void func_00198570(XglLightPack *pack, XglLightSet *lightSet, Vector4 *receiver)
                 XGL_LIGHT_KEY_ROTATION(key)
                 xglMatrixStackMulVector(&axisDir, &axisDir);
                 xglVectorScale(&scaledColor, &key->color, key->intensity);
-                func_00197C98(&lightSlots, &scaledColor, &axisDir);
+                xglLightSlotsInsert(&lightSlots, &scaledColor, &axisDir);
                 break;
             case XGL_LIGHT_SHADOW_DIRECTION:
                 axisDir.z = 1.0f;
@@ -716,33 +716,33 @@ void func_00198570(XglLightPack *pack, XglLightSet *lightSet, Vector4 *receiver)
                     break;
                 case XGL_LIGHT_SLOT_POINT:
                 case XGL_LIGHT_SLOT_POINT_ALT:
-                    if (!func_00197DB0(&pointColor, key, receiver)) {
+                    if (!xglLightPointColor(&pointColor, key, receiver)) {
                         break;
                     }
                     Vu0SubVectorXYZ(&pointDirection, &key->position, receiver);
                     xglVectorScale(&pointColor, &pointColor, key->intensity);
-                    func_00197C98(&lightSlots, &pointColor, &pointDirection);
+                    xglLightSlotsInsert(&lightSlots, &pointColor, &pointDirection);
                     break;
                 case XGL_LIGHT_SLOT_CONE:
                     if (!xglLightConeColor(&coneColor, &coneDirection, key, receiver)) {
                         break;
                     }
                     xglVectorScale(&coneColor, &coneColor, key->intensity);
-                    func_00197C98(&lightSlots, &coneColor, &coneDirection);
+                    xglLightSlotsInsert(&lightSlots, &coneColor, &coneDirection);
                     break;
                 case XGL_LIGHT_SLOT_BOX:
                     if (!xglLightBoxColor(&boxColor, &boxDirection, key, receiver)) {
                         break;
                     }
                     xglVectorScale(&boxColor, &boxColor, key->intensity);
-                    func_00197C98(&lightSlots, &boxColor, &boxDirection);
+                    xglLightSlotsInsert(&lightSlots, &boxColor, &boxDirection);
                     break;
                 case XGL_LIGHT_SLOT_SPOT:
                     if (!xglLightSpotColor(&spotColor, &spotDirection, key, receiver)) {
                         break;
                     }
                     xglVectorScale(&spotColor, &spotColor, key->intensity);
-                    func_00197C98(&lightSlots, &spotColor, &spotDirection);
+                    xglLightSlotsInsert(&lightSlots, &spotColor, &spotDirection);
                     break;
                 }
             }

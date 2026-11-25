@@ -32700,13 +32700,13 @@
      2
     ],
     [
-     "func_00197C98",
+     "xglLightSlotsInsert",
      1670296,
      280,
      2
     ],
     [
-     "func_00197DB0",
+     "xglLightPointColor",
      1670576,
      232,
      2
@@ -32742,7 +32742,7 @@
      2
     ],
     [
-     "func_00198570",
+     "xglLightPackBuildLightSet",
      1672560,
      1688,
      2

@@ -43994,18 +43994,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00197C98",
+     "name": "xglLightSlotsInsert",
      "size": 280,
-     "splat_name": "func_00197C98",
+     "splat_name": "xglLightSlotsInsert",
      "va": "0x00197c98",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00197DB0",
+     "name": "xglLightPointColor",
      "size": 232,
-     "splat_name": "func_00197DB0",
+     "splat_name": "xglLightPointColor",
      "va": "0x00197db0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -44057,9 +44057,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00198570",
+     "name": "xglLightPackBuildLightSet",
      "size": 1688,
-     "splat_name": "func_00198570",
+     "splat_name": "xglLightPackBuildLightSet",
      "va": "0x00198570",
      "name_basis": "address",
      "provenance": "estimated"
