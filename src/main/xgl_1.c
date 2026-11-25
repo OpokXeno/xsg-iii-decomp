@@ -290,7 +290,7 @@ int printf(const char *format, ...);
 void xglDmaDirectSrcChain(int channel, void *tag);
 int xglMovieRewind(XglMovieWork *movie);
 
-int func_0018B090(XglMovieWork *info)
+int xglMoviePlay(XglMovieWork *info)
 {
     int strip;
     int retry;

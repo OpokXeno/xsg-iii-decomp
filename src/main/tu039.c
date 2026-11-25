@@ -35,9 +35,9 @@ INCLUDE_ASM("asm/main/nonmatchings/tu039", func_0019D6F0);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu039", func_0019D990);
 
-/* X2 pxyFillFrameAlpha80: sets the frame alpha to 0x80 over the whole screen, then restores the frame mask and the
+/* Sets the frame alpha to 0x80 over the whole screen, then restores the frame mask and the
  * depth test. */
-void func_0019DBF8(u32 frameMask, u32 frameBase)
+void pxyFillFrameAlpha80(u32 frameMask, u32 frameBase)
 {
     int queueIndex;
     u64 *cursor;
@@ -60,8 +60,8 @@ void func_0019DBF8(u32 frameMask, u32 frameBase)
     nmlPacketAddGsFlushWide();
 }
 
-/* X2 pxyModulateFrameByAlpha: multiplies the frame colour by its alpha (a blended full-screen sprite). */
-void func_0019DDB0(int unusedFrameBase, float unusedScale)
+/* Multiplies the frame colour by its alpha (a blended full-screen sprite). */
+void pxyModulateFrameByAlpha(int unusedFrameBase, float unusedScale)
 {
     int queueIndex;
     u64 *p;

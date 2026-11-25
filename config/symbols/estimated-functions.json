@@ -31032,7 +31032,7 @@
      2
     ],
     [
-     "func_0018B090",
+     "xglMoviePlay",
      1618064,
      1556,
      2
@@ -33444,13 +33444,13 @@
      2
     ],
     [
-     "func_0019DBF8",
+     "pxyFillFrameAlpha80",
      1694712,
      436,
      2
     ],
     [
-     "func_0019DDB0",
+     "pxyModulateFrameByAlpha",
      1695152,
      336,
      2

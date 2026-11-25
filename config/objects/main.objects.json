@@ -39750,9 +39750,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0018B090",
+     "name": "xglMoviePlay",
      "size": 1556,
-     "splat_name": "func_0018B090",
+     "splat_name": "xglMoviePlay",
      "va": "0x0018b090",
      "name_basis": "address",
      "provenance": "estimated"
@@ -46494,18 +46494,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019DBF8",
+     "name": "pxyFillFrameAlpha80",
      "size": 436,
-     "splat_name": "func_0019DBF8",
+     "splat_name": "pxyFillFrameAlpha80",
      "va": "0x0019dbf8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019DDB0",
+     "name": "pxyModulateFrameByAlpha",
      "size": 336,
-     "splat_name": "func_0019DDB0",
+     "splat_name": "pxyModulateFrameByAlpha",
      "va": "0x0019ddb0",
      "name_basis": "address",
      "provenance": "estimated"
