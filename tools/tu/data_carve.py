@@ -1082,7 +1082,7 @@ def _character_tu_record(root, tu_id):
         return tu
     flags = tu.get('flags')
     if (tu.get('category') != 'game' or tu.get('in_scope') is not True or
-            tu.get('kind') != 'gcc' or
+            tu.get('kind') not in ('gcc', 'data-only') or  # a data-only object is a GCC object without functions
             tu.get('compiler_profile') != 'ee-gcc2_96-realconv-lp7' or
             flags not in (['-O2', '-G0'], ['-O2', '-G4'], ['-O2', '-G8'], ['-O0', '-G0'], ['-O0', '-G4'], ['-O0', '-G8'])):
         raise CarveError('unsupported public typed character TU contract')
