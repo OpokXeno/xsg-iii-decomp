@@ -10243,7 +10243,6 @@ xglMcBasePathThird = 0x004B36A0;
 xglMcBasePathFourth = 0x004B36A4;
 gMoviePathPrefix = 0x0055119C;
 gMovieKeyFormat = 0x00540380;
-gMovieFrameWidth = 0x004C839C;
 moviePlayerWidth = 0x005511A0;
 moviePlayerHeight = 0x005511A2;
 gSoundVoiceVolume = 0x004C7568;

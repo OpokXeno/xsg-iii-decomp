@@ -324,7 +324,6 @@
    "0x004b36a4": "xglMcBasePathFourth",
    "0x0055119c": "gMoviePathPrefix",
    "0x00540380": "gMovieKeyFormat",
-   "0x004c839c": "gMovieFrameWidth",
    "0x005511a0": "moviePlayerWidth",
    "0x005511a2": "moviePlayerHeight",
    "0x004c7568": "gSoundVoiceVolume",

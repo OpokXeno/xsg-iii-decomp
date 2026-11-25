@@ -2,6 +2,7 @@
 #include "shared.h"
 #include "gs.h"
 #include "main/xgl_cd.h"
+#include "main/xgl_render.h"
 
 /* DMA chain tags (EE DMAC packet words) and the GIF tag bits of the image block. */
 #define DMA_TAG_ID_RET 0x60000000U
@@ -168,7 +169,11 @@ int moviePlayerStartFile(MoviePlayerRecord *player, const char *name)
     return 0;
 }
 
-extern unsigned char gMovieFrameWidth[];
+extern XglRenderStateBlock D_004C8390;
+/* BITBLTBUF of the frame upload: the destination page (the previous display page) in DBP as page * 32,
+ * and DBW 8 (512 pixels). */
+#define MOVIE_BITBLTBUF_DBP_SHIFT 37
+#define MOVIE_BITBLTBUF_DBW_512 ((u64) 8 << 48)
 
 void func_00132E10(int playerHandle, int value);
 
@@ -196,7 +201,7 @@ void func_00130B50(int playerHandle, MovieCurrentFrame *frame);
 int func_00133F08(int playerHandle);
 
 /* XS2 moviePlayerUpdate: releases the frame taken last time, takes the next one and, when there
- * is one, builds its upload chain (with the width from gMovieFrameWidth as BITBLTBUF destination)
+ * is one, builds its upload chain (with the previous display page as BITBLTBUF destination)
  * and queues it. Returns 1 at the end of the movie, -1 on a playback error, 0 otherwise. */
 int func_0018BB08(MoviePlayerRecord *player)
 {
@@ -216,7 +221,7 @@ int func_0018BB08(MoviePlayerRecord *player)
         player->frame_height = frame.height;
         makeGstransChain(player->dma_address, frame.image, player);
         dma_words = (u64 *) ((player->dma_address & 0x0FFFFFFF) | 0x20000000);
-        dma_words[4] = ((u64) *(u16 *)gMovieFrameWidth << 37) | (0x8000ULL << 36);
+        dma_words[4] = ((u64) D_004C8390.prev_dispfb_base << MOVIE_BITBLTBUF_DBP_SHIFT) | MOVIE_BITBLTBUF_DBW_512;
         func_002F49F8(packet, player->dma_address, 0);
         player->frame_held = 1;
     }
@@ -231,7 +236,7 @@ int func_0018BB08(MoviePlayerRecord *player)
 }
 
 /* Forwards `value` to func_00132E10 for the player's handle. When `value` is 0 and the player
- * has a frame, it stores the BITBLTBUF word (the width from gMovieFrameWidth in the DBW field) at
+ * has a frame, it stores the BITBLTBUF word (the previous display page as destination) at
  * offset 0x20 of the player's DMA packet, then calls func_002F49F8 on the packet. */
 int moviePlayerUpdate(MoviePlayerRecord *player, int value)
 {
@@ -244,7 +249,7 @@ int moviePlayerUpdate(MoviePlayerRecord *player, int value)
         packet = xglPacketGetCurrent();
         dma_address = player->dma_address;
         dma_words = (u64 *) ((dma_address & 0x0FFFFFFF) | 0x20000000);
-        dma_words[4] = ((u64) *(u16 *)gMovieFrameWidth << 37) | (0x8000ULL << 36);
+        dma_words[4] = ((u64) D_004C8390.prev_dispfb_base << MOVIE_BITBLTBUF_DBP_SHIFT) | MOVIE_BITBLTBUF_DBW_512;
         func_002F49F8(packet, dma_address, 0);
     }
     return 0;
