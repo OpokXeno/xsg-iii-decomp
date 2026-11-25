@@ -384,8 +384,7 @@ int xglMoviePlay(XglMovieWork *info)
                 }
             }
             if (retry > MOVIE_POLL_LIMIT) {
-                printf("ipu time out:%d
-", strip);
+                printf("ipu time out:%d\n", strip);
             }
             pitch = info->width / 4;
             source = (MovieQuadword *) work;

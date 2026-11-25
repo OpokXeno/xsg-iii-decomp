@@ -204,9 +204,8 @@ extern int AddDmacHandler(int channel, int (*handler)(int channel), int next);
 
 void EnableIntc(unsigned int cause, int value);
 
-/* Kernel service 0x15 returns the previous state. xglIntcDisable passes a second, cleared argument
- * (the original sets $a1 = 0 there), func_00190688 only the cause, so the prototype is variadic. */
-int DisableIntc(unsigned int cause, ...);
+/* Kernel service 0x15; returns the previous state. */
+int DisableIntc(unsigned int cause);
 
 int EnableDmac(int channel);
 
@@ -336,7 +335,7 @@ int xglIntcDisable(unsigned int cause)
     volatile int *causeSlot = &xglIntcSlotMap[cause];
 
     if (valid_cause && (*causeSlot >= 0)) {
-        DisableIntc(cause, 0);
+        DisableIntc(cause);
         disabled = 1;
     }
     return disabled;
