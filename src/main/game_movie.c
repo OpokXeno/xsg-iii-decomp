@@ -387,7 +387,7 @@ void GameSynopsisDrawPanel(GameSynopsisPanel *panel, int x, int y, int alpha)
     sceVif1PkAddDataN(packet, &gameSynopsisPanelRectPacket, 44);
 }
 
-extern u16 movieBackdropBasePage[];
+extern XglRenderStateBlock D_004C8390;
 
 
 
@@ -405,7 +405,7 @@ void DrawBack(int alpha)
     nonnegative_alpha = alpha < 0 ? 0 : alpha;
     gs_frame_address_bits = 0xc800;
     movieBackdropPacket.doublewords[6] =
-        (0x24120000 | (movieBackdropBasePage[0] << 5)) |
+        (0x24120000 | (D_004C8390.work_buffer_base << 5)) |
         (gs_frame_address_bits << 0x13);
     movieBackdropPacket.doublewords[8] = (nonnegative_alpha << 32) | 100;
     FlushCache(0);

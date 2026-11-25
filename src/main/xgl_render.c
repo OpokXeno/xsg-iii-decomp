@@ -4,6 +4,9 @@
 #include "main/xgl_render.h"
 #include "gs.h"
 
+/* The render state block at 0x004C8390 (X3 scaffold label). */
+extern XglRenderStateBlock D_004C8390;
+
 typedef signed char s8;
 
 typedef unsigned char u8;
@@ -40,10 +43,8 @@ void stateExchangeOverrideSet(void) {
     gStateExchangeOverride = 1;
 }
 
-extern unsigned char gXglRenderFadeDisabled[];
-
 s32 xglRenderMovieIsActive(void) {
-    return gXglRenderFadeDisabled[0] != 0;
+    return D_004C8390.movieMode != 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199BE0);
@@ -506,8 +507,6 @@ void xglRenderSyncInit(void) {
     gVsyncsSinceFlip = 0;
 }
 
-/* X3 scaffold label 0x004c8390: the fields xglRenderSyncWait reads and writes, at their asm offsets. */
-extern XglRenderStateBlock D_004C8390;
 
 extern signed char gVsyncsPerFrame;
 
@@ -728,8 +727,6 @@ void xglRenderScanLineInit(void)
   xglRenderSyncInit();
 }
 
-extern unsigned char xglRenderStartFlag[];
-
 void xglRenderScanLineInit();
 
 void xglRenderDispEnvFlagSet();
@@ -737,7 +734,7 @@ void xglRenderDispEnvFlagSet();
 s32 xglIntcEnable();
 
 void xglRenderStart(s32 renderStartMode) {
-    xglRenderStartFlag[0] = renderStartMode;
+    D_004C8390.progressiveMode = renderStartMode;
     xglRenderScanLineInit();
     xglIntcEnable(5);
     func_0019A280();
@@ -898,7 +895,7 @@ void func_0019ADD8(void)
     D_004C8390.fade_level = RENDER_FADE_NEUTRAL;
     D_004C8390.palMode = 0;
     D_004C8390.progressiveMode = 0;
-    D_004C8390.unmodeled_83 = 0;
+    D_004C8390.movieFullColor = 0;
     xglRenderScanLineInit();
     func_0019A6F0(0);
     xglRenderMoveCount = 0;
@@ -1023,7 +1020,7 @@ void xglRenderGlobalFadeSend(void) {
     s32 alpha;
     XglPacket *packet;
 
-    if (gXglRenderFadeDisabled[0] == 0) {
+    if (D_004C8390.movieMode == 0) {
         alpha = xglRenderFadeAlpha();
         xglRenderFadeGifWord[0] = alpha;
         packet = xglPacketGetCurrent();
@@ -1037,7 +1034,7 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 s32 moviePlayerInit();
 
 void xglRenderMovieBegin(void) {
-    gXglRenderFadeDisabled[0] = 1;
+    D_004C8390.movieMode = 1;
     xglRenderMovieActive = 1;
     func_0019ADD8();
     moviePlayerInit();
