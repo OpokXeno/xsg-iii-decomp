@@ -133,6 +133,7 @@
    "0x005401a0": "xglCdDeviceName",
    "0x00540210": "$L13",
    "0x00540238": "xglMcBasePath",
+   "0x00540378": "gMoviePathPrefixText",
    "0x00540390": "$L499",
    "0x00540408": "soundCdLocationFormat",
    "0x00540620": "exitProgramBanner",

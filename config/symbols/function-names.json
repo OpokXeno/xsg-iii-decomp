@@ -415,6 +415,7 @@
    "0x002f95b8": "sceMcWrite",
    "0x002f9730": "sceMcSync",
    "0x002f9850": "sceMcGetInfo",
+   "0x002faf50": "sceIpuSync",
    "0x00303a50": "atanf",
    "0x00303cf0": "cosf",
    "0x00303ee0": "sinf",

@@ -139830,9 +139830,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002FAF50",
+     "name": "sceIpuSync",
      "size": 104,
-     "splat_name": "func_002FAF50",
+     "splat_name": "sceIpuSync",
      "va": "0x002faf50",
      "name_basis": "address",
      "provenance": "estimated"
