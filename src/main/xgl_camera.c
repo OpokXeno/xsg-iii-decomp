@@ -95,7 +95,7 @@ void xglCameraTravelDefaultInit(XglCamera *camera) {
 
     travel->focus = 5.0f;
     travel->fov = 0.69813174f;
-    travel->unknown_78 = 0;
+    travel->fast_travel_frames = 0;
     travel->fov_velocity = 0.0f;
     travel->scale = 0.0f;
     QuadwordCopy(&travel->rotation, &gCameraDefaultRotation);
@@ -200,19 +200,19 @@ void func_00193BD0(XglCamera *camera)
         travel->scale = travel->scale * 4.0f;
         xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, 4.0f);
         xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta, 4.0f);
-        travel->unknown_78 = travel->unknown_78 + 1;
+        travel->fast_travel_frames = travel->fast_travel_frames + 1;
     } else {
-        travel->unknown_78 = 0;
+        travel->fast_travel_frames = 0;
     }
     travel->scale = travel->scale * ((travel->focus - 5.0f) * 0.08f + 1.0f);
     if (travel->focus >= 10.0f) {
         xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta,
                           (CAMERA_TRAVEL_ANGLE_FOCUS_MAX - 5.0f) * 0.08f + 1.0f);
         xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta,
-                          (travel->focus * 10.0f - 5.0f) * 0.24f + 1.0f + travel->unknown_78 * 0.01f);
+                          (travel->focus * 10.0f - 5.0f) * 0.24f + 1.0f + travel->fast_travel_frames * 0.01f);
     } else {
         xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta,
-                          (travel->focus - 5.0f) * 0.24f + 1.0f + travel->unknown_78 * 0.01f);
+                          (travel->focus - 5.0f) * 0.24f + 1.0f + travel->fast_travel_frames * 0.01f);
         xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, (travel->focus - 5.0f) * 0.08f + 1.0f);
     }
 }
@@ -514,13 +514,19 @@ void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
  * value for MAGH 4. */
 #define CAMERA_PROJECTION_SCALE (25.0f / 22.0f)
 
+/* The depth range of the camera screen as floats: its minimum and its extent. */
+typedef struct CameraDepthRange {
+    float minimum;
+    float range;
+} CameraDepthRange;
+
 /* Derives the screen offset and scale, the clip range and the projection from the window, resolution and
  * port effect of the camera screen. */
 void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
 {
     XglCameraScreen *screen = &camera->screen;
     float scale;
-    float depth[2];
+    CameraDepthRange depth;
     Vector4 scaled;
     float offsetX;
     float offsetY;
@@ -528,8 +534,8 @@ void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
     offsetX = (screen->window.vector.z + screen->window.vector.x) * 0.5f - screen->resolution.vector.x * 0.5f;
     offsetY = (screen->window.vector.w + screen->window.vector.y) * 0.5f - screen->resolution.vector.y * 0.5f;
     scale = CAMERA_PROJECTION_SCALE;
-    depth[0] = (float) screen->depthMin;
-    depth[1] = (float) (screen->depthMax - screen->depthMin);
+    depth.minimum = (float) screen->depthMin;
+    depth.range = (float) (screen->depthMax - screen->depthMin);
     if (screen->resolution.vector.z > screen->resolution.vector.w) {
         xglVectorScale(&scaled, &screen->resolution.vector,
                        (CAMERA_GS_COORD_SIZE - __builtin_fabsf(2.0f * offsetX)) / screen->resolution.vector.z);
@@ -544,11 +550,11 @@ void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
     screen->projection.z = screen->projection.z * scale;
     screen->screenOffset.x = offsetX + CAMERA_GS_COORD_CENTER;
     screen->screenOffset.y = offsetY + CAMERA_GS_COORD_CENTER;
-    screen->screenOffset.z = depth[0] + depth[1] * 0.5f;
+    screen->screenOffset.z = depth.minimum + depth.range * 0.5f;
     screen->screenOffset.w = (1.0f - screen->portEffect.z) * 255.0f;
     screen->screenScale.x = (scaled.x * screen->portEffect.x) * 0.5f;
     screen->screenScale.y = -((scaled.y * screen->portEffect.y) * 0.5f);
-    screen->screenScale.z = -(depth[1] * 0.5f);
+    screen->screenScale.z = -(depth.range * 0.5f);
     screen->screenScale.w = (screen->portEffect.z * screen->portEffect.w) * 255.0f;
 }
 

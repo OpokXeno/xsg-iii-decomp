@@ -43,7 +43,7 @@ typedef struct CameraTravel {
     Vector4 place_delta;
     float chase_yaw;
     float chase_distance;
-    int unknown_78;
+    int fast_travel_frames;         /* frames the fast-travel button has been held */
     unsigned char unmodeled_7c[4];
     Vector4 chase_reference;
     Vector4 chase_position;
