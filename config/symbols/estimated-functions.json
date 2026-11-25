@@ -30414,7 +30414,7 @@
      2
     ],
     [
-     "func_00184938",
+     "xglFontGetGlyphIndex",
      1591608,
      500,
      2
@@ -31032,7 +31032,7 @@
      2
     ],
     [
-     "func_0018B090",
+     "xglMoviePlay",
      1618064,
      1556,
      2
@@ -32034,7 +32034,7 @@
      2
     ],
     [
-     "func_001948E0",
+     "xglCameraViewScreen",
      1657056,
      636,
      2
@@ -33444,13 +33444,13 @@
      2
     ],
     [
-     "func_0019DBF8",
+     "pxyFillFrameAlpha80",
      1694712,
      436,
      2
     ],
     [
-     "func_0019DDB0",
+     "pxyModulateFrameByAlpha",
      1695152,
      336,
      2
@@ -63912,7 +63912,7 @@
      2
     ],
     [
-     "func_002E6B20",
+     "RemoveIntcHandler",
      3042080,
      16,
      2
@@ -63930,7 +63930,7 @@
      2
     ],
     [
-     "func_002E6B50",
+     "RemoveDmacHandler",
      3042128,
      16,
      2
@@ -66522,7 +66522,7 @@
      2
     ],
     [
-     "func_002F33D0",
+     "sceGsSetDefDispEnv",
      3093456,
      884,
      2
@@ -66630,7 +66630,7 @@
      2
     ],
     [
-     "func_002F47D8",
+     "sceGsSyncVCallback",
      3098584,
      160,
      2
@@ -66642,19 +66642,19 @@
      2
     ],
     [
-     "func_002F4888",
+     "sceVif1PkReset",
      3098760,
      16,
      2
     ],
     [
-     "func_002F4898",
+     "sceVif1PkTerminate",
      3098776,
      88,
      2
     ],
     [
-     "func_002F48F0",
+     "sceVif1PkSize",
      3098864,
      20,
      2
@@ -66678,7 +66678,7 @@
      2
     ],
     [
-     "func_002F4A68",
+     "sceVif1PkEnd",
      3099240,
      88,
      2
@@ -67482,7 +67482,7 @@
      2
     ],
     [
-     "func_002FAF50",
+     "sceIpuSync",
      3125072,
      104,
      2

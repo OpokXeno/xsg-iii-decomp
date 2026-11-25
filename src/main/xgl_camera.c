@@ -95,7 +95,7 @@ void xglCameraTravelDefaultInit(XglCamera *camera) {
 
     travel->focus = 5.0f;
     travel->fov = 0.69813174f;
-    travel->unknown_78 = 0;
+    travel->fast_travel_frames = 0;
     travel->fov_velocity = 0.0f;
     travel->scale = 0.0f;
     QuadwordCopy(&travel->rotation, &gCameraDefaultRotation);
@@ -122,11 +122,100 @@ void func_00193A40(XglCamera *camera)
     QuadwordCopy(&camera->travel.place_delta, &gCameraResetPlaceDelta);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193A78);
-
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_00193BD0);
-
 extern PadRecord PadData[2];
+
+/* The buttons of the focus and scale update (PS2 pad bits: R2, L1, R1, circle, square). */
+#define CAMERA_FOCUS_BTN_SCALE_DOWN 0x0002
+#define CAMERA_FOCUS_BTN_SHIFTS 0x000E
+#define CAMERA_FOCUS_BTN_SCALE_UP 0x0008
+#define CAMERA_FOCUS_BTN_IN 0x0020
+#define CAMERA_FOCUS_BTN_OUT 0x0080
+/* From 10 on the focus steps while the button is held, below it once per press. */
+#define CAMERA_FOCUS_HELD_MIN 10.0f
+#define CAMERA_FOCUS_MAX 99.0f
+#define CAMERA_FOCUS_MIN 1.0f
+#define CAMERA_FOCUS_STEP 1.0f
+/* The travel scale the scale buttons set (in radians per frame). */
+#define CAMERA_SCALE_STEP 0.0011170107f
+
+/* Pad update of the travel focus and scale: steps the focus between 1 and 99 (unless one
+ * of R2/L1/R1 is held or sdv holds the camera) and sets the scale from R1 or R2. With the
+ * sdv special work active its buttons replace the pads'. */
+void func_00193A78(XglCamera *camera)
+{
+    CameraTravel *travel = &camera->travel;
+    unsigned short held;
+    unsigned short pressed;
+
+    held = PadData[1].held | PadData[camera->padPort].held;
+    pressed = PadData[1].pressed | PadData[camera->padPort].pressed;
+    if (sdvSpecialBuf.active) {
+        held = sdvSpecialBuf.held;
+        pressed = sdvSpecialBuf.pressed;
+    }
+    if (!(held & CAMERA_FOCUS_BTN_SHIFTS) && D_005511EC == 0) {
+        if (travel->focus >= CAMERA_FOCUS_HELD_MIN) {
+            if ((held & CAMERA_FOCUS_BTN_IN) && travel->focus < CAMERA_FOCUS_MAX) {
+                travel->focus += CAMERA_FOCUS_STEP;
+            }
+            if ((held & CAMERA_FOCUS_BTN_OUT) && travel->focus > CAMERA_FOCUS_MIN) {
+                travel->focus -= CAMERA_FOCUS_STEP;
+            }
+        } else {
+            if ((pressed & CAMERA_FOCUS_BTN_IN) && travel->focus < CAMERA_FOCUS_MAX) {
+                travel->focus += CAMERA_FOCUS_STEP;
+            }
+            if ((pressed & CAMERA_FOCUS_BTN_OUT) && travel->focus > CAMERA_FOCUS_MIN) {
+                travel->focus -= CAMERA_FOCUS_STEP;
+            }
+        }
+    }
+    if (held & CAMERA_FOCUS_BTN_SCALE_UP) {
+        travel->scale = CAMERA_SCALE_STEP;
+    }
+    if (held & CAMERA_FOCUS_BTN_SCALE_DOWN) {
+        travel->scale = -CAMERA_SCALE_STEP;
+    }
+}
+
+/* Cross (PS2 pad bit 0x40): the travel runs four times as fast. */
+#define CAMERA_TRAVEL_BTN_FAST 0x0040
+/* From focus 10 on the angle delta keeps the factor of focus 9 (episode II's largest focus). */
+#define CAMERA_TRAVEL_ANGLE_FOCUS_MAX 9.0f
+
+void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
+
+/* Scales the travel scale and deltas by focus-dependent factors, x4 while cross is held. From focus 10 on the
+ * angle delta keeps the factor of focus 9 and the place delta uses ten times the focus. */
+void func_00193BD0(XglCamera *camera)
+{
+    CameraTravel *travel = &camera->travel;
+    unsigned short held;
+
+    held = PadData[1].held | PadData[camera->padPort].held;
+    if (sdvSpecialBuf.active) {
+        held = sdvSpecialBuf.held;
+    }
+    if (held & CAMERA_TRAVEL_BTN_FAST) {
+        travel->scale = travel->scale * 4.0f;
+        xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, 4.0f);
+        xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta, 4.0f);
+        travel->fast_travel_frames = travel->fast_travel_frames + 1;
+    } else {
+        travel->fast_travel_frames = 0;
+    }
+    travel->scale = travel->scale * ((travel->focus - 5.0f) * 0.08f + 1.0f);
+    if (travel->focus >= 10.0f) {
+        xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta,
+                          (CAMERA_TRAVEL_ANGLE_FOCUS_MAX - 5.0f) * 0.08f + 1.0f);
+        xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta,
+                          (travel->focus * 10.0f - 5.0f) * 0.24f + 1.0f + travel->fast_travel_frames * 0.01f);
+    } else {
+        xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta,
+                          (travel->focus - 5.0f) * 0.24f + 1.0f + travel->fast_travel_frames * 0.01f);
+        xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, (travel->focus - 5.0f) * 0.08f + 1.0f);
+    }
+}
 
 void func_00193A40(XglCamera *camera);
 
@@ -416,12 +505,60 @@ void xglCameraSetPadPort(XglCamera *camera, s32 port) {
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001947F0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001948E0);
-
-float tanf(float angle);
-
 void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
 
+/* The GS primitive coordinate range (12.4 fixed point) and its centre. */
+#define CAMERA_GS_COORD_SIZE 4096.0f
+#define CAMERA_GS_COORD_CENTER 2048.0f
+/* The horizontal projection scale. XS2 computes (135 / 11) / (54 / (MAGH + 1)) from DISPLAY1; XS3 keeps the
+ * value for MAGH 4. */
+#define CAMERA_PROJECTION_SCALE (25.0f / 22.0f)
+
+/* The depth range of the camera screen as floats: its minimum and its extent. */
+typedef struct CameraDepthRange {
+    float minimum;
+    float range;
+} CameraDepthRange;
+
+/* Derives the screen offset and scale, the clip range and the projection from the window, resolution and
+ * port effect of the camera screen. */
+void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
+{
+    XglCameraScreen *screen = &camera->screen;
+    float scale;
+    CameraDepthRange depth;
+    Vector4 scaled;
+    float offsetX;
+    float offsetY;
+
+    offsetX = (screen->window.vector.z + screen->window.vector.x) * 0.5f - screen->resolution.vector.x * 0.5f;
+    offsetY = (screen->window.vector.w + screen->window.vector.y) * 0.5f - screen->resolution.vector.y * 0.5f;
+    scale = CAMERA_PROJECTION_SCALE;
+    depth.minimum = (float) screen->depthMin;
+    depth.range = (float) (screen->depthMax - screen->depthMin);
+    if (screen->resolution.vector.z > screen->resolution.vector.w) {
+        xglVectorScale(&scaled, &screen->resolution.vector,
+                       (CAMERA_GS_COORD_SIZE - __builtin_fabsf(2.0f * offsetX)) / screen->resolution.vector.z);
+    } else {
+        xglVectorScale(&scaled, &screen->resolution.vector,
+                       (CAMERA_GS_COORD_SIZE - __builtin_fabsf(2.0f * offsetY)) / screen->resolution.vector.w);
+    }
+    screen->clipRange.vector.z = screen->projection.x * (scaled.z / screen->resolution.vector.z);
+    screen->clipRange.vector.w = screen->projection.y * (scaled.w / screen->resolution.vector.w);
+    QuadwordCopy(&screen->projection, &screen->resolution);
+    screen->projection.x = screen->projection.x * scale;
+    screen->projection.z = screen->projection.z * scale;
+    screen->screenOffset.x = offsetX + CAMERA_GS_COORD_CENTER;
+    screen->screenOffset.y = offsetY + CAMERA_GS_COORD_CENTER;
+    screen->screenOffset.z = depth.minimum + depth.range * 0.5f;
+    screen->screenOffset.w = (1.0f - screen->portEffect.z) * 255.0f;
+    screen->screenScale.x = (scaled.x * screen->portEffect.x) * 0.5f;
+    screen->screenScale.y = -((scaled.y * screen->portEffect.y) * 0.5f);
+    screen->screenScale.z = -(depth.range * 0.5f);
+    screen->screenScale.w = (screen->portEffect.z * screen->portEffect.w) * 255.0f;
+}
+
+float tanf(float angle);
 void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
 
 void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b, const Vector4 *c);
@@ -541,8 +678,6 @@ void xglCameraTravelDefaultInit(XglCamera *camera);
 
 void xglCameraScreenInit(XglCamera *camera);
 
-void func_001948E0();
-
 void xglCameraViewTravel(XglCamera *camera, Vector4 *cameraShift);
 
 void xglCameraViewVolume(XglCamera *camera, Vector4 *cameraShift);
@@ -558,13 +693,13 @@ void xglCameraMove(XglCamera *camera) {
     Vector4 cameraShift;
 
     cameraShift = (Vector4){0, 0, 0, 0};
-    func_001948E0(camera, &cameraShift);
+    xglCameraViewScreen(camera, &cameraShift);
     xglCameraViewTravel(camera, &cameraShift);
     xglCameraViewVolume(camera, &cameraShift);
 }
 
 void xglCameraMoveOffset(XglCamera *camera, Vector4 *cameraShift) {
-    func_001948E0();
+    xglCameraViewScreen(camera, cameraShift);
     xglCameraViewTravel(camera, cameraShift);
     xglCameraViewVolume(camera, cameraShift);
 }

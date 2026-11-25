@@ -36,4 +36,18 @@ struct XglTaskScheduler {
     XglTaskPrefix *next_to_visit;
 };
 
+/* xglCdGetFilePos and xglCdGetFileData fill a 0x30-byte file-position record;
+ * only its leading lbn word is evidenced by the callers in xgl_cd.c. */
+typedef struct CdFilePosition {
+    unsigned int lbn;
+    unsigned int stored_bytes;
+    unsigned char unmodeled_08[0x1c];
+    unsigned char readMedium;
+    unsigned char unmodeled_25;
+    unsigned char packed;
+    unsigned char unmodeled_27;
+    int fileDescriptor;
+    int file_size;
+} CdFilePosition;
+
 #endif

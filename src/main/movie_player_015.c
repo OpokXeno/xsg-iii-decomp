@@ -1,6 +1,7 @@
 #include "common.h"
 #include "shared.h"
 #include "gs.h"
+#include "main/xgl_cd.h"
 
 /* DMA chain tags (EE DMAC packet words) and the GIF tag bits of the image block. */
 #define DMA_TAG_ID_RET 0x60000000U
@@ -37,19 +38,26 @@ typedef struct DmaRefTag {
     u64 upperQword;
 } DmaRefTag;
 
-/* The 16-bit frame record: an origin offset added to each macroblock position, and the extent. */
-typedef struct MovieFrame {
-    unsigned char unmodeled_00[12];
-    short origin_x;
-    short origin_y;
-    short width;
-    short height;
-} MovieFrame;
+/* The movie player record moviePlayerSetupObject fills in: the player handle, the GS transfer chain, the stamp of
+ * the current frame, the origin added to each macroblock position, the frame size (the maximum after the setup,
+ * then the size of each frame), the frame-held flag, and the extra-sound flag and volume. */
+typedef struct MoviePlayerRecord {
+    int playerHandle;            /* +0x00: returned by func_0012FBB8 */
+    unsigned int dma_address;    /* +0x04: the GS transfer chain */
+    int frame_stamp;             /* +0x08 */
+    short origin_x;              /* +0x0C */
+    short origin_y;              /* +0x0E */
+    short frame_width;           /* +0x10 */
+    short frame_height;          /* +0x12 */
+    unsigned char frame_held;    /* +0x14 */
+    unsigned char extra_enabled; /* +0x15 */
+    unsigned char volume;        /* +0x16 */
+} MoviePlayerRecord;
 
 /* Builds the DMA chain that uploads a frame's RGBA32 image to the GS, one 16x16 macroblock per
  * REF tag, and returns its length in quadwords. With a null `chainAddress` nothing is written
  * and only the length is computed. */
-int makeGstransChain(unsigned int chainAddress, unsigned int image, const MovieFrame *frame)
+int makeGstransChain(unsigned int chainAddress, unsigned int image, const MoviePlayerRecord *frame)
 {
     u64 *packet = (u64 *) ((chainAddress & 0x0fffffffU) | 0x20000000U);
     unsigned int macroblockSource = image;
@@ -68,8 +76,8 @@ int makeGstransChain(unsigned int chainAddress, unsigned int image, const MovieF
         packet[7] = GS_TRXREG;
     }
     packet += 8;
-    for (x = 0; x < frame->width; x += MOVIE_MACROBLOCK) {
-        for (y = 0; y < frame->height; y += MOVIE_MACROBLOCK) {
+    for (x = 0; x < frame->frame_width; x += MOVIE_MACROBLOCK) {
+        for (y = 0; y < frame->frame_height; y += MOVIE_MACROBLOCK) {
             if (chainAddress != 0) {
                 packet[0] = DMA_TAG_ID_CNT | 4;
                 packet[1] = DMA_TAG_VIF_DIRECT(4);
@@ -101,24 +109,6 @@ int makeGstransChain(unsigned int chainAddress, unsigned int image, const MovieF
     return (((unsigned int) packet - chainAddress) & 0x00ffffffU) >> 4;
 }
 
-/* The movie player record: the handle, the DMA packet address, the frame stamp, and the
- * extra-sound flag and volume. */
-typedef struct MoviePlayerRecord {
-    int playerHandle;
-    unsigned int dma_address;
-    int frame_stamp;
-    unsigned char unmodeled_0c[9];
-    unsigned char extra_enabled;
-    unsigned char volume;
-} MoviePlayerRecord;
-
-/* The 0x30-byte file-position record; only its leading lbn and stored_bytes words are evidenced here. */
-typedef struct CdFilePositionRecord {
-    unsigned int lbn;
-    unsigned int stored_bytes;
-    unsigned char unmodeled_08[0x28];
-} CdFilePositionRecord;
-
 extern const char *gMoviePathPrefix;
 
 extern const char gMovieKeyFormat[];
@@ -140,7 +130,7 @@ int GameMpeg2Play(char *destination, const char *format, unsigned int lbn, unsig
 int moviePlayerStartFile(MoviePlayerRecord *player, const char *name)
 {
     char path[256];
-    CdFilePositionRecord file;
+    CdFilePosition file;
     const char *sourceCursor;
     char *pathCursor;
     char character;
@@ -178,8 +168,6 @@ int moviePlayerStartFile(MoviePlayerRecord *player, const char *name)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/movie_player_015", func_0018BB08);
-
 extern unsigned char gMovieFrameWidth[];
 
 void func_00132E10(int playerHandle, int value);
@@ -187,6 +175,60 @@ void func_00132E10(int playerHandle, int value);
 void func_002F49F8(int packet, int dma_address, int flags);
 
 int xglPacketGetCurrent(void);
+
+/* The frame record func_00130B50 fills: a null image means no new frame. */
+typedef struct MovieCurrentFrame {
+    unsigned int image;
+    unsigned char unmodeled_04[8];
+    int width;
+    int height;
+    unsigned char unmodeled_14[0x10];
+    int stamp;
+    unsigned char unmodeled_28[0x68];
+} MovieCurrentFrame;
+
+/* Player statuses func_00133F08 returns that the frame step tells apart. */
+#define MOVIE_STATUS_PLAY_END 3
+#define MOVIE_STATUS_ERROR 4
+
+void func_00131470(int playerHandle);
+void func_00130B50(int playerHandle, MovieCurrentFrame *frame);
+int func_00133F08(int playerHandle);
+
+/* XS2 moviePlayerUpdate: releases the frame taken last time, takes the next one and, when there
+ * is one, builds its upload chain (with the width from gMovieFrameWidth as BITBLTBUF destination)
+ * and queues it. Returns 1 at the end of the movie, -1 on a playback error, 0 otherwise. */
+int func_0018BB08(MoviePlayerRecord *player)
+{
+    MovieCurrentFrame frame;
+    int packet;
+    u64 *dma_words;
+
+    packet = xglPacketGetCurrent();
+    if (player->frame_held != 0) {
+        func_00131470(player->playerHandle);
+    }
+    func_00130B50(player->playerHandle, &frame);
+    player->frame_held = 0;
+    if (frame.image != 0) {
+        player->frame_stamp = frame.stamp;
+        player->frame_width = frame.width;
+        player->frame_height = frame.height;
+        makeGstransChain(player->dma_address, frame.image, player);
+        dma_words = (u64 *) ((player->dma_address & 0x0FFFFFFF) | 0x20000000);
+        dma_words[4] = ((u64) *(u16 *)gMovieFrameWidth << 37) | (0x8000ULL << 36);
+        func_002F49F8(packet, player->dma_address, 0);
+        player->frame_held = 1;
+    }
+    switch (func_00133F08(player->playerHandle)) {
+    case MOVIE_STATUS_PLAY_END:
+        return 1;
+    case MOVIE_STATUS_ERROR:
+        return -1;
+    default:
+        return 0;
+    }
+}
 
 /* Forwards `value` to func_00132E10 for the player's handle. When `value` is 0 and the player
  * has a frame, it stores the BITBLTBUF word (the width from gMovieFrameWidth in the DBW field) at
@@ -268,7 +310,7 @@ extern unsigned short moviePlayerHeight;
 
 void func_002FB030(void);
 
-void func_002F47D8(int value);
+int sceGsSyncVCallback(int (*callback)(void));
 
 void func_00132140(void);
 
@@ -298,58 +340,44 @@ void moviePlayerSetDimensions(u16 width, u16 height) {
     moviePlayerHeight = height;
 }
 
-/* Layout of the movie player object that moviePlayerSetupObject fills in (0x17 bytes used). */
-typedef struct MoviePlayerObject {
-    s32 playerHandle;                     /* +0x00, returned by func_0012FBB8 */
-    s32 chainBase;                  /* +0x04 */
-    unsigned char unk_08[0x4];
-    s16 unk_0C;                     /* +0x0C, cleared */
-    s16 unk_0E;                     /* +0x0E, cleared */
-    s16 maxWidth;                   /* +0x10, from MoviePlayerParams.max_width */
-    s16 maxHeight;                  /* +0x12, from MoviePlayerParams.max_height */
-    unsigned char unk_14;           /* +0x14, cleared */
-    unsigned char unk_15;           /* +0x15, cleared */
-    unsigned char unk_16;           /* +0x16, set to 0x7F */
-} MoviePlayerObject;
-
 /* The bytes moviePlayerSetupObject uses: the work area and the GS transfer chain, each rounded up to 64. */
 s32 func_0018BD50(void)
 {
-    MoviePlayerObject player;
+    MoviePlayerRecord player;
     MoviePlayerParams creationParams;
     s32 workAreaBytes;
     s32 alignMask;
 
     alignMask = ~0x3F;
     moviePlayerParamsInit(&creationParams);
-    player.maxWidth = creationParams.max_width;
-    player.maxHeight = creationParams.max_height;
+    player.frame_width = creationParams.max_width;
+    player.frame_height = creationParams.max_height;
     workAreaBytes = (creationParams.movieWorkAreaSize + 0x3F) & alignMask;
-    return workAreaBytes + (((makeGstransChain(0, 0, (const MovieFrame *) &player) * 0x10) + 0x3F) & alignMask);
+    return workAreaBytes + (((makeGstransChain(0, 0, &player) * 0x10) + 0x3F) & alignMask);
 }
 
 s32 func_0012FBB8();
 
-s32 moviePlayerSetupObject(MoviePlayerObject *player, s32 movieWorkAreaBase)
+s32 moviePlayerSetupObject(MoviePlayerRecord *player, s32 movieWorkAreaBase)
 {
   MoviePlayerParams creationParams;
   s32 chainBase;
   s32 movieWorkAreaSize;
 
-  player->unk_16 = 0x7F;
-  player->unk_0E = 0;
-  player->unk_0C = 0;
-  player->unk_14 = 0;
-  player->unk_15 = 0;
+  player->volume = 0x7F;
+  player->origin_y = 0;
+  player->origin_x = 0;
+  player->frame_held = 0;
+  player->extra_enabled = 0;
   moviePlayerParamsInit(&creationParams);
   movieWorkAreaSize = creationParams.movieWorkAreaSize;
   creationParams.movieWorkAreaBase = movieWorkAreaBase;
   chainBase = movieWorkAreaBase + ((movieWorkAreaSize + 0x3F) & (~0x3F));
   player->playerHandle = func_0012FBB8(&creationParams);
-  player->maxWidth = creationParams.max_width;
-  player->maxHeight = creationParams.max_height;
-  player->chainBase = chainBase;
-  return chainBase + (((makeGstransChain(chainBase, 0, (const MovieFrame *) player) * 0x10) + 0x3F) & (~0x3F));
+  player->frame_width = creationParams.max_width;
+  player->frame_height = creationParams.max_height;
+  player->dma_address = chainBase;
+  return chainBase + (((makeGstransChain(chainBase, 0, player) * 0x10) + 0x3F) & (~0x3F));
 }
 
 void moviePlayerSetSize(void)
@@ -372,7 +400,7 @@ void moviePlayerInit(void)
 
 void moviePlayerTerminate(void)
 {
-    func_002F47D8(0);
+    sceGsSyncVCallback(0);
     func_00132140();
     func_00167790();
     func_0015DF18();

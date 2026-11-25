@@ -37508,9 +37508,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00184938",
+     "name": "xglFontGetGlyphIndex",
      "size": 500,
-     "splat_name": "func_00184938",
+     "splat_name": "xglFontGetGlyphIndex",
      "va": "0x00184938",
      "name_basis": "address",
      "provenance": "estimated"
@@ -39750,9 +39750,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0018B090",
+     "name": "xglMoviePlay",
      "size": 1556,
-     "splat_name": "func_0018B090",
+     "splat_name": "xglMoviePlay",
      "va": "0x0018b090",
      "name_basis": "address",
      "provenance": "estimated"
@@ -42622,9 +42622,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001948E0",
+     "name": "xglCameraViewScreen",
      "size": 636,
-     "splat_name": "func_001948E0",
+     "splat_name": "xglCameraViewScreen",
      "va": "0x001948e0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -46422,7 +46422,7 @@
    "path": "src/main/tu039.c",
    "scaffold_path": "scaffold/src/main/tu039.c",
    "kind": "gcc",
-   "mode": "asm",
+   "mode": "c",
    "category": "game",
    "map_class": "game",
    "domain": null,
@@ -46494,18 +46494,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019DBF8",
+     "name": "pxyFillFrameAlpha80",
      "size": 436,
-     "splat_name": "func_0019DBF8",
+     "splat_name": "pxyFillFrameAlpha80",
      "va": "0x0019dbf8",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019DDB0",
+     "name": "pxyModulateFrameByAlpha",
      "size": 336,
-     "splat_name": "func_0019DDB0",
+     "splat_name": "pxyModulateFrameByAlpha",
      "va": "0x0019ddb0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -46521,7 +46521,7 @@
     }
    ],
    "owners": {
-    ".text": "asm"
+    ".text": "c"
    },
    "sections": {},
    "text": {
@@ -46535,6 +46535,17 @@
      "0x0019e148"
     ],
     "note": null
+   },
+   "import": {
+    "mode": "c",
+    "note": "X3 package 1: tu039 recovered as C",
+    "source": {
+     "include_dirs": [
+      "include"
+     ],
+     "kind": "file",
+     "path": "src/main/tu039.c"
+    }
    }
   },
   {
@@ -134464,9 +134475,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002E6B20",
+     "name": "RemoveIntcHandler",
      "size": 16,
-     "splat_name": "func_002E6B20",
+     "splat_name": "RemoveIntcHandler",
      "va": "0x002e6b20",
      "name_basis": "address",
      "provenance": "estimated"
@@ -134491,9 +134502,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002E6B50",
+     "name": "RemoveDmacHandler",
      "size": 16,
-     "splat_name": "func_002E6B50",
+     "splat_name": "RemoveDmacHandler",
      "va": "0x002e6b50",
      "name_basis": "address",
      "provenance": "estimated"
@@ -138379,9 +138390,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F33D0",
+     "name": "sceGsSetDefDispEnv",
      "size": 884,
-     "splat_name": "func_002F33D0",
+     "splat_name": "sceGsSetDefDispEnv",
      "va": "0x002f33d0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -138541,9 +138552,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F47D8",
+     "name": "sceGsSyncVCallback",
      "size": 160,
-     "splat_name": "func_002F47D8",
+     "splat_name": "sceGsSyncVCallback",
      "va": "0x002f47d8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -138559,27 +138570,27 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F4888",
+     "name": "sceVif1PkReset",
      "size": 16,
-     "splat_name": "func_002F4888",
+     "splat_name": "sceVif1PkReset",
      "va": "0x002f4888",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F4898",
+     "name": "sceVif1PkTerminate",
      "size": 88,
-     "splat_name": "func_002F4898",
+     "splat_name": "sceVif1PkTerminate",
      "va": "0x002f4898",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F48F0",
+     "name": "sceVif1PkSize",
      "size": 20,
-     "splat_name": "func_002F48F0",
+     "splat_name": "sceVif1PkSize",
      "va": "0x002f48f0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -138613,9 +138624,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002F4A68",
+     "name": "sceVif1PkEnd",
      "size": 88,
-     "splat_name": "func_002F4A68",
+     "splat_name": "sceVif1PkEnd",
      "va": "0x002f4a68",
      "name_basis": "address",
      "provenance": "estimated"
@@ -139819,9 +139830,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002FAF50",
+     "name": "sceIpuSync",
      "size": 104,
-     "splat_name": "func_002FAF50",
+     "splat_name": "sceIpuSync",
      "va": "0x002faf50",
      "name_basis": "address",
      "provenance": "estimated"

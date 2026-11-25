@@ -58,7 +58,7 @@ typedef struct XglRenderState {
 /* Callbacks xglRenderFinalPacket runs on the frame packet. */
 #define RENDER_FINAL_CALLBACK_COUNT 21
 
-/* The X3 render state at 0x004C8390 (0x86 bytes; the object records the size). XglRenderState above is
+/* The X3 render state at 0x004C8390 (0x88 bytes with the fade gain and level). XglRenderState above is
  * X2's layout and belongs to sRender only. */
 typedef struct XglRenderStateBlock {
     short depth_psm;                    /* +0x00 */
@@ -68,26 +68,47 @@ typedef struct XglRenderStateBlock {
     unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
-    unsigned char unmodeled_0e[8];      /* +0x0E..+0x15 */
-    unsigned short display_buffer_base; /* +0x16: read by the drop-shadow packets of XenoActorUnpack.c */
-    unsigned char unmodeled_18[4];      /* +0x18..+0x1B */
+    /* +0x0E: the third full-screen page (X2 work_buffer_base; label movieBackdropBasePage) */
+    unsigned short work_buffer_base;
+    unsigned short aux_page;            /* +0x10: a VRAM page func_0019A6F0 sets; no reader in this build */
+    unsigned short texture_base;        /* +0x12: the texture buffer page (Packet.c's texture transfer) */
+    unsigned short aux_page2;           /* +0x14: a VRAM page func_0019A6F0 sets; no reader in this build */
+    /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame; read by the drop-shadow
+     * packets of XenoActorUnpack.c */
+    unsigned short display_buffer_base;
+    unsigned short flip_base;           /* +0x18: the next display page (X2 sRenderFlipBase) */
+    unsigned char unmodeled_1a[2];      /* +0x1A..+0x1B */
     XglRenderFadeCallback finalPacketCallbacks[RENDER_FINAL_CALLBACK_COUNT]; /* +0x1C: run by xglRenderFinalPacket */
-    unsigned char unmodeled_70[0x05];   /* +0x70..+0x74 */
+    unsigned char unmodeled_70[4];      /* +0x70..+0x73 */
+    unsigned char render_status;        /* +0x74: cleared by the base swap (X2 xglRenderStatus) */
     unsigned char frame_delta;          /* +0x75 */
-    unsigned char unmodeled_76[0x0a];   /* +0x76..+0x7F */
+    unsigned char path_busy_flag;       /* +0x76: cleared by the render reset (X2 xglRenderPathBusyFlag) */
+    unsigned char unmodeled_77;         /* +0x77 */
+    unsigned short frame_count;         /* +0x78: advanced by frame_delta on every base swap */
+    unsigned short vsync_tick_count;    /* +0x7A: VSyncs since the last render move (X2 xglRenderVSyncTickCount) */
+    /* +0x7C: half the ticks minus one, at least 0 (X2 xglRenderSkippedFrameCount) */
+    short skipped_frame_count;
+    unsigned char unmodeled_7e[2];      /* +0x7E..+0x7F */
     /* +0x80 / +0x81: the video mode xglRenderScanLineInit resets the GS with (PAL, else 480p when
      * progressiveMode is set, else NTSC interlaced); xglRenderStart sets +0x81 (xglRenderStartFlag). */
     unsigned char palMode;              /* +0x80 */
     unsigned char progressiveMode;      /* +0x81 */
-    unsigned char unmodeled_82[2];      /* +0x82..+0x83 */
+    /* +0x82: the base swap sends the movie frame instead of swapping pages (label gXglRenderFadeDisabled) */
+    unsigned char movieMode;
+    unsigned char unmodeled_83;         /* +0x83 */
     unsigned char syncBacklogFull;      /* +0x84 */
+    unsigned char unmodeled_85;         /* +0x85 */
+    unsigned char fade_gain;            /* +0x86 */
+    unsigned char fade_level;           /* +0x87 */
 } XglRenderStateBlock;
 
-/* The clear packet at gEnvFlags (0x004C8240, 0x150 bytes): one quadword, then the GIF packet that
- * xglRenderMove sends from +0x10 (the ClearEnv label). Its A+D writes include the TEST value that
- * xglRenderClearDepth / xglRenderClearFrame select (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
+/* The clear packet at gEnvFlags (0x004C8240, 0x150 = 0x15 quadwords, sent whole by the base swap in movie
+ * mode): one quadword, then the GIF packet that xglRenderMove sends by DMA from +0x10 (the
+ * ClearEnv label). Its A+D writes include the TEST value that xglRenderClearDepth / xglRenderClearFrame select
+ * (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
 typedef struct XglClearPacket {
-    unsigned char unmodeled_00[0x20];
+    unsigned char unmodeled_00[0x10];
+    u64 gifTag[2];                      /* +0x10: the GIF tag, start of the packet xglRenderMove sends */
     u64 test;                           /* +0x20: GS TEST_1 value of the clear */
     unsigned char unmodeled_28[0x18];
     struct {

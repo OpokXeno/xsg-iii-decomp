@@ -246,7 +246,14 @@ int xglMovieOpen(XglMovieWork *movie, const char *streamName)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_1", func_0018B090);
+/* IPU registers: the command port, the control register (RESET bit) and the sync timeout. */
+#define IPU_CMD ((volatile u32 *) 0x10002000)
+#define IPU_CTRL ((volatile u32 *) 0x10002010)
+#define IPU_CTRL_RESET 0x40000000
+#define IPU_CMD_BCLR 0
+#define IPU_SYNC_TIMEOUT 512
+
+extern int sceIpuSync(int id, int timeout);
 
 /* Writes D3_CHCR (the IPU output channel) the same way as setD4_CHCR. Inline: the original has this block in its callers. */
 static inline void setD3_CHCR(u32 chcrValue)
@@ -257,6 +264,179 @@ static inline void setD3_CHCR(u32 chcrValue)
     *D_ENABLEW = *D_ENABLEW & ~D_ENABLE_HOLD;
     EIntr();
 }
+
+/* IPU and DMAC channel 4 registers the movie decode uses beyond the ones above. */
+#define IPU_BP ((volatile u32 *) 0x10002020)
+#define D4_MADR ((volatile u32 *) 0x1000b410)
+#define D4_QWC ((volatile u32 *) 0x1000b420)
+#define D4_TADR ((volatile u32 *) 0x1000b430)
+/* IPU commands (IPU_CMD bits 28..31) and their fields. */
+#define IPU_CMD_IDEC 0x10000000
+#define IPU_CMD_FDEC 0x40000000
+#define IPU_CMD_SETTH 0x90000000
+#define IPU_IDEC_QSC_1 0x10000 /* quantiser step code 1 */
+#define IPU_IDEC_DTD_SHIFT 24
+#define IPU_CMD_FDEC_BITS(n) (IPU_CMD_FDEC | (n))
+/* IPU_BP: the bit position in the current quadword and the quadwords still in the input FIFO. */
+#define IPU_BP_QWORDS(bp) ((((bp) >> 16) & 3) + (((bp) >> 8) & 0xf))
+#define IPU_BP_BITS(bp) ((bp) & 0x7f)
+#define MOVIE_POLL_LIMIT 0xFFFFFF
+#define MOVIE_TRANS_MEMORY 0xff
+#define MOVIE_DMA_MAX_QWORDS 0xffff
+#define XGL_DMA_CHANNEL_GIF 2
+typedef unsigned int MovieQuadword __attribute__((mode(TI)));
+int sceGsSyncPath(int mode, int timeout);
+int printf(const char *format, ...);
+void xglDmaDirectSrcChain(int channel, void *tag);
+int xglMovieRewind(XglMovieWork *movie);
+
+int xglMoviePlay(XglMovieWork *info)
+{
+    int strip;
+    int retry;
+    unsigned int header;
+    int pitch;
+    int x;
+    int row;
+    MovieQuadword *source;
+    MovieQuadword *destination;
+    unsigned int work;
+
+    if (info->loop == 0 && info->currentFrame >= info->frameCount) {
+        return 1;
+    }
+    if ((*D4_CHCR & DMA_CHCR_STR) == 0) {
+        *IPU_CTRL = IPU_CTRL_RESET;
+        if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+            return -1;
+        }
+        *IPU_CMD = IPU_CMD_SETTH | (info->ipuThresholdHigh << 16) | info->ipuThresholdLow;
+        if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+            return -1;
+        }
+        *IPU_CMD = IPU_CMD_BCLR | info->bitPosition;
+        if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+            return -1;
+        }
+        *D4_MADR = info->dmaAddress;
+        if (info->dmaQwords > MOVIE_DMA_MAX_QWORDS) {
+            *D4_QWC = MOVIE_DMA_MAX_QWORDS;
+        } else {
+            *D4_QWC = info->dmaQwords;
+        }
+        *D4_TADR = (unsigned int) info->dmaTag;
+        setD4_CHCR(info->dmaControl);
+    }
+    if (info->transMode != MOVIE_TRANS_MEMORY) {
+        sceGsSyncPath(0, 0);
+        for (strip = 0; strip < info->height; strip += MOVIE_MACROBLOCK) {
+            myDmaDirectFromIPU((u32) info->imageAddress[info->activeBuffer], info->stripQwords);
+            if (strip == 0) {
+                *IPU_CMD = IPU_CMD_FDEC;
+                if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+                    return -1;
+                }
+                header = *IPU_CMD >> 24;
+                *IPU_CMD = IPU_CMD_FDEC_BITS(8);
+                if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+                    return -1;
+                }
+                /* The picture header byte: its bit 2 is IDEC's DTD flag, the others go to the
+                 * decode fields of IPU_CTRL (bits 16..23). */
+                *IPU_CTRL = (header & 0xfb) << 16;
+                *IPU_CMD = (((header & 4) >> 2) << IPU_IDEC_DTD_SHIFT) | (IPU_CMD_IDEC | IPU_IDEC_QSC_1);
+            }
+            make_gstrans(info, strip);
+            for (retry = 0; retry <= MOVIE_POLL_LIMIT; retry++) {
+                if ((*D3_CHCR & DMA_CHCR_STR) == 0) {
+                    break;
+                }
+            }
+            xglDmaDirectSrcChain(XGL_DMA_CHANNEL_GIF, info->packetAddress[info->activeBuffer]);
+            info->activeBuffer ^= 1;
+        }
+        sceGsSyncPath(0, 0);
+    } else {
+        work = SCRATCHPAD_BASE;
+        if (info->decodeBuffer != 0) {
+            work = (unsigned int) info->decodeBuffer;
+        }
+        for (strip = 0; strip < info->height; strip += MOVIE_MACROBLOCK) {
+            myDmaDirectFromIPU(work, info->stripQwords);
+            if (strip == 0) {
+                *IPU_CMD = IPU_CMD_FDEC;
+                if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+                    return -1;
+                }
+                header = *IPU_CMD >> 24;
+                *IPU_CMD = IPU_CMD_FDEC_BITS(8);
+                if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+                    return -1;
+                }
+                /* The picture header byte: its bit 2 is IDEC's DTD flag, the others go to the
+                 * decode fields of IPU_CTRL (bits 16..23). */
+                *IPU_CTRL = (header & 0xfb) << 16;
+                *IPU_CMD = (((header & 4) >> 2) << IPU_IDEC_DTD_SHIFT) | (IPU_CMD_IDEC | IPU_IDEC_QSC_1);
+            }
+            for (retry = 0; retry <= MOVIE_POLL_LIMIT; retry++) {
+                if ((*D3_CHCR & DMA_CHCR_STR) == 0) {
+                    break;
+                }
+            }
+            if (retry > MOVIE_POLL_LIMIT) {
+                printf("ipu time out:%d\n", strip);
+            }
+            pitch = info->width / 4;
+            source = (MovieQuadword *) work;
+            destination = (MovieQuadword *) (info->imageAddress[info->activeBuffer] + info->width * strip * 4);
+            for (x = 0; x < info->width; x += MOVIE_MACROBLOCK) {
+                for (row = MOVIE_MACROBLOCK - 1; row >= 0; row--) {
+                    destination[0] = source[0];
+                    destination[1] = source[1];
+                    destination[2] = source[2];
+                    destination[3] = source[3];
+                    source += 4;
+                    destination += pitch;
+                }
+                destination = destination - pitch * MOVIE_MACROBLOCK + 4;
+            }
+        }
+        info->activeBuffer ^= 1;
+    }
+    if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+        return -1;
+    }
+    *IPU_CMD = IPU_CMD_FDEC_BITS(32);
+    if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
+        return -1;
+    }
+    info->currentFrame++;
+    if (info->currentFrame >= info->frameCount) {
+        if (info->loop == 0) {
+            info->currentFrame = info->frameCount;
+            setD4_CHCR(MOVIE_D4_CHCR_CHAIN_STOP);
+            setD3_CHCR(0);
+        } else {
+            xglMovieRewind(info);
+        }
+        return 1;
+    }
+    if (info->streamOpen == 0) {
+        unsigned int bitstream;
+        unsigned int consumed;
+
+        info->dmaControl = *D4_CHCR;
+        setD4_CHCR(MOVIE_D4_CHCR_CHAIN_STOP);
+        bitstream = *IPU_BP;
+        consumed = *D4_MADR - info->dmaAddress - IPU_BP_QWORDS(bitstream) * MOVIE_DMA_QWORD;
+        info->dmaAddress += consumed;
+        info->dmaQwords -= consumed / MOVIE_DMA_QWORD;
+        info->dmaTag = (XglDmaRefTag *) *D4_TADR;
+        info->bitPosition = IPU_BP_BITS(bitstream);
+    }
+    return 0;
+}
+
 
 int xglMovieRewind(XglMovieWork *movie)
 {
@@ -274,24 +454,15 @@ int xglMovieRewind(XglMovieWork *movie)
     return 0;
 }
 
-/* IPU registers: the command port, the control register (RESET bit) and the sync timeout. */
-#define IPU_CMD ((volatile u32 *) 0x10002000)
-#define IPU_CTRL ((volatile u32 *) 0x10002010)
-#define IPU_CTRL_RESET 0x40000000
-#define IPU_CMD_BCLR 0
-#define IPU_SYNC_TIMEOUT 512
-
-extern int func_002FAF50(int id, int timeout);
-
 int xglMovieIpuReset(void)
 {
     setD4_CHCR(0);
     *IPU_CTRL = IPU_CTRL_RESET;
-    if (func_002FAF50(0, IPU_SYNC_TIMEOUT) < 0) {
+    if (sceIpuSync(0, IPU_SYNC_TIMEOUT) < 0) {
         return -1;
     }
     *IPU_CMD = IPU_CMD_BCLR;
-    return (func_002FAF50(0, IPU_SYNC_TIMEOUT) >= 0) ? 0 : -1;
+    return (sceIpuSync(0, IPU_SYNC_TIMEOUT) >= 0) ? 0 : -1;
 }
 
 /* Sets the default packet addresses and transfer thresholds of a movie work record (X2 xglMovieInfoInit). */

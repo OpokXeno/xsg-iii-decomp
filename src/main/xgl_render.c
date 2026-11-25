@@ -134,6 +134,9 @@ typedef struct GsDispEnv {
     u64 extbuf;                        /* +0x38 */
     GsExtdataRegister extdata;         /* +0x40 */
     u64 extwrite;                      /* +0x48 */
+    /* +0x50: the first circuit's DISPLAY as set up, the base the display offset works from
+     * (X2 keeps it in dispEnvTailWork[0], right after the block). */
+    GsDisplayRegister baseDisplay;
 } GsDispEnv;
 
 extern GsDispEnv DispEnv;
@@ -143,9 +146,7 @@ extern GsDispEnv DispEnv;
 extern signed char pxyTickScaleDouble;
 
 extern signed char xglRenderVSyncInterval;
-
-extern int LoopCount;
-
+extern int LoopCount; /* frames rendered (X2 name) */
 extern int ScanLineInterpolate;
 
 /* Glyph digit strokes of the pxy debug draw (.data after the hooks). */
@@ -414,8 +415,7 @@ extern void sceGsPutDrawEnv(GsDrawEnv *env);
 extern int xglRenderGlobalFadeColor;
 
 /* 0 by xglRenderCpUDispOff, 1 by xglRenderCpUDispOn */
-extern int xglRenderClearSkip;
-
+extern unsigned char xglRenderClearSkip; /* set: the next render move sends neither the clear nor the packet */
 extern int xglRenderMoveCount;
 
 /* The GS VSync interrupt callback increments this counter while
@@ -499,10 +499,10 @@ extern volatile unsigned int gVsyncsSinceFlip;
 
 extern unsigned char func_00199CE0[];
 
-s32 func_002F47D8();
+s32 sceGsSyncVCallback();
 
 void xglRenderSyncInit(void) {
-    func_002F47D8(func_00199CE0);
+    sceGsSyncVCallback(func_00199CE0);
     gVsyncsSinceFlip = 0;
 }
 
@@ -608,10 +608,50 @@ void xglRenderDrawEnvMove(void)
     func_002F3808(&gXglRenderDrawPacket.env);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A280);
-
 /* The display environment block (0x004c81c0). */
 extern GsDispEnv xglRenderDispEnvBlock;
+
+void sceGsSetDefDispEnv(GsDispEnv *env, short psm, short width, short height, int dx, int dy);
+
+/* The movie display mode: 640x448 (NTSC) or 640x512 (PAL) in PSMCT16. */
+#define RENDER_MOVIE_DISPLAY_PSM 2
+#define RENDER_MOVIE_DISPLAY_WIDTH 0x280
+#define RENDER_MOVIE_DISPLAY_HEIGHT_NTSC 0x1C0
+#define RENDER_MOVIE_DISPLAY_HEIGHT_PAL 0x200
+/* PMODE bits cleared after the default setup: the second circuit and the blend source (ALP from PMODE). */
+#define RENDER_PMODE_SECOND_CIRCUIT 0x2
+#define RENDER_PMODE_ALPHA_FROM_PMODE 0x40
+/* 480p moves the picture down by 16 scan lines. */
+#define RENDER_PROGRESSIVE_DISPLAY_DY 0x10
+
+/* X2 xglRenderDispEnvInit: sets up the display environment from the render state (or the movie mode),
+ * enables only the first circuit, and copies its DISPFB/DISPLAY into the second circuit and the base display. */
+void func_0019A280(void)
+{
+    if (D_004C8390.movieMode) {
+        if (D_004C8390.palMode == 0) {
+            sceGsSetDefDispEnv(&xglRenderDispEnvBlock, RENDER_MOVIE_DISPLAY_PSM, RENDER_MOVIE_DISPLAY_WIDTH,
+                               RENDER_MOVIE_DISPLAY_HEIGHT_NTSC, 0, 0);
+        } else {
+            sceGsSetDefDispEnv(&xglRenderDispEnvBlock, RENDER_MOVIE_DISPLAY_PSM, RENDER_MOVIE_DISPLAY_WIDTH,
+                               RENDER_MOVIE_DISPLAY_HEIGHT_PAL, 0, 0);
+        }
+    } else {
+        sceGsSetDefDispEnv(&xglRenderDispEnvBlock, D_004C8390.psm, D_004C8390.frame_width, D_004C8390.frame_height,
+                           0, 0);
+    }
+    xglRenderDispEnvBlock.pmodeWord &= ~RENDER_PMODE_SECOND_CIRCUIT;
+    xglRenderDispEnvBlock.pmodeWord &= ~RENDER_PMODE_ALPHA_FROM_PMODE;
+    if (D_004C8390.progressiveMode) {
+        xglRenderDispEnvBlock.firstDisplay.displayFields.dy += RENDER_PROGRESSIVE_DISPLAY_DY;
+    }
+    xglRenderDispEnvBlock.baseDisplay.packed = xglRenderDispEnvBlock.firstDisplay.packed;
+    xglRenderDispEnvBlock.secondDispfb.packed = xglRenderDispEnvBlock.firstDispfb.packed;
+    xglRenderDispEnvBlock.secondDisplay.packed = xglRenderDispEnvBlock.firstDisplay.packed;
+    xglRenderDispEnvBlock.extbuf = 0;
+    xglRenderDispEnvBlock.extdata.packed = 0;
+    xglRenderDispEnvBlock.extwrite = 0;
+}
 
 void func_002F3748(GsDispEnv *env);
 
@@ -690,8 +730,6 @@ void xglRenderScanLineInit(void)
 
 extern unsigned char xglRenderStartFlag[];
 
-s32 func_0019A280();
-
 void xglRenderScanLineInit();
 
 void xglRenderDispEnvFlagSet();
@@ -706,27 +744,102 @@ void xglRenderStart(s32 renderStartMode) {
     xglRenderDispEnvFlagSet();
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A6F0);
+void func_00199FE8(void);
+void func_0019A558(void);
+void xglStudioReset(void);
+void xglStudioMainCameraInit(void);
 
-/* The fade bytes sit just past XglRenderStateBlock, which must keep its 0x86-byte size (the object records it). */
-typedef struct XglRenderFadeView {
-  unsigned char unmodeled_00[0x86];
-  unsigned char fade_gain;            /* +0x86 */
-  unsigned char fade_level;           /* +0x87 */
-} XglRenderFadeView;
+/* The fixed display geometry of this build: a 512x448 frame, 32-bit colour, 24-bit depth, in 2048-word
+ * GS pages (one frame is 0x70 pages). */
+#define RENDER_DEPTH_PSM 0x31 /* PSMZ24 */
+#define RENDER_FRAME_PSM 0    /* PSMCT32 */
+#define RENDER_FRAME_WIDTH 512
+#define RENDER_FRAME_HEIGHT 448
+#define RENDER_FRAME_PAGES 0x70
+#define RENDER_PAGE_WORK (RENDER_FRAME_PAGES * 3)
+#define RENDER_PAGE_AUX 0xC0
+#define RENDER_PAGE_TEXTURE 0x1C0
+#define RENDER_PAGE_AUX2 0x1E0
 
-#define D_004C8390_FADE (*(XglRenderFadeView *) &D_004C8390)
+/* The XS3 xglRenderSetReso: one fixed geometry (resolution is not read); the display page is the second
+ * frame in movie mode (movieMode), else the first. Then the environments and the studio cameras. */
+void func_0019A6F0(int resolution)
+{
+    D_004C8390.depth_psm = RENDER_DEPTH_PSM;
+    D_004C8390.psm = RENDER_FRAME_PSM;
+    D_004C8390.frame_width = RENDER_FRAME_WIDTH;
+    D_004C8390.frame_height = RENDER_FRAME_HEIGHT;
+    D_004C8390.zbuf_base = 0;
+    D_004C8390.dispfb_base = RENDER_FRAME_PAGES;
+    D_004C8390.prev_dispfb_base = RENDER_FRAME_PAGES * 2;
+    D_004C8390.work_buffer_base = RENDER_PAGE_WORK;
+    D_004C8390.aux_page = RENDER_PAGE_AUX;
+    D_004C8390.texture_base = RENDER_PAGE_TEXTURE;
+    D_004C8390.aux_page2 = RENDER_PAGE_AUX2;
+    if (D_004C8390.movieMode != 0) {
+        D_004C8390.display_buffer_base = RENDER_FRAME_PAGES * 2;
+    } else {
+        D_004C8390.display_buffer_base = RENDER_FRAME_PAGES;
+    }
+    D_004C8390.flip_base = D_004C8390.prev_dispfb_base;
+    func_00199FE8();
+    func_0019A280();
+    func_0019A558();
+    xglStudioReset();
+    xglStudioMainCameraInit();
+}
 
 s32 xglRenderFadeAlpha(void)
 {
   s32 scaled;
-  scaled = (D_004C8390_FADE.fade_level * D_004C8390_FADE.fade_gain) >> 7;
+  scaled = (D_004C8390.fade_level * D_004C8390.fade_gain) >> 7;
   return (scaled >= 0x100) ? (0xFF) : (scaled);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A7C0);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AB00);
+extern unsigned char xglRenderLocked;
+extern unsigned char xglRenderMovieActive;
+
+/* Builds the movie frame's GS packet in the scratchpad and returns its quadword count. */
+int func_0019A7C0(void *scratch);
+
+/* XS2 xglRenderSwapBase: swaps the display and flip pages and makes the old draw page the previous one;
+ * in movie mode (movieMode set) the movie frame packet goes out instead, followed by the clear
+ * environment unless rendering is locked. Then clears the render status and advances the frame count. */
+void func_0019AB00(void)
+{
+    XglPacket *packet;
+    int quadwords;
+    unsigned short previousDisplayBase;
+
+    if (D_004C8390.movieMode != 0) {
+        if (xglRenderMovieActive != 0) {
+            packet = xglPacketGetCurrent();
+            quadwords = func_0019A7C0((void *) SCRATCHPAD_BASE);
+            sceVif1PkCnt(packet, 0);
+            sceVif1PkOpenDirectHLCode(packet, 0);
+            sceVif1PkAddDirectDataN(packet, (void *) SCRATCHPAD_BASE, quadwords);
+            sceVif1PkCloseDirectHLCode(packet);
+            if (xglRenderLocked == 0) {
+                XglPacket *envPacket;
+
+                envPacket = xglPacketGetCurrent();
+                sceVif1PkOpenDirectHLCode(envPacket, 0);
+                sceVif1PkAddDirectDataN(envPacket, &gEnvFlags, sizeof(gEnvFlags) / 16);
+                sceVif1PkCloseDirectHLCode(envPacket);
+            }
+        }
+    } else {
+        D_004C8390.prev_dispfb_base = D_004C8390.dispfb_base;
+        previousDisplayBase = D_004C8390.display_buffer_base;
+        D_004C8390.dispfb_base = D_004C8390.flip_base;
+        D_004C8390.display_buffer_base = D_004C8390.flip_base;
+        D_004C8390.flip_base = previousDisplayBase;
+    }
+    D_004C8390.render_status = 0;
+    D_004C8390.frame_count += D_004C8390.frame_delta;
+}
 
 void xglRenderDispEnvFlagClear(void) {
     xglRenderDispEnvBlock.pmodeWord &= ~2;
@@ -736,7 +849,6 @@ void xglRenderDispEnvFlagSet(void) {
     xglRenderDispEnvBlock.pmodeWord |= 2;
 }
 
-extern s8 xglRenderLocked;
 
 void xglRenderLockSet(void) {
     xglRenderLocked = 1;
@@ -746,7 +858,7 @@ void xglRenderLockClear(void) {
     xglRenderLocked = 0;
 }
 
-extern s8 xglRenderHeld;
+extern unsigned char xglRenderHeld;
 
 void xglRenderHoldClear(void) {
     xglRenderHeld = 0;
@@ -756,7 +868,6 @@ void xglRenderHoldSet(void) {
     xglRenderHeld = 1;
 }
 
-extern s8 xglRenderMovieActive;
 
 void func_0019AC80(s32 active)
 {
@@ -769,7 +880,46 @@ void func_0019AC80(s32 active)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019ADD8);
+void xglRenderGlobalFadeReset(void);
+void func_001AA968(void);
+u8 stateExchangeOff(void);
+
+#define RENDER_FADE_NEUTRAL 0x80
+#define RENDER_DEFAULT_VSYNCS_PER_FRAME 2
+
+/* The render reset (cf. X2 xglRenderInit): neutral fade, scan line setup, the fixed display geometry
+ * (func_0019A6F0; the resolution argument is 0), cleared counters and per-frame state, no final-packet
+ * callbacks, fade and state exchange reset, VSync interrupt on, unlocked and not held. */
+void func_0019ADD8(void)
+{
+    int i;
+
+    D_004C8390.fade_gain = RENDER_FADE_NEUTRAL;
+    D_004C8390.fade_level = RENDER_FADE_NEUTRAL;
+    D_004C8390.palMode = 0;
+    D_004C8390.progressiveMode = 0;
+    D_004C8390.unmodeled_83 = 0;
+    xglRenderScanLineInit();
+    func_0019A6F0(0);
+    xglRenderMoveCount = 0;
+    LoopCount = 0;
+    gVsyncsPerFrame = RENDER_DEFAULT_VSYNCS_PER_FRAME;
+    D_004C8390.render_status = 0;
+    D_004C8390.frame_count = 0;
+    D_004C8390.frame_delta = 0;
+    D_004C8390.path_busy_flag = 0;
+    D_004C8390.vsync_tick_count = 0;
+    D_004C8390.skipped_frame_count = 0;
+    for (i = 0; i < RENDER_FINAL_CALLBACK_COUNT; i++) {
+        D_004C8390.finalPacketCallbacks[i] = 0;
+    }
+    xglRenderGlobalFadeReset();
+    func_001AA968();
+    stateExchangeOff();
+    xglIntcEnable(5);
+    xglRenderLocked = 0;
+    xglRenderHoldClear();
+}
 
 /* Calls every registered final-packet callback with the current packet. */
 void xglRenderFinalPacket(void)
@@ -883,8 +1033,6 @@ void xglRenderGlobalFadeSend(void) {
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
-
-s32 func_0019ADD8();
 
 s32 moviePlayerInit();
 

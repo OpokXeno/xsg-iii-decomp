@@ -23,6 +23,7 @@ const char *xglFontCopyTextUnit(char *textUnitBuffer, const char *text, int *len
 #define GIF_AD 0x0E
 #include "main/Packet.h"
 #include "main/xgl_font_codes.h"
+#include "gs.h"
 
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int qwc);
 void *sceVif1PkReserve(XglPacket *packet, unsigned int words);
@@ -42,6 +43,9 @@ void *sceVif1PkReserve(XglPacket *packet, unsigned int words);
 #define EUC_ROW_HIRAGANA 0xa4
 #define EUC_ROW_KATAKANA 0xa5
 #define EUC_ROW_GREEK 0xa6
+#define EUC_ROW_CYRILLIC 0xa7
+#define EUC_ROW_BOX_DRAWING 0xa8
+#define EUC_ROW_HALF_WIDTH 0xa9
 #define EUC_ROW_NEC_SPECIAL 0xad
 #define EUC_ROW_SYMBOLS_2 0xa2
 #define EUC_ROW_KANJI_LEVEL1 0xb0
@@ -57,6 +61,7 @@ struct FontImage {
 extern unsigned char spCodeParameterSizeTable[];
 extern unsigned char spcode_0[32];
 int xglFontGetStringWidth2(const char *text, int delimiter);
+int func_00185770(int glyph, int *leftBound);
 /* Defined here, not with the data above: moving it before the functions that use it changes the original code or data order. */
 extern unsigned char spCodeParameterSizeTable[8];
 
@@ -122,9 +127,9 @@ void xglFontSetTextureFilter(FontDrawCursor *cursor, int useCursorScale);
 /* Advance of each printable ASCII character (32..127) in the debug font. */
 extern int fontAsciiWidthTable[];
 int xglFontParseNumber(const char **cursor, int *parsedNumber);
-unsigned short xglFontCharToEuc(signed char character, unsigned char **text);
+unsigned short xglFontCharToEuc(signed char character);
 unsigned int xglFontGetDebugCell(unsigned char eucRow, unsigned char eucColumn);
-unsigned short xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn);
+int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn);
 /* * Reads a hex number up to ';' or ',' and moves the text cursor past the delimiter; returns 0 on any * other character. */
 int xglFontParseHex(const char **cursor, int *parsedNumber);
 
@@ -154,6 +159,12 @@ int xglFontFindPairGlyph(unsigned char eucRow, unsigned char eucColumn);
 #define FONT_GLYPH_NONE 0x7F
 /* The level-1 kanji glyphs follow the 0x400 symbol and kana glyphs. */
 #define FONT_GLYPH_KANJI_BASE 0x400
+/* Set above the 12-bit glyph index on some symbol glyphs; xglFontGetProportionalSize masks it off. */
+#define FONT_GLYPH_SYMBOL_FLAG 0x1000
+/* The symbol-row columns whose glyphs carry FONT_GLYPH_SYMBOL_FLAG: 0xB9, 0xBC and all from 0xF9 on. */
+#define EUC_SYMBOL_FLAGGED_A 0xb9
+#define EUC_SYMBOL_FLAGGED_B 0xbc
+#define EUC_SYMBOL_FLAGGED_FROM 0xf9
 
 int xglFontInlineCommand(FontDrawCursor *cursor, const char **text);
 /* The kana cell codes of the debug font, one per EUC column (copied to the stack before use). */
@@ -177,7 +188,7 @@ extern unsigned short asciiEucTable[128];
 extern int fontAsciiWidthTable[98];
 extern struct FontInlineCommand fontInlineCommands[20];
 
-unsigned short xglFontCharToEuc(signed char character, unsigned char **text)
+unsigned short xglFontCharToEuc(signed char character)
 {
     if (character < 0x20) {
         return EUC_SPACE;
@@ -268,7 +279,90 @@ int xglFontIsTextureGlyphCode(unsigned char eucRow, unsigned char eucColumn)
     return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00181FA0);
+struct FontStateQueue {
+    unsigned char *texture_buffer;
+    unsigned short fontFlags;
+    unsigned char font_selection;
+    unsigned char unmodeled_07;
+    unsigned short unmodeled_08;
+    unsigned char unmodeled_0a[2];
+    unsigned char default_width;
+    /* Added to each glyph advance; "$xx7,N;". */
+    signed char character_spacing;
+    unsigned short unmodeled_0e;
+    /* FONT_CONFIG_DEFAULT_WIDTH, "$xx1,N;". */
+    unsigned char glyph_default_width;
+    /* FONT_MODE_* bits, set by $prop/$han and the ruby annotation. */
+    unsigned char text_mode;
+    /* FONT_CONFIG_PROPORTIONAL_MODE, "$xx3,N;". */
+    unsigned char proportional_mode;
+    unsigned char unmodeled_13;
+    /* Set: the glyphs are depth tested (TEST_1 GEQUAL) and do not write Z. */
+    unsigned char depth_test;
+    unsigned char unmodeled_15[7];
+    /* Text address of the include command that prefixes each debug line; 0 when none is set. */
+    unsigned int debug_prefix;
+    /* "$rubyb;" marks where the base text of a ruby annotation starts. */
+    const unsigned char *ruby_base;
+    /* From the end of the annotation back to the end of its base text; set by "$rubys;". */
+    unsigned short ruby_advance;
+    unsigned short ruby_offset_y;
+    union {
+        unsigned short default_scale;
+        struct {
+            signed char compact_width;
+            signed char compact_height;
+        };
+    };
+    unsigned char unmodeled_2a[6];
+    unsigned char word_buffer[256];
+    unsigned char *queue_cursor;
+};
+
+extern struct FontStateQueue xglFontState;
+void sceVif1PkRef();
+
+/* The 1-bit glyph plane behind the font texture: 0x800 bytes at texture_buffer + 0x78400, eight pixels
+ * per byte, expanded through fontNibbleMasks (four pixels per nibble, 0xFF per set bit) into
+ * fontExpandedPlane and sent to the GS after the setup packet fontPlaneUploadSetup. */
+#define FONT_PLANE_OFFSET 0x78400
+#define FONT_PLANE_BYTES 0x800
+#define FONT_PLANE_QUADWORDS 0x400
+#define FONT_PLANE_SETUP_QUADWORDS 7
+#define VIF_DIRECT_FONT_PLANE 0x51000400 /* VIF DIRECT, 0x400 quadwords */
+
+extern u32 fontNibbleMasks[16];
+extern u32 fontExpandedPlane[FONT_PLANE_BYTES * 2];
+extern unsigned char fontPlaneUploadSetup[];
+XglPacket *xglPacketGetCurrent(void);
+
+void func_00181FA0(void)
+{
+    unsigned char *source;
+    u32 *plane;
+    u32 *destination;
+    int i;
+    XglPacket *packet;
+
+    source = xglFontState.texture_buffer + FONT_PLANE_OFFSET;
+    plane = fontExpandedPlane;
+    destination = plane;
+    for (i = 0; i < FONT_PLANE_BYTES; i++) {
+        unsigned char bits;
+        u32 high;
+        u32 low;
+
+        bits = *source++;
+        high = fontNibbleMasks[bits >> 4];
+        low = fontNibbleMasks[bits & 0xF];
+        destination[0] = high;
+        destination[1] = low;
+        destination += 2;
+    }
+    packet = xglPacketGetCurrent();
+    sceVif1PkRef(packet, fontPlaneUploadSetup, FONT_PLANE_SETUP_QUADWORDS, 0, 0, 0);
+    sceVif1PkRef(packet, plane, FONT_PLANE_QUADWORDS, 0, VIF_DIRECT_FONT_PLANE, 0);
+}
 
 /*
  * Reserves count A+D writes in the cursor's packet and writes their GIF tag: NLOOP = count with
@@ -286,15 +380,47 @@ void *xglFontAllocGifPacket(FontDrawCursor *cursor, int adWriteCount)
     return packet + 4;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_001820D0);
+#define GIF_TAG_NREG_1 0x1000000000000000ULL
+/* The font's Z test when xglFontState.depth_test is set, else always. */
+#define FONT_ZTST_GEQUAL 2
+#define FONT_ZTST_ALWAYS 1
+/* The alpha test of the plain effects: pass where alpha is not equal to 0. */
+#define FONT_ATST_NOTEQUAL 6
+
+/* Queues the font's depth state as two A+D writes (ZBUF_1, TEST_1) from the 16-byte aligned
+ * start of the cursor's effect area: Z24 at page 0, written only without the depth test; the
+ * Z test from the depth-test flag, and the alpha test for effects 0 and 2..4. */
+void func_001820D0(FontDrawCursor *cursor)
+{
+    u64 *packet;
+    int ztst;
+
+    packet = (u64 *) (((unsigned int) cursor->effectArea.qwords + 0xF) & ~0xF);
+    ztst = xglFontState.depth_test != 0 ? FONT_ZTST_GEQUAL : FONT_ZTST_ALWAYS;
+    packet[0] = GIF_TAG_NREG_1 | GIF_TAG_EOP | 2;
+    packet[1] = GIF_AD;
+    packet[2] = GS_SET_ZBUF(0, GS_PSMZ24, xglFontState.depth_test ^ 1);
+    packet[3] = GS_ZBUF_1;
+    packet[5] = GS_TEST_1;
+    switch (cursor->effect) {
+    case 0:
+    case 2:
+    case 3:
+    case 4:
+        packet[4] = GS_SET_TEST(1, FONT_ATST_NOTEQUAL, 0, 0, 0, 0, 1, ztst);
+        break;
+    /* case 1 is its own test in the original's decision tree, with the default's code */
+    case 1:
+    default:
+        packet[4] = GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, ztst);
+        break;
+    }
+    sceVif1PkAddDirectDataN(cursor->packet, packet, 3);
+}
 
 /* The two texture-filter packets: 1:1 glyphs and scaled glyphs. */
 extern unsigned int D_004B3110[8];
 extern unsigned int D_004B3130[8];
-
-struct FontStateQueue { unsigned char *texture_buffer; unsigned short fontFlags; unsigned char font_selection; unsigned char unmodeled_07[5]; unsigned char default_width; unsigned char debug_mode; unsigned short unmodeled_0e; unsigned char unmodeled_10; unsigned char unmodeled_11[3]; unsigned char unmodeled_14; unsigned char unmodeled_15[7]; /* Text address of the include command that prefixes each debug line; 0 when none is set. */ unsigned int debug_prefix; unsigned char unmodeled_20[6]; unsigned short ruby_offset_y; union { unsigned short default_scale; struct { unsigned char compact_width; unsigned char compact_height; }; }; unsigned char unmodeled_2a[6]; unsigned char word_buffer[256]; unsigned char *queue_cursor; };
-
-extern struct FontStateQueue xglFontState;
 
 void xglFontSetTextureFilter(FontDrawCursor *cursor, int useCursorScale)
 {
@@ -585,8 +711,6 @@ void xglFontDebugPrefixSet(int stored_value)
     fontStateFromWindow.stored_value = stored_value;
 }
 
-#include "gs.h"
-
 /* The EE va_start spelling of the variadic debug print (as in the other variadic definitions of this tree). */
 typedef char *va_list;
 
@@ -634,7 +758,145 @@ void xglFontDebugPrintf(int x, int y, const char *format, ...)
     xglFontPrintSub(arguments);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", xglFontGetStringWidth2);
+/* Advance of an ASCII glyph drawn with the narrow font, before the glyph scale. */
+#define FONT_ASCII_ADVANCE 16
+
+/*
+ * Width of `text` in pixels up to its end or, when `delimiter` is set, up to the next space after the
+ * first character. Inline "$...;" commands and control codes update the text mode, the glyph scale and
+ * the character spacing on the way, as the drawing code would.
+ */
+int xglFontGetStringWidth2(const char *text, int delimiter)
+{
+    int compact = 0;
+    int width = 0;
+    int scale = FONT_SCALE_ONE;
+    int first = 1;
+    unsigned char high;
+
+    while (*text != 0 && (high = *text, !(!first && delimiter != 0 && high == ' '))) {
+        if (high == '$') {
+            if (text[1] == 'p' && text[2] == 'r' && text[3] == 'o' && text[4] == 'p') {
+                xglFontState.text_mode &= ~FONT_MODE_PROP;
+                xglFontState.text_mode |= text[5] & FONT_MODE_PROP;
+            } else if (text[1] == 'h' && text[2] == 'a' && text[3] == 'n') {
+                xglFontState.text_mode &= ~FONT_MODE_HAN;
+                xglFontState.text_mode |= (text[4] & 1) << 1;
+            } else if (text[1] == 'x' && text[2] == 'x') {
+                if (text[3] == '1' && text[4] == ',') {
+                    const char *number = text + 5;
+                    int value;
+
+                    xglFontParseNumber(&number, &value);
+                    xglFontState.glyph_default_width = value;
+                }
+                if (text[3] == '3' && text[4] == ',') {
+                    const char *number = text + 5;
+                    int value;
+
+                    xglFontParseNumber(&number, &value);
+                    xglFontState.proportional_mode = value;
+                }
+                if (text[3] == '7' && text[4] == ',') {
+                    const char *number = text + 5;
+                    int value;
+
+                    xglFontParseNumber(&number, &value);
+                    xglFontState.character_spacing = value;
+                }
+            } else if (text[1] == 'r' && text[2] == 'u' && text[3] == 'b' && text[4] == 'y' &&
+                       text[5] == 's' && text[6] == ';') {
+                const unsigned char *scan = (const unsigned char *) text + 7;
+
+                while (*scan != 0) {
+                    if (scan[0] == '$' && scan[1] == 'r' && scan[2] == 'u' && scan[3] == 'b' &&
+                        scan[4] == 'y' && scan[5] == 'e' && scan[6] == ';') {
+                        text = (const char *) scan;
+                        break;
+                    }
+                    if (*scan < 0x20) {
+                        scan += xglFontGetSPcodeSize(*scan, scan + 1);
+                    }
+                    scan++;
+                }
+            } else if (text[1] == 'z' && text[2] == 'o' && text[3] == 'o' && text[4] == 'm') {
+                const char *number = text + 5;
+                int value;
+
+                xglFontParseNumber(&number, &value);
+                scale = value;
+            }
+            do {
+                high = *text++;
+            } while (high != ';');
+        } else if (high < 0x20) {
+            switch (high) {
+            case FONT_OP_SCALE:
+                scale = text[1];
+                break;
+            case FONT_OP_CONFIG:
+                switch (text[2]) {
+                case FONT_CONFIG_DEFAULT_WIDTH:
+                    xglFontState.glyph_default_width = text[3];
+                    break;
+                case FONT_CONFIG_PROPORTIONAL_MODE:
+                    xglFontState.proportional_mode = text[3];
+                    break;
+                }
+                break;
+            case FONT_OP_COMPACT:
+                compact = text[1];
+                break;
+            case FONT_OP_STYLE:
+                xglFontState.text_mode = text[1];
+                break;
+            }
+            text += xglFontGetSPcodeSize(high, (const unsigned char *) text) + 1;
+        } else {
+            unsigned char low;
+            /* The glyph index, then its advance. */
+            int glyph;
+
+            if (high < 0xa0) {
+                if ((signed char) high >= 0) {
+                    if (!(xglFontState.text_mode & FONT_MODE_HAN)) {
+                        text++;
+                        width += (FONT_ASCII_ADVANCE * scale) >> 4;
+                        first = 0;
+                        continue;
+                    }
+                }
+            }
+            if ((signed char) high >= 0) {
+                unsigned short code = xglFontCharToEuc(high);
+
+                text++;
+                low = code;
+                high = code >> 8;
+            } else {
+                low = text[1];
+                if (xglFontIsTextureGlyphCode(high, low)) {
+                    text += 2;
+                } else {
+                    text++;
+                    low = high + 0x80;
+                    high = EUC_ROW_HALF_WIDTH;
+                }
+            }
+            glyph = xglFontGetGlyphIndex(high, low);
+            if (compact) {
+                glyph = func_00185770(xglFontGetProportionalSize(glyph), 0);
+            } else if ((xglFontState.text_mode & FONT_MODE_PROP) && glyph < FONT_PROPORTIONAL_GLYPHS) {
+                glyph = func_00185770(glyph, 0);
+            } else {
+                glyph = FONT_GLYPH_ADVANCE;
+            }
+            width += ((glyph + xglFontState.character_spacing) * scale) >> 4;
+        }
+        first = 0;
+    }
+    return width;
+}
 
 int xglFontGetStringWidth(const char *text)
 {
@@ -906,13 +1168,13 @@ int xglFontCmdInit(FontDrawCursor *cursor, const char **text)
     cursor->alpha_fix = 0;
     sceVif1PkAddDirectDataN(cursor->packet, xglFontResetPacket, 4);
     xglFontState.default_width = 24;
-    xglFontState.unmodeled_14 = 1;
+    xglFontState.depth_test = 1;
     xglFontState.compact_width = FONT_SCALE_ONE;
     xglFontState.compact_height = FONT_SCALE_ONE;
-    xglFontState.unmodeled_10 = 4;
-    xglFontState.debug_mode = 0;
-    xglFontState.unmodeled_11[1] = 0;
-    xglFontState.unmodeled_11[2] = 0;
+    xglFontState.glyph_default_width = 4;
+    xglFontState.character_spacing = 0;
+    xglFontState.proportional_mode = 0;
+    xglFontState.unmodeled_13 = 0;
     (*text)++;
     xglFontState.ruby_offset_y = 2;
     xglFontState.unmodeled_0e = 0;
@@ -1250,7 +1512,7 @@ void xglFontBufferReset(void)
 {
     struct FontStateQueue *queue_end;
 
-    xglFontState.unmodeled_11[0] = 0;
+    xglFontState.text_mode = 0;
     queue_end = (&xglFontState) + 1;
     xglFontState.queue_cursor = (u8 *) queue_end;
     xglFontState.debug_prefix = 0;
@@ -1280,7 +1542,82 @@ void xglFontFlushSubCRLF(void)
     cursor->y += (signed char) xglFontState.default_width;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184938);
+/* Glyph index of an EUC-JP code. Returns int, unlike XS2's unsigned short: the shared return is not
+ * truncated, only the kanji and pair results are (an unsigned short return adds the masks). */
+int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn)
+{
+    int glyph;
+
+    if (eucRow < EUC_ROW_KANJI_LEVEL1) {
+        glyph = FONT_GLYPH_NONE;
+        switch (eucRow) {
+        case EUC_ROW_SYMBOLS:
+            glyph = (unsigned short)(eucColumn - EUC_FIRST);
+            if (eucColumn == EUC_SYMBOL_FLAGGED_A || eucColumn == EUC_SYMBOL_FLAGGED_B
+                || eucColumn >= EUC_SYMBOL_FLAGGED_FROM) {
+                glyph |= FONT_GLYPH_SYMBOL_FLAG;
+            }
+            break;
+        case EUC_ROW_SYMBOLS_2:
+            switch (eucColumn & 0xF0) {
+            case 0xA0:
+                glyph = (eucColumn & 0xF) + FONT_GLYPH_SYMBOL_FLAG + 93;
+                break;
+            case 0xE0:
+                glyph = (eucColumn & 0xF) + 108;
+                break;
+            case 0xF0:
+                glyph = (eucColumn & 0xF) + 117;
+                break;
+            }
+            break;
+        case EUC_ROW_ALNUM:
+            switch (eucColumn & 0xE0) {
+            case 0xA0:
+                glyph = (eucColumn & 0xF) + 128;
+                break;
+            case 0xC0:
+                glyph = (eucColumn & 0x1F) + 137;
+                break;
+            case 0xE0:
+                glyph = (eucColumn & 0x1F) + 163;
+                break;
+            }
+            break;
+        case EUC_ROW_HIRAGANA:
+            glyph = eucColumn + 31;
+            break;
+        case EUC_ROW_KATAKANA:
+            glyph = eucColumn + 127;
+            break;
+        case EUC_ROW_GREEK:
+            if (eucColumn < 0xC0) {
+                glyph = (eucColumn & 0x1F) + 383;
+            } else {
+                glyph = (eucColumn & 0x1F) + 407;
+            }
+            break;
+        case EUC_ROW_CYRILLIC:
+            glyph = (unsigned short)(eucColumn < 0xD0 ? eucColumn + 271 : eucColumn + 256);
+            break;
+        case EUC_ROW_BOX_DRAWING:
+            glyph = eucColumn + 351;
+            break;
+        case EUC_ROW_HALF_WIDTH:
+            glyph = eucColumn + 256;
+            break;
+        case EUC_ROW_NEC_SPECIAL:
+            glyph = eucColumn + 383;
+            break;
+        }
+    } else if (eucRow < EUC_ROW_KANJI_LEVEL2) {
+        glyph = (unsigned short)((eucRow - EUC_ROW_KANJI_LEVEL1) * FONT_JIS_ROW_SIZE + (eucColumn - EUC_FIRST)
+                                 + FONT_GLYPH_KANJI_BASE);
+    } else {
+        glyph = (unsigned short)xglFontFindPairGlyph(eucRow, eucColumn);
+    }
+    return glyph;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184B30);
 
@@ -1289,53 +1626,98 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185770);
 extern unsigned char D_004B1E20[];
 extern unsigned char D_004B3320[];
 extern unsigned char D_004B33A0[];
-void func_00181FA0();
-void func_001820D0();
 void sceVif1PkCloseDirectHLCode();
 void sceVif1PkCnt();
 void sceVif1PkOpenDirectHLCode();
-void sceVif1PkRef();
 
-void xglFontBuildPacket(XglPacket **packet_slot)
+/* reloadMode: the flush passes 0; this build does not read it. */
+void xglFontBuildPacket(FontDrawCursor *cursor, int reloadMode)
 {
     XglPacket *packet;
     u32 *direct_state;
     u8 *texture;
 
-    packet = *packet_slot;
+    packet = cursor->packet;
     if (packet->directCode != 0) {
         direct_state = packet->directState;
         if (direct_state != 0) {
             sceVif1PkCloseDirectHLCode(packet);
-            packet = *packet_slot;
+            packet = cursor->packet;
             if (direct_state[0] == 0x51000000) {
                 packet->write_cursor -= 4;
             }
         }
     }
-    sceVif1PkRef(*packet_slot, D_004B1E20, 0x107, 0, 0, 0);
-    sceVif1PkRef(*packet_slot, D_004B3320, 8, 0, 0, 0);
+    sceVif1PkRef(cursor->packet, D_004B1E20, 0x107, 0, 0, 0);
+    sceVif1PkRef(cursor->packet, D_004B3320, 8, 0, 0, 0);
     texture = xglFontState.texture_buffer + 0x1A0;
-    sceVif1PkRef(*packet_slot, D_004B33A0, 7, 0, 0, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
-    sceVif1PkRef(*packet_slot, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, D_004B33A0, 7, 0, 0, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
+    sceVif1PkRef(cursor->packet, texture, 8, 0, 0x51000008, 0);
     if (xglFontState.fontFlags & 0x80) {
         func_00181FA0();
     }
-    sceVif1PkCnt(*packet_slot, 0);
-    sceVif1PkOpenDirectHLCode(*packet_slot, 0);
-    func_001820D0(packet_slot);
+    sceVif1PkCnt(cursor->packet, 0);
+    sceVif1PkOpenDirectHLCode(cursor->packet, 0);
+    func_001820D0(cursor);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185A20);
+#define SCRATCHPAD_BASE 0x70000000
+#define FONT_SCREEN_ORIGIN_X 0x700
+#define FONT_SCREEN_ORIGIN_Y 0x720
+#define FONT_COLOR_INITIAL 127
+#define FONT_ALPHA_SOURCE_BLEND 0x44
+#define GS_ALPHA_OPAQUE 0x80
 
-int func_00185A20();
+/* Draws one queued text from text and returns the address of its terminating zero. */
+unsigned char *func_00184B30(FontDrawCursor *cursor, unsigned char *text);
+/* The two quadwords that end the font packet (X2 test_15). */
+extern unsigned char D_004B3410[];
+
+/* XS2 xglFontFlush: sets up the drawing cursor at the base of the scratchpad, starts the font packet,
+ * draws every text queued behind xglFontState (zero-separated, ended by an empty one), closes the packet
+ * and empties the queue. */
+void func_00185A20(void)
+{
+    FontDrawCursor *cursor = (FontDrawCursor *) SCRATCHPAD_BASE;
+    unsigned char *text;
+
+    *xglFontState.queue_cursor = 0;
+    cursor->depth = -1;
+    cursor->blue = FONT_COLOR_INITIAL;
+    cursor->green = FONT_COLOR_INITIAL;
+    cursor->red = FONT_COLOR_INITIAL;
+    cursor->offset_x = FONT_SCREEN_ORIGIN_X;
+    cursor->offset_y = FONT_SCREEN_ORIGIN_Y;
+    cursor->drawFlags = 0;
+    cursor->effect_y = cursor->effect_x = cursor->effect = 1;
+    cursor->effect_red = 0;
+    cursor->scale_x = FONT_SCALE_ONE;
+    cursor->effect_green = 0;
+    cursor->alpha_abcd = FONT_ALPHA_SOURCE_BLEND;
+    cursor->alpha = GS_ALPHA_OPAQUE;
+    cursor->effect_blue = 0;
+    cursor->effect_alpha = 0;
+    cursor->alpha_fix = 0;
+    cursor->scale_y = FONT_SCALE_ONE;
+    cursor->packet = xglPacketGetCurrent();
+    xglFontBuildPacket(cursor, 0);
+    xglFontState.unmodeled_08 = 0;
+    text = (unsigned char *) (&xglFontState + 1);
+    while (*text != 0) {
+        text = func_00184B30(cursor, text) + 1;
+    }
+    sceVif1PkAddDirectDataN(cursor->packet, D_004B3410, 2);
+    sceVif1PkCloseDirectHLCode(cursor->packet);
+    xglFontBufferReset();
+}
+
 
 void xglFontUpdateState(void)
 {
@@ -1357,7 +1739,50 @@ void xglFontSetFlags(int fontFlags)
     xglFontStateFlags[0] = fontFlags & (0xFFFF & ~FONT_STATE_DEBUG_PRINT);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185B68);
+/* Four 16x16 colour patterns: the left and right halves of two images of 16 rows x 32 words
+ * (the splat labels D_004B1ED0 / D_004B26D0 mark the right halves). */
+#define FONT_PATTERN_SIZE 16
+extern unsigned int fontColorPatternA[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
+extern unsigned int fontColorPatternB[FONT_PATTERN_SIZE][FONT_PATTERN_SIZE * 2];
+
+/* Fills the four patterns from the four colours: the colour index runs along the row (x & 3),
+ * in 4x2 cells ((x >> 2) & 1, (y & 1) << 1), in 8x2-row cells ((x >> 3) & 1, y & 2), and down
+ * the rows ((y >> 2) & 3). */
+void func_00185B68(const unsigned int *colors)
+{
+    unsigned int *pixel;
+    int x;
+    int y;
+
+    pixel = &fontColorPatternA[0][0];
+    for (y = 0; y < FONT_PATTERN_SIZE; y++) {
+        for (x = 0; x < FONT_PATTERN_SIZE; x++) {
+            *pixel++ = colors[x & 3];
+        }
+        pixel += FONT_PATTERN_SIZE;
+    }
+    pixel = &fontColorPatternA[0][FONT_PATTERN_SIZE];
+    for (y = 0; y < FONT_PATTERN_SIZE; y++) {
+        for (x = 0; x < FONT_PATTERN_SIZE; x++) {
+            *pixel++ = colors[((x >> 2) & 1) | ((y << 1) & 2)];
+        }
+        pixel += FONT_PATTERN_SIZE;
+    }
+    pixel = &fontColorPatternB[0][0];
+    for (y = 0; y < FONT_PATTERN_SIZE; y++) {
+        for (x = 0; x < FONT_PATTERN_SIZE; x++) {
+            *pixel++ = colors[((x >> 3) & 1) | (y & 2)];
+        }
+        pixel += FONT_PATTERN_SIZE;
+    }
+    pixel = &fontColorPatternB[0][FONT_PATTERN_SIZE];
+    for (y = 0; y < FONT_PATTERN_SIZE; y++) {
+        for (x = 0; x < FONT_PATTERN_SIZE; x++) {
+            *pixel++ = colors[(y >> 2) & 3];
+        }
+        pixel += FONT_PATTERN_SIZE;
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185CB0);
 

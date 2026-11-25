@@ -493,7 +493,87 @@ void pxyBuildFadeRamp(float spread)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019E5B0);
+/* The upload header of a circle shadow packet: four VIF codes (the last one DIRECT) and the GIF tag of the
+ * image transfer. */
+typedef struct PxyUploadHeader {
+    unsigned int vifCode[4];
+    unsigned int gifTag[4];
+} PxyUploadHeader;
+
+/* The circle shadow texture: its upload header and 64x64 PSMT8 levels, a filled disc that fades out to the edge. */
+typedef struct PxyCircleShadowTexture {
+    PxyUploadHeader header;
+    unsigned char level[64][64];
+} PxyCircleShadowTexture;
+
+extern PxyCircleShadowTexture pxyCircleShadowTexture;
+/* The palette upload header of the circle shadow; the colours are pxyBuildFadeRamp's table right after it. */
+extern PxyUploadHeader pxyCircleShadowClut;
+/* Set once func_0019E5B0 has built the circle shadow texture and its palette. */
+extern int pxyShadowTexturesReady;
+
+/* Radius (in texels) of the circle shadow and its fade width. */
+#define PXY_CIRCLE_SHADOW_RADIUS 32.0f
+#define PXY_CIRCLE_SHADOW_FADE 31.0f
+/* The darkest level of the shadow texture. */
+#define PXY_CIRCLE_SHADOW_LEVEL_MAX 31.0f
+/* The fade ramp spread of the shadow palette. */
+#define PXY_CIRCLE_SHADOW_RAMP_SPREAD 0.3f
+
+/* X2 CONSTRUCT_CIRCLR_SHADOW: builds the 64x64 circle shadow levels once (full inside radius 1, fading to 0 at
+ * radius 32), the upload headers of the texture and palette, and the palette's fade ramp. */
+void func_0019E5B0(void)
+{
+    int row;
+    float maxLevel;
+    int column;
+    PxyUploadHeader *packet;
+
+    maxLevel = PXY_CIRCLE_SHADOW_LEVEL_MAX;
+    if (pxyShadowTexturesReady != 0) {
+        return;
+    }
+    for (row = 0; row < 64; row++) {
+        for (column = 0; column < 64; column++) {
+            float x;
+            float y;
+            float radius;
+
+            x = (float) column - PXY_CIRCLE_SHADOW_RADIUS;
+            y = (float) row - PXY_CIRCLE_SHADOW_RADIUS;
+            radius = __builtin_sqrtf(x * x + y * y);
+            if (radius <= 1.0f) {
+                radius = 0.0f;
+            } else if (PXY_CIRCLE_SHADOW_RADIUS < radius) {
+                radius = 1.0f;
+            } else {
+                radius = (radius - 1.0f) / PXY_CIRCLE_SHADOW_FADE;
+            }
+            radius = (1.0f - radius) * maxLevel;
+            pxyCircleShadowTexture.level[row][column] = (unsigned int) radius;
+        }
+    }
+    packet = &pxyCircleShadowClut;
+    packet->vifCode[0] = 0;
+    packet->vifCode[1] = 0;
+    packet->vifCode[2] = 0;
+    packet->vifCode[3] = 0x50000041;
+    packet->gifTag[0] = 0x8040;
+    packet->gifTag[1] = 0x08000000;
+    packet->gifTag[2] = 0;
+    packet->gifTag[3] = 0;
+    packet = &pxyCircleShadowTexture.header;
+    packet->vifCode[0] = 0;
+    packet->vifCode[1] = 0;
+    packet->vifCode[2] = 0;
+    packet->vifCode[3] = 0x50000101;
+    packet->gifTag[0] = 0x8100;
+    packet->gifTag[1] = 0x08000000;
+    packet->gifTag[2] = 0;
+    packet->gifTag[3] = 0;
+    pxyBuildFadeRamp(PXY_CIRCLE_SHADOW_RAMP_SPREAD);
+    pxyShadowTexturesReady = 1;
+}
 
 extern s32 gPxyLightDirtyFlag;
 
