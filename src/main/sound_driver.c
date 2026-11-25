@@ -119,7 +119,82 @@ void seBgmLoadDefault(int a0, int a1, int a2)
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E940);
+/* Bank slots that share their channels, as byte pairs (first and last slot of a group); the list ends with a
+ * first slot of 0. */
+extern unsigned char soundBankGroups[];
+#define SOUND_BANK_GROUP_BYTES 2
+
+/* The first word of a single bank file ("ps2_"); a bank list starts with the byte size of its offset table. */
+#define SOUND_BANK_SINGLE_MAGIC 0x5F327370
+/* Banks of a list start at 64-byte boundaries after the offset table. */
+#define SOUND_BANK_ALIGN 64
+
+void func_0018E870(int slot, void *bank, int numbered);
+
+/* Registers the bank file at bankAddress in slot id & 0xFF (or only stops the slot when there is none). A single bank
+ * goes to that slot; a bank list fills consecutive slots, one per nonempty entry. Without a current song, a slot of a
+ * bank group first stops every slot of its group (once per group). */
+void func_0018E940(int a0, void *bankAddress)
+{
+    unsigned int *header;
+    unsigned int *offset;
+    unsigned int tableBytes;
+    unsigned char *banks;
+    unsigned char *current;
+    unsigned char *next;
+    int slot;
+    int groupFirst;
+    int groupLast;
+    int i;
+    int first;
+    int last;
+
+    slot = a0 & 0xFF;
+    if (bankAddress == 0) {
+        func_0018EC68(slot);
+        return;
+    }
+    header = bankAddress;
+    if (header[0] == SOUND_BANK_SINGLE_MAGIC) {
+        func_0018EC68(slot);
+        func_0018E870(slot, bankAddress, a0 <= SOUND_RANGE_IDS);
+        return;
+    }
+    tableBytes = header[0];
+    offset = header + 1;
+    banks = (unsigned char *) bankAddress + ((tableBytes + SOUND_BANK_ALIGN - 1) & -SOUND_BANK_ALIGN);
+    current = banks;
+    groupLast = -1;
+    groupFirst = -1;
+    for (; tableBytes != 0; tableBytes -= sizeof(*offset)) {
+        next = banks + ((*offset++ + SOUND_BANK_ALIGN - 1) & -SOUND_BANK_ALIGN);
+        if (current < next) {
+            if (gSoundRecordBlock.current_song == 0) {
+                if (slot < groupFirst || groupLast < slot) {
+                    for (i = 0; soundBankGroups[i] != 0; i += SOUND_BANK_GROUP_BYTES) {
+                        first = soundBankGroups[i];
+                        if (slot >= first) {
+                            last = soundBankGroups[i + 1];
+                            if (last >= slot) {
+                                groupFirst = first;
+                                groupLast = last;
+                                break;
+                            }
+                        }
+                    }
+                    for (i = groupFirst; i <= groupLast; i++) {
+                        func_0018EC68(i);
+                    }
+                }
+            } else {
+                func_0018EC68(slot);
+            }
+            func_0018E870(slot, current, 0);
+        }
+        current = next;
+        slot++;
+    }
+}
 
 void func_001801C0();
 int func_0018EC68(int channel);
