@@ -40,7 +40,7 @@ struct XglTaskScheduler {
  * only its leading lbn word is evidenced by the callers in xgl_cd.c. */
 typedef struct CdFilePosition {
     unsigned int lbn;
-    int stored_bytes;
+    unsigned int stored_bytes;
     unsigned char unmodeled_08[0x1c];
     unsigned char readMedium;
     unsigned char unmodeled_25;
