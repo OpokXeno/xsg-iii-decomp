@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/ee_stdarg.h"
 #include "shared.h"
 
 int printf(const char *format, ...);
@@ -7,9 +8,6 @@ void assertExit(void);
 #include "debug_break.h"
 
 
-typedef char *va_list;
-
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
 
 int vprintf(const char *format, va_list formatArgs);
 extern const char exitProgramBanner[64];

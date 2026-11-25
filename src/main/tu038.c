@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/ee_stdarg.h"
 
 typedef int s32;
 typedef float f32;
@@ -50,9 +51,6 @@ void setKindWeightCount(s32 kind, s32 count, f32 weight) {
     D_00551238 = count;
 }
 
-typedef char *va_list;
-
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
 
 int vsprintf(char *destination, const char *format, va_list formatArgs);
 

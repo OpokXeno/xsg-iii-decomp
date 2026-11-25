@@ -2449,13 +2449,7 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A4058);
 
 /* The X3 layout of the packet a batch draws: X2's PxyPacket with 0x10 more bytes below +0x9c. */
 
-typedef union XglDirectQueueEntry {
-    struct {
-        u64 registerValue;
-        u64 registerAddress;
-    };
-    u32 tagAndHeaderWords[4];
-} XglDirectQueueEntry;
+#include "main/xgl_direct_queue.h"
 
 /* ---- pxyDrawBatches ---- */
 

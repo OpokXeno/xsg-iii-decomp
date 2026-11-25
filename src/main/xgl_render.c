@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/sce_libgraph.h"
 #include "shared.h"
 #include "main/Packet.h"
 #include "main/xgl_render.h"
@@ -498,9 +499,8 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199CE0);
 
 extern volatile unsigned int gVsyncsSinceFlip;
 
-extern unsigned char func_00199CE0[];
+int func_00199CE0(void);
 
-s32 sceGsSyncVCallback();
 
 void xglRenderSyncInit(void) {
     sceGsSyncVCallback(func_00199CE0);

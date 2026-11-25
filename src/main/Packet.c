@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_dma.h"
 #include "shared.h"
 
 #include "main/Packet.h"
@@ -147,7 +148,6 @@ void func_00199A20(void)
     sceVif1PkReset(pCurrentPacket);
 }
 
-void xglDmaDirectSrcChain(u32 channel, u32 address);
 
 void xglPacketSend(void) {
     if (pSendPacket != 0) {

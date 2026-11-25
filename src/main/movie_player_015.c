@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/sce_libgraph.h"
 #include "shared.h"
 #include "gs.h"
 #include "main/xgl_cd.h"
@@ -315,7 +316,6 @@ extern unsigned short moviePlayerHeight;
 
 void func_002FB030(void);
 
-int sceGsSyncVCallback(int (*callback)(void));
 
 void func_00132140(void);
 

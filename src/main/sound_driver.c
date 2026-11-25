@@ -1,4 +1,6 @@
 #include "common.h"
+#include "main/sce_libgraph.h"
+#include "main/ee_stdarg.h"
 #include "shared.h"
 #include "main/tu018.h"
 
@@ -364,10 +366,7 @@ void soundSlotStartNumbered(s32 soundSlotNumber, const char *fileNumber) {
     soundSlotStartFile(soundSlotNumber, fileKey);
 }
 
-/* The EE va_start spelling (as in the other variadic definitions of this tree); every
- * variadic argument takes one 8-byte slot. */
-typedef char *va_list;
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
+/* Every variadic argument takes one 8-byte slot (main/ee_stdarg.h). */
 #define VA_SLOT_SIZE 8
 
 /* The pool the playlist's file keys are written to, one after another (the driver keeps
@@ -870,7 +869,6 @@ typedef struct SoundIopSetup {
 extern unsigned char D_0089BF00[];
 void func_00166B30(int value);
 void func_0015F8C8(int value);
-int sceGsSyncVCallback(int (*callback)(void));
 void func_0015DD88(void);
 void func_0017CE40(SoundIopSetup *setup);
 void func_0017D020(void);

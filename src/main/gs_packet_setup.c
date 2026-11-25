@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/ee_stdarg.h"
 #include "shared.h"
 #include "gs.h"
 
@@ -29,8 +30,6 @@ typedef struct SRenderState {
 } SRenderState;
 typedef int s32;
 typedef signed char s8;
-typedef char *va_list;
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
 typedef long long s64;
 extern unsigned char D_0055A850[];
 void *memset(void *dest, s32 value, u32 size);

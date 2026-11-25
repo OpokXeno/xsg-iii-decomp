@@ -142,7 +142,7 @@ float pxyProfileGetMs(const char *name)
     return elapsedMs;
 }
 
-void func_0019D4E8(const char *text, int x, int y, float scale, int color, int shadowColor, int flag);
+int func_0019D4E8(const char *text, int x, int y, float scale, int color, int shadowColor, int flag);
 
 float pxyProfileGetMsUnchecked(const char *name)
 {

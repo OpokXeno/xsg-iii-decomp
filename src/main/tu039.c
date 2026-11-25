@@ -3,15 +3,7 @@
 #include "main/xgl_render.h"
 #include "main/xgl_2.h"
 
-/* One A+D entry of the direct GS queue: the register value and its address (the queue head reuses the words as
- * the GIF tag). */
-typedef union XglDirectQueueEntry {
-    struct {
-        u64 registerValue;
-        u64 registerAddress;
-    };
-    u32 tagAndHeaderWords[4];
-} XglDirectQueueEntry;
+#include "main/xgl_direct_queue.h"
 
 extern XglDirectQueueEntry *xglDirectQueueBuffer;
 extern int xglDirectQueueCount;
