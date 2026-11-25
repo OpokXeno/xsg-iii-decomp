@@ -58,7 +58,7 @@ typedef struct XglRenderState {
 /* Callbacks xglRenderFinalPacket runs on the frame packet. */
 #define RENDER_FINAL_CALLBACK_COUNT 21
 
-/* The X3 render state at 0x004C8390 (0x86 bytes; the object records the size). XglRenderState above is
+/* The X3 render state at 0x004C8390 (0x88 bytes with the fade gain and level). XglRenderState above is
  * X2's layout and belongs to sRender only. */
 typedef struct XglRenderStateBlock {
     short depth_psm;                    /* +0x00 */
@@ -97,14 +97,15 @@ typedef struct XglRenderStateBlock {
     unsigned char movieMode;
     unsigned char unmodeled_83;         /* +0x83 */
     unsigned char syncBacklogFull;      /* +0x84 */
+    unsigned char unmodeled_85;         /* +0x85 */
+    unsigned char fade_gain;            /* +0x86 */
+    unsigned char fade_level;           /* +0x87 */
 } XglRenderStateBlock;
 
 /* The clear packet at gEnvFlags (0x004C8240, 0x150 = 0x15 quadwords, sent whole by the base swap in movie
- * mode): one quadword, then the GIF packet of 0x14 quadwords that xglRenderMove sends by DMA from +0x10 (the
+ * mode): one quadword, then the GIF packet that xglRenderMove sends by DMA from +0x10 (the
  * ClearEnv label). Its A+D writes include the TEST value that xglRenderClearDepth / xglRenderClearFrame select
  * (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
-#define RENDER_CLEAR_PACKET_QUADWORDS 0x14
-
 typedef struct XglClearPacket {
     unsigned char unmodeled_00[0x10];
     u64 gifTag[2];                      /* +0x10: the GIF tag, start of the packet xglRenderMove sends */

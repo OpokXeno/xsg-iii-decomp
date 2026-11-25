@@ -789,19 +789,10 @@ void func_0019A6F0(int resolution)
     xglStudioMainCameraInit();
 }
 
-/* The fade bytes sit just past XglRenderStateBlock, which must keep its 0x86-byte size (the object records it). */
-typedef struct XglRenderFadeView {
-  unsigned char unmodeled_00[0x86];
-  unsigned char fade_gain;            /* +0x86 */
-  unsigned char fade_level;           /* +0x87 */
-} XglRenderFadeView;
-
-#define D_004C8390_FADE (*(XglRenderFadeView *) &D_004C8390)
-
 s32 xglRenderFadeAlpha(void)
 {
   s32 scaled;
-  scaled = (D_004C8390_FADE.fade_level * D_004C8390_FADE.fade_gain) >> 7;
+  scaled = (D_004C8390.fade_level * D_004C8390.fade_gain) >> 7;
   return (scaled >= 0x100) ? (0xFF) : (scaled);
 }
 
@@ -835,7 +826,7 @@ void func_0019AB00(void)
 
                 envPacket = xglPacketGetCurrent();
                 sceVif1PkOpenDirectHLCode(envPacket, 0);
-                sceVif1PkAddDirectDataN(envPacket, &gEnvFlags, 0x15);
+                sceVif1PkAddDirectDataN(envPacket, &gEnvFlags, sizeof(gEnvFlags) / 16);
                 sceVif1PkCloseDirectHLCode(envPacket);
             }
         }
@@ -903,8 +894,8 @@ void func_0019ADD8(void)
 {
     int i;
 
-    D_004C8390_FADE.fade_gain = RENDER_FADE_NEUTRAL;
-    D_004C8390_FADE.fade_level = RENDER_FADE_NEUTRAL;
+    D_004C8390.fade_gain = RENDER_FADE_NEUTRAL;
+    D_004C8390.fade_level = RENDER_FADE_NEUTRAL;
     D_004C8390.palMode = 0;
     D_004C8390.progressiveMode = 0;
     D_004C8390.unmodeled_83 = 0;
@@ -1040,18 +1031,6 @@ void xglRenderGlobalFadeSend(void) {
         sceVif1PkRef(packet, &xglRenderFadeGifWord[-0x11], 0x15, 0, 0, 0);
     }
 }
-
-void pxyVif1EmptyPacketStart(void);
-void sefDrawEffectRecords3D(void);
-void func_001AA580(void);
-void func_002586A8(void);
-void pxyStateConsumeDirty(void);
-void xglFontUpdateState(void);
-void func_0019B020(void);
-void pxyVif1EmptyPacketRestart(void);
-void func_00199A20(void);
-void func_0019AC98(void);
-void pxyResetAndDisablePending(void);
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", xglRenderMove);
 
