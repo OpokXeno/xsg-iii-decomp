@@ -228,7 +228,7 @@ f32 func_00197A00(XglLightStreamWord **cursor, f32 time)
 /* One light entry of a pack: its channel types select how each of the 20 values is produced. */
 typedef struct XglLightEntry {
     u8 unmodeled_00[0x4];
-    s32 type;               /* 0x04: XGL_LIGHT_* (below XGL_LIGHT_SLOT_TYPES: ambient and global keys) */
+    s32 entryType;          /* 0x04: XGL_LIGHT_* (below XGL_LIGHT_SLOT_TYPES: ambient and global keys) */
     u8 unmodeled_08[0x8];
     u8 channelTypes[20];    /* 0x10 */
     u8 unmodeled_24[0xC];
@@ -609,7 +609,7 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
     for (i = 0; i < pack->lightEntryCount; i++) {
         XglLightEntry *entry = (XglLightEntry *)((u8 *)pack + entryOffsets[i]);
 
-        if (entry->type < XGL_LIGHT_SLOT_TYPES) {
+        if (entry->entryType < XGL_LIGHT_SLOT_TYPES) {
             XglLightKey *key = &((XglLightKey *)((u8 *)pack + pack->keyOffset))[i];
             DoublewordAlignedVector4 axisDir = xglLightKeyAxisTemplate;
             Vector4 pointColor;
@@ -623,7 +623,7 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
             Vector4 *lightColor;
             int lit;
 
-            switch (entry->type) {
+            switch (entry->entryType) {
             case XGL_LIGHT_COLOR_SCALE:
                 xglVectorScale(&xglLightBankStorage, &key->color, key->intensity);
                 pxySetColorScale(&xglLightBankStorage);
@@ -693,7 +693,7 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
         for (i = 0; i < pack->lightEntryCount; i++) {
             XglLightEntry *entry = (XglLightEntry *)((u8 *)pack + entryOffsets[i]);
 
-            if (entry->type >= XGL_LIGHT_SLOT_TYPES) {
+            if (entry->entryType >= XGL_LIGHT_SLOT_TYPES) {
                 XglLightKey *key = &((XglLightKey *)((u8 *)pack + pack->keyOffset))[i];
                 Vector4 pointColor;
                 Vector4 pointDirection;
@@ -704,7 +704,7 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
                 Vector4 spotColor;
                 Vector4 spotDirection;
 
-                switch (entry->type) {
+                switch (entry->entryType) {
                 case XGL_LIGHT_POINT:
                     if (pointCount < XGL_LIGHT_POINTS) {
                         xglVectorCopy(lightSet->pointPositions[pointCount], &key->position);
