@@ -117,6 +117,8 @@ typedef struct XglLightSlot {
     u8 unk_08[0x8];
 } XglLightSlot;
 
+#define XGL_LIGHT_SLOT_TABLE_COUNT 16
+
 extern XglLightSlot xglLightSlotTable[];
 
 void xglLightSlotsClear(void) {
@@ -645,6 +647,8 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
             case XGL_LIGHT_AMBIENT_POINT:
                 lightColor = &pointColor;
                 lit = xglLightPointColor(lightColor, key, receiver);
+            /* kept: the cone, spot and box cases jump here because the original has one copy of this tail for
+             * all four; written out per case, the inlined asm vector adds are not merged and the tail repeats. */
             addAmbientLight:
                 if (!lit) {
                     break;
@@ -767,7 +771,7 @@ void xglLightPackBuildByName(XglLightSet *light, const char *packName, Vector4 *
     int i;
 
     xglLightBankValid = 0;
-    for (i = 0; i < 16; i++) {
+    for (i = 0; i < XGL_LIGHT_SLOT_TABLE_COUNT; i++) {
         if (xglLightSlotTable[i].lightPack != 0) {
             if (strcmp(xglLightSlotTable[i].lightPack->name, packName) == 0) {
                 xglLightPackBuildLightSet(xglLightSlotTable[i].lightPack, light, receiver);
