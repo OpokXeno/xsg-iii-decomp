@@ -11248,6 +11248,7 @@ gQuadDepthCounter = 0x00550C50;
 gShardSeedX = 0x00538EC0;
 gShardSeedY = 0x00538ED0;
 gShardFieldTitleText = 0x00538EE0;
+D_005412A0 = 0x005412A0;
 gDefaultSpringOffset = 0x005412B0;
 saveScreenRecordTable = 0x003E6E90;
 gSaveIconUpload = 0x003E7040;

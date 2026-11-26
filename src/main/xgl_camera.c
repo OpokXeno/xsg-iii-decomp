@@ -501,7 +501,56 @@ void xglCameraSetPadPort(XglCamera *camera, s32 port) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001947F0);
+#define PAD_TRIANGLE 0x0010
+#define PAD_SELECT 0x0100
+
+/* XglCamera.cameraState values the pad update dispatches on. */
+#define CAMERA_STATE_RESET 0  /* xglCameraResetState: no pad update, the sdv special work is left alone */
+#define CAMERA_STATE_STUDIO 1 /* set by xglStudioMainCameraInit */
+#define CAMERA_STATE_FREE 2   /* xglCameraPadUpdateFree */
+#define CAMERA_STATE_CHASE 3  /* xglCameraPadUpdateChase */
+#define CAMERA_STATE_GAME 4   /* XS2 name; set by sb_natives.c, tu237.c and ov02 tu097.c */
+
+/* Pad update of a camera: the free and the chase state run their update unless SELECT is held; SELECT
+ * with TRIANGLE pressed puts the travel back to its default. The pad is the camera's port ORed with port 1,
+ * or the sdv special work while it is active. */
+void func_001947F0(XglCamera *camera)
+{
+    unsigned short held;
+    unsigned short pressed;
+
+    held = PadData[1].held | PadData[camera->padPort].held;
+    pressed = PadData[1].pressed | PadData[camera->padPort].pressed;
+    if (sdvSpecialBuf.active) {
+        held = sdvSpecialBuf.held;
+        pressed = sdvSpecialBuf.pressed;
+    }
+    switch (camera->cameraState) {
+    case CAMERA_STATE_RESET:
+        return;
+    case CAMERA_STATE_STUDIO:
+        break;
+    case CAMERA_STATE_FREE:
+        if (!(held & PAD_SELECT)) {
+            xglCameraPadUpdateFree(camera);
+        } else if (pressed & PAD_TRIANGLE) {
+            xglCameraTravelDefaultInit(camera);
+        }
+        break;
+    case CAMERA_STATE_CHASE:
+        if (held & PAD_SELECT) {
+            if (pressed & PAD_TRIANGLE) {
+                xglCameraTravelDefaultInit(camera);
+            }
+        } else {
+            xglCameraPadUpdateChase(camera);
+        }
+        break;
+    case CAMERA_STATE_GAME:
+        break;
+    }
+    sdvInitSpecialWork();
+}
 
 void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
 

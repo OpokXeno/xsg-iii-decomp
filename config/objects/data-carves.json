@@ -1218,6 +1218,30 @@
    ]
   },
   "main/tu027": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00541280",
+      "0x005412a0"
+     ],
+     "generated": [
+      "0x00541280",
+      "0x00541294"
+     ],
+     "generated_by": [
+      "func_001947F0"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00541280"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_camera.o"
+     }
+    }
+   ],
    ".lit4": [
     {
      "range": [
@@ -1284,8 +1308,8 @@
       "0x0054ff24"
      ],
      "generated_by": [
-      "xglCameraViewScreen",
-      "xglCameraPadUpdateChase"
+      "xglCameraPadUpdateChase",
+      "xglCameraViewScreen"
      ],
      "c_owned_symbols": [
       "D_0054FF18",
