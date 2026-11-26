@@ -126,8 +126,7 @@ typedef struct SaveGameHeader {
     unsigned char fileIndex; /* +0x26 */
 } SaveGameHeader;
 
-/* The 0x130B0-byte memory-card save image at gXglMcAgedEntries (tu178 AgedEntryRing, extended with the
-   regions the new-game reset clears). */
+/* The 0x130B0-byte memory-card save image at gXglMcAgedEntries (same definition as in tu178). */
 typedef struct AgedEntryRing {
     unsigned char unmodeled_0000[0x10];
     s32 newGameCounters[2];                     /* +0x10: zeroed by the new-game reset */
@@ -144,7 +143,10 @@ typedef struct AgedEntryRing {
     unsigned char bytes157C[0x177C - 0x157C];   /* +0x157C */
     unsigned char unmodeled_177C[0x3A0C - 0x177C];
     unsigned char bytes3A0C[0x1302C - 0x3A0C];  /* +0x3A0C */
-    unsigned char unmodeled_1302C[0x130B0 - 0x1302C]; /* tu178: aged-entry ring cursors at +0x130AA */
+    unsigned char unmodeled_1302C[0x130AA - 0x1302C];
+    s8 ringWriteIndex;                          /* +0x130AA: slot of agedEntries the next entry goes to */
+    u8 ringCursor;                              /* +0x130AB: slot of the newest entry */
+    unsigned char unmodeled_130AC[0x130B0 - 0x130AC];
 } AgedEntryRing;
 
 extern BattleRosterTable gBattleRosterTable;
@@ -238,7 +240,8 @@ u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
-  return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
+  return ((s32 (*)()) battleRosterEntryIdGet)(
+      gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
 }
 
 u8 battleRosterHasEntryId(s32 entryId)
