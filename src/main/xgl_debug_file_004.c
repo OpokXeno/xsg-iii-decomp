@@ -41,7 +41,7 @@ extern unsigned char xglLanguageSetting[];
 #define XGL_LANGUAGE_DEFAULT 2
 
 /* Returns the code of the selected language; a non-null buffer receives its two bytes. */
-unsigned short func_00181C18(char *buffer)
+unsigned short xglGetLanguageCode(char *buffer)
 {
     XglLanguageCodes codes = xglLanguageCodeTable;
     unsigned int language = xglLanguageSetting[0];

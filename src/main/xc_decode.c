@@ -64,12 +64,12 @@ INCLUDE_ASM("asm/main/nonmatchings/xc_decode", func_001B7190);
 extern unsigned char gXcMpeg2PackedInput[];
 extern unsigned char gXcMpeg2OutputBuffer[];
 s32 sprintf(void *, void *, u32, s32);
-u32 func_00181C18(s32);
+u32 xglGetLanguageCode(s32);
 
 void *xcMpeg2PlayPacked(void) {
     u32 packed;
 
-    packed = func_00181C18(0);
+    packed = xglGetLanguageCode(0);
     sprintf(gXcMpeg2OutputBuffer, gXcMpeg2PackedInput, packed, (packed >> 8) & 0xFFFF);
     return gXcMpeg2OutputBuffer;
 }

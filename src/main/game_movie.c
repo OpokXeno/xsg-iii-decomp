@@ -425,12 +425,12 @@ INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B41E8);
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B43C8);
 
 extern unsigned char movieCdReadBuffer[];
-s32 func_00181C18();
+s32 xglGetLanguageCode();
 s32 func_001B43C8();
 s32 xglCdReadFile();
 
 void movieCdLoadAndStart(s32 location, s32 mode) {
-    func_00181C18(movieCdReadBuffer);
+    xglGetLanguageCode(movieCdReadBuffer);
     xglCdReadFile(movieCdReadBuffer - 4, location, 0, 0);
     func_001B43C8(location, mode);
 }

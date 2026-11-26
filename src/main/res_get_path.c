@@ -1939,7 +1939,7 @@ void pagedTableInit(struct SaveMenuTable *table, s32 capacity);
 void mcModuleReset(void);
 void sheetStateReset(void);
 void memPoolFree(void *block);
-void func_00181C18(void *file);
+void xglGetLanguageCode(void *file);
 s32 xglCdServiceIfPending(void);
 void scratchpadSendCmd23Mode1(ScratchpadCommand *command);
 void scratchpadSendCmd23Mode0(ScratchpadCommand *command);
@@ -1988,7 +1988,7 @@ void saveScreenSetup(void) {
         memPoolFree(thumbnailBuffer);
         gSaveFileBuffer = memPoolAlloc(0x4000);
         gSaveScreen->fileImageReady = 0;
-        func_00181C18(gSaveImagePath + 4);
+        xglGetLanguageCode(gSaveImagePath + 4);
         xglCdReadFile(gSaveImagePath, gSaveFileBuffer, 1, saveFileReadCallback);
         if (gSaveScreen->unmodeled_5BB2D != 0) {
             while (xglCdServiceIfPending()) {

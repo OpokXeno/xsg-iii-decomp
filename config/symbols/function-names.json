@@ -13,6 +13,7 @@
    "0x00181bc0": "xglSleep",
    "0x00181be8": "xglTimer0Reset",
    "0x00181c08": "xglTimer0Get",
+   "0x00181c18": "xglGetLanguageCode",
    "0x00181c90": "xglDebFileEmpty",
    "0x00181c98": "xglDebFileSize",
    "0x00181cc0": "xglDebFileRead",

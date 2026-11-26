@@ -164,7 +164,7 @@ const s8 gSrsAssetFormatNameOnly[16] = "ef\\esp\\%s";
 
 static s8 gSrsAssetNameBuffer[64];
 
-u32 func_00181C18();
+u32 xglGetLanguageCode();
 
 s32 xglCdGetFileSize();
 
@@ -176,13 +176,13 @@ char *srsBuildAssetName(char *name, s32 isLoaded)
 
     if (isLoaded != 0) {
         if (name[0] == 'c' && name[1] == 'e' && (nameSixthChar = name[6]) == '9' && (nameSeventhChar = name[7]) == nameSixthChar && name[8] == nameSeventhChar) {
-            position = func_00181C18(0);
+            position = xglGetLanguageCode(0);
             sprintf(gSrsAssetNameBuffer, gSrsAssetFormatCeRepeatTag, position, (position >> 8) & 0xFFFF, name);
         } else {
             sprintf(gSrsAssetNameBuffer, gSrsAssetFormatCdChars, name[0], name[1], name[2], name);
         }
     } else if (name[0] == 'e' && name[1] == 'f') {
-        position = func_00181C18(0);
+        position = xglGetLanguageCode(0);
         sprintf(gSrsAssetNameBuffer, gSrsAssetFormatEfPosition, position, (position >> 8) & 0xFFFF, name);
         if (xglCdGetFileSize(gSrsAssetNameBuffer) < 0) {
             sprintf(gSrsAssetNameBuffer, gSrsAssetFormatEfFallback, name);

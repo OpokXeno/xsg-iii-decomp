@@ -36963,9 +36963,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00181C18",
+     "name": "xglGetLanguageCode",
      "size": 116,
-     "splat_name": "func_00181C18",
+     "splat_name": "xglGetLanguageCode",
      "va": "0x00181c18",
      "name_basis": "address",
      "provenance": "estimated"
