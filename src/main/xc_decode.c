@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_debug_file_004.h"
 
 INCLUDE_ASM("asm/main/nonmatchings/xc_decode", func_001B6BD8);
 
@@ -64,7 +65,6 @@ INCLUDE_ASM("asm/main/nonmatchings/xc_decode", func_001B7190);
 extern unsigned char gXcMpeg2PackedInput[];
 extern unsigned char gXcMpeg2OutputBuffer[];
 s32 sprintf(void *, void *, u32, s32);
-u32 xglGetLanguageCode(s32);
 
 void *xcMpeg2PlayPacked(void) {
     u32 packed;

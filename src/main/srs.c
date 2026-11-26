@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main/sv_get_image_item_142.h"
+#include "main/xgl_debug_file_004.h"
 
 typedef int s32;
 
@@ -163,8 +164,6 @@ const s8 gSrsAssetFormatEfFallback[16] = "ef\\map\\%s";
 const s8 gSrsAssetFormatNameOnly[16] = "ef\\esp\\%s";
 
 static s8 gSrsAssetNameBuffer[64];
-
-u32 xglGetLanguageCode();
 
 s32 xglCdGetFileSize();
 

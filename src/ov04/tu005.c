@@ -2,6 +2,7 @@
  * OV04 original TU 5: 0x00a8deb0..0x00a90940 (14 functions)
  */
 #include "common.h"
+#include "main/sound_driver.h"
 #include "main/tu007.h"
 
 typedef short s16;
@@ -168,7 +169,6 @@ void func_00A969B8(s32 button);
 s32 func_00A969F8(char *code);
 void func_00A98730(char *text, s32 x, s32 y, s32 width, s32 height, s32 flags, s32 frames, f32 scale);
 void ov04SlotsClearUpper(void);
-void func_0018F098(s32 handle);
 s16 func_00A9D770(s32 voice, s16 bank, s16 track);
 void func_00A9D1A0(s32 enable);
 void func_00A8F780(void);

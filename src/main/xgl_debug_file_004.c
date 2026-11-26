@@ -2,6 +2,7 @@
 #include "shared.h"
 
 #include "debug_break.h"
+#include "main/xgl_debug_file_004.h"
 
 int xglDebFileSize(const char *name);
 int xglDebFileRead(const char *name, void *fileBytes);

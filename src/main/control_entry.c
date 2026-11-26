@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/assert_fail.h"
 
 void xglSleep(void);
 void xglRenderFrame(void);
@@ -23,7 +24,6 @@ void xglPadInitial(void);
 void xglMcInitial(void);
 void xglDmaInitial(void);
 void xglIntrInit(void);
-void func_00193600(void);
 void xglGeometryInit(void);
 void xglPacketInitDoubleBuffer(unsigned int base, unsigned int size, float rate);
 void xglRenderInit(void);

@@ -3,6 +3,7 @@
 #include "main/ee_stdarg.h"
 #include "shared.h"
 #include "main/tu018.h"
+#include "main/sound_driver.h"
 
 /* Sends a sound driver command (0xA0nn0000 group) for a channel with one argument. */
 int func_00180978(int channel, unsigned int command, int argument);
@@ -183,8 +184,6 @@ extern unsigned char soundBankGroups[];
 /* Banks of a list start at 64-byte boundaries after the offset table. */
 #define SOUND_BANK_ALIGN 64
 
-void func_0018E870(int slot, void *bank, int numbered);
-
 /* Registers the bank file at bankAddress in slot id & 0xFF (or only stops the slot when there is none). A single bank
  * goes to that slot; a bank list fills consecutive slots, one per nonempty entry. Without a current song, a slot of a
  * bank group first stops every slot of its group (once per group). */
@@ -311,8 +310,6 @@ void seVoiceStartDefault(unsigned int voice)
 {
     seVoiceStart(voice, 127, 0xffff);
 }
-
-void func_0018F1D0(void);
 
 void soundDriverCheckStatus(s32 driverStatus) {
     if (driverStatus < 0) {

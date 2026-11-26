@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/xgl_debug_file_004.h"
 
 char *caption_nextline(char *cursor);
 struct XglPacket;
@@ -425,7 +426,6 @@ INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B41E8);
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B43C8);
 
 extern unsigned char movieCdReadBuffer[];
-s32 xglGetLanguageCode();
 s32 func_001B43C8();
 s32 xglCdReadFile();
 

@@ -5,6 +5,7 @@
 #include "main/xgl_render.h"
 #include "main/xgl_cd.h"
 #include "gs.h"
+#include "main/xgl_debug_file_004.h"
 
 void *memset(void *destination, int value, unsigned int count);
 
@@ -1939,7 +1940,6 @@ void pagedTableInit(struct SaveMenuTable *table, s32 capacity);
 void mcModuleReset(void);
 void sheetStateReset(void);
 void memPoolFree(void *block);
-void xglGetLanguageCode(void *file);
 s32 xglCdServiceIfPending(void);
 void scratchpadSendCmd23Mode1(ScratchpadCommand *command);
 void scratchpadSendCmd23Mode0(ScratchpadCommand *command);
