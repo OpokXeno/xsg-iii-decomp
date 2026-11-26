@@ -480,8 +480,6 @@ void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
   gBattleRosterTable.secondValue = storedSecond;
 }
 
-void *memset(void *destination, int value, unsigned int count);
-
 /* For a roster 1 entry id (0xD..0x10), returns its linked roster 0 entry id number index & 1, counting only the
    linked ids present in roster 0 (present ones first); 0 when there is none or for any other entry id. */
 s32 func_002224E8(s32 entryId, s32 index)
