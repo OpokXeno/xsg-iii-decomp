@@ -4,6 +4,8 @@
 #include "shared.h"
 #include "main/tu018.h"
 
+/* Sends a sound driver command (0xA0nn0000 group) for a channel with one argument. */
+int func_00180978(int channel, unsigned int command, int argument);
 int func_0018EC68(int channel);
 void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
 
@@ -265,7 +267,7 @@ void seVoiceStartDefault(unsigned int voice)
     seVoiceStart(voice, 127, 0xffff);
 }
 
-s32 func_0018F1D0();
+void func_0018F1D0(void);
 
 void soundDriverCheckStatus(s32 driverStatus) {
     if (driverStatus < 0) {
@@ -300,7 +302,6 @@ INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F098);
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F118);
 
 void soundDriverSetOutputMode(s32 outputSelect) {
-    extern s32 func_00180978();
     if (outputSelect != 0) {
         func_00180978(0, 0xA0000500, 0);
         return;
@@ -308,7 +309,16 @@ void soundDriverSetOutputMode(s32 outputSelect) {
     func_00180978(outputSelect, 0xA0000600, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F1D0);
+/* Sends driver command 0xA0000100 and clears the channel states. */
+void func_0018F1D0(void)
+{
+    int channel;
+
+    func_00180978(0, 0xA0000100, 0);
+    for (channel = 1; channel < SOUND_CHANNEL_COUNT; channel++) {
+        gSoundRecordBlock.channelStates[channel].word = 0;
+    }
+}
 
 /* <<< CHUNK se_bank_load */
 
@@ -661,7 +671,6 @@ void soundSlotStartKey(int soundSlotNumber, const char *fileKey)
 s32 func_0016A3F8(s32);
 
 void soundDriverSetStreamMode(s32 streamEnable) {
-    extern s32 func_00180978(s32, s32, s32);
     if (streamEnable != 0) {
         func_0016A3F8(0);
         func_00180978(0, 0xA0000800, 0);
