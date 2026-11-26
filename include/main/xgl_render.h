@@ -79,7 +79,7 @@ typedef struct XglRenderStateBlock {
     unsigned short flip_base;           /* +0x18: the next display page (X2 sRenderFlipBase) */
     unsigned char unmodeled_1a[2];      /* +0x1A..+0x1B */
     XglRenderFadeCallback finalPacketCallbacks[RENDER_FINAL_CALLBACK_COUNT]; /* +0x1C: run by xglRenderFinalPacket */
-    unsigned char unmodeled_70[4];      /* +0x70..+0x73 */
+    XglRenderFadeCallback globalFadeCallback; /* +0x70: run with the packet before the global fade */
     unsigned char render_status;        /* +0x74: cleared by the base swap (X2 xglRenderStatus) */
     unsigned char frame_delta;          /* +0x75 */
     unsigned char path_busy_flag;       /* +0x76: cleared by the render reset (X2 xglRenderPathBusyFlag) */

@@ -934,13 +934,11 @@ void xglRenderFinalPacket(void)
     }
 }
 
-extern s32 D_004C8400[];
-
 extern s32 xglRenderGlobalFadeValue;
 
 void xglRenderGlobalFadeReset(void) {
     xglRenderGlobalFadeValue = 0;
-    D_004C8400[0] = 0;
+    D_004C8390.globalFadeCallback = 0;
 }
 
 s32 xglRenderGlobalFadeValueGet(void) {
