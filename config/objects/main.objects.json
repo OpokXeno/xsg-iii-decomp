@@ -37418,9 +37418,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00183B68",
+     "name": "xglFontCmdRuby",
      "size": 1052,
-     "splat_name": "func_00183B68",
+     "splat_name": "xglFontCmdRuby",
      "va": "0x00183b68",
      "name_basis": "address",
      "provenance": "estimated"

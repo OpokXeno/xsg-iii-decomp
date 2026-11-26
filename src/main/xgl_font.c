@@ -1433,7 +1433,7 @@ int xglFontCmdXx(FontDrawCursor *cursor, const char **text)
     return 1;
 }
 
-int func_00183B68(FontDrawCursor *cursor, const char **text)
+int xglFontCmdRuby(FontDrawCursor *cursor, const char **text)
 {
     const unsigned char *next;
     /* The cursor's address is taken before its first assignment and used for the first parser call:

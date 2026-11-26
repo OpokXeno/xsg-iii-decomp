@@ -26,6 +26,7 @@
    "0x00182e78": "xglFontGetStringWidth",
    "0x001831d0": "xglFontParseHex",
    "0x00183660": "xglFontCmdBg",
+   "0x00183b68": "xglFontCmdRuby",
    "0x00184938": "xglFontGetGlyphIndex",
    "0x00185a20": "xglFontFlush",
    "0x00185ee8": "xglDmaBufferReset",
