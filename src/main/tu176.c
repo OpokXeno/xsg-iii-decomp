@@ -1,6 +1,7 @@
 #include "common.h"
 #include "shared.h"
-#include "main/xgl_cd.h"
+#include "main/tu176.h"
+#include "main/tu178.h"
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
 
@@ -20,41 +21,6 @@ typedef struct ClampedCounter
   u8 unmodeled_1E[0x20 - 0x1E];
   u16 clampedValue;            /* +0x20 */
 } ClampedCounter;
-
-/* 0x10-byte roster of the table at gBattleRosterTable: roster 0 holds entry ids below 0xD (at most 7),
-   roster 1 the ids from 0xD on (at most 4). */
-typedef struct BattleRoster
-{
-  u8 entryIdCount;             /* +0x00 */
-  u8 cursor;          /* +0x01: index of the selected entry */
-  u8 entryIds[0xE];   /* +0x02 */
-} BattleRoster;
-
-/* 0x24-byte per-character record of gBattleRosterTable, from +0x48 (func_00222768 returns &values[slot]).
-   The stride-0x24 accessors in tu177 use other bases into the same array: the skill count and cost of
-   character c sit at table +0x28 + c * 0x24 (+0x04/+0x05 of record c - 1), and the skill-board nibbles
-   at table +0x28 + c * 0x24 + (page >> 1) * 8 + row. */
-typedef struct BattleCharacterRecord
-{
-  s16 values[2];                /* +0x00: newGameStateReset writes the new-game defaults */
-  u8 unmodeled_04[0x24 - 0x04];
-} BattleCharacterRecord;
-
-/* gBattleRosterTable, 0x2B0 bytes (newGameStateReset clears it with one memset). The game also addresses parts of it
-   through their own symbols: gBattleRosterCursors (+0x01), gBattleRosterEntryIds (+0x02), D_003E6BA0 (+0x20),
-   gBattleCurrentRosterIndex (+0x26), gRecordSlotBitTable (+0x28), D_003E6BC8 (+0x48). */
-typedef struct BattleRosterTable
-{
-  BattleRoster rosters[2];      /* +0x00 */
-  s32 entryMask;                /* +0x20: bit n set when entry id n is in a roster (testFlagBit) */
-  s8 firstValue;                /* +0x24 */
-  s8 secondValue;               /* +0x25 */
-  u8 currentRosterIndex;        /* +0x26 */
-  u8 unlockFlags;               /* +0x27 */
-  u8 slotBitNibbles[0x48 - 0x28]; /* +0x28: skill-board nibbles (gRecordSlotBitTable) */
-  BattleCharacterRecord characters[(0x2AC - 0x48) / 0x24]; /* +0x48 */
-  u8 unmodeled_2AC[0x2B0 - 0x2AC];
-} BattleRosterTable;
 
 void clampedCounterInit(ClampedCounter *clampedCounter, s32 stepDelta)
 {
@@ -118,40 +84,6 @@ s8 sheetLatchedPositionGet(void) {
     return D_0055144A;
 }
 
-/* Play-state header at D_003E6E30 (res_get_path.c SaveGameHeader). */
-typedef struct SaveGameHeader {
-    s32 startTime; /* +0x00 */
-    unsigned char unmodeled_04[0x21];
-    unsigned char port;      /* +0x25 */
-    unsigned char fileIndex; /* +0x26 */
-} SaveGameHeader;
-
-/* The 0x130B0-byte memory-card save image at gXglMcAgedEntries (same definition as in tu178). */
-typedef struct AgedEntryRing {
-    unsigned char unmodeled_0000[0x10];
-    s32 newGameCounters[2];                     /* +0x10: zeroed by the new-game reset */
-    XglClock newGameClock;                      /* +0x18: clock read when a new game starts */
-    unsigned char unmodeled_0020[0x4A - 0x20];
-    unsigned char flag4A;                       /* +0x4A */
-    unsigned char flag4B;                       /* +0x4B */
-    unsigned char unmodeled_004C[0x1330 - 0x4C];
-    unsigned char bytes1330[0x1408 - 0x1330];   /* +0x1330 */
-    unsigned short agedEntries[50];             /* +0x1408 */
-    unsigned char unmodeled_146C[0x146D - 0x146C];
-    unsigned char bytes146D[0x147C - 0x146D];   /* +0x146D */
-    unsigned char bytes147C[0x157C - 0x147C];   /* +0x147C */
-    unsigned char bytes157C[0x177C - 0x157C];   /* +0x157C */
-    unsigned char unmodeled_177C[0x3A0C - 0x177C];
-    unsigned char bytes3A0C[0x1302C - 0x3A0C];  /* +0x3A0C */
-    unsigned char unmodeled_1302C[0x130AA - 0x1302C];
-    s8 ringWriteIndex;                          /* +0x130AA: slot of agedEntries the next entry goes to */
-    u8 ringCursor;                              /* +0x130AB: slot of the newest entry */
-    unsigned char unmodeled_130AC[0x130B0 - 0x130AC];
-} AgedEntryRing;
-
-extern BattleRosterTable gBattleRosterTable;
-extern SaveGameHeader D_003E6E30;
-extern AgedEntryRing gXglMcAgedEntries;
 extern u8 gSaveAbortFlag;
 
 void *memset(void *destination, int value, unsigned int count);
@@ -168,28 +100,28 @@ void newGameStateReset(void)
   memset(&D_003E6E30, 0, 0x2C);
   xglClockRead(&gXglMcAgedEntries.newGameClock);
   D_003E6E30.startTime = xglClockDayTime2UInt(&gXglMcAgedEntries.newGameClock);
-  gBattleRosterTable.characters[1].values[0] = 1;
-  gBattleRosterTable.characters[2].values[0] = 0xC;
-  gBattleRosterTable.characters[3].values[0] = 0x1B;
-  gBattleRosterTable.characters[4].values[0] = 0x25;
-  gBattleRosterTable.characters[5].values[0] = 0x34;
-  gBattleRosterTable.characters[6].values[0] = 0x41;
-  gBattleRosterTable.characters[7].values[0] = 0x51;
-  gBattleRosterTable.characters[8].values[0] = 0x61;
-  gBattleRosterTable.characters[9].values[0] = 0x62;
-  gBattleRosterTable.characters[10].values[0] = 0x63;
-  gBattleRosterTable.characters[13].values[0] = 0x6E;
-  gBattleRosterTable.characters[13].values[1] = 0x6C;
-  gBattleRosterTable.characters[14].values[0] = 0x7E;
-  gBattleRosterTable.characters[14].values[1] = 0x80;
-  gBattleRosterTable.characters[15].values[0] = 0x8E;
-  gBattleRosterTable.characters[15].values[1] = 0x8F;
-  gBattleRosterTable.characters[16].values[0] = 0x9E;
-  gBattleRosterTable.characters[16].values[1] = 0;
-  memset(gXglMcAgedEntries.bytes3A0C, 0, sizeof(gXglMcAgedEntries.bytes3A0C));
-  memset(gXglMcAgedEntries.bytes157C, 0, sizeof(gXglMcAgedEntries.bytes157C));
-  memset(gXglMcAgedEntries.bytes146D, 0, sizeof(gXglMcAgedEntries.bytes146D));
-  memset(gXglMcAgedEntries.bytes147C, 0, sizeof(gXglMcAgedEntries.bytes147C));
+  gBattleRosterTable.characters[1].newGameDefaults[0] = 1;
+  gBattleRosterTable.characters[2].newGameDefaults[0] = 0xC;
+  gBattleRosterTable.characters[3].newGameDefaults[0] = 0x1B;
+  gBattleRosterTable.characters[4].newGameDefaults[0] = 0x25;
+  gBattleRosterTable.characters[5].newGameDefaults[0] = 0x34;
+  gBattleRosterTable.characters[6].newGameDefaults[0] = 0x41;
+  gBattleRosterTable.characters[7].newGameDefaults[0] = 0x51;
+  gBattleRosterTable.characters[8].newGameDefaults[0] = 0x61;
+  gBattleRosterTable.characters[9].newGameDefaults[0] = 0x62;
+  gBattleRosterTable.characters[10].newGameDefaults[0] = 0x63;
+  gBattleRosterTable.characters[13].newGameDefaults[0] = 0x6E;
+  gBattleRosterTable.characters[13].newGameDefaults[1] = 0x6C;
+  gBattleRosterTable.characters[14].newGameDefaults[0] = 0x7E;
+  gBattleRosterTable.characters[14].newGameDefaults[1] = 0x80;
+  gBattleRosterTable.characters[15].newGameDefaults[0] = 0x8E;
+  gBattleRosterTable.characters[15].newGameDefaults[1] = 0x8F;
+  gBattleRosterTable.characters[16].newGameDefaults[0] = 0x9E;
+  gBattleRosterTable.characters[16].newGameDefaults[1] = 0;
+  memset(gXglMcAgedEntries.newGameClearedRegion3A0C, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion3A0C));
+  memset(gXglMcAgedEntries.newGameClearedRegion157C, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion157C));
+  memset(gXglMcAgedEntries.newGameClearedRegion146D, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion146D));
+  memset(gXglMcAgedEntries.newGameClearedRegion147C, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion147C));
   xglMcAgedEntriesReset();
   if (gSaveAbortFlag)
   {
@@ -198,9 +130,9 @@ void newGameStateReset(void)
   D_003E6E30.fileIndex = -1;
   gXglMcAgedEntries.newGameCounters[0] = 0;
   gXglMcAgedEntries.newGameCounters[1] = 0;
-  gXglMcAgedEntries.flag4A = 0;
-  gXglMcAgedEntries.flag4B = 0;
-  memset(gXglMcAgedEntries.bytes1330, 0, sizeof(gXglMcAgedEntries.bytes1330));
+  gXglMcAgedEntries.newGameClearedFlag4A = 0;
+  gXglMcAgedEntries.newGameClearedFlag4B = 0;
+  memset(gXglMcAgedEntries.newGameClearedRegion1330, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion1330));
 }
 
 BattleRoster *battleRosterGet(s32 rosterIndex) {
@@ -211,8 +143,6 @@ u8 battleRosterEntryIdCountGet(s32 rosterIndex) {
     return gBattleRosterTable.rosters[rosterIndex].entryIdCount;
 }
 
-u8 battleRosterEntryIdCountGet(s32 rosterIndex);
-
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
 {
   if (!(entryIdIndex < battleRosterEntryIdCountGet(rosterIndex)))
@@ -221,8 +151,6 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   }
   return gBattleRosterTable.rosters[rosterIndex].entryIds[entryIdIndex];
 }
-
-u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
 
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
     return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[rosterIndex].cursor, rosterIndex);
@@ -309,10 +237,8 @@ void battleRosterPairReset(void) {
     gBattleRosterTable.rosters[1].cursor = 0;
 }
 
-s32 battleRosterCursorSet(s32 index, s32 rosterIndex);
-
-/* Swaps entries indexA and indexB of a roster; a cursor on one of the first three entries follows its entry.
-   For roster 0, a cursor left on an entry id of 8 or more moves to the first of the first three entries below 8. */
+/* Swaps entries indexA and indexB of a roster. When both swapped indices are below 3, a cursor on either index is
+   moved through battleRosterCursorSet. For roster 0, a cursor left on an entry id of 8 or more moves to the first of the first three entries below 8. */
 void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
 {
   s32 value; /* the entry count, then the moved entry id, then the cursor */
@@ -437,8 +363,8 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
     s32 entryIds[4];
     s32 entryId;
     s32 handleOrdinal;
-    s32 resolvedKind;
-    s32 retriedKind;
+    s32 resolvedEntryIndex;
+    s32 retriedEntryIndex;
 
     entryIds[0] = firstEntryId;
     entryIds[1] = secondEntryId;
@@ -446,13 +372,13 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
     for (handleOrdinal = 0; handleOrdinal < 3; handleOrdinal++) {
         entryId = entryIds[handleOrdinal];
         if (entryId != 0) {
-            resolvedKind = battleRosterEntryIdIndexGet(entryId);
-            if (resolvedKind == -1) {
+            resolvedEntryIndex = battleRosterEntryIdIndexGet(entryId);
+            if (resolvedEntryIndex == -1) {
                 func_00221FB8(entryIds[handleOrdinal]);
-                retriedKind = battleRosterEntryIdIndexGet(entryIds[handleOrdinal]);
-                resolvedKind = retriedKind;
+                retriedEntryIndex = battleRosterEntryIdIndexGet(entryIds[handleOrdinal]);
+                resolvedEntryIndex = retriedEntryIndex;
             }
-            battleRosterEntrySwap(handleOrdinal, resolvedKind, entryIds[handleOrdinal] >= 0xD);
+            battleRosterEntrySwap(handleOrdinal, resolvedEntryIndex, entryIds[handleOrdinal] >= 0xD);
         }
     }
 }
@@ -468,19 +394,20 @@ s32 testFlagBit(s32 bitIndex)
   return (gBattleRosterTable.entryMask & mask) != 0;
 }
 
-void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
+/* Stores the two guest entry ids (VM native ptSetGuest); a lone second guest moves to the first place. */
+void battleRosterGuestPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId)
 {
-  s32 storedFirst;
-  s32 storedSecond;
-  storedFirst = firstArg;
-  storedSecond = secondArg;
-  if ((storedFirst == 0) && (storedSecond != 0))
+  s32 primaryGuest;
+  s32 secondaryGuest;
+  primaryGuest = firstGuestEntryId;
+  secondaryGuest = secondGuestEntryId;
+  if ((primaryGuest == 0) && (secondaryGuest != 0))
   {
-    storedFirst = storedSecond;
-    storedSecond = 0;
+    primaryGuest = secondaryGuest;
+    secondaryGuest = 0;
   }
-  gBattleRosterTable.firstValue = storedFirst;
-  gBattleRosterTable.secondValue = storedSecond;
+  gBattleRosterTable.primaryGuestEntryId = primaryGuest;
+  gBattleRosterTable.secondaryGuestEntryId = secondaryGuest;
 }
 
 /* For a roster 1 entry id (0xD..0x10), returns its linked roster 0 entry id number index & 1, counting only the

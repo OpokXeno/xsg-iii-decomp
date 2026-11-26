@@ -78301,9 +78301,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "battleRosterHeaderPairSet",
+     "name": "battleRosterGuestPairSet",
      "size": 44,
-     "splat_name": "battleRosterHeaderPairSet",
+     "splat_name": "battleRosterGuestPairSet",
      "va": "0x002224b8",
      "name_basis": "address",
      "provenance": "estimated"
