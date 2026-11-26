@@ -1,6 +1,7 @@
 #include "common.h"
 #include "shared.h"
 #include "main/xgl_cd.h"
+#include "main/xgl_font.h"
 
 unsigned int xglClockDayTime2UInt(XglClock *clock_time);
 
@@ -51,8 +52,11 @@ extern unsigned char xglMcQueueEnd;
 extern McQueueEntry xglMcQueue[16];
 
 /* The icon.sys contents the create request keeps (sizeof(sceMcIconSys) bytes, byte aligned). */
+#define MC_ICON_TITLE_CHARS 34
 typedef struct McIconSys {
-    unsigned char header[0x1C4];   /* +0x000: the sceMcIconSys fields up to the delete icon name */
+    unsigned char header[0xC0];    /* +0x000: the sceMcIconSys fields before the title */
+    unsigned char titleName[MC_ICON_TITLE_CHARS][2]; /* +0x0C0: the SJIS title */
+    unsigned char iconFileNames[3][0x40]; /* +0x104: the list, copy and delete icon file names */
     unsigned char reserved[0x200]; /* +0x1C4: the reserved tail, cleared before a save writes icon.sys */
 } McIconSys;
 
@@ -356,7 +360,68 @@ void xglMcEUC2SJIS(u8 *lead, u8 *trail)
   *trail = sjis_trail;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_mc_request", func_001894A0);
+/* The save title in the icon.sys of a create request: characters 14 and 15 are a two-digit number
+ * (only the trail bytes are written, the lead bytes are preset), characters 16 on a name of up to
+ * 16 characters, converted to SJIS and zero padded to character 32. */
+#define MC_TITLE_NUMBER_CHAR 14
+#define MC_TITLE_NAME_CHAR 16
+#define MC_TITLE_NAME_CHARS 16
+#define SJIS_DIGIT_ZERO_TRAIL 0x4F /* trail byte of the full-width "0" (0x824F) */
+
+/* Writes number (when positive) and the name text (when not null, in SJIS) into the save title of
+ * the create request's icon.sys. */
+void func_001894A0(McCreateFileTable *table, int number, const char *text)
+{
+    McIconSys *icon;
+    unsigned char *destination;
+    int count;
+    unsigned char sjis[2];
+    unsigned char character;
+
+    icon = &table->icon;
+    if (number <= 0) {
+        return;
+    }
+    icon->titleName[MC_TITLE_NUMBER_CHAR + 1][1] = number % 10 + SJIS_DIGIT_ZERO_TRAIL;
+    icon->titleName[MC_TITLE_NUMBER_CHAR][1] = number / 10 % 10 + SJIS_DIGIT_ZERO_TRAIL;
+    if (text == 0) {
+        return;
+    }
+    destination = table->icon.titleName[MC_TITLE_NAME_CHAR];
+    count = 0;
+    sjis[0] = *text;
+    character = sjis[0];
+    while (sjis[0] != 0) {
+        /* a single-byte character goes through the EUC table, a lead byte copies its pair */
+        if ((signed char) character >= 0) {
+            unsigned short euc;
+
+            euc = xglFontCharToEuc(character);
+            text++;
+            sjis[1] = euc;
+            sjis[0] = euc >> 8;
+        } else {
+            sjis[1] = text[1];
+            text += 2;
+        }
+        xglMcEUC2SJIS(&sjis[0], &sjis[1]);
+        count++;
+        destination[0] = sjis[0];
+        destination[1] = sjis[1];
+        destination += 2;
+        if (count >= MC_TITLE_NAME_CHARS) {
+            break;
+        }
+        sjis[0] = *text;
+        character = sjis[0];
+    }
+    while (count < MC_TITLE_NAME_CHARS + 1) {
+        destination[0] = 0;
+        destination[1] = 0;
+        destination += 2;
+        count++;
+    }
+}
 
 /* Builds the full path in xglMcCardState.full_path: base, then the card number as two digits ("*" for
  * MC_CARD_ANY, nothing for MC_CARD_NONE), then by selector the path so far once more, one of the

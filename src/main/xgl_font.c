@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/xgl_font.h"
 
 struct XglPacket;
 
@@ -133,7 +134,6 @@ void xglFontSetTextureFilter(FontDrawCursor *cursor, int useCursorScale);
 /* Advance of each printable ASCII character (32..127) in the debug font. */
 extern int fontAsciiWidthTable[];
 int xglFontParseNumber(const char **cursor, int *parsedNumber);
-unsigned short xglFontCharToEuc(signed char character);
 unsigned int xglFontGetDebugCell(unsigned char eucRow, unsigned char eucColumn);
 int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn);
 /* * Reads a hex number up to ';' or ',' and moves the text cursor past the delimiter; returns 0 on any * other character. */
