@@ -98,13 +98,14 @@
     {
      "range": [
       "0x0053fd50",
-      "0x0053ffb0"
+      "0x00540018"
      ],
      "generated": [
       "0x0053fd50",
-      "0x0053ffb0"
+      "0x00540018"
      ],
      "generated_by": [
+      "func_00183B68",
       "xglFontCmdXx",
       "xglFontParseHex",
       "xglFontPrintSub"
@@ -112,7 +113,8 @@
      "c_owned_symbols": [
       "jtbl_0053FD50",
       "jtbl_0053FEB0",
-      "jtbl_0053FF90"
+      "jtbl_0053FF90",
+      "jtbl_0053FFB0"
      ],
      "also_referenced_by_c": [
       "spCodeParameterSizeTable",
@@ -134,7 +136,7 @@
       "0x005400b4"
      ],
      "generated_by": [
-      "func_00184938"
+      "xglFontGetGlyphIndex"
      ],
      "c_owned_symbols": [
       "jtbl_00540080"
