@@ -762,7 +762,7 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
 }
 
 /* Builds the light set from the registered light pack named packName. */
-void func_00198C08(XglLightSet *light, const char *packName, Vector4 *receiver)
+void xglLightPackBuildByName(XglLightSet *light, const char *packName, Vector4 *receiver)
 {
     int i;
 
