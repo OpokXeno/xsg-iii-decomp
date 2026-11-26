@@ -137,7 +137,7 @@ s32 monsSlotQueueEmpty(void) {
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu044", func_00A8FED0);
 
-s32 battleRosterEntrySwap(s32, s32, s32);
+void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex);
 s32 battleRosterEntryIdIndexGet();
 
 void monsLinkActorToTarget(s32 unusedValue, s32 targetActorHandle) {

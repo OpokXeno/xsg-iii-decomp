@@ -36,10 +36,11 @@ s32 vmRunNativeWithPluginFlush(s32 vmThread) {
     return nativeResult;
 }
 
-s32 battleRosterEntrySwap(s32, s32, s32);
-s32 battleRosterEntryIdIndexGet(s32);
+void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex);
+s32 battleRosterEntryIdIndexGet(s32 entryId);
 
-/* VM native with two arguments: func_00221FB8(first) then a loop of battleRosterEntrySwap over the battleRosterEntryIdIndexGet kind count. */
+/* VM native with two arguments (entry id, index): adds the entry id to its roster (func_00221FB8), then swaps it
+   one slot forward until it sits at the given index. */
 s32 vmRaiseEntryKindTo(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
@@ -176,7 +177,7 @@ s32 vmRunNativeFlushOnResult(s32 vmThread) {
     return nativeResult;
 }
 
-s32 battleCurrentRosterIndexSet();
+void battleCurrentRosterIndexSet();
 
 s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
     extern u8 gBattleCurrentRosterIndex[];

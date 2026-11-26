@@ -340,8 +340,8 @@ void debugStageMenuStep(DebugSelection *selection) {
 
 s32 battleRosterPairReset();
 s32 func_00221FB8();
-s32 battleCurrentRosterIndexSet();
-s32 battleRosterCursorSet();
+void battleCurrentRosterIndexSet(s32 rosterIndex);
+s32 battleRosterCursorSet(s32 index, s32 rosterIndex);
 s32 xglPadSetDefaults();
 void func_001BC918(s16 *out);
 
@@ -400,7 +400,7 @@ void func_001BC6A8(void) {
     gGameLoopResetComboHalves.resetComboHalves[0] = 7000;
     gGameLoopResetComboHalves.resetComboHalves[1] = -1;
     ((void (*)()) battleRosterPairReset)();
-    ((void (*)()) battleCurrentRosterIndexSet)(0);
+    battleCurrentRosterIndexSet(0);
     ((void (*)()) func_00221FB8)(1);
     ((void (*)()) func_00221FB8)(8);
     ((void (*)()) func_00221FB8)(7);
