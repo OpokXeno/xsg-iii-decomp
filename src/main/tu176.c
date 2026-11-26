@@ -5,39 +5,25 @@
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
 
-/* Counter entry: a step direction pair (+0x08, +0x09), a phase (+0x0B), a limit and a count. */
-typedef struct ClampedCounter
-{
-  u8 unmodeled_00[0x8];
-  u8 positive;          /* +0x08: 1 when the step is positive */
-  s8 negative;          /* +0x09: 0x80 when it is not */
-  u8 state;             /* +0x0A */
-  u8 phase;             /* +0x0B: 0x80 until the phase is advanced */
-  u8 unmodeled_0C[0x1C - 0x0C];
-  s16 limit;            /* +0x1C */
-  u8 unmodeled_1E[0x20 - 0x1E];
-  u16 clampedValue;            /* +0x20 */
-} ClampedCounter;
-
-void clampedCounterInit(ClampedCounter *clampedCounter, s32 stepDelta)
+void clampedCounterInit(McGauge *gauge, s32 stepDelta)
 {
   s32 isPositive;
   isPositive = stepDelta > 0;
-  clampedCounter->phase = 0x80;
-  clampedCounter->positive = isPositive;
-  clampedCounter->state = 0;
-  clampedCounter->negative = (1 - isPositive) << 7;
+  gauge->flag = 0x80;
+  gauge->state = isPositive;
+  gauge->fadeIn = 0;
+  gauge->negative = (1 - isPositive) << 7;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221440);
 
 extern u8 gVsyncsPerFrame;
 
-void counterEntryAdvancePhase(ClampedCounter *clampedCounter)
+void counterEntryAdvancePhase(McGauge *gauge)
 {
-  if (clampedCounter->phase == 0x80)
+  if (gauge->flag == 0x80)
   {
-    clampedCounter->phase = clampedCounter->phase - (gVsyncsPerFrame * 0x10);
+    gauge->flag = gauge->flag - (gVsyncsPerFrame * 0x10);
   }
 }
 
@@ -45,21 +31,21 @@ INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002215A0);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221A88);
 
-void addClampedCounter(ClampedCounter *clampedCounter, s16 delta)
+void addClampedCounter(McFileList *fileList, s16 delta)
 {
   int unclampedValue;
   s16 truncatedValue;
-  unclampedValue = delta + clampedCounter->clampedValue;
+  unclampedValue = delta + fileList->position;
   truncatedValue = unclampedValue;
-  clampedCounter->clampedValue = unclampedValue;
-  if (clampedCounter->limit < truncatedValue)
+  fileList->position = unclampedValue;
+  if (fileList->cursor < truncatedValue)
   {
-    clampedCounter->clampedValue = clampedCounter->limit;
+    fileList->position = fileList->cursor;
     return;
   }
   if (truncatedValue < 0)
   {
-    clampedCounter->clampedValue = 0U;
+    fileList->position = 0;
   }
 }
 

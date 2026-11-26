@@ -71,9 +71,59 @@ typedef struct SaveGameHeader {
     u8 unmodeled_27[0x2C - 0x27];                             /* +0x27 */
 } SaveGameHeader;
 
+/* 0xC-byte Yes/No choice prompt (func_002213A8 init, func_00221440 update, func_002215A0 draw). The save screen
+   embeds one at +0x5B610 (res_get_path.c), the stream player and the SE/voice screen embed others. */
+typedef struct McGauge {
+    const char *text;           /* +0x00: title text, drawn above the Yes/No pair */
+    s32 width;                  /* +0x04: box width, at least the text width + 0x30 */
+    u8 state;                   /* +0x08: selected answer (0 = message 0x74, 1 = message 0x75) */
+    s8 negative;                /* +0x09: highlight fade of the other answer, (1 - state) << 7 at init */
+    s8 fadeIn;                  /* +0x0A: fade-in level, 0 at init; the fade stops when it goes negative */
+    u8 flag;                    /* +0x0B: phase, 0x80 until counterEntryAdvancePhase starts the fade */
+} McGauge;
+
+/* One save file of the card directory, as read into the file list (layout from res_get_path.c). */
+typedef struct McFileEntry {
+    u32 playTime;               /* +0x00 */
+    s32 unmodeled04;            /* +0x04 */
+    s32 textIds[2];             /* +0x08: message ids of the two text lines, 0 = none */
+    s16 row;                    /* +0x10 */
+    s16 rowSecond;              /* +0x12 */
+    s8 rowFlag;                 /* +0x14 */
+    u8 fileState;               /* +0x15: file state */
+    u8 pictureState;            /* +0x16: picture slot state */
+    u8 thumbnailSlot;           /* +0x17: slot that loads the entry */
+} McFileEntry;
+
+/* Save file list with its scroll bar (func_00221A88 init, addClampedCounter, func_00221B40 step). It starts with the
+   0x1C-byte DrawEntry of tu370.c (drawEntryReset / SetValue / SetFlag / SetAlpha / SetScale) that draws the bar;
+   that entry's f32 at +0x10 is the scale base func_00221B40 multiplies by. The save screen embeds the list at
+   +0x5B61C (res_get_path.c). addClampedCounter moves position (+0x20) and clamps it to 0..cursor (+0x1C);
+   func_00221B40 steps previousCursor (+0x1E) toward position. */
+typedef struct McFileList {
+    u8 unmodeled_00[0x1C];      /* +0x00: DrawEntry (tu370.c) */
+    s16 cursor;                 /* +0x1C: upper limit of position */
+    s16 previousCursor;         /* +0x1E: displayed value, stepped toward position */
+    u16 position;               /* +0x20: u16 here (addClampedCounter loads it with lhu), short in res_get_path.c */
+    u8 unmodeled_22[2];
+    s16 drawAlpha;              /* +0x24 */
+    u8 unmodeled_26[2];
+    s16 fadingAlpha;            /* +0x28 */
+    u8 unmodeled_2A[2];
+    u16 portResult[2];          /* +0x2C, indexed by port */
+    McFileEntry fileEntries[50]; /* +0x30 */
+    s32 freeSize;               /* +0x4E0 */
+    s32 scroll;                 /* +0x4E4 */
+    s32 fadeBase;               /* +0x4E8 */
+    s32 scrollTarget;           /* +0x4EC */
+} McFileList;
+
 extern BattleRosterTable gBattleRosterTable;
 extern SaveGameHeader gSaveGameHeader;
 
+void clampedCounterInit(McGauge *gauge, s32 stepDelta);
+void counterEntryAdvancePhase(McGauge *gauge);
+void addClampedCounter(McFileList *fileList, s16 delta);
 void newGameStateReset(void);
 BattleRoster *battleRosterGet(s32 rosterIndex);
 u8 battleRosterEntryIdCountGet(s32 rosterIndex);
