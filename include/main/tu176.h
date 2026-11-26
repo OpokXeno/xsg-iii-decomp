@@ -10,17 +10,17 @@ typedef signed char s8;
 
 typedef int s32;
 
-/* 0x10-byte roster of the table at gBattleRosterTable: roster 0 holds entry ids below 0xD (at most 7),
-   roster 1 the ids from 0xD on (at most 4). */
 /* First entry id of roster 1; lower ids belong to roster 0. */
 #define BATTLE_ROSTER1_FIRST_ENTRY_ID 0xD
 /* Last roster 1 entry id battleRosterLinkedEntryIdGet has linked ids for. */
 #define BATTLE_ROSTER1_LAST_ENTRY_ID 0x10
-/* The cursor can only select one of the first three entries of a roster. */
+/* Exclusive upper bound on the index used by the cursor setter and the cursor scans; not an entry-count check. */
 #define BATTLE_ROSTER_CURSOR_ENTRY_COUNT 3
 /* A roster 0 entry the cursor selects must have an id below this. */
 #define BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT 8
 
+/* 0x10-byte roster of the table at gBattleRosterTable: roster 0 holds entry ids below 0xD (at most 7),
+   roster 1 the ids from 0xD on (at most 4). */
 typedef struct BattleRoster {
     u8 entryIdCount;                                          /* +0x00 */
     u8 cursor;                                                /* +0x01: index of the selected entry */
@@ -39,7 +39,9 @@ typedef struct BattleRosterPair {
    at table +0x28 + c * 0x24 + (page >> 1) * 8 + row. */
 typedef struct BattleCharacterRecord {
     s16 newGameDefaults[2];     /* +0x00: the two slots newGameStateReset gives a starting value */
-    u8 unmodeled_04[0x24 - 0x04];
+    u8 skillCount;              /* +0x04: skill count of character c + 1 */
+    u8 skillCost;               /* +0x05: skill cost of character c + 1 */
+    u8 unmodeled_06[0x24 - 0x06];                             /* +0x06 */
 } BattleCharacterRecord;
 
 /* gBattleRosterTable, 0x2B0 bytes (newGameStateReset clears it with one memset). The game also addresses parts of it
@@ -52,9 +54,9 @@ typedef struct BattleRosterTable {
     s8 secondGuestEntryId;                                    /* +0x25 */
     u8 currentRosterIndex;                                    /* +0x26 */
     u8 unlockFlags;                                           /* +0x27: bit 0 written by vmSetRosterTableFlag */
-    u8 slotBitNibbles[0x48 - 0x28];                           /* +0x28: skill-board nibbles (gRecordSlotBitTable) */
+    u8 recordSlotBitTable[0x48 - 0x28];                       /* +0x28: skill-board nibbles (gRecordSlotBitTable) */
     BattleCharacterRecord characters[(0x2AC - 0x48) / 0x24];  /* +0x48 */
-    u8 unmodeled_2AC[0x2B0 - 0x2AC];
+    u8 unmodeled_2AC[0x2B0 - 0x2AC];                          /* +0x2AC */
 } BattleRosterTable;
 
 /* Play-state header at gSaveGameHeader, 0x2C bytes (newGameStateReset clears it): the start time of the game, the
@@ -66,7 +68,7 @@ typedef struct SaveGameHeader {
     u8 snapshotFlags;                                         /* +0x24: bit 1 set by battleRosterSnapshotTake */
     u8 port;                                                  /* +0x25 */
     u8 fileIndex;                                             /* +0x26 */
-    u8 unmodeled_27[0x2C - 0x27];
+    u8 unmodeled_27[0x2C - 0x27];                             /* +0x27 */
 } SaveGameHeader;
 
 extern BattleRosterTable gBattleRosterTable;

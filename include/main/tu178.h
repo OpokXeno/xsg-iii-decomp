@@ -12,32 +12,41 @@
 /* The 0x130B0-byte memory-card save image at gXglMcAgedEntries. The newGameCleared* members are the bytes and regions
    newGameStateReset (tu176) zeroes; nothing else about them is known yet. */
 typedef struct AgedEntryRing {
-    unsigned char unmodeled_0000[0x10];
+    unsigned char unmodeled_0000[0x10];                               /* +0x0000 */
     int newGameCounters[2];                                           /* +0x10: zeroed by the new-game reset */
     XglClock newGameClock;                                            /* +0x18: clock read when a new game starts */
-    unsigned char unmodeled_0020[0x4A - 0x20];
+    unsigned char unmodeled_0020[0x28 - 0x20];                        /* +0x20 */
+    unsigned char flag28;                                             /* +0x28: soundDriverSetStreamMode argument */
+    unsigned char unmodeled_0029[0x3F - 0x29];                        /* +0x29 */
+    unsigned char flag3F;                                             /* +0x3F */
+    unsigned char unmodeled_0040[0x42 - 0x40];                        /* +0x40 */
+    unsigned char flag42;                                             /* +0x42 */
+    unsigned char unmodeled_0043[0x47 - 0x43];                        /* +0x43 */
+    unsigned char flag47;                                             /* +0x47 */
+    unsigned char unmodeled_0048[0x4A - 0x48];                        /* +0x48 */
     unsigned char newGameClearedFlag4A;                               /* +0x4A */
     unsigned char newGameClearedFlag4B;                               /* +0x4B */
-    unsigned char unmodeled_004C[0x1330 - 0x4C];
+    unsigned char unmodeled_004C[0x1330 - 0x4C];                      /* +0x4C */
     unsigned char newGameClearedRegion1330[0x1408 - 0x1330];          /* +0x1330 */
     unsigned short agedEntries[XGL_MC_AGED_ENTRY_COUNT];              /* +0x1408 */
-    unsigned char unmodeled_146C[0x146D - 0x146C];
+    unsigned char unmodeled_146C[0x146D - 0x146C];                    /* +0x146C */
     unsigned char newGameClearedRegion146D[0x147C - 0x146D];          /* +0x146D */
     unsigned char newGameClearedRegion147C[0x157C - 0x147C];          /* +0x147C */
     unsigned char newGameClearedRegion157C[0x177C - 0x157C];          /* +0x157C */
-    unsigned char unmodeled_177C[0x3A0C - 0x177C];
+    unsigned char unmodeled_177C[0x3A0C - 0x177C];                    /* +0x177C */
     unsigned char newGameClearedRegion3A0C[0x1302C - 0x3A0C];         /* +0x3A0C */
-    unsigned char unmodeled_1302C[0x130AA - 0x1302C];
+    unsigned char unmodeled_1302C[0x130AA - 0x1302C];                 /* +0x1302C */
     signed char ringWriteIndex;                                       /* +0x130AA: slot the next entry goes to */
     unsigned char ringCursor;                                         /* +0x130AB: slot of the newest entry */
-    unsigned char unmodeled_130AC[0x130B0 - 0x130AC];
+    unsigned char unmodeled_130AC[0x130B0 - 0x130AC];                 /* +0x130AC */
 } AgedEntryRing;
 
 extern AgedEntryRing gXglMcAgedEntries;
 
 /* Empties the aged-entry ring: both indices to 0 and every slot cleared. */
 void xglMcAgedEntriesReset(void);
-/* Returns the ring slot written age entries before the newest one (age 0 is the newest). */
+/* Returns the ring slot written age entries before the newest one. Requires 0 <= age < XGL_MC_AGED_ENTRY_COUNT;
+   age 0 selects ringCursor. */
 unsigned short *xglMcTableGetAgedEntry(int age);
 
 #endif /* INCLUDE_MAIN_TU178_H */

@@ -148,8 +148,10 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIds[entryIdIndex];
 }
 
-/* The call goes through an int-returning view of battleRosterEntryIdGet: with the plain call (u8 result promoted to
-   s32) the two cursor getters come out 8 bytes longer in total and the link no longer fits. */
+/* The call goes through an int-returning view of battleRosterEntryIdGet. Plain forms tried: the direct call and
+   `entryId = battleRosterEntryIdGet(...); return entryId;` compile to a jal and a return instead of the original's
+   tail jump (the u8 result type blocks the sibling call), so the two cursor getters come out 8 bytes longer in
+   total and the link no longer fits. */
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
     return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor, rosterIndex);
 }
@@ -241,11 +243,15 @@ void battleRosterPairReset(void) {
 }
 
 /* Swaps entries indexA and indexB of a roster. When both swapped indices are below 3, a cursor on either index is
-   moved through battleRosterCursorSet. For roster 0, a cursor left on an entry id of 8 or more moves to the first of
-   the first three entries below 8. */
+   moved through battleRosterCursorSet. For roster 0, if the cursor's entry id is at least the limit, scans indices
+   0..2 and selects the first whose getter result is below it; an index past the count reads as 0 and also
+   qualifies.
+   value holds the entry count, then the swapped entry id, then the cursor. Plain form tried: three locals entryCount,
+   swappedEntryId and cursor; the compiler then keeps the count in $3 and the swapped ids in $4/$5 instead of all
+   three in $6, and the function no longer matches. */
 void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
 {
-  s32 value; /* the entry count, then the moved entry id, then the cursor */
+  s32 value;
   s32 index;
   s32 entryId;
   BattleRoster *roster;
@@ -364,7 +370,7 @@ s32 battleRosterEntryIdIndexGet(s32 entryId)
   return result;
 }
 
-s32 func_00221FB8();
+void func_00221FB8(s32 entryId);
 
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
     s32 entryIds[3];
