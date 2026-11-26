@@ -163,7 +163,20 @@ s32 battleCurrentRosterCursorEntryIdGet(void)
   return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221F40);
+u8 func_00221F40(s32 entryId)
+{
+  BattleRoster *roster;
+  s32 index;
+  roster = (entryId < 0xD) ? &gBattleRosterTable.rosters[0] : &gBattleRosterTable.rosters[1];
+  for (index = 0; index < roster->entryIdCount; index++)
+  {
+    if (roster->entryIds[index] == entryId)
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FA0);
 
@@ -180,11 +193,44 @@ void battleRosterPairReset(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222120);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222238);
+s32 func_00222238(s32 index, s32 rosterIndex)
+{
+  s32 entryId;
+  if (index < 3)
+  {
+    if (rosterIndex == 0)
+    {
+      entryId = battleRosterEntryIdGet(index, rosterIndex);
+      if (entryId >= 8)
+      {
+        return 0;
+      }
+    }
+    gBattleRosterTable.rosters[rosterIndex].cursor = index;
+    return 1;
+  }
+  return 0;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002222A0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222360);
+s32 func_00222360(s32 entryId)
+{
+  BattleRoster *roster;
+  s32 index;
+  s32 result;
+  roster = battleRosterGet(entryId >= 0xD);
+  result = -1;
+  for (index = 0; index < roster->entryIdCount; index++)
+  {
+    if (roster->entryIds[index] == entryId)
+    {
+      result = index;
+      break;
+    }
+  }
+  return result;
+}
 
 s32 func_00221FB8();
 s32 func_00222120();
