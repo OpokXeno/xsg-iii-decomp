@@ -77,6 +77,7 @@
    "0x004c6f88": "seVolumeCurveTable",
    "0x004c6fd0": "soundSongRangeSet",
    "0x004c6fd8": "soundBankGroups",
+   "0x004c6fe8": "soundCueGroupTable",
    "0x004c7020": "soundSongPairLists",
    "0x004c7044": "seMasterVolumeRamp",
    "0x004c7aa8": "xglIntcSlotMap",

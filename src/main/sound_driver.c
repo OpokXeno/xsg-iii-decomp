@@ -52,6 +52,8 @@ typedef union SoundChannelState {
     struct {
         unsigned char counter;
         unsigned char state;
+        unsigned char volume; /* the cue's start volume (func_0018EDD8) */
+        unsigned char pan;    /* the cue's start pan */
     } bytes;
 } SoundChannelState;
 
@@ -299,9 +301,10 @@ int func_0018EC68(int channel)
 }
 
 s32 func_001808E0();
+int func_0018EDD8(int id, int volume, int pan);
+void soundVoiceVolumeReset(s32 voiceIndex);
 
 void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan) {
-    extern s32 func_0018EDD8();
     if ((voice & 0xF0000000) == 0x10000000) {
         func_001808E0(voice & 0x0FFFFFFF, volume & 0xFF, pan & 0xFF);
         return;
@@ -335,14 +338,123 @@ void soundDriverNoop(void) {
 
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EDD8);
+/* The group of each of the first SOUND_CUE_GROUP_SLOTS cue slots: starting a cue stops the channels that play a cue of
+ * its group (group 0: every cue channel). */
+#define SOUND_CUE_GROUP_SLOTS 0x40
+extern unsigned char soundCueGroupTable[SOUND_CUE_GROUP_SLOTS];
+/* Per cue slot four bytes, the volume at gSoundCueVolumeTable[slot * 4] and the pan right after it. */
+extern unsigned char gSoundCueVolumeTable[];
+#define SOUND_CUE_RECORD_BYTES 4
+/* Cue ids from SOUND_CUE_UPDATE_FIRST on below SOUND_CUE_UPDATE_END only change the volume and pan of their slot. */
+#define SOUND_CUE_UPDATE_FIRST 0x101
+#define SOUND_CUE_UPDATE_END 0x140
+/* Bits 16.. of a cue id may name the channel; a channel hint with any of these bits set is ignored. */
+#define SOUND_CUE_HINT_INVALID 0xF000
+/* A pan of 0xFF centres the channel. */
+#define SOUND_PAN_CENTRE 0xFF
+/* Channel handles returned for a started cue. */
+#define SOUND_CHANNEL_HANDLE 0x100
 
-s32 seVoiceStartDriver(s32 voice) {
-    extern s32 func_0018EDD8();
-    return func_0018EDD8(voice, 0x7F, 0xFFFF);
+/* Driver calls for one channel; each returns 0 or a negative error code. */
+int func_0017E790(int channel, int bank, int program, int key, int index);
+int func_0017E820(int channel);
+int func_0017E9E0(int channel, int volume);
+int func_0017EA50(int channel, int pan);
+int func_0017EAC0(int channel);
+
+/* Starts the cue `id` (slot id & 0xFF) at `volume` and `pan` on a free channel (or the one named in id >> 16) and returns
+ * its channel handle, or 0 when the slot is unassigned or the named channel is busy. Starting a cue first stops the
+ * channels of its group. Ids SOUND_CUE_UPDATE_FIRST.. only store and apply a new volume and pan (negative: keep). */
+int func_0018EDD8(int id, int volume, int pan)
+{
+    int bank;
+    int program;
+    int key;
+    int index;
+    unsigned char slot;
+    int value;
+    unsigned char channel;
+    int group;
+    int other;
+    unsigned char playing;
+
+    if (id == 0) {
+        return 0;
+    }
+    value = id >> 16;
+    slot = id & 0xFF;
+    channel = 0;
+    if (value != 0) {
+        if ((value & SOUND_CUE_HINT_INVALID) == 0) {
+            channel = value;
+        }
+    } else {
+        if (id >= SOUND_CUE_UPDATE_END) {
+            return 0;
+        }
+        if (id >= SOUND_CUE_UPDATE_FIRST) {
+            if (volume >= 0) {
+                gSoundCueVolumeTable[(id & 0xFF) * SOUND_CUE_RECORD_BYTES] = volume;
+                func_0017E9E0(slot, volume);
+            }
+            if (pan >= 0) {
+                gSoundCueVolumeTable[(id & 0xFF) * SOUND_CUE_RECORD_BYTES + 1] = pan;
+                func_0017EA50(slot, pan);
+            }
+            return id;
+        }
+    }
+    value = gSoundRecordBlock.channelAssign[slot];
+    if (value == 0) {
+        return 0;
+    }
+    bank = (unsigned int) value >> 24;
+    program = ((unsigned int) value >> 16) & 0xFF;
+    key = ((unsigned int) value >> 8) & 0xFF;
+    index = value & 0xFF;
+    if ((unsigned int) slot < SOUND_CUE_GROUP_SLOTS) {
+        group = soundCueGroupTable[slot];
+        for (other = 1; other < SOUND_CUE_GROUP_SLOTS; other++) {
+            playing = gSoundRecordBlock.channelStates[other].bytes.counter;
+            if ((unsigned char) (playing - 1) < SOUND_CUE_GROUP_SLOTS - 1) {
+                if (group == 0 || soundCueGroupTable[playing] == group) {
+                    soundVoiceVolumeReset(other);
+                }
+            }
+        }
+    }
+    if (channel != 0) {
+        if (gSoundRecordBlock.channelStates[channel].half != 0) {
+            return 0;
+        }
+    } else {
+        channel = 1;
+        if (gSoundRecordBlock.channelStates[channel].word != 0) {
+            do {
+                channel++;
+                if (channel >= SOUND_CHANNEL_COUNT) {
+                    break;
+                }
+            } while (gSoundRecordBlock.channelStates[channel].word != 0);
+        }
+    }
+    gSoundRecordBlock.channelStates[channel].half = slot;
+    gSoundRecordBlock.channelStates[channel].bytes.volume = volume;
+    gSoundRecordBlock.channelStates[channel].bytes.pan = pan;
+    func_0017E790(channel, bank, program, key, index);
+    func_0017E820(channel);
+    func_0017E9E0(channel, volume);
+    if ((pan & 0xFF) == SOUND_PAN_CENTRE) {
+        func_0017EAC0(channel);
+    } else {
+        func_0017EA50(channel, pan);
+    }
+    return channel + SOUND_CHANNEL_HANDLE;
 }
 
-void soundVoiceVolumeReset(s32 voiceIndex);
+s32 seVoiceStartDriver(s32 voice) {
+    return func_0018EDD8(voice, 0x7F, 0xFFFF);
+}
 
 /* Resets the voice volume of every channel `id` occupies. */
 void func_0018F098(int id)

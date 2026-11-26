@@ -10004,6 +10004,7 @@ imm1_4 = 0x004C6CC0;
 seVolumeCurveTable = 0x004C6F88;
 soundSongRangeSet = 0x004C6FD0;
 soundBankGroups = 0x004C6FD8;
+soundCueGroupTable = 0x004C6FE8;
 soundSongPairLists = 0x004C7020;
 seMasterVolumeRamp = 0x004C7044;
 xglIntcSlotMap = 0x004C7AA8;
