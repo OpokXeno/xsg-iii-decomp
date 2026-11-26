@@ -12,6 +12,15 @@ typedef int s32;
 
 /* 0x10-byte roster of the table at gBattleRosterTable: roster 0 holds entry ids below 0xD (at most 7),
    roster 1 the ids from 0xD on (at most 4). */
+/* First entry id of roster 1; lower ids belong to roster 0. */
+#define BATTLE_ROSTER1_FIRST_ENTRY_ID 0xD
+/* Last roster 1 entry id battleRosterLinkedEntryIdGet has linked ids for. */
+#define BATTLE_ROSTER1_LAST_ENTRY_ID 0x10
+/* The cursor can only select one of the first three entries of a roster. */
+#define BATTLE_ROSTER_CURSOR_ENTRY_COUNT 3
+/* A roster 0 entry the cursor selects must have an id below this. */
+#define BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT 8
+
 typedef struct BattleRoster {
     u8 entryIdCount;                                          /* +0x00 */
     u8 cursor;                                                /* +0x01: index of the selected entry */

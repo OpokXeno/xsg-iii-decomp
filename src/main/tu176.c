@@ -172,11 +172,13 @@ s32 battleCurrentRosterCursorEntryIdGet(void)
       gBattleRosterTable.currentRosterIndex);
 }
 
+/* Returns 1 when entryId is in its roster (roster 0 below BATTLE_ROSTER1_FIRST_ENTRY_ID, else roster 1), else 0. */
 u8 battleRosterHasEntryId(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
-  roster = (entryId < 0xD) ? &gBattleRosterTable.rosterPair.rosters[0] : &gBattleRosterTable.rosterPair.rosters[1];
+  roster = (entryId < BATTLE_ROSTER1_FIRST_ENTRY_ID) ? &gBattleRosterTable.rosterPair.rosters[0]
+                                                     : &gBattleRosterTable.rosterPair.rosters[1];
   for (index = 0; index < roster->entryIdCount; index++)
   {
     if (roster->entryIds[index] == entryId)
@@ -202,7 +204,8 @@ void battleRosterEntryIdRemove(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
-  roster = (entryId < 0xD) ? &gBattleRosterTable.rosterPair.rosters[0] : &gBattleRosterTable.rosterPair.rosters[1];
+  roster = (entryId < BATTLE_ROSTER1_FIRST_ENTRY_ID) ? &gBattleRosterTable.rosterPair.rosters[0]
+                                                     : &gBattleRosterTable.rosterPair.rosters[1];
   for (index = 0; index < roster->entryIdCount; index++)
   {
     if (roster->entryIds[index] == entryId)
@@ -259,7 +262,7 @@ void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
   value = roster->entryIds[indexA];
   roster->entryIds[indexA] = roster->entryIds[indexB];
   roster->entryIds[indexB] = value;
-  if ((indexA < 3) && (indexB < 3))
+  if ((indexA < BATTLE_ROSTER_CURSOR_ENTRY_COUNT) && (indexB < BATTLE_ROSTER_CURSOR_ENTRY_COUNT))
   {
     value = gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor;
     if (value == indexA)
@@ -273,12 +276,12 @@ void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
   }
   if (rosterIndex == 0)
   {
-    if (battleRosterCursorEntryIdGet(0) >= 8)
+    if (battleRosterCursorEntryIdGet(0) >= BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT)
     {
-      for (index = 0; index < 3; index++)
+      for (index = 0; index < BATTLE_ROSTER_CURSOR_ENTRY_COUNT; index++)
       {
         entryId = battleRosterEntryIdGet(index, 0);
-        if (entryId < 8)
+        if (entryId < BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT)
         {
           battleRosterCursorSet(index, 0);
           break;
@@ -288,15 +291,18 @@ void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
   }
 }
 
+/* Puts the cursor of a roster on entry index when index is below BATTLE_ROSTER_CURSOR_ENTRY_COUNT; for roster 0 the
+   entry id battleRosterEntryIdGet gives there must also be below BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT. Returns 1 when
+   the cursor was set, 0 when it was left alone. */
 s32 battleRosterCursorSet(s32 index, s32 rosterIndex)
 {
   s32 entryId;
-  if (index < 3)
+  if (index < BATTLE_ROSTER_CURSOR_ENTRY_COUNT)
   {
     if (rosterIndex == 0)
     {
       entryId = battleRosterEntryIdGet(index, rosterIndex);
-      if (entryId >= 8)
+      if (entryId >= BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT)
       {
         return 0;
       }
@@ -320,9 +326,9 @@ s32 battleCurrentRosterCursorAdvance(void)
   cursor = battleRosterGet(rosterIndex)->cursor;
   count = battleRosterEntryIdCountGet(rosterIndex);
   wrapCount = count;
-  if (count >= 4)
+  if (count > BATTLE_ROSTER_CURSOR_ENTRY_COUNT)
   {
-    wrapCount = 3;
+    wrapCount = BATTLE_ROSTER_CURSOR_ENTRY_COUNT;
   }
   else if (count <= 0)
   {
@@ -338,12 +344,14 @@ s32 battleCurrentRosterCursorAdvance(void)
   return cursor != battleRosterGet(rosterIndex)->cursor;
 }
 
+/* Returns the index of entryId in its roster (roster 1 from BATTLE_ROSTER1_FIRST_ENTRY_ID on, else roster 0), or -1
+   when the roster does not hold it. */
 s32 battleRosterEntryIdIndexGet(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
   s32 result;
-  roster = battleRosterGet(entryId >= 0xD);
+  roster = battleRosterGet(entryId >= BATTLE_ROSTER1_FIRST_ENTRY_ID);
   result = -1;
   for (index = 0; index < roster->entryIdCount; index++)
   {
@@ -359,7 +367,7 @@ s32 battleRosterEntryIdIndexGet(s32 entryId)
 s32 func_00221FB8();
 
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
-    s32 entryIds[4];
+    s32 entryIds[3];
     s32 entryId;
     s32 handleOrdinal;
     s32 resolvedEntryIndex;
@@ -377,7 +385,8 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
                 retriedEntryIndex = battleRosterEntryIdIndexGet(entryIds[handleOrdinal]);
                 resolvedEntryIndex = retriedEntryIndex;
             }
-            battleRosterEntrySwap(handleOrdinal, resolvedEntryIndex, entryIds[handleOrdinal] >= 0xD);
+            battleRosterEntrySwap(handleOrdinal, resolvedEntryIndex,
+                                  entryIds[handleOrdinal] >= BATTLE_ROSTER1_FIRST_ENTRY_ID);
         }
     }
 }
@@ -413,15 +422,15 @@ void battleRosterHeaderPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId)
    linked ids present in roster 0 (present ones first); 0 when there is none or for any other entry id. */
 s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index)
 {
-  static const u8 linkedEntryIds[4][2] = { { 7, 6 }, { 3, 4 }, { 5, 1 }, { 2, 0 } };
+  static const u8 gBattleRosterLinkedEntryIds[4][2] = { { 7, 6 }, { 3, 4 }, { 5, 1 }, { 2, 0 } };
   s32 linked[2];
   s32 linkedEntryId;
   memset(linked, 0, sizeof(linked));
   linkedEntryId = 0;
-  if (entryId >= 0xD && entryId < 0x11)
+  if (entryId >= BATTLE_ROSTER1_FIRST_ENTRY_ID && entryId <= BATTLE_ROSTER1_LAST_ENTRY_ID)
   {
-    linked[0] = linkedEntryIds[entryId - 0xD][0];
-    linked[1] = linkedEntryIds[entryId - 0xD][1];
+    linked[0] = gBattleRosterLinkedEntryIds[entryId - BATTLE_ROSTER1_FIRST_ENTRY_ID][0];
+    linked[1] = gBattleRosterLinkedEntryIds[entryId - BATTLE_ROSTER1_FIRST_ENTRY_ID][1];
     if (battleRosterHasEntryId(linked[1]) == 0)
     {
       linked[1] = 0;
