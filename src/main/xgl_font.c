@@ -1201,7 +1201,26 @@ int xglFontCmdCol(FontDrawCursor *cursor, const char **text)
     return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00183660);
+/* Inline background command: "N;" with N = 0..3 selects the glyph effect; func_001820D0 sends its
+ * TEST_1 setting. */
+int func_00183660(FontDrawCursor *cursor, const char **text)
+{
+    const unsigned char *next = (const unsigned char *) *text;
+    int digit;
+
+    if (next[1] == ';') {
+        digit = next[0];
+        if (digit < '4') {
+            if (digit >= '0') {
+                *text = (const char *) (next + 2);
+                cursor->effect = next[0] - '0';
+                func_001820D0(cursor);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 int xglFontCmdShadow(FontDrawCursor *cursor, const char **text)
 {
