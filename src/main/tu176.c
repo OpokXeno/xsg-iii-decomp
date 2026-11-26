@@ -22,30 +22,40 @@ typedef struct ClampedCounter
   u16 clampedValue;            /* +0x20 */
 } ClampedCounter;
 
-/* 0x10-byte record of the table at gBattleRosterTable. */
+/* 0x10-byte roster of the table at gBattleRosterTable: roster 0 holds entry ids below 0xD (at most 7),
+   roster 1 the ids from 0xD on (at most 4). */
 typedef struct BattleRoster
 {
   u8 entryIdCount;             /* +0x00 */
-  u8 cursor;          /* +0x01 */
-  u8 entryIds[0xE];
+  u8 cursor;          /* +0x01: index of the selected entry */
+  u8 entryIds[0xE];   /* +0x02 */
 } BattleRoster;
 
-/* The first two records of the table, as one pair. */
-typedef struct BattleRosterPair
+/* 0x24-byte per-character record of gBattleRosterTable, from +0x48 (func_00222768 returns &values[slot]).
+   The stride-0x24 accessors in tu177 use other bases into the same array: the skill count and cost of
+   character c sit at table +0x28 + c * 0x24 (+0x04/+0x05 of record c - 1), and the skill-board nibbles
+   at table +0x28 + c * 0x24 + (page >> 1) * 8 + row. */
+typedef struct BattleCharacterRecord
 {
-  BattleRoster firstRoster;
-  BattleRoster secondRoster;
-} BattleRosterPair;
+  s16 values[2];                /* +0x00: func_00221C50 writes the new-game defaults */
+  u8 unmodeled_04[0x24 - 0x04];
+} BattleCharacterRecord;
 
-/* Table header: two values at +0x24 and +0x25, the current record index at +0x26. */
-
-typedef struct BattleRosterHeader
+/* gBattleRosterTable, 0x2B0 bytes (func_00221C50 clears it with one memset). The game also addresses parts of it
+   through their own symbols: gBattleRosterCursors (+0x01), gBattleRosterEntryIds (+0x02), D_003E6BA0 (+0x20),
+   gBattleCurrentRosterIndex (+0x26), gRecordSlotBitTable (+0x28), D_003E6BC8 (+0x48). */
+typedef struct BattleRosterTable
 {
-  u8 unmodeled_00[0x24];
-  s8 firstValue;        /* +0x24 */
-  s8 secondValue;       /* +0x25 */
-  u8 currentRosterIndex;     /* +0x26 */
-} BattleRosterHeader;
+  BattleRoster rosters[2];      /* +0x00 */
+  s32 entryMask;                /* +0x20: bit n set when entry id n is in a roster (testFlagBit) */
+  s8 firstValue;                /* +0x24 */
+  s8 secondValue;               /* +0x25 */
+  u8 currentRosterIndex;        /* +0x26 */
+  u8 unlockFlags;               /* +0x27 */
+  u8 slotBitNibbles[0x48 - 0x28]; /* +0x28: skill-board nibbles (gRecordSlotBitTable) */
+  BattleCharacterRecord characters[(0x2AC - 0x48) / 0x24]; /* +0x48 */
+  u8 unmodeled_2AC[0x2B0 - 0x2AC];
+} BattleRosterTable;
 
 void clampedCounterInit(ClampedCounter *clampedCounter, s32 stepDelta)
 {
@@ -111,22 +121,17 @@ s8 sheetLatchedPositionGet(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221C50);
 
-extern unsigned char gBattleRosterTable[];
-/* Typed views of the table at gBattleRosterTable: 0x10-byte records, and the header overlaying them at +0x24. */
-#define gBattleRosters ((BattleRoster *) gBattleRosterTable)
-#define gBattleRosterHeader (*(BattleRosterHeader *) gBattleRosterTable)
-#define gBattleRosterPair ((BattleRosterPair *) gBattleRosterTable)
+extern BattleRosterTable gBattleRosterTable;
 
 BattleRoster *battleRosterGet(s32 rosterIndex) {
-    return &gBattleRosters[rosterIndex];
+    return &gBattleRosterTable.rosters[rosterIndex];
 }
 
 u8 battleRosterEntryIdCountGet(s32 rosterIndex) {
-    return gBattleRosters[rosterIndex].entryIdCount;
+    return gBattleRosterTable.rosters[rosterIndex].entryIdCount;
 }
 
 u8 battleRosterEntryIdCountGet(s32 rosterIndex);
-extern unsigned char gBattleRosterEntryIds[];
 
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
 {
@@ -134,36 +139,28 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   {
     return 0;
   }
-  return gBattleRosterEntryIds[entryIdIndex + (rosterIndex << 4)];
+  return gBattleRosterTable.rosters[rosterIndex].entryIds[entryIdIndex];
 }
 
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
-extern unsigned char gBattleRosterCursors[];
 
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
-    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterCursors[rosterIndex * 0x10], rosterIndex);
+    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[rosterIndex].cursor, rosterIndex);
 }
 
 u8 battleCurrentRosterEntryCountGet(void)
 {
-  return gBattleRosters[gBattleRosterHeader.currentRosterIndex].entryIdCount;
+  return gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
 }
 
 u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 {
-  return (&gBattleRosterTable[entryIdIndex + (gBattleRosterHeader.currentRosterIndex << 4)])[2];
+  return gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
 }
-
-/* The same records seen from their subIndex byte (+0x01). */
-typedef struct BattleRosterCursorView
-{
-  u8 cursor;
-  u8 unmodeled_01[0x0F];
-} BattleRosterCursorView;
 
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
-  return ((s32 (*)()) battleRosterEntryIdGet)(((BattleRosterCursorView *) &gBattleRosterTable[1])[gBattleRosterHeader.currentRosterIndex].cursor, gBattleRosterHeader.currentRosterIndex);
+  return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221F40);
@@ -175,10 +172,10 @@ INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FB8);
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222048);
 
 void battleRosterPairReset(void) {
-    gBattleRosterPair->firstRoster.entryIdCount = 0;
-    gBattleRosterPair->secondRoster.entryIdCount = 0;
-    gBattleRosterPair->firstRoster.cursor = 0;
-    gBattleRosterPair->secondRoster.cursor = 0;
+    gBattleRosterTable.rosters[0].entryIdCount = 0;
+    gBattleRosterTable.rosters[1].entryIdCount = 0;
+    gBattleRosterTable.rosters[0].cursor = 0;
+    gBattleRosterTable.rosters[1].cursor = 0;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222120);
@@ -217,19 +214,15 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
     }
 }
 
-extern unsigned char gBattleCurrentRosterIndex[];
-
 u8 battleCurrentRosterIndexGet(void) {
-    return gBattleCurrentRosterIndex[0];
+    return gBattleRosterTable.currentRosterIndex;
 }
-
-extern unsigned char D_003E6BA0[];
 
 s32 testFlagBit(s32 bitIndex)
 {
   int mask;
   mask = 1 << bitIndex;
-  return (*(s32 *) D_003E6BA0 & mask) != 0;
+  return (gBattleRosterTable.entryMask & mask) != 0;
 }
 
 void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
@@ -243,8 +236,8 @@ void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
     storedFirst = storedSecond;
     storedSecond = 0;
   }
-  gBattleRosterHeader.firstValue = storedFirst;
-  gBattleRosterHeader.secondValue = storedSecond;
+  gBattleRosterTable.firstValue = storedFirst;
+  gBattleRosterTable.secondValue = storedSecond;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002224E8);
