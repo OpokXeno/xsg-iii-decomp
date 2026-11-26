@@ -126,7 +126,52 @@ void seBgmLoadDefault(int id, int kind, int group)
     func_0018E6F0(id, kind, group, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
+/* A sound bank file: the offset of its entry table at +0xA4. The table's first byte is the last
+ * entry index; entry i (4 bytes) holds the offset of its length byte, the group and the kind. */
+typedef struct SeBankEntry {
+    unsigned short lengthOffset;
+    unsigned char group;
+    unsigned char flags; /* the kind in the low nibble */
+} SeBankEntry;
+
+typedef struct SeBankHeader {
+    unsigned char unmodeled_00[0xA4];
+    int entryTableOffset; /* +0xA4 */
+} SeBankHeader;
+
+#define SE_BANK_KIND_MASK 0xF
+
+void func_0017D6E8(int slot, void *bank);
+void func_0017D5A0(int slot, void *bank);
+
+/* Registers a sound bank with the driver and assigns the channel ranges of its entries. */
+void func_0018E870(int slot, void *bank, int numbered)
+{
+    SeBankHeader *header;
+    SeBankEntry *entries;
+    int index;
+    int start;
+    int length;
+
+    if (numbered != 0) {
+        func_0017D6E8(slot, bank);
+    } else {
+        /* kept: this assignment and the one after the join give the original's copy of bank in both branches. */
+        header = bank;
+        func_0017D5A0(slot, bank);
+    }
+    header = bank;
+    entries = (SeBankEntry *) ((unsigned char *) header + header->entryTableOffset);
+    if ((SeBankEntry *) header != entries) {
+        start = 0;
+        for (index = *(unsigned char *) entries + 1; index > 0; index--) {
+            length = ((unsigned char *) entries)[entries[index].lengthOffset] + 1;
+            func_0018E6F0(slot, entries[index].flags & SE_BANK_KIND_MASK, entries[index].group,
+                          (start << 16) + length);
+            start += length;
+        }
+    }
+}
 
 /* Bank slots that share their channels, as byte pairs (first and last slot of a group); the list ends with a
  * first slot of 0. */
