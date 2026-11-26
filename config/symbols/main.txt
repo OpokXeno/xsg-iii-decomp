@@ -10064,6 +10064,7 @@ $L13 = 0x00540210;
 xglMcBasePath = 0x00540238;
 $L499 = 0x00540390;
 gMoviePathPrefixText = 0x00540378;
+iopSubBindErrorText = 0x00540608;
 exitProgramBanner = 0x00540620;
 errorBanner = 0x00540660;
 xglLightKeyAxisTemplate = 0x005412F0;

@@ -137,6 +137,7 @@
    "0x00540378": "gMoviePathPrefixText",
    "0x00540390": "$L499",
    "0x00540408": "soundCdLocationFormat",
+   "0x00540608": "iopSubBindErrorText",
    "0x00540620": "exitProgramBanner",
    "0x00540660": "errorBanner",
    "0x005412f0": "xglLightKeyAxisTemplate",
