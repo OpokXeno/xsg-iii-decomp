@@ -133,11 +133,11 @@ void newGameStateReset(void)
 }
 
 BattleRoster *battleRosterGet(s32 rosterIndex) {
-    return &gBattleRosterTable.party.rosters[rosterIndex];
+    return &gBattleRosterTable.rosterPair.rosters[rosterIndex];
 }
 
 u8 battleRosterEntryIdCountGet(s32 rosterIndex) {
-    return gBattleRosterTable.party.rosters[rosterIndex].entryIdCount;
+    return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIdCount;
 }
 
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
@@ -146,30 +146,30 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   {
     return 0;
   }
-  return gBattleRosterTable.party.rosters[rosterIndex].entryIds[entryIdIndex];
+  return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIds[entryIdIndex];
 }
 
 /* The call goes through an int-returning view of battleRosterEntryIdGet: with the plain call (u8 result promoted to
    s32) the two cursor getters come out 8 bytes longer in total and the link no longer fits. */
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
-    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.party.rosters[rosterIndex].cursor, rosterIndex);
+    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor, rosterIndex);
 }
 
 u8 battleCurrentRosterEntryCountGet(void)
 {
-  return gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
+  return gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
 }
 
 u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 {
-  return gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
+  return gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
 }
 
 /* Same int-returning view of battleRosterEntryIdGet as battleRosterCursorEntryIdGet. */
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
   return ((s32 (*)()) battleRosterEntryIdGet)(
-      gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].cursor,
+      gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].cursor,
       gBattleRosterTable.currentRosterIndex);
 }
 
@@ -177,7 +177,7 @@ u8 battleRosterHasEntryId(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
-  roster = (entryId < 0xD) ? &gBattleRosterTable.party.rosters[0] : &gBattleRosterTable.party.rosters[1];
+  roster = (entryId < 0xD) ? &gBattleRosterTable.rosterPair.rosters[0] : &gBattleRosterTable.rosterPair.rosters[1];
   for (index = 0; index < roster->entryIdCount; index++)
   {
     if (roster->entryIds[index] == entryId)
@@ -203,7 +203,7 @@ void battleRosterEntryIdRemove(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
-  roster = (entryId < 0xD) ? &gBattleRosterTable.party.rosters[0] : &gBattleRosterTable.party.rosters[1];
+  roster = (entryId < 0xD) ? &gBattleRosterTable.rosterPair.rosters[0] : &gBattleRosterTable.rosterPair.rosters[1];
   for (index = 0; index < roster->entryIdCount; index++)
   {
     if (roster->entryIds[index] == entryId)
@@ -232,10 +232,10 @@ void battleRosterEntryIdRemove(s32 entryId)
 }
 
 void battleRosterPairReset(void) {
-    gBattleRosterTable.party.rosters[0].entryIdCount = 0;
-    gBattleRosterTable.party.rosters[1].entryIdCount = 0;
-    gBattleRosterTable.party.rosters[0].cursor = 0;
-    gBattleRosterTable.party.rosters[1].cursor = 0;
+    gBattleRosterTable.rosterPair.rosters[0].entryIdCount = 0;
+    gBattleRosterTable.rosterPair.rosters[1].entryIdCount = 0;
+    gBattleRosterTable.rosterPair.rosters[0].cursor = 0;
+    gBattleRosterTable.rosterPair.rosters[1].cursor = 0;
 }
 
 /* Swaps entries indexA and indexB of a roster. When both swapped indices are below 3, a cursor on either index is
@@ -262,7 +262,7 @@ void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
   roster->entryIds[indexB] = value;
   if ((indexA < 3) && (indexB < 3))
   {
-    value = gBattleRosterTable.party.rosters[rosterIndex].cursor;
+    value = gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor;
     if (value == indexA)
     {
       battleRosterCursorSet(indexB, rosterIndex);
@@ -302,7 +302,7 @@ s32 battleRosterCursorSet(s32 index, s32 rosterIndex)
         return 0;
       }
     }
-    gBattleRosterTable.party.rosters[rosterIndex].cursor = index;
+    gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor = index;
     return 1;
   }
   return 0;
@@ -399,17 +399,17 @@ s32 testFlagBit(s32 bitIndex)
 /* Stores the two guest entry ids (VM native ptSetGuest); a lone second guest moves to the first place. */
 void battleRosterHeaderPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId)
 {
-  s32 primaryGuest;
-  s32 secondaryGuest;
-  primaryGuest = firstGuestEntryId;
-  secondaryGuest = secondGuestEntryId;
-  if ((primaryGuest == 0) && (secondaryGuest != 0))
+  s32 firstGuest;
+  s32 secondGuest;
+  firstGuest = firstGuestEntryId;
+  secondGuest = secondGuestEntryId;
+  if ((firstGuest == 0) && (secondGuest != 0))
   {
-    primaryGuest = secondaryGuest;
-    secondaryGuest = 0;
+    firstGuest = secondGuest;
+    secondGuest = 0;
   }
-  gBattleRosterTable.primaryGuestEntryId = primaryGuest;
-  gBattleRosterTable.secondaryGuestEntryId = secondaryGuest;
+  gBattleRosterTable.firstGuestEntryId = firstGuest;
+  gBattleRosterTable.secondGuestEntryId = secondGuest;
 }
 
 /* For a roster 1 entry id (0xD..0x10), returns its linked roster 0 entry id number index & 1, counting only the

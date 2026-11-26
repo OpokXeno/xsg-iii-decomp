@@ -20,9 +20,9 @@ typedef struct BattleRoster {
 
 /* The two rosters, the part of gBattleRosterTable that battleRosterSnapshotTake (VM native ptSaveUMNParty) copies
    into the save header as one block. */
-typedef struct BattleParty {
+typedef struct BattleRosterPair {
     BattleRoster rosters[2];                                  /* +0x00 */
-} BattleParty;
+} BattleRosterPair;
 
 /* 0x24-byte per-character record of gBattleRosterTable, from +0x48. func_00222768 (tu177) returns the address of
    s16 slot n of a record. The stride-0x24 accessors in tu177 use other bases into the same array: the skill count
@@ -37,23 +37,23 @@ typedef struct BattleCharacterRecord {
    through their own symbols: gBattleRosterCursors (+0x01), gBattleRosterEntryIds (+0x02), D_003E6BA0 (+0x20),
    gBattleCurrentRosterIndex (+0x26), gRecordSlotBitTable (+0x28), D_003E6BC8 (+0x48). */
 typedef struct BattleRosterTable {
-    BattleParty party;                                        /* +0x00 */
+    BattleRosterPair rosterPair;                              /* +0x00 */
     s32 entryMask;                                            /* +0x20: bitmask read by testFlagBit */
-    s8 primaryGuestEntryId;                                   /* +0x24: battleRosterHeaderPairSet (ptSetGuest) */
-    s8 secondaryGuestEntryId;                                 /* +0x25 */
+    s8 firstGuestEntryId;                                     /* +0x24: battleRosterHeaderPairSet (ptSetGuest) */
+    s8 secondGuestEntryId;                                    /* +0x25 */
     u8 currentRosterIndex;                                    /* +0x26 */
     u8 unlockFlags;                                           /* +0x27: bit 0 written by vmSetRosterTableFlag */
     u8 slotBitNibbles[0x48 - 0x28];                           /* +0x28: skill-board nibbles (gRecordSlotBitTable) */
-    BattleCharacterRecord characters[(0x2AC - 0x48) / 0x24];     /* +0x48 */
+    BattleCharacterRecord characters[(0x2AC - 0x48) / 0x24];  /* +0x48 */
     u8 unmodeled_2AC[0x2B0 - 0x2AC];
 } BattleRosterTable;
 
 /* Play-state header at D_003E6E30, 0x2C bytes (newGameStateReset clears it): the start time of the game, the copy of
-   the party battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the last save
+   the roster pair battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the last save
    (res_get_path.c). */
 typedef struct SaveGameHeader {
     s32 startTime;                                            /* +0x00: xglClockDayTime2UInt of the new-game clock */
-    BattleParty savedParty;                                   /* +0x04: copied from gBattleRosterTable.party */
+    BattleRosterPair roster;                                  /* +0x04: copied from gBattleRosterTable.rosterPair */
     u8 snapshotFlags;                                         /* +0x24: bit 1 set by battleRosterSnapshotTake */
     u8 port;                                                  /* +0x25 */
     u8 fileIndex;                                             /* +0x26 */
