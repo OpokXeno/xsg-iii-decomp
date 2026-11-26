@@ -86,7 +86,6 @@ extern u8 gSaveAbortFlag;
 void *memset(void *destination, int value, unsigned int count);
 void xglClockRead(XglClock *clock);
 unsigned int xglClockDayTime2UInt(XglClock *clock_time);
-void xglMcAgedEntriesReset(void);
 s32 func_001B8D08(s32 category, s32 item, s32 amount);
 
 /* New-game reset: clears the roster table, the play-state header and the save image regions, stamps the

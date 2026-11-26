@@ -6,6 +6,9 @@
 
 #include "main/xgl_cd.h"
 
+/* Number of slots in the aged-entry ring of the save image. */
+#define XGL_MC_AGED_ENTRY_COUNT 50
+
 /* The 0x130B0-byte memory-card save image at gXglMcAgedEntries. The newGameCleared* members are the bytes and regions
    newGameStateReset (tu176) zeroes; nothing else about them is known yet. */
 typedef struct AgedEntryRing {
@@ -17,7 +20,7 @@ typedef struct AgedEntryRing {
     unsigned char newGameClearedFlag4B;                               /* +0x4B */
     unsigned char unmodeled_004C[0x1330 - 0x4C];
     unsigned char newGameClearedRegion1330[0x1408 - 0x1330];          /* +0x1330 */
-    unsigned short agedEntries[50];                                   /* +0x1408 */
+    unsigned short agedEntries[XGL_MC_AGED_ENTRY_COUNT];              /* +0x1408 */
     unsigned char unmodeled_146C[0x146D - 0x146C];
     unsigned char newGameClearedRegion146D[0x147C - 0x146D];          /* +0x146D */
     unsigned char newGameClearedRegion147C[0x157C - 0x147C];          /* +0x147C */
@@ -31,5 +34,10 @@ typedef struct AgedEntryRing {
 } AgedEntryRing;
 
 extern AgedEntryRing gXglMcAgedEntries;
+
+/* Empties the aged-entry ring: both indices to 0 and every slot cleared. */
+void xglMcAgedEntriesReset(void);
+/* Returns the ring slot written age entries before the newest one (age 0 is the newest). */
+unsigned short *xglMcTableGetAgedEntry(int age);
 
 #endif /* INCLUDE_MAIN_TU178_H */
