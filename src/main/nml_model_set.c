@@ -807,7 +807,37 @@ void pxyLatchValueB(s32 valueToLatch)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019ED68);
+/* The draw callback slots of the render state (drawCallbacks). */
+#define PXY_DRAW_CALLBACK_SLOTS 16
+
+/* Registers a draw callback in the first free slot unless it is registered already; nothing happens when
+ * all slots hold other callbacks. */
+void func_0019ED68(void (*callback)(int))
+{
+    int i;
+
+    i = 0;
+    if (gPxyModelRenderStateStorage.drawCallbacks[i] == 0) {
+        gPxyModelRenderStateStorage.drawCallbacks[i] = callback;
+        gPxyModelRenderStateStorage.drawCallbackCount++;
+        return;
+    }
+    /* kept: the backward goto; as a do-while or for loop the index becomes a running pointer, the original
+     * recomputes the slot address from i on every pass. */
+next:
+    if (gPxyModelRenderStateStorage.drawCallbacks[i] == callback) {
+        return;
+    }
+    i++;
+    if (i >= PXY_DRAW_CALLBACK_SLOTS) {
+        return;
+    }
+    if (gPxyModelRenderStateStorage.drawCallbacks[i] != 0) {
+        goto next;
+    }
+    gPxyModelRenderStateStorage.drawCallbacks[i] = callback;
+    gPxyModelRenderStateStorage.drawCallbackCount++;
+}
 
 void pxyEnableFlag400000(s32 enabled) {
     if (enabled != 0) {
