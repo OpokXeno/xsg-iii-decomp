@@ -1203,7 +1203,7 @@ int xglFontCmdCol(FontDrawCursor *cursor, const char **text)
 
 /* Inline background command: "N;" with N = 0..3 selects the glyph effect; func_001820D0 sends its
  * TEST_1 setting. */
-int func_00183660(FontDrawCursor *cursor, const char **text)
+int xglFontCmdBg(FontDrawCursor *cursor, const char **text)
 {
     const unsigned char *next = (const unsigned char *) *text;
     int digit;

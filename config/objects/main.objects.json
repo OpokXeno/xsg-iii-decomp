@@ -37373,9 +37373,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00183660",
+     "name": "xglFontCmdBg",
      "size": 104,
-     "splat_name": "func_00183660",
+     "splat_name": "xglFontCmdBg",
      "va": "0x00183660",
      "name_basis": "address",
      "provenance": "estimated"
