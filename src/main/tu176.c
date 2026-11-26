@@ -1,12 +1,11 @@
 #include "common.h"
+#include "shared.h"
+#include "main/xgl_cd.h"
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
 
 typedef signed char s8;
 typedef int s32;
-typedef unsigned char u8;
-typedef short s16;
-typedef unsigned short u16;
 
 /* Counter entry: a step direction pair (+0x08, +0x09), a phase (+0x0B), a limit and a count. */
 typedef struct ClampedCounter
@@ -119,9 +118,88 @@ s8 sheetLatchedPositionGet(void) {
     return D_0055144A;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221C50);
+/* Play-state header at D_003E6E30 (res_get_path.c SaveGameHeader). */
+typedef struct SaveGameHeader {
+    s32 startTime; /* +0x00 */
+    unsigned char unmodeled_04[0x21];
+    unsigned char port;      /* +0x25 */
+    unsigned char fileIndex; /* +0x26 */
+} SaveGameHeader;
+
+/* The 0x130B0-byte memory-card save image at gXglMcAgedEntries (tu178 AgedEntryRing, extended with the
+   regions the new-game reset clears). */
+typedef struct AgedEntryRing {
+    unsigned char unmodeled_0000[0x10];
+    s32 newGameCounters[2];                     /* +0x10: zeroed by the new-game reset */
+    XglClock newGameClock;                      /* +0x18: clock read when a new game starts */
+    unsigned char unmodeled_0020[0x4A - 0x20];
+    unsigned char flag4A;                       /* +0x4A */
+    unsigned char flag4B;                       /* +0x4B */
+    unsigned char unmodeled_004C[0x1330 - 0x4C];
+    unsigned char bytes1330[0x1408 - 0x1330];   /* +0x1330 */
+    unsigned short agedEntries[50];             /* +0x1408 */
+    unsigned char unmodeled_146C[0x146D - 0x146C];
+    unsigned char bytes146D[0x147C - 0x146D];   /* +0x146D */
+    unsigned char bytes147C[0x157C - 0x147C];   /* +0x147C */
+    unsigned char bytes157C[0x177C - 0x157C];   /* +0x157C */
+    unsigned char unmodeled_177C[0x3A0C - 0x177C];
+    unsigned char bytes3A0C[0x1302C - 0x3A0C];  /* +0x3A0C */
+    unsigned char unmodeled_1302C[0x130B0 - 0x1302C]; /* tu178: aged-entry ring cursors at +0x130AA */
+} AgedEntryRing;
 
 extern BattleRosterTable gBattleRosterTable;
+extern SaveGameHeader D_003E6E30;
+extern AgedEntryRing gXglMcAgedEntries;
+extern u8 gSaveAbortFlag;
+
+void *memset(void *destination, int value, unsigned int count);
+void xglClockRead(XglClock *clock);
+unsigned int xglClockDayTime2UInt(XglClock *clock_time);
+void xglMcAgedEntriesReset(void);
+s32 func_001B8D08(s32 category, s32 item, s32 amount);
+
+/* New-game reset: clears the roster table, the play-state header and the save image regions, stamps the
+   start time and writes the per-character defaults. */
+void func_00221C50(void)
+{
+  memset(&gBattleRosterTable, 0, 0x2B0);
+  memset(&D_003E6E30, 0, 0x2C);
+  xglClockRead(&gXglMcAgedEntries.newGameClock);
+  D_003E6E30.startTime = xglClockDayTime2UInt(&gXglMcAgedEntries.newGameClock);
+  gBattleRosterTable.characters[1].values[0] = 1;
+  gBattleRosterTable.characters[2].values[0] = 0xC;
+  gBattleRosterTable.characters[3].values[0] = 0x1B;
+  gBattleRosterTable.characters[4].values[0] = 0x25;
+  gBattleRosterTable.characters[5].values[0] = 0x34;
+  gBattleRosterTable.characters[6].values[0] = 0x41;
+  gBattleRosterTable.characters[7].values[0] = 0x51;
+  gBattleRosterTable.characters[8].values[0] = 0x61;
+  gBattleRosterTable.characters[9].values[0] = 0x62;
+  gBattleRosterTable.characters[10].values[0] = 0x63;
+  gBattleRosterTable.characters[13].values[0] = 0x6E;
+  gBattleRosterTable.characters[13].values[1] = 0x6C;
+  gBattleRosterTable.characters[14].values[0] = 0x7E;
+  gBattleRosterTable.characters[14].values[1] = 0x80;
+  gBattleRosterTable.characters[15].values[0] = 0x8E;
+  gBattleRosterTable.characters[15].values[1] = 0x8F;
+  gBattleRosterTable.characters[16].values[0] = 0x9E;
+  gBattleRosterTable.characters[16].values[1] = 0;
+  memset(gXglMcAgedEntries.bytes3A0C, 0, sizeof(gXglMcAgedEntries.bytes3A0C));
+  memset(gXglMcAgedEntries.bytes157C, 0, sizeof(gXglMcAgedEntries.bytes157C));
+  memset(gXglMcAgedEntries.bytes146D, 0, sizeof(gXglMcAgedEntries.bytes146D));
+  memset(gXglMcAgedEntries.bytes147C, 0, sizeof(gXglMcAgedEntries.bytes147C));
+  xglMcAgedEntriesReset();
+  if (gSaveAbortFlag)
+  {
+    func_001B8D08(2, 0x4D, 1);
+  }
+  D_003E6E30.fileIndex = -1;
+  gXglMcAgedEntries.newGameCounters[0] = 0;
+  gXglMcAgedEntries.newGameCounters[1] = 0;
+  gXglMcAgedEntries.flag4A = 0;
+  gXglMcAgedEntries.flag4B = 0;
+  memset(gXglMcAgedEntries.bytes1330, 0, sizeof(gXglMcAgedEntries.bytes1330));
+}
 
 BattleRoster *battleRosterGet(s32 rosterIndex) {
     return &gBattleRosterTable.rosters[rosterIndex];
@@ -178,7 +256,12 @@ u8 func_00221F40(s32 entryId)
   return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FA0);
+/* Selects the current roster (0 or 1). */
+void func_00221FA0(s32 rosterIndex)
+{
+  gBattleRosterTable.currentRosterIndex = rosterIndex;
+  gBattleRosterTable.currentRosterIndex %= 2;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FB8);
 
