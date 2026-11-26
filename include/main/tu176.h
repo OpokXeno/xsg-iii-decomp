@@ -64,12 +64,24 @@ extern BattleRosterTable gBattleRosterTable;
 extern SaveGameHeader D_003E6E30;
 
 void newGameStateReset(void);
+BattleRoster *battleRosterGet(s32 rosterIndex);
+u8 battleRosterEntryIdCountGet(s32 rosterIndex);
+u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
+s32 battleRosterCursorEntryIdGet(s32 rosterIndex);
+u8 battleCurrentRosterEntryCountGet(void);
+u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex);
+s32 battleCurrentRosterCursorEntryIdGet(void);
+u8 battleRosterHasEntryId(s32 entryId);
 void battleCurrentRosterIndexSet(s32 rosterIndex);
 void battleRosterEntryIdRemove(s32 entryId);
+void battleRosterPairReset(void);
 void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex);
 s32 battleRosterCursorSet(s32 index, s32 rosterIndex);
+s32 battleCurrentRosterCursorAdvance(void);
 s32 battleRosterEntryIdIndexGet(s32 entryId);
-s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index);
+void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId);
+u8 battleCurrentRosterIndexGet(void);
 void battleRosterHeaderPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId);
+s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index);
 
 #endif /* INCLUDE_MAIN_TU176_H */

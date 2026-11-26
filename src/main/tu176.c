@@ -308,8 +308,6 @@ s32 battleRosterCursorSet(s32 index, s32 rosterIndex)
   return 0;
 }
 
-u8 battleCurrentRosterIndexGet(void);
-
 /* Moves the cursor of the current roster forward to the next entry battleRosterCursorSet accepts, wrapping over the
    first one to three entries. Returns 1 when the cursor moved. */
 s32 battleCurrentRosterCursorAdvance(void)
