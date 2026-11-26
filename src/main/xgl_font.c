@@ -1642,7 +1642,52 @@ int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184B30);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185770);
+/* The glyph span table behind the glyph pixels of the font texture: per glyph a halfword with the
+ * first column in the low byte and the column after the last in the high byte, both stored minus one
+ * (the read adds 0x100). */
+#define FONT_GLYPH_SPAN_OFFSET 0x78000
+#define FONT_GLYPH_SPAN_BIAS 0x100
+/* The fixed cell (proportional_mode set): half = mode / 2, FONT_FIXED_DEFAULT_HALF when that is 0;
+ * the glyph spans columns FONT_FIXED_CENTER + 1 - half up to FONT_FIXED_CENTER + half. */
+#define FONT_FIXED_CENTER 10
+#define FONT_FIXED_DEFAULT_HALF 5
+
+/* The drawn width of a glyph: the fixed cell when proportional_mode is set, the default width for
+ * glyph 0, else the glyph's span from the table. A non-null leftBound receives the first column in
+ * 1/16 pixel units. */
+int func_00185770(int glyph, int *leftBound)
+{
+    unsigned char left;
+    int right;
+    unsigned char mode;
+
+    if (xglFontState.proportional_mode != 0) {
+        mode = xglFontState.proportional_mode;
+        left = mode >> 1;
+        if (left == 0) {
+            left = FONT_FIXED_DEFAULT_HALF;
+        }
+        right = left + FONT_FIXED_CENTER;
+        left = FONT_FIXED_CENTER + 1 - left;
+    } else if (glyph == 0) {
+        right = xglFontState.glyph_default_width;
+        left = 0;
+    } else {
+        unsigned short span;
+
+        span = ((unsigned short *) (xglFontState.texture_buffer + FONT_GLYPH_SPAN_OFFSET))[glyph]
+            + FONT_GLYPH_SPAN_BIAS;
+        left = span;
+        right = span >> 8;
+        if (left != 0) {
+            left = left - 1;
+        }
+    }
+    if (leftBound != 0) {
+        *leftBound = left << 4;
+    }
+    return right - left + 1;
+}
 
 extern unsigned char D_004B1E20[];
 extern unsigned char D_004B3320[];
