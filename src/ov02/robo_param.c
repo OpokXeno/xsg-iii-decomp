@@ -226,16 +226,16 @@ s32 roboParamRollScore(RoboActor *actor) {
     return ((0x64 - battleStats->rollBias) * actor->gauge) + (random % 9U) + 1;
 }
 
-s32 func_00222238(s32, s32);
-s32 func_00222360(s32);
+s32 battleRosterCursorSet(s32, s32);
+s32 battleRosterEntryIdIndexGet(s32);
 
 void roboParamSetActive(RoboActor *actor, s32 isActive) {
     s32 effectHandle;
 
     if (isActive != 0) {
         actor->active = 1;
-        effectHandle = func_00222360(actor->key);
-        func_00222238(effectHandle, 1);
+        effectHandle = battleRosterEntryIdIndexGet(actor->key);
+        battleRosterCursorSet(effectHandle, 1);
         return;
     }
     actor->active = 0;

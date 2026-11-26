@@ -36,11 +36,11 @@ typedef struct BattleRoster
    at table +0x28 + c * 0x24 + (page >> 1) * 8 + row. */
 typedef struct BattleCharacterRecord
 {
-  s16 values[2];                /* +0x00: func_00221C50 writes the new-game defaults */
+  s16 values[2];                /* +0x00: newGameStateReset writes the new-game defaults */
   u8 unmodeled_04[0x24 - 0x04];
 } BattleCharacterRecord;
 
-/* gBattleRosterTable, 0x2B0 bytes (func_00221C50 clears it with one memset). The game also addresses parts of it
+/* gBattleRosterTable, 0x2B0 bytes (newGameStateReset clears it with one memset). The game also addresses parts of it
    through their own symbols: gBattleRosterCursors (+0x01), gBattleRosterEntryIds (+0x02), D_003E6BA0 (+0x20),
    gBattleCurrentRosterIndex (+0x26), gRecordSlotBitTable (+0x28), D_003E6BC8 (+0x48). */
 typedef struct BattleRosterTable
@@ -160,7 +160,7 @@ s32 func_001B8D08(s32 category, s32 item, s32 amount);
 
 /* New-game reset: clears the roster table, the play-state header and the save image regions, stamps the
    start time and writes the per-character defaults. */
-void func_00221C50(void)
+void newGameStateReset(void)
 {
   memset(&gBattleRosterTable, 0, 0x2B0);
   memset(&D_003E6E30, 0, 0x2C);
@@ -241,7 +241,7 @@ s32 battleCurrentRosterCursorEntryIdGet(void)
   return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
 }
 
-u8 func_00221F40(s32 entryId)
+u8 battleRosterHasEntryId(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
@@ -257,7 +257,7 @@ u8 func_00221F40(s32 entryId)
 }
 
 /* Selects the current roster (0 or 1). */
-void func_00221FA0(s32 rosterIndex)
+void battleCurrentRosterIndexSet(s32 rosterIndex)
 {
   gBattleRosterTable.currentRosterIndex = rosterIndex;
   gBattleRosterTable.currentRosterIndex %= 2;
@@ -267,7 +267,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FB8);
 
 /* Removes entry id from its roster: later entries move down one slot and the cursor follows its entry
    (a cursor on the removed entry goes back to 0). */
-void func_00222048(s32 entryId)
+void battleRosterEntryIdRemove(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
@@ -306,11 +306,11 @@ void battleRosterPairReset(void) {
     gBattleRosterTable.rosters[1].cursor = 0;
 }
 
-s32 func_00222238(s32 index, s32 rosterIndex);
+s32 battleRosterCursorSet(s32 index, s32 rosterIndex);
 
 /* Swaps entries indexA and indexB of a roster; a cursor on one of the first three entries follows its entry.
    For roster 0, a cursor left on an entry id of 8 or more moves to the first of the first three entries below 8. */
-void func_00222120(s32 indexA, s32 indexB, s32 rosterIndex)
+void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
 {
   s32 value; /* the entry count, then the moved entry id, then the cursor */
   s32 index;
@@ -334,11 +334,11 @@ void func_00222120(s32 indexA, s32 indexB, s32 rosterIndex)
     value = gBattleRosterTable.rosters[rosterIndex].cursor;
     if (value == indexA)
     {
-      func_00222238(indexB, rosterIndex);
+      battleRosterCursorSet(indexB, rosterIndex);
     }
     else if (value == indexB)
     {
-      func_00222238(indexA, rosterIndex);
+      battleRosterCursorSet(indexA, rosterIndex);
     }
   }
   if (rosterIndex == 0)
@@ -350,7 +350,7 @@ void func_00222120(s32 indexA, s32 indexB, s32 rosterIndex)
         entryId = battleRosterEntryIdGet(index, 0);
         if (entryId < 8)
         {
-          func_00222238(index, 0);
+          battleRosterCursorSet(index, 0);
           break;
         }
       }
@@ -358,7 +358,7 @@ void func_00222120(s32 indexA, s32 indexB, s32 rosterIndex)
   }
 }
 
-s32 func_00222238(s32 index, s32 rosterIndex)
+s32 battleRosterCursorSet(s32 index, s32 rosterIndex)
 {
   s32 entryId;
   if (index < 3)
@@ -379,9 +379,9 @@ s32 func_00222238(s32 index, s32 rosterIndex)
 
 u8 battleCurrentRosterIndexGet(void);
 
-/* Moves the cursor of the current roster forward to the next entry func_00222238 accepts, wrapping over the
+/* Moves the cursor of the current roster forward to the next entry battleRosterCursorSet accepts, wrapping over the
    first one to three entries. Returns 1 when the cursor moved. */
-s32 func_002222A0(void)
+s32 battleCurrentRosterCursorAdvance(void)
 {
   s32 step;
   s32 rosterIndex;
@@ -402,7 +402,7 @@ s32 func_002222A0(void)
   }
   for (step = 1; step < wrapCount; step++)
   {
-    if (func_00222238((cursor + step) % wrapCount, rosterIndex))
+    if (battleRosterCursorSet((cursor + step) % wrapCount, rosterIndex))
     {
       break;
     }
@@ -410,7 +410,7 @@ s32 func_002222A0(void)
   return cursor != battleRosterGet(rosterIndex)->cursor;
 }
 
-s32 func_00222360(s32 entryId)
+s32 battleRosterEntryIdIndexGet(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
@@ -443,13 +443,13 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
     for (handleOrdinal = 0; handleOrdinal < 3; handleOrdinal++) {
         entryId = entryIds[handleOrdinal];
         if (entryId != 0) {
-            resolvedKind = func_00222360(entryId);
+            resolvedKind = battleRosterEntryIdIndexGet(entryId);
             if (resolvedKind == -1) {
                 func_00221FB8(entryIds[handleOrdinal]);
-                retriedKind = func_00222360(entryIds[handleOrdinal]);
+                retriedKind = battleRosterEntryIdIndexGet(entryIds[handleOrdinal]);
                 resolvedKind = retriedKind;
             }
-            func_00222120(handleOrdinal, resolvedKind, entryIds[handleOrdinal] >= 0xD);
+            battleRosterEntrySwap(handleOrdinal, resolvedKind, entryIds[handleOrdinal] >= 0xD);
         }
     }
 }
@@ -482,7 +482,7 @@ void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
 
 /* For a roster 1 entry id (0xD..0x10), returns its linked roster 0 entry id number index & 1, counting only the
    linked ids present in roster 0 (present ones first); 0 when there is none or for any other entry id. */
-s32 func_002224E8(s32 entryId, s32 index)
+s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index)
 {
   static const u8 linkedEntryIds[4][2] = { { 7, 6 }, { 3, 4 }, { 5, 1 }, { 2, 0 } };
   s32 linked[2];
@@ -493,11 +493,11 @@ s32 func_002224E8(s32 entryId, s32 index)
   {
     linked[0] = linkedEntryIds[entryId - 0xD][0];
     linked[1] = linkedEntryIds[entryId - 0xD][1];
-    if (func_00221F40(linked[1]) == 0)
+    if (battleRosterHasEntryId(linked[1]) == 0)
     {
       linked[1] = 0;
     }
-    if (func_00221F40(linked[0]) == 0)
+    if (battleRosterHasEntryId(linked[0]) == 0)
     {
       linked[0] = linked[1];
       linked[1] = 0;

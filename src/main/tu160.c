@@ -231,7 +231,7 @@ void swapWordsRestore(void) {
 extern s32 gFontEscapeBuffer;
 extern s32 gFontNumberBuffer;
 void bufferCursorClear();
-void func_00221C50();
+void newGameStateReset();
 void func_00225780();
 void sceneReset();
 
@@ -240,7 +240,7 @@ void initScratchpadBuffers(void) {
     gFontNumberBuffer = 0x70000100;
     bufferCursorClear();
     sceneReset();
-    func_00221C50();
+    newGameStateReset();
     func_00225780();
 }
 

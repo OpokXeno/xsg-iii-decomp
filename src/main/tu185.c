@@ -797,10 +797,10 @@ s32 pagedTableGetStatus(PagedTable *pagedTable) {
     return ((pagedTable->pending + pagedTableGetPageLength(pagedTable)) < pagedTable->filledEntryCount) ? (statusBits | 2) : statusBits;
 }
 
-void func_00221C50();
+void newGameStateReset();
 
 s32 pagedTableFlush(void) {
-    func_00221C50();
+    newGameStateReset();
     return 1;
 }
 

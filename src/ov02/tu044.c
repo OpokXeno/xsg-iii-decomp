@@ -137,17 +137,17 @@ s32 monsSlotQueueEmpty(void) {
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu044", func_00A8FED0);
 
-s32 func_00222120(s32, s32, s32);
-s32 func_00222360();
+s32 battleRosterEntrySwap(s32, s32, s32);
+s32 battleRosterEntryIdIndexGet();
 
 void monsLinkActorToTarget(s32 unusedValue, s32 targetActorHandle) {
     s32 actorSlotIndex;
     s32 targetActorSlotIndex;
 
-    actorSlotIndex = func_00222360();
-    targetActorSlotIndex = func_00222360(targetActorHandle);
+    actorSlotIndex = battleRosterEntryIdIndexGet();
+    targetActorSlotIndex = battleRosterEntryIdIndexGet(targetActorHandle);
     if ((actorSlotIndex != -1) && (targetActorSlotIndex != -1)) {
-        func_00222120(actorSlotIndex, targetActorSlotIndex, 0);
+        battleRosterEntrySwap(actorSlotIndex, targetActorSlotIndex, 0);
     }
 }
 

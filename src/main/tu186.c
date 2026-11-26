@@ -36,10 +36,10 @@ s32 vmRunNativeWithPluginFlush(s32 vmThread) {
     return nativeResult;
 }
 
-s32 func_00222120(s32, s32, s32);
-s32 func_00222360(s32);
+s32 battleRosterEntrySwap(s32, s32, s32);
+s32 battleRosterEntryIdIndexGet(s32);
 
-/* VM native with two arguments: func_00221FB8(first) then a loop of func_00222120 over the func_00222360 kind count. */
+/* VM native with two arguments: func_00221FB8(first) then a loop of battleRosterEntrySwap over the battleRosterEntryIdIndexGet kind count. */
 s32 vmRaiseEntryKindTo(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
@@ -58,11 +58,11 @@ s32 vmRaiseEntryKindTo(s32 vmThread) {
     vmSecondArg = vmArgGet(vmThread, 2);
     vmKindFlag = vmFirstArg >= 13;
     func_00221FB8(vmFirstArg);
-    vmKind = func_00222360(vmFirstArg);
+    vmKind = battleRosterEntryIdIndexGet(vmFirstArg);
     if (vmKind != -1 && vmSecondArg >= 0 && vmSecondArg < vmKind) {
         do {
-            func_00222120(vmKind, vmKind - 1, vmKindFlag);
-            vmKind = func_00222360(vmFirstArg);
+            battleRosterEntrySwap(vmKind, vmKind - 1, vmKindFlag);
+            vmKind = battleRosterEntryIdIndexGet(vmFirstArg);
         } while (vmSecondArg < vmKind);
     }
     return 1;
@@ -79,7 +79,7 @@ s32 vmRunSecondNativeWithPluginFlush(s32 vmThread) {
     return secondNativeResult;
 }
 
-void func_00222048(s32);
+void battleRosterEntryIdRemove(s32);
 void battleRosterPairReset();
 
 s32 vmForEachArgCall(s32 vmThread) {
@@ -96,7 +96,7 @@ s32 vmForEachArgCall(s32 vmThread) {
             do {
                 vmArgIndex += 1;
                 vmArgValue = vmArgGet(vmThread, vmArgIndex);
-                func_00222048(vmArgValue);
+                battleRosterEntryIdRemove(vmArgValue);
             } while (vmArgIndex < vmArgCount);
         }
     } else {
@@ -176,7 +176,7 @@ s32 vmRunNativeFlushOnResult(s32 vmThread) {
     return nativeResult;
 }
 
-s32 func_00221FA0();
+s32 battleCurrentRosterIndexSet();
 
 s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
     extern u8 gBattleCurrentRosterIndex[];
@@ -186,9 +186,9 @@ s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
 
     if (VM_PLUGIN_CNT_GET() > 0) {
         vmArgValue = vmArgGet(vmThread, 1);
-        func_00221FA0(vmArgValue > 0);
+        battleCurrentRosterIndexSet(vmArgValue > 0);
     } else {
-        func_00221FA0(gBattleCurrentRosterIndex[0] == 0, 1);
+        battleCurrentRosterIndexSet(gBattleCurrentRosterIndex[0] == 0, 1);
     }
     return 1;
 }
@@ -209,7 +209,7 @@ s32 vmIsFlagSet(void) {
     return gBattleCurrentRosterIndex[0] != 0;
 }
 
-s32 func_00222238(s32, s32);
+s32 battleRosterCursorSet(s32, s32);
 
 s32 vmApplyIndexedKindArg(s32 vmThread)
 {
@@ -220,12 +220,12 @@ s32 vmApplyIndexedKindArg(s32 vmThread)
 
     if (VM_PLUGIN_CNT_GET(vmThread) > 0) {
         vmTargetIndex = vmArgGet(vmThread, 1);
-        vmTargetKind = func_00222360(vmTargetIndex);
+        vmTargetKind = battleRosterEntryIdIndexGet(vmTargetIndex);
         if (vmTargetKind >= 3) {
-            func_00222120(0, vmTargetKind, vmTargetIndex >= 0xD);
+            battleRosterEntrySwap(0, vmTargetKind, vmTargetIndex >= 0xD);
             vmTargetKind = 0;
         }
-        func_00222238(vmTargetKind, (vmTargetIndex < 0xD) ^ 1);
+        battleRosterCursorSet(vmTargetKind, (vmTargetIndex < 0xD) ^ 1);
         return 1;
     }
     return 0;

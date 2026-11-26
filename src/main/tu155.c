@@ -1250,7 +1250,7 @@ s32 func_A88B40(void);
 StateBudget *func_A871D8(void);
 u8 battleRosterEntryIdCountGet(s32 rosterIndex);
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
-s32 func_002224E8(s32 entryId, s32 index);
+s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index);
 s32 statusHeaderTestFlags(void);
 void sefFlagSetBit26(void);
 void swapWordsSendCommand(s32 frames);
@@ -1290,7 +1290,7 @@ s32 budgetDisplayRun(s32 flags) {
                     gBudgetDisplayBlock->activeEntryCount = storedCount;
                 }
                 for (k = 0; k < 2; k++) {
-                    resolvedEntryId = func_002224E8(battleRosterEntryIdGet(rosterIndex, 1), k);
+                    resolvedEntryId = battleRosterLinkedEntryIdGet(battleRosterEntryIdGet(rosterIndex, 1), k);
                     if (resolvedEntryId != 0) {
                         gBudgetDisplayBlock->entryId[storedCount] = resolvedEntryId;
                         storedCount++;
