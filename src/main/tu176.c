@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/tu173.h"
 #include "main/tu176.h"
 #include "main/tu178.h"
 
@@ -29,7 +30,23 @@ void counterEntryAdvancePhase(McGauge *gauge)
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002215A0);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221A88);
+void drawEntryReset(void *drawEntry);
+void drawEntrySetValue(void *drawEntry, s32 spriteIndex);
+void drawEntrySetFlag(void *drawEntry, s8 drawFlag);
+void drawEntrySetAlpha(void *drawEntry, s32 alpha);
+
+/* Resets the file list's draw entry and its own scroll fields: previousCursor to 0, cursor to the given
+   limit, position to 0. */
+void func_00221A88(McFileList *fileList, s32 position, s32 cursor)
+{
+    drawEntryReset(fileList);
+    drawEntrySetValue(fileList, position);
+    drawEntrySetFlag(fileList, 1);
+    drawEntrySetAlpha(fileList, 0x80);
+    fileList->previousCursor = 0;
+    fileList->cursor = cursor;
+    fileList->position = 0;
+}
 
 void addClampedCounter(McFileList *fileList, s16 delta)
 {
@@ -59,7 +76,13 @@ void tableSelectValue(s32 drawEntry) {
     func_002BE480(drawEntry);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221C18);
+void func_00220130(TiFrameSheet *sheet, s32 index, s32 mask);
+
+/* Sets the sheet cell's colour mask to 0xE3FF5F with the given alpha in the top byte. */
+void func_00221C18(TiFrameSheet *sheet, s32 index, u64 alpha)
+{
+    func_00220130(sheet, index, (s32)(((alpha & 0xFF) << 24) | 0xE3FF5F));
+}
 
 extern s8 D_0055144A;
 
