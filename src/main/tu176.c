@@ -94,9 +94,9 @@ s32 func_001B8D08(s32 category, s32 item, s32 amount);
 void newGameStateReset(void)
 {
   memset(&gBattleRosterTable, 0, sizeof(gBattleRosterTable));
-  memset(&D_003E6E30, 0, sizeof(D_003E6E30));
+  memset(&gSaveGameHeader, 0, sizeof(gSaveGameHeader));
   xglClockRead(&gXglMcAgedEntries.newGameClock);
-  D_003E6E30.startTime = xglClockDayTime2UInt(&gXglMcAgedEntries.newGameClock);
+  gSaveGameHeader.startTime = xglClockDayTime2UInt(&gXglMcAgedEntries.newGameClock);
   gBattleRosterTable.characters[1].newGameDefaults[0] = 1;
   gBattleRosterTable.characters[2].newGameDefaults[0] = 0xC;
   gBattleRosterTable.characters[3].newGameDefaults[0] = 0x1B;
@@ -124,7 +124,7 @@ void newGameStateReset(void)
   {
     func_001B8D08(2, 0x4D, 1);
   }
-  D_003E6E30.fileIndex = -1;
+  gSaveGameHeader.fileIndex = -1;
   gXglMcAgedEntries.newGameCounters[0] = 0;
   gXglMcAgedEntries.newGameCounters[1] = 0;
   gXglMcAgedEntries.newGameClearedFlag4A = 0;

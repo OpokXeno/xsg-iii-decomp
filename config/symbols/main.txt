@@ -10588,6 +10588,7 @@ gBattleRosterCursors = 0x003E6B81;
 gBattleRosterEntryIds = 0x003E6B82;
 gBattleCurrentRosterIndex = 0x003E6BA6;
 gPagedEntryKindTable = 0x003E69F8;
+gSaveGameHeader = 0x003E6E30;
 gRecordSlotBitTable = 0x003E6BA8;
 gXglMcAgedEntries = 0x004B3740;
 gSaveLoadMenuStorage = 0x00551428;

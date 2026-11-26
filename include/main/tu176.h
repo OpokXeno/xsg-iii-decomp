@@ -48,9 +48,9 @@ typedef struct BattleRosterTable {
     u8 unmodeled_2AC[0x2B0 - 0x2AC];
 } BattleRosterTable;
 
-/* Play-state header at D_003E6E30, 0x2C bytes (newGameStateReset clears it): the start time of the game, the copy of
-   the roster pair battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the last save
-   (res_get_path.c). */
+/* Play-state header at gSaveGameHeader, 0x2C bytes (newGameStateReset clears it): the start time of the game, the
+   copy of the roster pair battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the
+   last save (res_get_path.c). */
 typedef struct SaveGameHeader {
     s32 startTime;                                            /* +0x00: xglClockDayTime2UInt of the new-game clock */
     BattleRosterPair roster;                                  /* +0x04: copied from gBattleRosterTable.rosterPair */
@@ -61,7 +61,7 @@ typedef struct SaveGameHeader {
 } SaveGameHeader;
 
 extern BattleRosterTable gBattleRosterTable;
-extern SaveGameHeader D_003E6E30;
+extern SaveGameHeader gSaveGameHeader;
 
 void newGameStateReset(void);
 BattleRoster *battleRosterGet(s32 rosterIndex);

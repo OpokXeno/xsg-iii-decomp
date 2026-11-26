@@ -1057,7 +1057,7 @@ typedef struct SaveGameHeader {
     unsigned char fileIndex; /* +0x26 */
 } SaveGameHeader;
 
-extern SaveGameHeader D_003E6E30;
+extern SaveGameHeader gSaveGameHeader;
 void func_00221A88(void *obj, int a, int b);
 void addClampedCounter(void *obj, short value);
 void func_00221B40(void *obj, int value);
@@ -1114,14 +1114,14 @@ void saveScreenFileListUpdate(s32 setup) {
             }
             gSaveScreen->lastFile =
                 gSaveScreen->lastSavedFile;
-            if (D_003E6E30.port != gSaveScreen->port) {
-                D_003E6E30.fileIndex = -1;
+            if (gSaveGameHeader.port != gSaveScreen->port) {
+                gSaveGameHeader.fileIndex = -1;
             }
-            if (D_003E6E30.fileIndex == 0xFF) {
+            if (gSaveGameHeader.fileIndex == 0xFF) {
                 pagedTableSeek(&gSaveScreen->fileTable,
                                gSaveScreen->lastFile);
             } else {
-                pagedTableSeek(&gSaveScreen->fileTable, D_003E6E30.fileIndex);
+                pagedTableSeek(&gSaveScreen->fileTable, gSaveGameHeader.fileIndex);
             }
             gSaveScreen->uiState = 1;
         }
@@ -1696,8 +1696,8 @@ void saveScreenFileReadState(s32 setup) {
             func_00220B90(0x20, 0);
             func_00220D28();
             gSaveScreen->uiState = 20;
-            D_003E6E30.port = gSaveScreen->port;
-            D_003E6E30.fileIndex = gSaveScreen->levelIndex[0];
+            gSaveGameHeader.port = gSaveScreen->port;
+            gSaveGameHeader.fileIndex = gSaveScreen->levelIndex[0];
             gSaveScreen->fileLoaded = 1;
             seVoiceStartDefault(0x1C);
         }
@@ -1780,8 +1780,8 @@ void saveScreenEntriesReadState(s32 setup) {
             func_00220D28();
             gSaveScreen->uiState = 20;
             gSaveScreen->messagePending = 0;
-            D_003E6E30.port = gSaveScreen->port;
-            D_003E6E30.fileIndex = gSaveScreen->levelIndex[0];
+            gSaveGameHeader.port = gSaveScreen->port;
+            gSaveGameHeader.fileIndex = gSaveScreen->levelIndex[0];
             func_001B1D28(0);
             seVoiceStartDefault(0x1C);
         }
@@ -1866,7 +1866,7 @@ void saveScreenDraw(void) {
         }
     }
     xglClockReadBcd(clock);
-    func_0021BB68(0x200, 0x1C0, xglClockDayTime2UInt(clock) - D_003E6E30.startTime);
+    func_0021BB68(0x200, 0x1C0, xglClockDayTime2UInt(clock) - gSaveGameHeader.startTime);
     xglFontSetAlphaScale(saveScreenFadeAlpha());
     sheetDrawFrame(0x19F);
     xglFontSetAlphaScale(0x80);
@@ -1965,7 +1965,7 @@ void saveScreenSetup(void) {
     portMenu->flags |= 0x48;
     portMenu->columnFlags |= 0x100;
     if (gSaveScreen->mode == 0) {
-        pagedTableSeek(portMenu, D_003E6E30.port & 1);
+        pagedTableSeek(portMenu, gSaveGameHeader.port & 1);
     } else {
         pagedTableSeek(portMenu, 0);
     }

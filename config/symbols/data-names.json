@@ -651,6 +651,7 @@
    "0x003e6ba6": "gBattleCurrentRosterIndex",
    "0x003e69f8": "gPagedEntryKindTable",
    "0x003e6ba8": "gRecordSlotBitTable",
+   "0x003e6e30": "gSaveGameHeader",
    "0x004b3740": "gXglMcAgedEntries",
    "0x00551428": "gSaveLoadMenuStorage",
    "0x00550bb8": "gSeStartInProgress",

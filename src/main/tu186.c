@@ -307,13 +307,13 @@ typedef struct BattleRosterSnapshot {
     u8 snapshotFlags;
 } BattleRosterSnapshot;
 
-extern BattleRosterSnapshot D_003E6E30;
+extern BattleRosterSnapshot gSaveGameHeader;
 extern unsigned char gBattleRosterTable[];
 
 /* Copies the 8-word battle roster table into the snapshot and sets bit 1 of snapshotFlags. */
 s32 battleRosterSnapshotTake(void) {
-    D_003E6E30.snapshotFlags |= 2;
-    D_003E6E30.roster = *(BattleRosterWords *) gBattleRosterTable;
+    gSaveGameHeader.snapshotFlags |= 2;
+    gSaveGameHeader.roster = *(BattleRosterWords *) gBattleRosterTable;
     return 1;
 }
 
