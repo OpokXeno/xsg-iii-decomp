@@ -265,7 +265,39 @@ void func_00221FA0(s32 rosterIndex)
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FB8);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222048);
+/* Removes entry id from its roster: later entries move down one slot and the cursor follows its entry
+   (a cursor on the removed entry goes back to 0). */
+void func_00222048(s32 entryId)
+{
+  BattleRoster *roster;
+  s32 index;
+  roster = (entryId < 0xD) ? &gBattleRosterTable.rosters[0] : &gBattleRosterTable.rosters[1];
+  for (index = 0; index < roster->entryIdCount; index++)
+  {
+    if (roster->entryIds[index] == entryId)
+    {
+      if (roster->cursor == index)
+      {
+        roster->cursor = 0;
+      }
+      index++;
+      if (index < roster->entryIdCount)
+      {
+        do
+        {
+          if (roster->cursor == index)
+          {
+            roster->cursor = index - 1;
+          }
+          roster->entryIds[index - 1] = roster->entryIds[index];
+          index++;
+        } while (index < roster->entryIdCount);
+      }
+      roster->entryIdCount--;
+      return;
+    }
+  }
+}
 
 void battleRosterPairReset(void) {
     gBattleRosterTable.rosters[0].entryIdCount = 0;
@@ -274,7 +306,57 @@ void battleRosterPairReset(void) {
     gBattleRosterTable.rosters[1].cursor = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222120);
+s32 func_00222238(s32 index, s32 rosterIndex);
+
+/* Swaps entries indexA and indexB of a roster; a cursor on one of the first three entries follows its entry.
+   For roster 0, a cursor left on an entry id of 8 or more moves to the first of the first three entries below 8. */
+void func_00222120(s32 indexA, s32 indexB, s32 rosterIndex)
+{
+  s32 value; /* the entry count, then the moved entry id, then the cursor */
+  s32 index;
+  s32 entryId;
+  BattleRoster *roster;
+  value = battleRosterEntryIdCountGet(rosterIndex);
+  if (!(indexA < value))
+  {
+    return;
+  }
+  if (!(indexB < value))
+  {
+    return;
+  }
+  roster = battleRosterGet(rosterIndex);
+  value = roster->entryIds[indexA];
+  roster->entryIds[indexA] = roster->entryIds[indexB];
+  roster->entryIds[indexB] = value;
+  if ((indexA < 3) && (indexB < 3))
+  {
+    value = gBattleRosterTable.rosters[rosterIndex].cursor;
+    if (value == indexA)
+    {
+      func_00222238(indexB, rosterIndex);
+    }
+    else if (value == indexB)
+    {
+      func_00222238(indexA, rosterIndex);
+    }
+  }
+  if (rosterIndex == 0)
+  {
+    if (battleRosterCursorEntryIdGet(0) >= 8)
+    {
+      for (index = 0; index < 3; index++)
+      {
+        entryId = battleRosterEntryIdGet(index, 0);
+        if (entryId < 8)
+        {
+          func_00222238(index, 0);
+          break;
+        }
+      }
+    }
+  }
+}
 
 s32 func_00222238(s32 index, s32 rosterIndex)
 {
@@ -295,7 +377,38 @@ s32 func_00222238(s32 index, s32 rosterIndex)
   return 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002222A0);
+u8 battleCurrentRosterIndexGet(void);
+
+/* Moves the cursor of the current roster forward to the next entry func_00222238 accepts, wrapping over the
+   first one to three entries. Returns 1 when the cursor moved. */
+s32 func_002222A0(void)
+{
+  s32 step;
+  s32 rosterIndex;
+  s32 cursor;
+  s32 count;
+  s32 wrapCount;
+  rosterIndex = battleCurrentRosterIndexGet();
+  cursor = battleRosterGet(rosterIndex)->cursor;
+  count = battleRosterEntryIdCountGet(rosterIndex);
+  wrapCount = count;
+  if (count >= 4)
+  {
+    wrapCount = 3;
+  }
+  else if (count <= 0)
+  {
+    wrapCount = 1;
+  }
+  for (step = 1; step < wrapCount; step++)
+  {
+    if (func_00222238((cursor + step) % wrapCount, rosterIndex))
+    {
+      break;
+    }
+  }
+  return cursor != battleRosterGet(rosterIndex)->cursor;
+}
 
 s32 func_00222360(s32 entryId)
 {
@@ -316,7 +429,6 @@ s32 func_00222360(s32 entryId)
 }
 
 s32 func_00221FB8();
-s32 func_00222120();
 
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
     s32 entryIds[4];
@@ -368,4 +480,31 @@ void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
   gBattleRosterTable.secondValue = storedSecond;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002224E8);
+void *memset(void *destination, int value, unsigned int count);
+
+/* For a roster 1 entry id (0xD..0x10), returns its linked roster 0 entry id number index & 1, counting only the
+   linked ids present in roster 0 (present ones first); 0 when there is none or for any other entry id. */
+s32 func_002224E8(s32 entryId, s32 index)
+{
+  static const u8 linkedEntryIds[4][2] = { { 7, 6 }, { 3, 4 }, { 5, 1 }, { 2, 0 } };
+  s32 linked[2];
+  s32 linkedEntryId;
+  memset(linked, 0, sizeof(linked));
+  linkedEntryId = 0;
+  if (entryId >= 0xD && entryId < 0x11)
+  {
+    linked[0] = linkedEntryIds[entryId - 0xD][0];
+    linked[1] = linkedEntryIds[entryId - 0xD][1];
+    if (func_00221F40(linked[1]) == 0)
+    {
+      linked[1] = 0;
+    }
+    if (func_00221F40(linked[0]) == 0)
+    {
+      linked[0] = linked[1];
+      linked[1] = 0;
+    }
+    linkedEntryId = linked[index & 1];
+  }
+  return linkedEntryId;
+}
