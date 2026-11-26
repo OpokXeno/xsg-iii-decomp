@@ -4,6 +4,7 @@
 #include "main/Packet.h"
 #include "main/xgl_render.h"
 #include "gs.h"
+#include "main/xgl_dma.h"
 
 /* The render state block at 0x004C8390 (X3 scaffold label). */
 extern XglRenderStateBlock D_004C8390;
@@ -55,7 +56,6 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199BE0);
 
 void soundApplySettings(void);
 
-void xglDmaDirectNormal(unsigned int channel, unsigned int address, unsigned int count);
 
 /* GS PMODE register: display circuit enables and the alpha blend value. */
 typedef struct GsPmode {
