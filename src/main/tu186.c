@@ -317,7 +317,7 @@ s32 battleRosterSnapshotTake(void) {
     return 1;
 }
 
-s32 battleRosterGuestPairSet();
+s32 battleRosterHeaderPairSet();
 
 s32 vmInvokePairFromArgs(s32 vmThread) {
     extern s32 vmArgGet();
@@ -326,7 +326,7 @@ s32 vmInvokePairFromArgs(s32 vmThread) {
 
     vmFirstHeaderValue = vmArgGet(vmThread, 1);
     vmSecondHeaderValue = vmArgGet(vmThread, 2);
-    battleRosterGuestPairSet(vmFirstHeaderValue, vmSecondHeaderValue);
+    battleRosterHeaderPairSet(vmFirstHeaderValue, vmSecondHeaderValue);
     return 1;
 }
 

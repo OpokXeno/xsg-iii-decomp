@@ -397,7 +397,7 @@ s32 testFlagBit(s32 bitIndex)
 }
 
 /* Stores the two guest entry ids (VM native ptSetGuest); a lone second guest moves to the first place. */
-void battleRosterGuestPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId)
+void battleRosterHeaderPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId)
 {
   s32 primaryGuest;
   s32 secondaryGuest;

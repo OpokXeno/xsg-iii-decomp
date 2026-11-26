@@ -39,7 +39,7 @@ typedef struct BattleCharacterRecord {
 typedef struct BattleRosterTable {
     BattleParty party;                                        /* +0x00 */
     s32 entryMask;                                            /* +0x20: bitmask read by testFlagBit */
-    s8 primaryGuestEntryId;                                   /* +0x24: battleRosterGuestPairSet (ptSetGuest) */
+    s8 primaryGuestEntryId;                                   /* +0x24: battleRosterHeaderPairSet (ptSetGuest) */
     s8 secondaryGuestEntryId;                                 /* +0x25 */
     u8 currentRosterIndex;                                    /* +0x26 */
     u8 unlockFlags;                                           /* +0x27: bit 0 written by vmSetRosterTableFlag */
@@ -70,6 +70,6 @@ void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex);
 s32 battleRosterCursorSet(s32 index, s32 rosterIndex);
 s32 battleRosterEntryIdIndexGet(s32 entryId);
 s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index);
-void battleRosterGuestPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId);
+void battleRosterHeaderPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId);
 
 #endif /* INCLUDE_MAIN_TU176_H */

@@ -1729,7 +1729,7 @@
    "0x00222100": "battleRosterPairReset",
    "0x002223e8": "battleUpdateEntryKinds",
    "0x00222488": "battleCurrentRosterIndexGet",
-   "0x002224b8": "battleRosterGuestPairSet",
+   "0x002224b8": "battleRosterHeaderPairSet",
    "0x00222610": "slotKindResolve",
    "0x00222e18": "rndSkipOne",
    "0x00223930": "recordSlotFlagApply",
