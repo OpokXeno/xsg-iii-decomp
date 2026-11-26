@@ -1,5 +1,4 @@
 #include "common.h"
-#include "main/tu176.h"
 
 typedef signed char s8;
 
@@ -797,6 +796,8 @@ s32 pagedTableGetStatus(PagedTable *pagedTable) {
     statusBits = pending != 0;
     return ((pagedTable->pending + pagedTableGetPageLength(pagedTable)) < pagedTable->filledEntryCount) ? (statusBits | 2) : statusBits;
 }
+
+void newGameStateReset();
 
 s32 pagedTableFlush(void) {
     newGameStateReset();

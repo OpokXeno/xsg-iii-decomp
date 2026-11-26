@@ -2,7 +2,6 @@
  * OV02 original TU 44: 0x00a8fb00..0x00a914d0 (36 functions)
  */
 #include "common.h"
-#include "main/tu176.h"
 
 typedef int s32;
 typedef signed char s8;
@@ -138,14 +137,17 @@ s32 monsSlotQueueEmpty(void) {
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu044", func_00A8FED0);
 
-void monsLinkActorToTarget(s32 actorEntryId, s32 targetEntryId) {
-    s32 actorEntryIndex;
-    s32 targetEntryIndex;
+s32 battleRosterEntrySwap(s32, s32, s32);
+s32 battleRosterEntryIdIndexGet();
 
-    actorEntryIndex = battleRosterEntryIdIndexGet(actorEntryId);
-    targetEntryIndex = battleRosterEntryIdIndexGet(targetEntryId);
-    if ((actorEntryIndex != -1) && (targetEntryIndex != -1)) {
-        battleRosterEntrySwap(actorEntryIndex, targetEntryIndex, 0);
+void monsLinkActorToTarget(s32 unusedValue, s32 targetActorHandle) {
+    s32 actorSlotIndex;
+    s32 targetActorSlotIndex;
+
+    actorSlotIndex = battleRosterEntryIdIndexGet();
+    targetActorSlotIndex = battleRosterEntryIdIndexGet(targetActorHandle);
+    if ((actorSlotIndex != -1) && (targetActorSlotIndex != -1)) {
+        battleRosterEntrySwap(actorSlotIndex, targetActorSlotIndex, 0);
     }
 }
 

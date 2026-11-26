@@ -1,5 +1,4 @@
 #include "common.h"
-#include "main/tu176.h"
 
 #include "main/tu007.h"
 
@@ -232,6 +231,7 @@ void swapWordsRestore(void) {
 extern s32 gFontEscapeBuffer;
 extern s32 gFontNumberBuffer;
 void bufferCursorClear();
+void newGameStateReset();
 void func_00225780();
 void sceneReset();
 

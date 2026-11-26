@@ -1,5 +1,4 @@
 #include "common.h"
-#include "main/tu176.h"
 
 typedef int s32;
 
@@ -37,32 +36,34 @@ s32 vmRunNativeWithPluginFlush(s32 vmThread) {
     return nativeResult;
 }
 
-/* VM native with two arguments (entry id, index): adds the entry id to its roster (func_00221FB8), then swaps it
-   one slot forward until it sits at the given index. */
+s32 battleRosterEntrySwap(s32, s32, s32);
+s32 battleRosterEntryIdIndexGet(s32);
+
+/* VM native with two arguments: func_00221FB8(first) then a loop of battleRosterEntrySwap over the battleRosterEntryIdIndexGet kind count. */
 s32 vmRaiseEntryKindTo(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
     extern void func_00221FB8(s32);
     s32 vmArgCount;
-    s32 vmEntryId;
-    s32 vmTargetIndex;
-    s32 vmEntryIndex;
-    s32 vmRosterIndex;
+    s32 vmFirstArg;
+    s32 vmSecondArg;
+    s32 vmKind;
+    s32 vmKindFlag;
 
     vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
     if (vmArgCount != 2) {
         return 0;
     }
-    vmEntryId = vmArgGet(vmThread, 1);
-    vmTargetIndex = vmArgGet(vmThread, 2);
-    vmRosterIndex = vmEntryId >= 13;
-    func_00221FB8(vmEntryId);
-    vmEntryIndex = battleRosterEntryIdIndexGet(vmEntryId);
-    if (vmEntryIndex != -1 && vmTargetIndex >= 0 && vmTargetIndex < vmEntryIndex) {
+    vmFirstArg = vmArgGet(vmThread, 1);
+    vmSecondArg = vmArgGet(vmThread, 2);
+    vmKindFlag = vmFirstArg >= 13;
+    func_00221FB8(vmFirstArg);
+    vmKind = battleRosterEntryIdIndexGet(vmFirstArg);
+    if (vmKind != -1 && vmSecondArg >= 0 && vmSecondArg < vmKind) {
         do {
-            battleRosterEntrySwap(vmEntryIndex, vmEntryIndex - 1, vmRosterIndex);
-            vmEntryIndex = battleRosterEntryIdIndexGet(vmEntryId);
-        } while (vmTargetIndex < vmEntryIndex);
+            battleRosterEntrySwap(vmKind, vmKind - 1, vmKindFlag);
+            vmKind = battleRosterEntryIdIndexGet(vmFirstArg);
+        } while (vmSecondArg < vmKind);
     }
     return 1;
 }
@@ -78,6 +79,7 @@ s32 vmRunSecondNativeWithPluginFlush(s32 vmThread) {
     return secondNativeResult;
 }
 
+void battleRosterEntryIdRemove(s32);
 void battleRosterPairReset();
 
 s32 vmForEachArgCall(s32 vmThread) {
@@ -174,6 +176,8 @@ s32 vmRunNativeFlushOnResult(s32 vmThread) {
     return nativeResult;
 }
 
+s32 battleCurrentRosterIndexSet();
+
 s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
     extern u8 gBattleCurrentRosterIndex[];
     extern s32 VM_PLUGIN_CNT_GET();
@@ -184,7 +188,7 @@ s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
         vmArgValue = vmArgGet(vmThread, 1);
         battleCurrentRosterIndexSet(vmArgValue > 0);
     } else {
-        battleCurrentRosterIndexSet(gBattleCurrentRosterIndex[0] == 0);
+        battleCurrentRosterIndexSet(gBattleCurrentRosterIndex[0] == 0, 1);
     }
     return 1;
 }
@@ -205,21 +209,23 @@ s32 vmIsFlagSet(void) {
     return gBattleCurrentRosterIndex[0] != 0;
 }
 
+s32 battleRosterCursorSet(s32, s32);
+
 s32 vmApplyIndexedKindArg(s32 vmThread)
 {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
-    s32 vmEntryId;
-    s32 vmEntryIndex;
+    s32 vmTargetIndex;
+    s32 vmTargetKind;
 
     if (VM_PLUGIN_CNT_GET(vmThread) > 0) {
-        vmEntryId = vmArgGet(vmThread, 1);
-        vmEntryIndex = battleRosterEntryIdIndexGet(vmEntryId);
-        if (vmEntryIndex >= 3) {
-            battleRosterEntrySwap(0, vmEntryIndex, vmEntryId >= 0xD);
-            vmEntryIndex = 0;
+        vmTargetIndex = vmArgGet(vmThread, 1);
+        vmTargetKind = battleRosterEntryIdIndexGet(vmTargetIndex);
+        if (vmTargetKind >= 3) {
+            battleRosterEntrySwap(0, vmTargetKind, vmTargetIndex >= 0xD);
+            vmTargetKind = 0;
         }
-        battleRosterCursorSet(vmEntryIndex, (vmEntryId < 0xD) ^ 1);
+        battleRosterCursorSet(vmTargetKind, (vmTargetIndex < 0xD) ^ 1);
         return 1;
     }
     return 0;
@@ -291,21 +297,36 @@ s32 vmGetRecordSubEntryFromArgs(s32 vmThread)
     return 0;
 }
 
-/* Copies the party (both rosters) of gBattleRosterTable into the save header and sets bit 1 of its snapshotFlags. */
+typedef struct BattleRosterWords {
+    s32 rosterEntryWords[8];
+} BattleRosterWords;
+
+typedef struct BattleRosterSnapshot {
+    u8 unmodeled_00[4];
+    BattleRosterWords roster;
+    u8 snapshotFlags;
+} BattleRosterSnapshot;
+
+extern BattleRosterSnapshot D_003E6E30;
+extern unsigned char gBattleRosterTable[];
+
+/* Copies the 8-word battle roster table into the snapshot and sets bit 1 of snapshotFlags. */
 s32 battleRosterSnapshotTake(void) {
     D_003E6E30.snapshotFlags |= 2;
-    D_003E6E30.savedParty = gBattleRosterTable.party;
+    D_003E6E30.roster = *(BattleRosterWords *) gBattleRosterTable;
     return 1;
 }
 
+s32 battleRosterGuestPairSet();
+
 s32 vmInvokePairFromArgs(s32 vmThread) {
     extern s32 vmArgGet();
-    s32 vmFirstGuestEntryId;
-    s32 vmSecondGuestEntryId;
+    s32 vmFirstHeaderValue;
+    s32 vmSecondHeaderValue;
 
-    vmFirstGuestEntryId = vmArgGet(vmThread, 1);
-    vmSecondGuestEntryId = vmArgGet(vmThread, 2);
-    battleRosterGuestPairSet(vmFirstGuestEntryId, vmSecondGuestEntryId);
+    vmFirstHeaderValue = vmArgGet(vmThread, 1);
+    vmSecondHeaderValue = vmArgGet(vmThread, 2);
+    battleRosterGuestPairSet(vmFirstHeaderValue, vmSecondHeaderValue);
     return 1;
 }
 
@@ -322,9 +343,9 @@ s32 vmSetRosterTableFlag(s32 vmThread) {
         vmArgValue = vmArgGet(vmThread, 1);
     }
     if (vmArgValue != 0) {
-        gBattleRosterTable.unlockFlags |= 1;
+        gBattleRosterTable[0x27] |= 1;
     } else {
-        gBattleRosterTable.unlockFlags &= 0xFE;
+        gBattleRosterTable[0x27] &= 0xFE;
     }
     return 1;
 }
