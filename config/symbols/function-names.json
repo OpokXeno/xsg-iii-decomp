@@ -398,6 +398,8 @@
    "0x002e7598": "EnableIntc",
    "0x002e7600": "DisableDmac",
    "0x002e7668": "EnableDmac",
+   "0x002e7ef8": "sceSifBindRpc",
+   "0x002e80d8": "sceSifCallRpc",
    "0x002e97a8": "sceClose",
    "0x002e9920": "sceLseek",
    "0x002e9b60": "sceRead",

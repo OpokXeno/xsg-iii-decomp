@@ -135807,9 +135807,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002E7EF8",
+     "name": "sceSifBindRpc",
      "size": 332,
-     "splat_name": "func_002E7EF8",
+     "splat_name": "sceSifBindRpc",
      "va": "0x002e7ef8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -135825,9 +135825,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002E80D8",
+     "name": "sceSifCallRpc",
      "size": 512,
-     "splat_name": "func_002E80D8",
+     "splat_name": "sceSifCallRpc",
      "va": "0x002e80d8",
      "name_basis": "address",
      "provenance": "estimated"
