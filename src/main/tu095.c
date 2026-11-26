@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/sound_driver.h"
 
 typedef int s32;
 
@@ -72,7 +73,6 @@ typedef struct SoundKind3Record {
     /* 0x14 */ signed char value5;
 } SoundKind3Record;
 
-extern u8 gSoundCueVolumeTable[];
 
 s32 func_001CDDD8(s32 vm) {
     s32 soundNumber;

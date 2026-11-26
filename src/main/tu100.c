@@ -281,7 +281,6 @@ SoundCueRecord *soundCueCommand(int cueOperation, int operationArg) {
     return cueRecord;
 }
 
-extern u8 gSoundCueVolumeTable[];
 
 /* Fades the current ambient voice out over 10 ticks when its flags ask for it, otherwise stops it. */
 void soundCueAmbientFadeOut(void) {

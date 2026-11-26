@@ -342,8 +342,6 @@ void soundDriverNoop(void) {
  * its group (group 0: every cue channel). */
 #define SOUND_CUE_GROUP_SLOTS 0x40
 extern unsigned char soundCueGroupTable[SOUND_CUE_GROUP_SLOTS];
-/* Per cue slot four bytes, the volume at gSoundCueVolumeTable[slot * 4] and the pan right after it. */
-extern unsigned char gSoundCueVolumeTable[];
 #define SOUND_CUE_RECORD_BYTES 4
 /* Cue ids from SOUND_CUE_UPDATE_FIRST on below SOUND_CUE_UPDATE_END only change the volume and pan of their slot. */
 #define SOUND_CUE_UPDATE_FIRST 0x101
@@ -372,7 +370,7 @@ int func_0018EDD8(int id, int volume, int pan)
     int key;
     int index;
     unsigned char slot;
-    int value;
+    unsigned int value;
     unsigned char channel;
     int group;
     int other;
@@ -408,15 +406,15 @@ int func_0018EDD8(int id, int volume, int pan)
     if (value == 0) {
         return 0;
     }
-    bank = (unsigned int) value >> 24;
-    program = ((unsigned int) value >> 16) & 0xFF;
-    key = ((unsigned int) value >> 8) & 0xFF;
+    bank = value >> 24;
+    program = (value >> 16) & 0xFF;
+    key = (value >> 8) & 0xFF;
     index = value & 0xFF;
-    if ((unsigned int) slot < SOUND_CUE_GROUP_SLOTS) {
+    if (slot < SOUND_CUE_GROUP_SLOTS) {
         group = soundCueGroupTable[slot];
         for (other = 1; other < SOUND_CUE_GROUP_SLOTS; other++) {
             playing = gSoundRecordBlock.channelStates[other].bytes.counter;
-            if ((unsigned char) (playing - 1) < SOUND_CUE_GROUP_SLOTS - 1) {
+            if (playing != 0 && playing < SOUND_CUE_GROUP_SLOTS) {
                 if (group == 0 || soundCueGroupTable[playing] == group) {
                     soundVoiceVolumeReset(other);
                 }
