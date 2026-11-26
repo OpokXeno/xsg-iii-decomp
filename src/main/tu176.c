@@ -5,9 +5,6 @@
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
 
-typedef signed char s8;
-typedef int s32;
-
 /* Counter entry: a step direction pair (+0x08, +0x09), a phase (+0x0B), a limit and a count. */
 typedef struct ClampedCounter
 {
