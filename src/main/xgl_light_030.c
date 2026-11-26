@@ -100,8 +100,9 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_001975C8);
 typedef struct XglLightPack {
     union {
         u64 signature;            /* 0x00: "lxy" in the low three bytes */
-        u8 unmodeled_00[0x30];
+        u8 unmodeled_00[0x10];
     };
+    char name[0x20];             /* 0x10: the name xglLightPackBuildByName looks packs up by */
     s32 lightEntryCount;         /* 0x30 */
     u8 unmodeled_34[0x8];
     s32 keyOffset;          /* 0x3C */
@@ -760,7 +761,21 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_light_030", func_00198C08);
+/* Builds the light set from the registered light pack named packName. */
+void func_00198C08(XglLightSet *light, const char *packName, Vector4 *receiver)
+{
+    int i;
+
+    xglLightBankValid = 0;
+    for (i = 0; i < 16; i++) {
+        if (xglLightSlotTable[i].lightPack != 0) {
+            if (strcmp(xglLightSlotTable[i].lightPack->name, packName) == 0) {
+                xglLightPackBuildLightSet(xglLightSlotTable[i].lightPack, light, receiver);
+                return;
+            }
+        }
+    }
+}
 
 void xglLightSlotsInit(void) {
     s32 lightSlotNumber;
