@@ -297,7 +297,28 @@ s32 seVoiceStartDriver(s32 voice) {
     return func_0018EDD8(voice, 0x7F, 0xFFFF);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F098);
+void soundVoiceVolumeReset(s32 voiceIndex);
+
+/* Resets the voice volume of every channel `id` occupies. */
+void func_0018F098(int id)
+{
+    int channel;
+
+    if (id > 0) {
+        if (id < SOUND_RANGE_IDS) {
+            for (channel = 1; channel < SOUND_CHANNEL_COUNT; channel++) {
+                if (gSoundRecordBlock.channelStates[channel].bytes.counter == id) {
+                    soundVoiceVolumeReset(channel);
+                }
+            }
+        } else {
+            /* kept: the do-while(0) block keeps this call a jal (no tail call), as in the original. */
+            do {
+                soundVoiceVolumeReset(id & 0xFF);
+            } while (0);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F118);
 
