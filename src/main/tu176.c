@@ -96,8 +96,8 @@ s32 func_001B8D08(s32 category, s32 item, s32 amount);
    start time and writes the per-character defaults. */
 void newGameStateReset(void)
 {
-  memset(&gBattleRosterTable, 0, 0x2B0);
-  memset(&D_003E6E30, 0, 0x2C);
+  memset(&gBattleRosterTable, 0, sizeof(gBattleRosterTable));
+  memset(&D_003E6E30, 0, sizeof(D_003E6E30));
   xglClockRead(&gXglMcAgedEntries.newGameClock);
   D_003E6E30.startTime = xglClockDayTime2UInt(&gXglMcAgedEntries.newGameClock);
   gBattleRosterTable.characters[1].newGameDefaults[0] = 1;
@@ -152,6 +152,8 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   return gBattleRosterTable.party.rosters[rosterIndex].entryIds[entryIdIndex];
 }
 
+/* The call goes through an int-returning view of battleRosterEntryIdGet: with the plain call (u8 result promoted to
+   s32) the two cursor getters come out 8 bytes longer in total and the link no longer fits. */
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
     return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.party.rosters[rosterIndex].cursor, rosterIndex);
 }
@@ -166,6 +168,7 @@ u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
   return gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
 }
 
+/* Same int-returning view of battleRosterEntryIdGet as battleRosterCursorEntryIdGet. */
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
   return ((s32 (*)()) battleRosterEntryIdGet)(
