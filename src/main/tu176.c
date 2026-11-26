@@ -136,11 +136,11 @@ void newGameStateReset(void)
 }
 
 BattleRoster *battleRosterGet(s32 rosterIndex) {
-    return &gBattleRosterTable.rosters[rosterIndex];
+    return &gBattleRosterTable.party.rosters[rosterIndex];
 }
 
 u8 battleRosterEntryIdCountGet(s32 rosterIndex) {
-    return gBattleRosterTable.rosters[rosterIndex].entryIdCount;
+    return gBattleRosterTable.party.rosters[rosterIndex].entryIdCount;
 }
 
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
@@ -149,34 +149,34 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   {
     return 0;
   }
-  return gBattleRosterTable.rosters[rosterIndex].entryIds[entryIdIndex];
+  return gBattleRosterTable.party.rosters[rosterIndex].entryIds[entryIdIndex];
 }
 
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
-    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosters[rosterIndex].cursor, rosterIndex);
+    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.party.rosters[rosterIndex].cursor, rosterIndex);
 }
 
 u8 battleCurrentRosterEntryCountGet(void)
 {
-  return gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
+  return gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
 }
 
 u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 {
-  return gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
+  return gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
 }
 
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
   return ((s32 (*)()) battleRosterEntryIdGet)(
-      gBattleRosterTable.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
+      gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
 }
 
 u8 battleRosterHasEntryId(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
-  roster = (entryId < 0xD) ? &gBattleRosterTable.rosters[0] : &gBattleRosterTable.rosters[1];
+  roster = (entryId < 0xD) ? &gBattleRosterTable.party.rosters[0] : &gBattleRosterTable.party.rosters[1];
   for (index = 0; index < roster->entryIdCount; index++)
   {
     if (roster->entryIds[index] == entryId)
@@ -202,7 +202,7 @@ void battleRosterEntryIdRemove(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
-  roster = (entryId < 0xD) ? &gBattleRosterTable.rosters[0] : &gBattleRosterTable.rosters[1];
+  roster = (entryId < 0xD) ? &gBattleRosterTable.party.rosters[0] : &gBattleRosterTable.party.rosters[1];
   for (index = 0; index < roster->entryIdCount; index++)
   {
     if (roster->entryIds[index] == entryId)
@@ -231,10 +231,10 @@ void battleRosterEntryIdRemove(s32 entryId)
 }
 
 void battleRosterPairReset(void) {
-    gBattleRosterTable.rosters[0].entryIdCount = 0;
-    gBattleRosterTable.rosters[1].entryIdCount = 0;
-    gBattleRosterTable.rosters[0].cursor = 0;
-    gBattleRosterTable.rosters[1].cursor = 0;
+    gBattleRosterTable.party.rosters[0].entryIdCount = 0;
+    gBattleRosterTable.party.rosters[1].entryIdCount = 0;
+    gBattleRosterTable.party.rosters[0].cursor = 0;
+    gBattleRosterTable.party.rosters[1].cursor = 0;
 }
 
 /* Swaps entries indexA and indexB of a roster. When both swapped indices are below 3, a cursor on either index is
@@ -260,7 +260,7 @@ void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
   roster->entryIds[indexB] = value;
   if ((indexA < 3) && (indexB < 3))
   {
-    value = gBattleRosterTable.rosters[rosterIndex].cursor;
+    value = gBattleRosterTable.party.rosters[rosterIndex].cursor;
     if (value == indexA)
     {
       battleRosterCursorSet(indexB, rosterIndex);
@@ -300,7 +300,7 @@ s32 battleRosterCursorSet(s32 index, s32 rosterIndex)
         return 0;
       }
     }
-    gBattleRosterTable.rosters[rosterIndex].cursor = index;
+    gBattleRosterTable.party.rosters[rosterIndex].cursor = index;
     return 1;
   }
   return 0;

@@ -2,6 +2,7 @@
 #include "shared.h"
 
 #include "main/res_get_path.h"
+#include "main/tu176.h"
 #include "main/xgl_render.h"
 #include "main/xgl_cd.h"
 #include "gs.h"
@@ -1050,14 +1051,6 @@ void pagedTableAppend(struct SaveMenuTable *table, s32 value, s32 flags);
 void pagedTableSeek(struct SaveMenuTable *table, u16 position);
 void saveScreenClearRecords(void);
 
-typedef struct SaveGameHeader {
-    s32 startTime; /* +0x00 */
-    unsigned char unmodeled_04[0x21];
-    unsigned char port;      /* +0x25 */
-    unsigned char fileIndex; /* +0x26 */
-} SaveGameHeader;
-
-extern SaveGameHeader D_003E6E30;
 void func_00221A88(void *obj, int a, int b);
 void addClampedCounter(void *obj, short value);
 void func_00221B40(void *obj, int value);

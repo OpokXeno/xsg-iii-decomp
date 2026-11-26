@@ -2,6 +2,7 @@
 
 #include "shared.h"
 #include "main/battle_shared.h"
+#include "main/tu176.h"
 typedef signed char s8;
 
 typedef unsigned char u8;
@@ -300,7 +301,6 @@ void mcStateSeekEntry(s32 id);
 s32 xglFontTextWidth(void *text, s32 b);
 s32 xglFontDrawDigitsMinTwo(s32 x, s32 y, s32 value, s32 digits);
 void xglFontDrawDigits(s32 x, s32 y, s32 value, s32 digits);
-extern unsigned char gBattleRosterTable[];
 
 /* Draws the whole result page: the fonts, the entry rows (activeEntryCount rows highlighted), the record list,
  * the budget figures and the play-time line at the bottom. */
@@ -312,7 +312,7 @@ void budgetDisplayDrawPage(void) {
     u32 minutesTotal;
     u32 hoursTotal;
     s32 textOffset;
-    u8 savedRoster;
+    u8 savedCursor;
     u8 rowsNow;
     s32 i;
     s32 entryCount;
@@ -345,9 +345,9 @@ void budgetDisplayDrawPage(void) {
     }
 
     if (gBudgetDisplayBlock->fontAlpha[0] != 0) {
-        savedRoster = gBattleRosterTable[1];
+        savedCursor = gBattleRosterTable.party.rosters[0].cursor;
         if (battleCurrentRosterIndexGet() != 0) {
-            gBattleRosterTable[1] = -1;
+            gBattleRosterTable.party.rosters[0].cursor = -1;
         }
         entryCount = gBudgetDisplayBlock->entryCount;
         xglFontSetAlphaScale(gBudgetDisplayBlock->fontAlpha[0]);
@@ -370,7 +370,7 @@ void budgetDisplayDrawPage(void) {
         if (inactiveRows > 0) {
             xglFontQueueBarBlue(28936, ((gBudgetDisplayBlock->activeEntryCount * 768) + 30008) & 0xfff8, inactiveRows * 48);
         }
-        gBattleRosterTable[1] = savedRoster;
+        gBattleRosterTable.party.rosters[0].cursor = savedCursor;
         xglFontResetState();
     }
 
@@ -1250,7 +1250,6 @@ s32 func_A88B40(void);
 StateBudget *func_A871D8(void);
 u8 battleRosterEntryIdCountGet(s32 rosterIndex);
 u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
-s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index);
 s32 statusHeaderTestFlags(void);
 void sefFlagSetBit26(void);
 void swapWordsSendCommand(s32 frames);

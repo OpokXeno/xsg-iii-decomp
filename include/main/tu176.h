@@ -12,6 +12,12 @@ typedef struct BattleRoster {
     unsigned char entryIds[0xE];  /* +0x02 */
 } BattleRoster;
 
+/* The two rosters, the part of gBattleRosterTable that battleRosterSnapshotTake (VM native ptSaveUMNParty) copies
+   into the save header as one block. */
+typedef struct BattleParty {
+    BattleRoster rosters[2];      /* +0x00 */
+} BattleParty;
+
 /* 0x24-byte per-character record of gBattleRosterTable, from +0x48. func_00222768 (tu177) returns the address of
    s16 slot n of a record. The stride-0x24 accessors in tu177 use other bases into the same array: the skill count
    and cost of character c sit at table +0x28 + c * 0x24 (+0x04/+0x05 of record c - 1), and the skill-board nibbles
@@ -25,7 +31,7 @@ typedef struct BattleCharacterRecord {
    through their own symbols: gBattleRosterCursors (+0x01), gBattleRosterEntryIds (+0x02), D_003E6BA0 (+0x20),
    gBattleCurrentRosterIndex (+0x26), gRecordSlotBitTable (+0x28), D_003E6BC8 (+0x48). */
 typedef struct BattleRosterTable {
-    BattleRoster rosters[2];                                     /* +0x00 */
+    BattleParty party;                                           /* +0x00 */
     int entryMask;                                               /* +0x20: bitmask read by testFlagBit */
     signed char primaryGuestEntryId;                             /* +0x24: set by battleRosterGuestPairSet (ptSetGuest) */
     signed char secondaryGuestEntryId;                           /* +0x25 */
@@ -37,11 +43,11 @@ typedef struct BattleRosterTable {
 } BattleRosterTable;
 
 /* Play-state header at D_003E6E30, 0x2C bytes (newGameStateReset clears it): the start time of the game, the copy of
-   the two rosters battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the last save
+   the party battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the last save
    (res_get_path.c). */
 typedef struct SaveGameHeader {
     int startTime;                        /* +0x00: xglClockDayTime2UInt of the new-game clock */
-    BattleRoster savedRosters[2];         /* +0x04: copied from gBattleRosterTable.rosters */
+    BattleParty savedParty;               /* +0x04: copied from gBattleRosterTable.party */
     unsigned char snapshotFlags;          /* +0x24: bit 1 set by battleRosterSnapshotTake */
     unsigned char port;                   /* +0x25 */
     unsigned char fileIndex;              /* +0x26 */
@@ -58,5 +64,6 @@ void battleRosterEntrySwap(int indexA, int indexB, int rosterIndex);
 int battleRosterCursorSet(int index, int rosterIndex);
 int battleRosterEntryIdIndexGet(int entryId);
 int battleRosterLinkedEntryIdGet(int entryId, int index);
+void battleRosterGuestPairSet(int firstGuestEntryId, int secondGuestEntryId);
 
 #endif /* INCLUDE_MAIN_TU176_H */

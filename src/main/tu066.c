@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/tu176.h"
 #include "main/tu007.h"
 
 #include "main/xgl_render.h"
@@ -340,8 +341,6 @@ void debugStageMenuStep(DebugSelection *selection) {
 
 s32 battleRosterPairReset();
 s32 func_00221FB8();
-void battleCurrentRosterIndexSet(s32 rosterIndex);
-s32 battleRosterCursorSet(s32 index, s32 rosterIndex);
 s32 xglPadSetDefaults();
 void func_001BC918(s16 *out);
 
