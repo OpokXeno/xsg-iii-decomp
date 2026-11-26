@@ -234,7 +234,6 @@ s32 func_00222360(s32 entryId)
 
 s32 func_00221FB8();
 s32 func_00222120();
-s32 func_00222360();
 
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
     s32 entryIds[4];
