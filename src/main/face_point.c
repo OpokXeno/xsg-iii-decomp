@@ -13,7 +13,7 @@
 typedef struct CullingVolume {
     Vector4 position;
     Vector4 rotation;
-    Vector4 scale;
+    Vector4Elements scale;
     Vector4 normalizedDirection;
     Matrix4 transform;
     Matrix4 inverseTransform;
@@ -52,7 +52,7 @@ void xglCullingVolumeSetup(CullingVolume *volume)
     xglMatrixStackRotZ(volume->rotation.z);
     xglMatrixStackRotY(volume->rotation.y);
     xglMatrixStackRotX(volume->rotation.x);
-    xglMatrixStackScale(&volume->scale);
+    xglMatrixStackScale(&volume->scale.vector);
     xglMatrixStackSave(volume->transform);
     xglMatrixStackInverse();
     xglMatrixStackSave(volume->inverseTransform);
@@ -243,11 +243,22 @@ typedef struct CullingMapRecord {
     unsigned char unmodeled_00[0x8];
     s32 volumeFlags;
     unsigned char unmodeled_0C[0x4];
-    unsigned char query[0x160 - 0x10];  /* +0x10: the query block strcmp reads */
+    char query[0x100 - 0x10];          /* +0x10: the map name strcmp compares and the load copies */
+    s32 volumeBlockOffset;              /* +0x100: the CullingVolumeBlock, from the record start */
+    s32 volumeBlockPresent;             /* +0x104: nonzero when the record has one */
+    unsigned char unmodeled_108[0x160 - 0x108];
 } CullingMapRecord;
 
+/* The volumes of a culling map record: the count, then the volumes in the map's layout. */
+typedef struct CullingVolumeBlock {
+    unsigned char unmodeled_00[0x8];
+    s32 volumeCount;           /* +0x08 */
+    unsigned char unmodeled_0C[0x4];
+    CullingVolume volumes[1];  /* +0x10: volumeCount of them */
+} CullingVolumeBlock;
+
 typedef struct CullingMap {
-    unsigned char unmodeled_00[0x20];
+    char name[0x20];               /* the loaded map's name (empty after xglCullingMapClear) */
     CullingVolume volumes[10];
     s32 volumeCount;
     s32 *volumeIndexList;          /* +0xDE4: a list of up to 12 indices ended by a negative one (func_0019C3C8) */
@@ -301,7 +312,7 @@ void xglCullingMapClear(void)
 
     gCullingEnabled = 0;
     map->volumeCount = 0;
-    map->unmodeled_00[0] = 0;
+    map->name[0] = 0;
     map->volumeIndexList = 0;
 }
 
@@ -353,7 +364,51 @@ s32 xglCullingRecordQuery(CullingMapRecord *volumeRecord) {
     return queryResult;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/face_point", func_0019C538);
+/* The load turns each record volume about x by a quarter turn and halves its scale, the record's
+ * y and z scales swapped. */
+#define CULLING_LOAD_ROTATION_X 1.5707964f /* pi / 2 */
+#define CULLING_LOAD_ROTATION_Y 0.0f
+#define CULLING_LOAD_ROTATION_Z 0.0f
+#define CULLING_LOAD_SCALE 0.5f
+/* volumeFlags bits of a record whose map is loaded (the record query tests the same bits). */
+#define CULLING_RECORD_LOADABLE 0x81
+
+char *strcpy(char *destination, const char *source);
+
+/* Loads the map of an active record: its name, then each of its volumes (rotated and scaled for the
+ * map) appended to the map and set up. */
+void func_0019C538(CullingMapRecord *record)
+{
+    CullingVolumeBlock *block;
+    CullingVolume *volumes;
+    CullingVolume *volume;
+    s32 index;
+
+    if (record->volumeFlags & CULLING_RECORD_LOADABLE) {
+        gCullingVolumeTable->volumeCount = 0;
+        strcpy(gCullingVolumeTable->name, record->query);
+        if (record->volumeBlockPresent != 0) {
+            block = (CullingVolumeBlock *) ((unsigned char *) record + record->volumeBlockOffset);
+            volumes = block->volumes;
+            for (index = 0; index < block->volumeCount; index++) {
+                volume = &gCullingVolumeTable->volumes[gCullingVolumeTable->volumeCount];
+                volume->position.x = volumes[index].position.x;
+                volume->position.y = volumes[index].position.y;
+                volume->position.z = volumes[index].position.z;
+                volume->position.w = 1.0f;
+                volume->rotation.x = volumes[index].rotation.x + CULLING_LOAD_ROTATION_X;
+                volume->rotation.y = volumes[index].rotation.y + CULLING_LOAD_ROTATION_Y;
+                volume->rotation.z = volumes[index].rotation.z + CULLING_LOAD_ROTATION_Z;
+                volume->scale.vector.x = volumes[index].scale.vector.x * CULLING_LOAD_SCALE;
+                volume->scale.vector.y = volumes[index].scale.vector.z * CULLING_LOAD_SCALE;
+                volume->scale.vector.z = volumes[index].scale.vector.y * CULLING_LOAD_SCALE;
+                volume->scale.vector.w = 1.0f;
+                xglCullingVolumeSetup(&gCullingVolumeTable->volumes[gCullingVolumeTable->volumeCount]);
+                gCullingVolumeTable->volumeCount++;
+            }
+        }
+    }
+}
 
 extern const float cullingBaseVolume[9];
 
@@ -373,10 +428,10 @@ void xglCullingMapCreate(void)
         volume->rotation.x = record[3];
         volume->rotation.y = record[4];
         volume->rotation.z = record[5];
-        volume->scale.x = record[6];
-        volume->scale.y = record[7];
-        volume->scale.z = record[8];
-        volume->scale.w = 1.0f;
+        volume->scale.vector.x = record[6];
+        volume->scale.vector.y = record[7];
+        volume->scale.vector.z = record[8];
+        volume->scale.vector.w = 1.0f;
         xglCullingVolumeSetup(volume);
         map->volumeCount++;
     }
