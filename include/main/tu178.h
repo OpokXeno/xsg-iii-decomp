@@ -25,7 +25,7 @@ typedef struct AgedEntryRing {
     unsigned char unmodeled_177C[0x3A0C - 0x177C];
     unsigned char newGameClearedRegion3A0C[0x1302C - 0x3A0C];         /* +0x3A0C */
     unsigned char unmodeled_1302C[0x130AA - 0x1302C];
-    signed char ringWriteIndex;                                       /* +0x130AA: slot of agedEntries the next entry goes to */
+    signed char ringWriteIndex;                                       /* +0x130AA: slot the next entry goes to */
     unsigned char ringCursor;                                         /* +0x130AB: slot of the newest entry */
     unsigned char unmodeled_130AC[0x130B0 - 0x130AC];
 } AgedEntryRing;

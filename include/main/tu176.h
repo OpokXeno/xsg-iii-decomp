@@ -33,10 +33,10 @@ typedef struct BattleCharacterRecord {
 typedef struct BattleRosterTable {
     BattleParty party;                                           /* +0x00 */
     int entryMask;                                               /* +0x20: bitmask read by testFlagBit */
-    signed char primaryGuestEntryId;                             /* +0x24: set by battleRosterGuestPairSet (ptSetGuest) */
+    signed char primaryGuestEntryId;                             /* +0x24: battleRosterGuestPairSet (ptSetGuest) */
     signed char secondaryGuestEntryId;                           /* +0x25 */
     unsigned char currentRosterIndex;                            /* +0x26 */
-    unsigned char unlockFlags;                                   /* +0x27: bit 0 set and cleared by vmSetRosterTableFlag */
+    unsigned char unlockFlags;                                   /* +0x27: bit 0 written by vmSetRosterTableFlag */
     unsigned char slotBitNibbles[0x48 - 0x28];                   /* +0x28: skill-board nibbles (gRecordSlotBitTable) */
     BattleCharacterRecord characters[(0x2AC - 0x48) / 0x24];     /* +0x48 */
     unsigned char unmodeled_2AC[0x2B0 - 0x2AC];

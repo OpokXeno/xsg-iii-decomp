@@ -172,7 +172,8 @@ u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
   return ((s32 (*)()) battleRosterEntryIdGet)(
-      gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].cursor, gBattleRosterTable.currentRosterIndex);
+      gBattleRosterTable.party.rosters[gBattleRosterTable.currentRosterIndex].cursor,
+      gBattleRosterTable.currentRosterIndex);
 }
 
 u8 battleRosterHasEntryId(s32 entryId)
@@ -241,7 +242,8 @@ void battleRosterPairReset(void) {
 }
 
 /* Swaps entries indexA and indexB of a roster. When both swapped indices are below 3, a cursor on either index is
-   moved through battleRosterCursorSet. For roster 0, a cursor left on an entry id of 8 or more moves to the first of the first three entries below 8. */
+   moved through battleRosterCursorSet. For roster 0, a cursor left on an entry id of 8 or more moves to the first of
+   the first three entries below 8. */
 void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
 {
   s32 value; /* the entry count, then the moved entry id, then the cursor */
