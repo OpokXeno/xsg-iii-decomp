@@ -4,11 +4,6 @@
 typedef signed char s8;
 typedef int s32;
 
-typedef struct TiFramePos {
-    u16 x;
-    u16 y;
-} TiFramePos;
-
 typedef struct TiFrameBox {
     s16 left;
     s16 top;
@@ -98,7 +93,7 @@ void sheetFrameDrawBox(TiFrameSheet *sheet)
   frameBase = sheet->frameBase;
   box.left = left;
   box.top = top;
-  func_0021B740(&box.left, sheet->unk_1A, rows, frameBase);
+  func_0021B740(&box.left, sheet->entryCount, rows, frameBase);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu173", func_00220488);
