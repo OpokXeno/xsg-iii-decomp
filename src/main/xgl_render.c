@@ -717,9 +717,9 @@ void xglRenderClearColor(u32 color)
 #define RENDER_CLEAR_TOP (GS_XY_FIXED(RENDER_CLEAR_CENTER - RENDER_CLEAR_HALF_HEIGHT) << 16)
 #define RENDER_CLEAR_BOTTOM ((u64) GS_XY_FIXED(RENDER_CLEAR_CENTER + RENDER_CLEAR_HALF_HEIGHT) << 16)
 
-/* XS2 xglRenderClearEnvInit: builds the clear packet (TEST from xglRenderClearFrame, a sprite primitive, the
+/* Builds the clear packet (TEST from xglRenderClearFrame, a sprite primitive, the
  * default colour and the sprites over the frame). */
-void func_0019A558(void)
+void xglRenderClearEnvInit(void)
 {
     int i;
     int left;
@@ -786,7 +786,7 @@ void xglRenderStart(s32 renderStartMode) {
 }
 
 void func_00199FE8(void);
-void func_0019A558(void);
+void xglRenderClearEnvInit(void);
 void xglStudioReset(void);
 void xglStudioMainCameraInit(void);
 
@@ -825,7 +825,7 @@ void xglRenderSetReso(int resolution)
     D_004C8390.flip_base = D_004C8390.prev_dispfb_base;
     func_00199FE8();
     xglRenderDispEnvInit();
-    func_0019A558();
+    xglRenderClearEnvInit();
     xglStudioReset();
     xglStudioMainCameraInit();
 }

@@ -44938,9 +44938,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019A558",
+     "name": "xglRenderClearEnvInit",
      "size": 196,
-     "splat_name": "func_0019A558",
+     "splat_name": "xglRenderClearEnvInit",
      "va": "0x0019a558",
      "name_basis": "address",
      "provenance": "estimated"

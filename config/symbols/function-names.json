@@ -131,6 +131,7 @@
    "0x0019a500": "xglRenderClearDepth",
    "0x0019a518": "xglRenderClearFrame",
    "0x0019a530": "xglRenderClearColor",
+   "0x0019a558": "xglRenderClearEnvInit",
    "0x0019a6f0": "xglRenderSetReso",
    "0x0019ab00": "xglRenderSwapBase",
    "0x0019add8": "xglRenderInit",
