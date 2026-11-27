@@ -77,7 +77,7 @@ typedef struct McGauge {
     const char *text;           /* +0x00: title text, drawn above the Yes/No pair */
     s32 width;                  /* +0x04: box width, at least the text width + 0x30 */
     u8 state;                   /* +0x08: selected answer (0 = message 0x74, 1 = message 0x75) */
-    s8 negative;                /* +0x09: highlight fade of the other answer, (1 - state) << 7 at init */
+    u8 negative;                /* +0x09: highlight fade of the other answer, (1 - state) << 7 at init */
     s8 fadeIn;                  /* +0x0A: fade-in level, 0 at init; the fade stops when it goes negative */
     u8 flag;                    /* +0x0B: phase, 0x80 until counterEntryAdvancePhase starts the fade */
 } McGauge;

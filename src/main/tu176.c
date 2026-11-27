@@ -92,11 +92,11 @@ s32 choicePromptUpdate(McGauge *gauge, s32 active)
     gauge->flag -= step;
   }
   target = (1 - gauge->state) << 7;
-  if (target < (u8)gauge->negative)
+  if (target < gauge->negative)
   {
     gauge->negative -= step;
   }
-  if ((u8)gauge->negative < target)
+  if (gauge->negative < target)
   {
     gauge->negative += step;
   }
@@ -194,12 +194,12 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
   else
   {
     fontQueueColorState(
-        ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20), (u8) gauge->negative),
+        ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20), gauge->negative),
                                       alpha) << 24) | 0xE3FF5F);
     func_0021E9A8(rect.x, rect.y + 0x1E0, gauge->width << 4, 0x160);
     fontQueueColorState(
         ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20),
-                                                        (u8) (0x80 - (u8) gauge->negative)),
+                                                        (u8) (0x80 - gauge->negative)),
                                       alpha) << 24) | 0xE3FF5F);
     func_0021E9A8(rect.x, rect.y + 0x340, gauge->width << 4, 0x160);
   }
