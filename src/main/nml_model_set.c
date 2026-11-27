@@ -111,7 +111,8 @@ typedef struct PxyDrawPacket {
     float lowerClipHeight; /* +0xd0 */
     u8 unkD4[4];
     float upperClipHeight; /* +0xd8 */
-    u8 unkDC[0xE4 - 0xDC];
+    u8 unkDC[0xE0 - 0xDC];
+    u8 *shadowReceiverParts; /* +0xe0: the parts that receive the shadow, PXY_PART_LIST_END-terminated */
     u32 flags; /* +0xe4: bit 0 skips the translucent passes, bit 2 draws with the alternate light tables */
     u8 unkE8[0xF0 - 0xE8];
     Matrix4 localMatrix; /* +0xf0: model to world */
@@ -2463,7 +2464,49 @@ void nmlModelDirectSendWithFlag(s32 key, void *packetData, s32 qwc, s32 sendFlag
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", nmlModelDirectSendFull);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A4058);
+/* Draw state kept in the EE scratchpad while the batches are drawn. */
+typedef struct PxyDrawWork {
+    PxyDrawEntry *entry; /* +0x00 */
+    int i; /* +0x04 */
+    u32 batchFlags; /* +0x08 */
+    int count; /* +0x0c */
+    PxyDrawPacket *packet; /* +0x10 */
+    PxyDrawPacket *lastPacket; /* +0x14 */
+    int mode; /* +0x18 */
+    PxyPart *part; /* +0x1c */
+    u32 partFlags; /* +0x20 */
+    u32 packetFlags; /* +0x24 */
+    int unk28; /* +0x28 */
+    u8 cameraBit; /* +0x2c */
+    u8 unk2D[3];
+    u32 frameMask; /* +0x30 */
+    u32 frameBase; /* +0x34 */
+    PxyBatch *batch; /* +0x38 */
+} PxyDrawWork;
+
+/* The shadow receiver list of a draw packet holds at most this many part indices. */
+#define PXY_SHADOW_RECEIVER_PARTS 16
+/* Ends a part index list shorter than PXY_SHADOW_RECEIVER_PARTS. */
+#define PXY_PART_LIST_END 0xFF
+
+/* Returns 1 when the packet has a shadow receiver list without the current part, else 0. */
+int pxyPartNotInIndexList(PxyDrawPacket *packet, PxyDrawWork *work)
+{
+    if (packet->shadowReceiverParts != 0) {
+        int i = 0;
+
+        for (i = 0; i < PXY_SHADOW_RECEIVER_PARTS; i++) {
+            if (packet->shadowReceiverParts[i] == PXY_PART_LIST_END) {
+                break;
+            }
+            if (work->part->index == packet->shadowReceiverParts[i]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
 
 #include "gs.h"
 
@@ -2498,25 +2541,6 @@ void nmlPacketAddGsFlushWide(void);
 
 /* ---- pxyDrawShadowCaster ---- */
 
-/* Draw state kept in the EE scratchpad while the batches are drawn. */
-typedef struct PxyDrawWork {
-    PxyDrawEntry *entry; /* +0x00 */
-    int i; /* +0x04 */
-    u32 batchFlags; /* +0x08 */
-    int count; /* +0x0c */
-    PxyDrawPacket *packet; /* +0x10 */
-    PxyDrawPacket *lastPacket; /* +0x14 */
-    int mode; /* +0x18 */
-    PxyPart *part; /* +0x1c */
-    u32 partFlags; /* +0x20 */
-    u32 packetFlags; /* +0x24 */
-    int unk28; /* +0x28 */
-    u8 cameraBit; /* +0x2c */
-    u8 unk2D[3];
-    u32 frameMask; /* +0x30 */
-    u32 frameBase; /* +0x34 */
-    PxyBatch *batch; /* +0x38 */
-} PxyDrawWork;
 
 #define pxyDrawWork ((PxyDrawWork *)0x70000000)
 
@@ -2536,7 +2560,6 @@ typedef struct XglPacket XglPacket;
 typedef unsigned int XglQuadword __attribute__((mode(TI)));
 
 extern PxyDrawEntry D_008D3600[];
-int func_001A4058(PxyDrawPacket *packet, PxyDrawWork *work);
 void func_001AAE70(int mode, PxyDrawPacket *packet);
 void pxyPacketSelectMode(PxyDrawPacket *packet);
 void func_001ACB50(void);
@@ -2694,7 +2717,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
                 if (drawWork->packet->header->flags & 0x80) {
                     break;
                 }
-                if (func_001A4058(packet, drawWork)) {
+                if (pxyPartNotInIndexList(packet, drawWork)) {
                     continue;
                 }
                 if (drawWork->part->flags & 0x1000) {

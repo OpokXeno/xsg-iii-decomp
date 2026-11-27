@@ -47671,9 +47671,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A4058",
+     "name": "pxyPartNotInIndexList",
      "size": 112,
-     "splat_name": "func_001A4058",
+     "splat_name": "pxyPartNotInIndexList",
      "va": "0x001a4058",
      "name_basis": "address",
      "provenance": "estimated"
