@@ -70,7 +70,51 @@ typedef struct FontGlyphPacket {
     FontGlyphCorner corners[4];
 } FontGlyphPacket;
 
-typedef struct FontDrawCursor { struct XglPacket *packet; short origin_x; unsigned char unmodeled_06[2]; unsigned short x; unsigned short y; int depth; unsigned short offset_x; unsigned short offset_y; unsigned char red; unsigned char green; unsigned char blue; unsigned char unmodeled_17; unsigned char drawFlags; unsigned char effect; unsigned char attributes; unsigned char draw_state_high; unsigned char unmodeled_1c[4]; signed char effect_x; signed char effect_y; unsigned char unmodeled_22[2]; unsigned char effect_red; unsigned char effect_green; unsigned char effect_blue; unsigned char effect_alpha; /* The GS ALPHA_1 value: the A/B/C/D selectors and FIX. */ unsigned char alpha_abcd; unsigned char alpha_fix; unsigned char alpha; unsigned char unmodeled_2b; unsigned short scale_x; unsigned short scale_y; union { struct FontEffectScratchPacket effect_packet; u64 qwords[(0x4000 - 0x30) / sizeof(u64)]; struct { unsigned char unmodeled_30[0x100 - 0x30]; struct FontMarkPacket sprite; } mark; struct { unsigned char unmodeled_30[0x100 - 0x30]; FontGlyphPacket sprite; } glyph; } effectArea; } FontDrawCursor;
+typedef struct FontDrawCursor {
+    struct XglPacket *packet;           /* +0x00 */
+    short origin_x;                     /* +0x04 */
+    unsigned char unmodeled_06[2];
+    unsigned short x;                   /* +0x08 */
+    unsigned short y;                   /* +0x0A */
+    int depth;                          /* +0x0C */
+    unsigned short offset_x;            /* +0x10 */
+    unsigned short offset_y;            /* +0x12 */
+    unsigned char red;                  /* +0x14 */
+    unsigned char green;                /* +0x15 */
+    unsigned char blue;                 /* +0x16 */
+    unsigned char unmodeled_17;
+    unsigned char drawFlags;            /* +0x18 */
+    unsigned char effect;               /* +0x19 */
+    unsigned char attributes;           /* +0x1A */
+    unsigned char draw_state_high;      /* +0x1B */
+    unsigned char unmodeled_1c[4];
+    signed char effect_x;               /* +0x20 */
+    signed char effect_y;               /* +0x21 */
+    unsigned char unmodeled_22[2];
+    unsigned char effect_red;           /* +0x24 */
+    unsigned char effect_green;         /* +0x25 */
+    unsigned char effect_blue;          /* +0x26 */
+    unsigned char effect_alpha;         /* +0x27 */
+    /* The GS ALPHA_1 value: the A/B/C/D selectors and FIX. */
+    unsigned char alpha_abcd;           /* +0x28 */
+    unsigned char alpha_fix;            /* +0x29 */
+    unsigned char alpha;                /* +0x2A */
+    unsigned char unmodeled_2b;
+    unsigned short scale_x;             /* +0x2C */
+    unsigned short scale_y;             /* +0x2E */
+    union {
+        struct FontEffectScratchPacket effect_packet;
+        u64 qwords[(0x4000 - 0x30) / sizeof(u64)];
+        struct {
+            unsigned char unmodeled_30[0x100 - 0x30];
+            struct FontMarkPacket sprite;
+        } mark;
+        struct {
+            unsigned char unmodeled_30[0x100 - 0x30];
+            FontGlyphPacket sprite;
+        } glyph;
+    } effectArea;                       /* +0x30 */
+} FontDrawCursor;
 
 int xglFontGetStringWidth(const char *text);
 int xglFontGetSPcodeSize(int opcode, const unsigned char *text);
