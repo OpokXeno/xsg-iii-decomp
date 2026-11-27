@@ -520,12 +520,12 @@ int xglLightConeColor(Vector4 *color, Vector4 *lightDirection, XglLightKey *key,
 }
 
 extern s32 xglLightBankValid;
-/* The global colour scale of the light bank (X2 xglLightColorScale). */
-extern Vector4 xglLightBankStorage;
+/* The global colour scale of the light bank. */
+extern Vector4 xglLightColorScale;
 
 Vector4 *xglLightBankGet(void) {
     if (xglLightBankValid != 0) {
-        return &xglLightBankStorage;
+        return &xglLightColorScale;
     }
     return 0;
 }
@@ -629,8 +629,8 @@ void xglLightPackBuildLightSet(XglLightPack *pack, XglLightSet *lightSet, Vector
 
             switch (entry->entryType) {
             case XGL_LIGHT_COLOR_SCALE:
-                xglVectorScale(&xglLightBankStorage, &key->color, key->intensity);
-                pxySetColorScale(&xglLightBankStorage);
+                xglVectorScale(&xglLightColorScale, &key->color, key->intensity);
+                pxySetColorScale(&xglLightColorScale);
                 xglLightBankValid = 1;
                 break;
             case XGL_LIGHT_AMBIENT:

@@ -350,7 +350,7 @@
    "0x008bbfd0": "xglLightSlotTable",
    "0x005412e0": "xglLightConeEdgeTemplate",
    "0x005511f4": "xglLightBankValid",
-   "0x008bc250": "xglLightBankStorage",
+   "0x008bc250": "xglLightColorScale",
    "0x00541380": "lightDebugBoxPointTable",
    "0x00551588": "pSendPacket",
    "0x005511f8": "xglPacketSendMode",

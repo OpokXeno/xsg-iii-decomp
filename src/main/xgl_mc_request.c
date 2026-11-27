@@ -58,13 +58,8 @@ typedef struct McIconSys {
 
 /* Memory-card state block at xglMcCardState. */
 typedef struct XglMcCardState {
-    union {
-        struct {
-            unsigned char requestPhase; /* +0x00: phase of the request requestPhase machine */
-            unsigned char substate;     /* +0x01: step inside the current state, cleared per request */
-        };
-        unsigned short phaseAndStep;    /* +0x00: requestPhase | substate << 8 (MC_PHASE_STEP) */
-    };
+    unsigned char requestPhase;            /* +0x00: phase of the request requestPhase machine */
+    unsigned char substate;         /* +0x01: step inside the current state, cleared per request */
     unsigned char unmodeled_02[1];
     unsigned char next_card;        /* +0x03: bit 0 is the card the next status poll asks about */
     union {
@@ -699,8 +694,6 @@ int xglMcOpenNearestSave(void)
     return 0;
 }
 
-/* xglMcCardState.requestPhase and .substate read together as one halfword (MC_PHASE_STEP). */
-#define MC_PHASE_STEP(phase, step) (((step) << 8) | (phase))
 /* The last check-old search mode (the fourth base path, xglMcOpenNearestSave). */
 #define MC_OLD_SEARCH_LAST 3
 /* Check-old mode 3: the flag byte of the save that marks a clear. */
@@ -837,7 +830,8 @@ int xglMcMain(void)
         list = (McScanWork *)xglMcCardBlock.cardState.activeRequest.bufferAddress;
         callback = xglMcCardBlock.cardState.activeRequest.callback;
         while ((stored = result) < 0) {
-            if (xglMcCardBlock.cardState.phaseAndStep == MC_PHASE_STEP(MC_STATE_CHECK_OLD, MC_SCAN_READ)
+            if (xglMcCardBlock.cardState.requestPhase == MC_STATE_CHECK_OLD
+                && xglMcCardBlock.cardState.substate == MC_SCAN_READ
                 && xglMcCardBlock.cardState.activeRequest.file == MC_OLD_SEARCH_LAST) {
                 list->scanStatus = MC_LIST_FAILED;
                 if (result >= MC_RESULT_SOFT_LIMIT) {
@@ -1074,7 +1068,8 @@ int xglMcMain(void)
             case MC_RW_TRANSFERRED:
             case MC_RW_ICON_WRITTEN:
                 sceMcClose(xglMcCardBlock.cardState.fileDescriptor);
-                if (xglMcCardBlock.cardState.phaseAndStep == MC_PHASE_STEP(MC_STATE_WRITE, MC_RW_TRANSFERRED)) {
+                if (xglMcCardBlock.cardState.requestPhase == MC_STATE_WRITE
+                    && xglMcCardBlock.cardState.substate == MC_RW_TRANSFERRED) {
                     xglMcCardBlock.cardState.substate = MC_RW_OPEN_ICON;
                 } else {
                     xglMcCardBlock.cardState.substate = MC_RW_LIST_FOLDER;

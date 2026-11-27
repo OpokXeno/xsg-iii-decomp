@@ -129,10 +129,13 @@ void seBgmLoadDefault(int id, int kind, int group)
 
 /* A sound bank file: the offset of its entry table at +0xA4. The table's first byte is the last
  * entry index; entry i (4 bytes) holds the offset of its length byte, the group and the kind. */
-typedef struct SeBankEntry {
-    unsigned short lengthOffset;
-    unsigned char group;
-    unsigned char flags; /* the kind in the low nibble */
+typedef union SeBankEntry {
+    struct {
+        unsigned short lengthOffset;
+        unsigned char group;
+        unsigned char flags; /* the kind in the low nibble */
+    };
+    unsigned char lastIndex; /* entry 0: the last entry index */
 } SeBankEntry;
 
 typedef struct SeBankHeader {
@@ -165,7 +168,7 @@ void func_0018E870(int slot, void *bank, int numbered)
     entries = (SeBankEntry *) ((unsigned char *) header + header->entryTableOffset);
     if ((SeBankEntry *) header != entries) {
         start = 0;
-        for (index = *(unsigned char *) entries + 1; index > 0; index--) {
+        for (index = entries->lastIndex + 1; index > 0; index--) {
             length = ((unsigned char *) entries)[entries[index].lengthOffset] + 1;
             func_0018E6F0(slot, entries[index].flags & SE_BANK_KIND_MASK, entries[index].group,
                           (start << 16) + length);

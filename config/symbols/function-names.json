@@ -52,7 +52,6 @@
    "0x0018b090": "xglMoviePlay",
    "0x0018b7e0": "xglMovieInfoInit",
    "0x0018bb08": "moviePlayerUpdate",
-   "0x0018bc00": "moviePlayerPause",
    "0x0018d2a0": "DefineQuantizeTable",
    "0x0018ed90": "soundDriverReset",
    "0x0018f228": "soundSlotStartFile",
