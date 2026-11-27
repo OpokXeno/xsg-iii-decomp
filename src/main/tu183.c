@@ -1,11 +1,8 @@
 #include "common.h"
+#include "main/tu183.h"
 
-typedef unsigned char u8;
 typedef int s32;
-typedef float f32;
 typedef signed char s8;
-typedef short s16;
-typedef unsigned short u16;
 
 /* Voice record at SaveLoadMenu +0x720 (alpha at +0xAC). */
 typedef struct SeVoice {
@@ -25,12 +22,6 @@ typedef struct SaveLoadMenu {
 } SaveLoadMenu;
 
 extern SaveLoadMenu *gSaveLoadMenuStorage;
-
-/* Header returned by getStatusHeader(); flags at +2. */
-typedef struct StatusHeader {
-    u8 unk00[2];
-    u16 headerFlags;
-} StatusHeader;
 
 s32 xglFRandSeed(f32);
 void *memPoolAlloc(s32 size);

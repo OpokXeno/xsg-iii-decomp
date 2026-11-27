@@ -3,6 +3,7 @@
 #include "main/tu173.h"
 #include "main/tu176.h"
 #include "main/tu178.h"
+#include "main/tu183.h"
 #include "main/sound_driver.h"
 
 s32 xglFontGetFormattedWidth(const char *text);
@@ -39,12 +40,6 @@ void clampedCounterInit(McGauge *gauge, s32 stepDelta)
   gauge->fadeIn = 0;
   gauge->negative = (1 - isPositive) << 7;
 }
-
-/* Header returned by getStatusHeader() (tu183.c); flags at +2. */
-typedef struct StatusHeader {
-    u8 unk00[2];
-    u16 headerFlags;
-} StatusHeader;
 
 /* headerFlags bits that toggle the prompt's selection (up and down in the pad's bit order). */
 #define CHOICE_PROMPT_TOGGLE_BUTTONS 0x5000
