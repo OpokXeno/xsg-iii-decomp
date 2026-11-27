@@ -294,7 +294,37 @@ void battleCurrentRosterIndexSet(s32 rosterIndex)
   gBattleRosterTable.currentRosterIndex %= 2;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FB8);
+/* Entry id capacities of the two rosters (BattleRoster.entryIds has room for more; these are the limits the game
+   enforces when adding). */
+#define BATTLE_ROSTER0_ENTRY_ID_CAPACITY 7
+#define BATTLE_ROSTER1_ENTRY_ID_CAPACITY 4
+
+/* Appends entryId to its roster (roster 1 from BATTLE_ROSTER1_FIRST_ENTRY_ID on, else roster 0) when the roster does
+   not hold it yet and still has room, and sets the id's bit in the table's entry mask. */
+void func_00221FB8(s32 entryId)
+{
+  BattleRosterTable *table;
+  BattleRoster *roster;
+  s32 rosterIndex;
+  s32 mask;
+  s32 count;
+  if (battleRosterHasEntryId(entryId) != 0)
+  {
+    return;
+  }
+  rosterIndex = entryId >= BATTLE_ROSTER1_FIRST_ENTRY_ID;
+  roster = battleRosterGet(rosterIndex);
+  table = &gBattleRosterTable;
+  mask = 1 << entryId;
+  count = roster->entryIdCount;
+  if (rosterIndex != 0 ? count >= BATTLE_ROSTER1_ENTRY_ID_CAPACITY : count >= BATTLE_ROSTER0_ENTRY_ID_CAPACITY)
+  {
+    return;
+  }
+  roster->entryIds[count] = entryId;
+  roster->entryIdCount++;
+  table->entryMask |= mask;
+}
 
 /* Removes entry id from its roster: later entries move down one slot and the cursor follows its entry
    (a cursor on the removed entry goes back to 0). */
@@ -465,8 +495,6 @@ s32 battleRosterEntryIdIndexGet(s32 entryId)
   }
   return result;
 }
-
-void func_00221FB8(s32 entryId);
 
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
     s32 entryIds[3];
