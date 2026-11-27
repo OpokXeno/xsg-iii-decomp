@@ -89,6 +89,13 @@ typedef struct CdReadRetryPolicy {
 } CdReadRetryPolicy;
 
 /* Only the fields xglCdArcInitSub1 writes are evidenced here. */
+/* One directory cache slot of an archive entry: the hash of a directory path and where its records start in
+ * xglCdArchiveTocBuffer (-1: unused). */
+typedef struct CdDirectoryCacheEntry {
+    unsigned int hash;
+    int tocOffset;
+} CdDirectoryCacheEntry;
+
 typedef struct CdArchiveEntry {
     unsigned char readMedium;   /* CD_SOURCE_*, or CD_SOURCE_UNUSED */
     unsigned char unmodeled_01;
@@ -99,6 +106,10 @@ typedef struct CdArchiveEntry {
     int file_lbn_offset;
     int stored_bytes;
     int file_size;
+    unsigned char directoryCacheCount;   /* +0x18: slots of the directory cache (func_00187AB8) */
+    unsigned char directoryCacheNext;    /* +0x19: the slot a cache miss replaces next when all are used */
+    unsigned char unmodeled_1a[2];
+    struct CdDirectoryCacheEntry *directoryCache; /* +0x1C */
 } CdArchiveEntry;
 
 /* Events passed to a completion callback (int event, int eventValue). */
@@ -216,7 +227,7 @@ typedef struct CdStreamService {
 } CdStreamService;
 
 /* Four 0x20-byte archive slots (slot n at +0x20 * n); the table that follows them at
- * D_0089B660 is cleared by func_00187AB8. */
+ * xglCdDirectoryCache is cleared by func_00187AB8. */
 typedef union CdArchiveStorage {
     CdArchiveEntry archiveEntry;
     unsigned char slotImage[0x20];
@@ -745,7 +756,30 @@ void xglCdSetReadTag(int readTag)
     xglCdReadTag = readTag;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_cd", func_00187AB8);
+/* The directory cache the archive slots share: 64 entries, split as entries 0..49 (slot 0), 50..62
+ * (slots 1 and 2) and 63 (slot 3). */
+#define CD_DIRECTORY_CACHE_ENTRIES 64
+#define CD_DIRECTORY_CACHE_SPLIT_1 50
+#define CD_DIRECTORY_CACHE_SPLIT_2 63
+#define CD_DIRECTORY_CACHE_UNUSED (-1)
+extern CdDirectoryCacheEntry xglCdDirectoryCache[CD_DIRECTORY_CACHE_ENTRIES];
+
+/* Clears the directory cache and points the archive slots at their parts of it. */
+void func_00187AB8(void)
+{
+    int i;
+
+    for (i = 0; i < CD_DIRECTORY_CACHE_ENTRIES; i++) {
+        xglCdDirectoryCache[i].hash = 0;
+        xglCdDirectoryCache[i].tocOffset = CD_DIRECTORY_CACHE_UNUSED;
+    }
+    xglCdArchiveSlots[0].archiveEntry.directoryCache = &xglCdDirectoryCache[0];
+    xglCdArchiveSlots[1].archiveEntry.directoryCache = &xglCdDirectoryCache[CD_DIRECTORY_CACHE_SPLIT_1];
+    xglCdArchiveSlots[2].archiveEntry.directoryCache = &xglCdDirectoryCache[CD_DIRECTORY_CACHE_SPLIT_1];
+    xglCdArchiveSlots[3].archiveEntry.directoryCache = &xglCdDirectoryCache[CD_DIRECTORY_CACHE_SPLIT_2];
+    xglCdArchiveSlots[0].archiveEntry.directoryCacheCount = 1;
+    xglCdArchiveSlots[0].archiveEntry.directoryCacheNext = 0;
+}
 
 /* Expands one name record of an archive table into `name` and returns the name's end. A record starts with
  * a count byte. Zero: the bytes after it, up to a terminator, replace the name. Otherwise the low

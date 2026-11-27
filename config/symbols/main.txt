@@ -10173,6 +10173,7 @@ fontStateFromWindow = 0x007E7E0C;
 LW = 0x00897588;
 xglCdStreamsActive = 0x008975B8;
 xglCdStreamService = 0x0089B5C8;
+xglCdDirectoryCache = 0x0089B660;
 xglMcQueue = 0x0089B880;
 xglMcCardState = 0x0089BE44;
 xglMcCardStatusWord = 0x0089BE48;

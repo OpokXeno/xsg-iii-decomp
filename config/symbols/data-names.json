@@ -253,6 +253,7 @@
    "0x00897588": "LW",
    "0x008975b8": "xglCdStreamsActive",
    "0x0089b5c8": "xglCdStreamService",
+   "0x0089b660": "xglCdDirectoryCache",
    "0x0089b880": "xglMcQueue",
    "0x0089be44": "xglMcCardState",
    "0x0089be48": "xglMcCardStatusWord",
