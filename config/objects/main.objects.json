@@ -47473,9 +47473,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019F778",
+     "name": "pxyAddClipPlanePair",
      "size": 340,
-     "splat_name": "func_0019F778",
+     "splat_name": "pxyAddClipPlanePair",
      "va": "0x0019f778",
      "name_basis": "address",
      "provenance": "estimated"

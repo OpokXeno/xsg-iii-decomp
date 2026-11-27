@@ -1202,9 +1202,34 @@ s32 pxyWaterReflectionPendingGet(void) {
     return pxyModelFlags[0] & 1;
 }
 
+/* renderStatus bit of a clip plane pair. */
+#define NML_RENDER_CLIP_PLANE_PAIR 0x4000
+/* Clip planes a table holds (PxyPlaneTable, five quadwords reserved). */
+#define PXY_CLIP_PLANES 2
+#define PXY_CLIP_TABLE_QUADWORDS 5
+
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019F678);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019F778);
+/* Adds a clip plane pair unless both rows are zero; the first pair also fills the second entry. */
+void pxyAddClipPlanePair(PxyRowBits *plane, PxyRowBits *angle)
+{
+    if (plane->rowWords[0] != 0 || plane->rowWords[1] != 0 || plane->rowWords[2] != 0 || angle->rowWords[0] != 0
+        || angle->rowWords[1] != 0 || angle->rowWords[2] != 0) {
+        if (pxyState.clipPlanes == 0) {
+            pxyState.clipPlanes = xglPacketReserve(PXY_CLIP_TABLE_QUADWORDS);
+        }
+        if (pxyState.clipPlaneCount < PXY_CLIP_PLANES) {
+            pxyState.clipPlanes->plane[pxyState.clipPlaneCount] = *plane;
+            pxyState.clipPlanes->angle[pxyState.clipPlaneCount] = *angle;
+            if (pxyState.clipPlaneCount == 0) {
+                pxyState.clipPlanes->plane[1] = *plane;
+                pxyState.clipPlanes->angle[1] = *angle;
+            }
+            pxyState.renderStatus |= NML_RENDER_CLIP_PLANE_PAIR;
+            pxyState.clipPlaneCount++;
+        }
+    }
+}
 
 
 void pxySetClipPlaneMasked(PxyRowBits *plane, PxyRowBits *angle, int maskedPlaneCount, float x, float y, float z, u32 *planeMask) {
