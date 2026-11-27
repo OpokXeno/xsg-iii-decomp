@@ -3451,12 +3451,28 @@ void pxyWorkFlag2F74Set(void) {
     D_008C2F74[0] = 1;
 }
 
+void func_001AA828(XglPacket *packet);
+
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA828);
 
 s32 func_001A3D90(s32 mode);
 
-void pxyPlayEntryGroupFive(void) {
+void pxyPlayEntryGroupFive(XglPacket *packet) {
     func_001A3D90(5);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA968);
+extern s32 D_00551240;
+
+/* Init the pxy module: the reset helpers, then the two final packet callbacks it installs (frame copy, entry group 5). */
+void nmlModelConstruct(void)
+{
+    D_00551240 = 0;
+    pxyClearPacketSlots();
+    pxyInitModelCounters();
+    pxyInitTables();
+    pxyResetBatchTables();
+    CONSTRUCT_CIRCLR_SHADOW();
+    D_008C2F74[0] = 0;
+    D_004C8390.finalPacketCallbacks[RENDER_CALLBACK_PXY_FRAME_COPY] = func_001AA828;
+    D_004C8390.finalPacketCallbacks[RENDER_CALLBACK_PXY_ENTRY_GROUP] = pxyPlayEntryGroupFive;
+}

@@ -57,6 +57,10 @@ typedef struct XglRenderState {
 
 /* Callbacks xglRenderFinalPacket runs on the frame packet. */
 #define RENDER_FINAL_CALLBACK_COUNT 21
+/* The final packet callback slots the pxy module installs (nmlModelConstruct): its entry group 5 draw and
+ * its frame copy packet. */
+#define RENDER_CALLBACK_PXY_ENTRY_GROUP 13
+#define RENDER_CALLBACK_PXY_FRAME_COPY 14
 
 /* The X3 render state at 0x004C8390 (0x88 bytes with the fade gain and level). XglRenderState above is
  * X2's layout and belongs to sRender only. */

@@ -47905,9 +47905,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001AA968",
+     "name": "nmlModelConstruct",
      "size": 104,
-     "splat_name": "func_001AA968",
+     "splat_name": "nmlModelConstruct",
      "va": "0x001aa968",
      "name_basis": "address",
      "provenance": "estimated"

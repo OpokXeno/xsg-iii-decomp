@@ -922,7 +922,7 @@ void func_0019AC80(s32 active)
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
 void xglRenderGlobalFadeReset(void);
-void func_001AA968(void);
+void nmlModelConstruct(void);
 u8 stateExchangeOff(void);
 
 #define RENDER_FADE_NEUTRAL 0x80
@@ -955,7 +955,7 @@ void xglRenderInit(void)
         D_004C8390.finalPacketCallbacks[i] = 0;
     }
     xglRenderGlobalFadeReset();
-    func_001AA968();
+    nmlModelConstruct();
     stateExchangeOff();
     xglIntcEnable(5);
     xglRenderLocked = 0;
