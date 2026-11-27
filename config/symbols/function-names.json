@@ -31,6 +31,7 @@
    "0x00184b30": "xglFontFlushCore",
    "0x00185a20": "xglFontFlush",
    "0x00185cb0": "xglFontLoad",
+   "0x00185d58": "xglFontInitial",
    "0x00185ee8": "xglDmaBufferReset",
    "0x00186198": "xglDmaInitial",
    "0x001863f0": "xglPadRead",

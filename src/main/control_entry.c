@@ -27,7 +27,7 @@ void xglIntrInit(void);
 void xglGeometryInit(void);
 void xglPacketInitDoubleBuffer(unsigned int base, unsigned int size, float rate);
 void xglRenderInit(void);
-void func_00185D58(void);
+void xglFontInitial(void);
 void moviePlayerSetSize(void);
 void initScratchpadBuffers(void);
 
@@ -78,7 +78,7 @@ void InitializeSystem(void) {
     xglGeometryInit();
     xglPacketInitDoubleBuffer(0xB00000, 0x180000, 50.0f);
     xglRenderInit();
-    func_00185D58();
+    xglFontInitial();
     moviePlayerSetSize();
     initScratchpadBuffers();
 }

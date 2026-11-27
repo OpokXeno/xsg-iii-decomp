@@ -2630,7 +2630,7 @@ extern unsigned char fontTextureBuffer[];
 #define FONT_DEFAULT_FONT 1
 
 /* Resets the font state, loads the default font and sets the default layout (X2 xglFontInitial). */
-void func_00185D58(void)
+void xglFontInitial(void)
 {
     xglFontState.font_selection = FONT_SELECTION_NONE;
     xglFontState.texture_buffer = fontTextureBuffer;
