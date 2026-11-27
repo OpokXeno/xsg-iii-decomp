@@ -134,7 +134,6 @@ void xglFontPrintEscapeByte(int escapeArgument);
 void xglFontPrintExtendedColor(int red, int green, int blue);
 void xglFontPrintAlphaCommand(int alphaMode, int alphaIndex, int alpha);
 void xglFontSetColor(int red, int green, int blue);
-s32 xglFontGetFormattedWidth(const char *text);
 void xglFontPrintIndexed(s32 x, s32 y, const char *text);
 char *messageTextGet(s32 textId);
 u8 statusByte0Get(void);
