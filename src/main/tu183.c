@@ -1,12 +1,7 @@
 #include "common.h"
+#include "main/tu176.h"
 
-typedef unsigned char u8;
-typedef int s32;
 typedef float f32;
-typedef signed char s8;
-typedef short s16;
-typedef unsigned short u16;
-
 /* Voice record at SaveLoadMenu +0x720 (alpha at +0xAC). */
 typedef struct SeVoice {
     u8 unk00[0xAC];
@@ -40,7 +35,6 @@ s32 pagedTablePoolInit();
 s32 memset(void *dst, s32 value, s32 size);
 s32 xglClockReadBcd();
 s32 xglPadSetRepeat(s32, s32, s32, s32);
-u8 battleRosterEntryIdCountGet(s32 index);
 void *func_00226F18(s32 mode);
 void *seVoiceStartDefault(s32 id);
 

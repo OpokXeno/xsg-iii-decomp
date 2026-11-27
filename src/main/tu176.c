@@ -1,12 +1,9 @@
 #include "common.h"
+#include "shared.h"
+#include "main/tu176.h"
+#include "main/tu178.h"
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
-
-typedef signed char s8;
-typedef int s32;
-typedef unsigned char u8;
-typedef short s16;
-typedef unsigned short u16;
 
 /* Counter entry: a step direction pair (+0x08, +0x09), a phase (+0x0B), a limit and a count. */
 typedef struct ClampedCounter
@@ -21,31 +18,6 @@ typedef struct ClampedCounter
   u8 unmodeled_1E[0x20 - 0x1E];
   u16 clampedValue;            /* +0x20 */
 } ClampedCounter;
-
-/* 0x10-byte record of the table at gBattleRosterTable. */
-typedef struct BattleRoster
-{
-  u8 entryIdCount;             /* +0x00 */
-  u8 cursor;          /* +0x01 */
-  u8 entryIds[0xE];
-} BattleRoster;
-
-/* The first two records of the table, as one pair. */
-typedef struct BattleRosterPair
-{
-  BattleRoster firstRoster;
-  BattleRoster secondRoster;
-} BattleRosterPair;
-
-/* Table header: two values at +0x24 and +0x25, the current record index at +0x26. */
-
-typedef struct BattleRosterHeader
-{
-  u8 unmodeled_00[0x24];
-  s8 firstValue;        /* +0x24 */
-  s8 secondValue;       /* +0x25 */
-  u8 currentRosterIndex;     /* +0x26 */
-} BattleRosterHeader;
 
 void clampedCounterInit(ClampedCounter *clampedCounter, s32 stepDelta)
 {
@@ -109,96 +81,291 @@ s8 sheetLatchedPositionGet(void) {
     return D_0055144A;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221C50);
+extern u8 gSaveAbortFlag;
 
-extern unsigned char gBattleRosterTable[];
-/* Typed views of the table at gBattleRosterTable: 0x10-byte records, and the header overlaying them at +0x24. */
-#define gBattleRosters ((BattleRoster *) gBattleRosterTable)
-#define gBattleRosterHeader (*(BattleRosterHeader *) gBattleRosterTable)
-#define gBattleRosterPair ((BattleRosterPair *) gBattleRosterTable)
+void *memset(void *destination, int value, unsigned int count);
+void xglClockRead(XglClock *clock);
+unsigned int xglClockDayTime2UInt(XglClock *clock_time);
+s32 func_001B8D08(s32 category, s32 item, s32 amount);
+
+/* New-game reset: clears the roster table, the play-state header and the save image regions, stamps the
+   start time and writes the per-character defaults. */
+void newGameStateReset(void)
+{
+  memset(&gBattleRosterTable, 0, sizeof(gBattleRosterTable));
+  memset(&gSaveGameHeader, 0, sizeof(gSaveGameHeader));
+  xglClockRead(&gXglMcAgedEntries.newGameClock);
+  gSaveGameHeader.startTime = xglClockDayTime2UInt(&gXglMcAgedEntries.newGameClock);
+  gBattleRosterTable.characters[1].newGameDefaults[0] = 1;
+  gBattleRosterTable.characters[2].newGameDefaults[0] = 0xC;
+  gBattleRosterTable.characters[3].newGameDefaults[0] = 0x1B;
+  gBattleRosterTable.characters[4].newGameDefaults[0] = 0x25;
+  gBattleRosterTable.characters[5].newGameDefaults[0] = 0x34;
+  gBattleRosterTable.characters[6].newGameDefaults[0] = 0x41;
+  gBattleRosterTable.characters[7].newGameDefaults[0] = 0x51;
+  gBattleRosterTable.characters[8].newGameDefaults[0] = 0x61;
+  gBattleRosterTable.characters[9].newGameDefaults[0] = 0x62;
+  gBattleRosterTable.characters[10].newGameDefaults[0] = 0x63;
+  gBattleRosterTable.characters[13].newGameDefaults[0] = 0x6E;
+  gBattleRosterTable.characters[13].newGameDefaults[1] = 0x6C;
+  gBattleRosterTable.characters[14].newGameDefaults[0] = 0x7E;
+  gBattleRosterTable.characters[14].newGameDefaults[1] = 0x80;
+  gBattleRosterTable.characters[15].newGameDefaults[0] = 0x8E;
+  gBattleRosterTable.characters[15].newGameDefaults[1] = 0x8F;
+  gBattleRosterTable.characters[16].newGameDefaults[0] = 0x9E;
+  gBattleRosterTable.characters[16].newGameDefaults[1] = 0;
+  memset(gXglMcAgedEntries.newGameClearedRegion3A0C, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion3A0C));
+  memset(gXglMcAgedEntries.newGameClearedRegion157C, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion157C));
+  memset(gXglMcAgedEntries.newGameClearedRegion146D, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion146D));
+  memset(gXglMcAgedEntries.newGameClearedRegion147C, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion147C));
+  xglMcAgedEntriesReset();
+  if (gSaveAbortFlag)
+  {
+    func_001B8D08(2, 0x4D, 1);
+  }
+  gSaveGameHeader.fileIndex = -1;
+  gXglMcAgedEntries.newGameCounters[0] = 0;
+  gXglMcAgedEntries.newGameCounters[1] = 0;
+  gXglMcAgedEntries.newGameClearedFlag4A = 0;
+  gXglMcAgedEntries.newGameClearedFlag4B = 0;
+  memset(gXglMcAgedEntries.newGameClearedRegion1330, 0, sizeof(gXglMcAgedEntries.newGameClearedRegion1330));
+}
 
 BattleRoster *battleRosterGet(s32 rosterIndex) {
-    return &gBattleRosters[rosterIndex];
+    return &gBattleRosterTable.rosterPair.rosters[rosterIndex];
 }
 
-u8 battleRosterEntryIdCountGet(s32 rosterIndex) {
-    return gBattleRosters[rosterIndex].entryIdCount;
+s32 battleRosterEntryIdCountGet(s32 rosterIndex) {
+    return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIdCount;
 }
 
-u8 battleRosterEntryIdCountGet(s32 rosterIndex);
-extern unsigned char gBattleRosterEntryIds[];
-
-u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
+s32 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
 {
   if (!(entryIdIndex < battleRosterEntryIdCountGet(rosterIndex)))
   {
     return 0;
   }
-  return gBattleRosterEntryIds[entryIdIndex + (rosterIndex << 4)];
+  return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIds[entryIdIndex];
 }
-
-u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
-extern unsigned char gBattleRosterCursors[];
 
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
-    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterCursors[rosterIndex * 0x10], rosterIndex);
+    return battleRosterEntryIdGet(gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor, rosterIndex);
 }
 
-u8 battleCurrentRosterEntryCountGet(void)
+s32 battleCurrentRosterEntryCountGet(void)
 {
-  return gBattleRosters[gBattleRosterHeader.currentRosterIndex].entryIdCount;
+  return gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
 }
 
-u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
+s32 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 {
-  return (&gBattleRosterTable[entryIdIndex + (gBattleRosterHeader.currentRosterIndex << 4)])[2];
+  return gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
 }
-
-/* The same records seen from their subIndex byte (+0x01). */
-typedef struct BattleRosterCursorView
-{
-  u8 cursor;
-  u8 unmodeled_01[0x0F];
-} BattleRosterCursorView;
 
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
-  return ((s32 (*)()) battleRosterEntryIdGet)(((BattleRosterCursorView *) &gBattleRosterTable[1])[gBattleRosterHeader.currentRosterIndex].cursor, gBattleRosterHeader.currentRosterIndex);
+  return battleRosterEntryIdGet(
+      gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].cursor,
+      gBattleRosterTable.currentRosterIndex);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221F40);
+/* Returns 1 when entryId is in its roster (roster 0 below BATTLE_ROSTER1_FIRST_ENTRY_ID, else roster 1), else 0. */
+s32 battleRosterHasEntryId(s32 entryId)
+{
+  BattleRoster *roster;
+  s32 index;
+  roster = (entryId < BATTLE_ROSTER1_FIRST_ENTRY_ID) ? &gBattleRosterTable.rosterPair.rosters[0]
+                                                     : &gBattleRosterTable.rosterPair.rosters[1];
+  for (index = 0; index < roster->entryIdCount; index++)
+  {
+    if (roster->entryIds[index] == entryId)
+    {
+      return 1;
+    }
+  }
+  return 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FA0);
+/* Selects the current roster (0 or 1). */
+void battleCurrentRosterIndexSet(s32 rosterIndex)
+{
+  gBattleRosterTable.currentRosterIndex = rosterIndex;
+  gBattleRosterTable.currentRosterIndex %= 2;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221FB8);
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222048);
-
-void battleRosterPairReset(void) {
-    gBattleRosterPair->firstRoster.entryIdCount = 0;
-    gBattleRosterPair->secondRoster.entryIdCount = 0;
-    gBattleRosterPair->firstRoster.cursor = 0;
-    gBattleRosterPair->secondRoster.cursor = 0;
+/* Removes entry id from its roster: later entries move down one slot and the cursor follows its entry
+   (a cursor on the removed entry goes back to 0). */
+void battleRosterEntryIdRemove(s32 entryId)
+{
+  BattleRoster *roster;
+  s32 index;
+  roster = (entryId < BATTLE_ROSTER1_FIRST_ENTRY_ID) ? &gBattleRosterTable.rosterPair.rosters[0]
+                                                     : &gBattleRosterTable.rosterPair.rosters[1];
+  for (index = 0; index < roster->entryIdCount; index++)
+  {
+    if (roster->entryIds[index] == entryId)
+    {
+      if (roster->cursor == index)
+      {
+        roster->cursor = 0;
+      }
+      for (index++; index < roster->entryIdCount; index++)
+      {
+        if (roster->cursor == index)
+        {
+          roster->cursor = index - 1;
+        }
+        roster->entryIds[index - 1] = roster->entryIds[index];
+      }
+      roster->entryIdCount--;
+      return;
+    }
+  }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222120);
+void battleRosterPairReset(void) {
+    gBattleRosterTable.rosterPair.rosters[0].entryIdCount = 0;
+    gBattleRosterTable.rosterPair.rosters[1].entryIdCount = 0;
+    gBattleRosterTable.rosterPair.rosters[0].cursor = 0;
+    gBattleRosterTable.rosterPair.rosters[1].cursor = 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222238);
+/* Swaps entries indexA and indexB of a roster. When both swapped indices are below 3, a cursor on either index is
+   moved through battleRosterCursorSet. For roster 0, if the cursor's entry id is at least the limit, scans indices
+   0..2 and selects the first whose getter result is below it; an index past the count reads as 0 and also
+   qualifies.
+   value holds the entry count, then the swapped entry id, then the cursor. Plain form tried: three locals entryCount,
+   swappedEntryId and cursor; the compiler then keeps the count in $3 and the swapped ids in $4/$5 instead of all
+   three in $6, and the function no longer matches. */
+void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex)
+{
+  s32 value;
+  s32 index;
+  s32 entryId;
+  BattleRoster *roster;
+  value = battleRosterEntryIdCountGet(rosterIndex);
+  if (!(indexA < value))
+  {
+    return;
+  }
+  if (!(indexB < value))
+  {
+    return;
+  }
+  roster = battleRosterGet(rosterIndex);
+  value = roster->entryIds[indexA];
+  roster->entryIds[indexA] = roster->entryIds[indexB];
+  roster->entryIds[indexB] = value;
+  if ((indexA < BATTLE_ROSTER_CURSOR_ENTRY_COUNT) && (indexB < BATTLE_ROSTER_CURSOR_ENTRY_COUNT))
+  {
+    value = gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor;
+    if (value == indexA)
+    {
+      battleRosterCursorSet(indexB, rosterIndex);
+    }
+    else if (value == indexB)
+    {
+      battleRosterCursorSet(indexA, rosterIndex);
+    }
+  }
+  if (rosterIndex == 0)
+  {
+    if (battleRosterCursorEntryIdGet(0) >= BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT)
+    {
+      for (index = 0; index < BATTLE_ROSTER_CURSOR_ENTRY_COUNT; index++)
+      {
+        entryId = battleRosterEntryIdGet(index, 0);
+        if (entryId < BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT)
+        {
+          battleRosterCursorSet(index, 0);
+          break;
+        }
+      }
+    }
+  }
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002222A0);
+/* Puts the cursor of a roster on entry index when index is below BATTLE_ROSTER_CURSOR_ENTRY_COUNT; for roster 0 the
+   entry id battleRosterEntryIdGet gives there must also be below BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT. Returns 1 when
+   the cursor was set, 0 when it was left alone. */
+s32 battleRosterCursorSet(s32 index, s32 rosterIndex)
+{
+  s32 entryId;
+  if (index < BATTLE_ROSTER_CURSOR_ENTRY_COUNT)
+  {
+    if (rosterIndex == 0)
+    {
+      entryId = battleRosterEntryIdGet(index, rosterIndex);
+      if (entryId >= BATTLE_ROSTER0_CURSOR_ENTRY_ID_LIMIT)
+      {
+        return 0;
+      }
+    }
+    gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor = index;
+    return 1;
+  }
+  return 0;
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00222360);
+/* Moves the cursor of the current roster forward to the next entry battleRosterCursorSet accepts, wrapping over the
+   first one to three entries. Returns 1 when the cursor moved. */
+s32 battleCurrentRosterCursorAdvance(void)
+{
+  s32 step;
+  s32 rosterIndex;
+  s32 cursor;
+  s32 count;
+  s32 wrapCount;
+  rosterIndex = battleCurrentRosterIndexGet();
+  cursor = battleRosterGet(rosterIndex)->cursor;
+  count = battleRosterEntryIdCountGet(rosterIndex);
+  wrapCount = count;
+  if (count > BATTLE_ROSTER_CURSOR_ENTRY_COUNT)
+  {
+    wrapCount = BATTLE_ROSTER_CURSOR_ENTRY_COUNT;
+  }
+  else if (count <= 0)
+  {
+    wrapCount = 1;
+  }
+  for (step = 1; step < wrapCount; step++)
+  {
+    if (battleRosterCursorSet((cursor + step) % wrapCount, rosterIndex))
+    {
+      break;
+    }
+  }
+  return cursor != battleRosterGet(rosterIndex)->cursor;
+}
 
-s32 func_00221FB8();
-s32 func_00222120();
-s32 func_00222360();
+/* Returns the index of entryId in its roster (roster 1 from BATTLE_ROSTER1_FIRST_ENTRY_ID on, else roster 0), or -1
+   when the roster does not hold it. */
+s32 battleRosterEntryIdIndexGet(s32 entryId)
+{
+  BattleRoster *roster;
+  s32 index;
+  s32 result;
+  roster = battleRosterGet(entryId >= BATTLE_ROSTER1_FIRST_ENTRY_ID);
+  result = -1;
+  for (index = 0; index < roster->entryIdCount; index++)
+  {
+    if (roster->entryIds[index] == entryId)
+    {
+      result = index;
+      break;
+    }
+  }
+  return result;
+}
 
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
-    s32 entryIds[4];
+    s32 entryIds[3];
     s32 entryId;
     s32 handleOrdinal;
-    s32 resolvedKind;
-    s32 retriedKind;
+    s32 resolvedEntryIndex;
+    s32 retriedEntryIndex;
 
     entryIds[0] = firstEntryId;
     entryIds[1] = secondEntryId;
@@ -206,45 +373,68 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
     for (handleOrdinal = 0; handleOrdinal < 3; handleOrdinal++) {
         entryId = entryIds[handleOrdinal];
         if (entryId != 0) {
-            resolvedKind = func_00222360(entryId);
-            if (resolvedKind == -1) {
+            resolvedEntryIndex = battleRosterEntryIdIndexGet(entryId);
+            if (resolvedEntryIndex == -1) {
                 func_00221FB8(entryIds[handleOrdinal]);
-                retriedKind = func_00222360(entryIds[handleOrdinal]);
-                resolvedKind = retriedKind;
+                retriedEntryIndex = battleRosterEntryIdIndexGet(entryIds[handleOrdinal]);
+                resolvedEntryIndex = retriedEntryIndex;
             }
-            func_00222120(handleOrdinal, resolvedKind, entryIds[handleOrdinal] >= 0xD);
+            battleRosterEntrySwap(handleOrdinal, resolvedEntryIndex,
+                                  entryIds[handleOrdinal] >= BATTLE_ROSTER1_FIRST_ENTRY_ID);
         }
     }
 }
 
-extern unsigned char gBattleCurrentRosterIndex[];
-
-u8 battleCurrentRosterIndexGet(void) {
-    return gBattleCurrentRosterIndex[0];
+s32 battleCurrentRosterIndexGet(void) {
+    return gBattleRosterTable.currentRosterIndex;
 }
-
-extern unsigned char D_003E6BA0[];
 
 s32 testFlagBit(s32 bitIndex)
 {
   int mask;
   mask = 1 << bitIndex;
-  return (*(s32 *) D_003E6BA0 & mask) != 0;
+  return (gBattleRosterTable.entryMask & mask) != 0;
 }
 
-void battleRosterHeaderPairSet(s32 firstArg, s32 secondArg)
+/* Stores the two guest entry ids (VM native ptSetGuest); a lone second guest moves to the first place. */
+void battleRosterHeaderPairSet(s32 firstGuestEntryId, s32 secondGuestEntryId)
 {
-  s32 storedFirst;
-  s32 storedSecond;
-  storedFirst = firstArg;
-  storedSecond = secondArg;
-  if ((storedFirst == 0) && (storedSecond != 0))
+  s32 firstGuest;
+  s32 secondGuest;
+  firstGuest = firstGuestEntryId;
+  secondGuest = secondGuestEntryId;
+  if ((firstGuest == 0) && (secondGuest != 0))
   {
-    storedFirst = storedSecond;
-    storedSecond = 0;
+    firstGuest = secondGuest;
+    secondGuest = 0;
   }
-  gBattleRosterHeader.firstValue = storedFirst;
-  gBattleRosterHeader.secondValue = storedSecond;
+  gBattleRosterTable.firstGuestEntryId = firstGuest;
+  gBattleRosterTable.secondGuestEntryId = secondGuest;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002224E8);
+/* For a roster 1 entry id (0xD..0x10), returns its linked roster 0 entry id number index & 1, counting only the
+   linked ids present in roster 0 (present ones first); 0 when there is none or for any other entry id. */
+s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index)
+{
+  static const u8 gBattleRosterLinkedEntryIds[4][2] = { { 7, 6 }, { 3, 4 }, { 5, 1 }, { 2, 0 } };
+  s32 linked[2];
+  s32 linkedEntryId;
+  memset(linked, 0, sizeof(linked));
+  linkedEntryId = 0;
+  if (entryId >= BATTLE_ROSTER1_FIRST_ENTRY_ID && entryId <= BATTLE_ROSTER1_LAST_ENTRY_ID)
+  {
+    linked[0] = gBattleRosterLinkedEntryIds[entryId - BATTLE_ROSTER1_FIRST_ENTRY_ID][0];
+    linked[1] = gBattleRosterLinkedEntryIds[entryId - BATTLE_ROSTER1_FIRST_ENTRY_ID][1];
+    if (battleRosterHasEntryId(linked[1]) == 0)
+    {
+      linked[1] = 0;
+    }
+    if (battleRosterHasEntryId(linked[0]) == 0)
+    {
+      linked[0] = linked[1];
+      linked[1] = 0;
+    }
+    linkedEntryId = linked[index & 1];
+  }
+  return linkedEntryId;
+}

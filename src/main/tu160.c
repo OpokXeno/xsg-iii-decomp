@@ -1,18 +1,9 @@
 #include "common.h"
 
 #include "main/tu007.h"
+#include "main/tu176.h"
 
 void xglPadSetRepeat(int, int, int, int);
-
-typedef int s32;
-
-typedef signed char s8;
-
-typedef short s16;
-
-typedef unsigned char u8;
-
-typedef unsigned short u16;
 
 static u16 gStatusBitsLow;
 static u16 gStatusBitsHigh;
@@ -231,7 +222,6 @@ void swapWordsRestore(void) {
 extern s32 gFontEscapeBuffer;
 extern s32 gFontNumberBuffer;
 void bufferCursorClear();
-void func_00221C50();
 void func_00225780();
 void sceneReset();
 
@@ -240,7 +230,7 @@ void initScratchpadBuffers(void) {
     gFontNumberBuffer = 0x70000100;
     bufferCursorClear();
     sceneReset();
-    func_00221C50();
+    newGameStateReset();
     func_00225780();
 }
 

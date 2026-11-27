@@ -1,9 +1,8 @@
 #include "common.h"
+#include "main/tu176.h"
 
 extern char *gFontEscapeBuffer;
 void sprintf();
-
-typedef int s32;
 
 s32 streamSlotLoadFrame(s32 streamSlot);
 
@@ -14,16 +13,6 @@ s32 streamSlotLoadFrame(s32 streamSlot) {
     sprintf(gFontEscapeBuffer, moviePath, streamSlot + 1);
     return (s32) gFontEscapeBuffer;
 }
-
-typedef signed char s8;
-
-typedef unsigned char u8;
-
-typedef short s16;
-
-typedef unsigned short u16;
-
-typedef unsigned int u32;
 
 s32 memset(void *dst, s32 value, s32 size);
 s32 xglJpegDecode(void *jpegRequest);
@@ -282,7 +271,6 @@ void streamPlayerShutdown(void) {
 }
 
 s32 saveStateIndexGet(void);
-s32 battleRosterEntryIdCountGet(s32 rosterIndex);
 void pagedTableAppend(void *table, s32 index, s32 value);
 s32 pagedTableGetKeyAt(void *table, s32 index);
 void mcModuleReset(void);

@@ -29103,6 +29103,32 @@
      }
     }
    ]
+  },
+  "main/tu176": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00537df0",
+      "0x00537e00"
+     ],
+     "generated": [
+      "0x00537df0",
+      "0x00537df8"
+     ],
+     "generated_by": [
+      "battleRosterLinkedEntryIdGet"
+     ],
+     "c_owned_symbols": [
+      "D_00537DF0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu176.o"
+     }
+    }
+   ]
   }
  }
 }

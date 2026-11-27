@@ -4,15 +4,7 @@
 #include "main/xgl_render.h"
 #include "quadword.h"
 #include "main/battle_shared.h"
-typedef signed char s8;
-
-typedef int s32;
-
-typedef unsigned char u8;
-
-typedef short s16;
-
-typedef unsigned short u16;
+#include "main/tu176.h"
 
 typedef long long s64;
 
@@ -338,10 +330,6 @@ void debugStageMenuStep(DebugSelection *selection) {
     xglFontDebugPrintf(8, gDebugMenuRow * 10 + 32, ">");
 }
 
-s32 battleRosterPairReset();
-s32 func_00221FB8();
-s32 func_00221FA0();
-s32 func_00222238();
 s32 xglPadSetDefaults();
 void func_001BC918(s16 *out);
 
@@ -374,11 +362,11 @@ void gameStartSelectedMap(ResetComboBits *combo) {
             memberIndex++;
         } while (memberIndex < 4);
         if (pressed < 13) {
-            func_00221FA0(0);
-            func_00222238(0, 0);
+            battleCurrentRosterIndexSet(0);
+            battleRosterCursorSet(0, 0);
         } else {
-            func_00221FA0(1);
-            func_00222238(0, 1);
+            battleCurrentRosterIndexSet(1);
+            battleRosterCursorSet(0, 1);
         }
     }
     xglPadSetDefaults();
@@ -399,12 +387,12 @@ void func_001BC6A8(void) {
     gGameLoopRuntime.unk_1C4 = 0;
     gGameLoopResetComboHalves.resetComboHalves[0] = 7000;
     gGameLoopResetComboHalves.resetComboHalves[1] = -1;
-    ((void (*)()) battleRosterPairReset)();
-    ((void (*)()) func_00221FA0)(0);
-    ((void (*)()) func_00221FB8)(1);
-    ((void (*)()) func_00221FB8)(8);
-    ((void (*)()) func_00221FB8)(7);
-    func_00222238(0, 0);
+    battleRosterPairReset();
+    battleCurrentRosterIndexSet(0);
+    func_00221FB8(1);
+    func_00221FB8(8);
+    func_00221FB8(7);
+    battleRosterCursorSet(0, 0);
     seScriptTablesClear();
     sbNativeValueSlotSet(func_001BC918, 0);
 }
@@ -475,9 +463,9 @@ void func_001BC808(void) {
     stateRestore(gSavedPlacement);
     func_00225108();
     battleRosterPairReset();
-    func_00221FA0(0);
+    battleCurrentRosterIndexSet(0);
     func_00221FB8(1);
-    func_00222238(0, 0);
+    battleRosterCursorSet(0, 0);
     requestBits = mapRequest[0];
 
     if (requestBits & 1) {
@@ -988,7 +976,6 @@ typedef struct SlotEnumView {
 extern const s32 D_00531340[];
 s32 padStartAndSoftResetHeld();
 s32 Get_Rnd_001B8CD0();
-s32 func_002222A0();
 s32 slotModelStateIsFour();
 s32 MMathRandomNext();
 void sefFlagSetBit26();
@@ -1062,7 +1049,7 @@ void func_001BD450() {
         if (gGameLoopRuntime.waitFrames > 0) {
             gGameLoopRuntime.waitFrames--;
         } else if (slot->flags & 0x10000000) {
-            if (func_002222A0()) {
+            if (battleCurrentRosterCursorAdvance()) {
                 scratchpadSendCmd0A(D_00531340);
                 gGameLoopRuntime.loopFlags |= 8;
                 slot->flags &= 0xefbfffff;

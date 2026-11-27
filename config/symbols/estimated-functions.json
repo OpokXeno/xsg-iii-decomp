@@ -44850,7 +44850,7 @@
      2
     ],
     [
-     "func_00221C50",
+     "newGameStateReset",
      2235472,
      460,
      2
@@ -44898,13 +44898,13 @@
      2
     ],
     [
-     "func_00221F40",
+     "battleRosterHasEntryId",
      2236224,
      96,
      2
     ],
     [
-     "func_00221FA0",
+     "battleCurrentRosterIndexSet",
      2236320,
      24,
      2
@@ -44916,7 +44916,7 @@
      2
     ],
     [
-     "func_00222048",
+     "battleRosterEntryIdRemove",
      2236488,
      180,
      2
@@ -44928,25 +44928,25 @@
      2
     ],
     [
-     "func_00222120",
+     "battleRosterEntrySwap",
      2236704,
      280,
      2
     ],
     [
-     "func_00222238",
+     "battleRosterCursorSet",
      2236984,
      104,
      2
     ],
     [
-     "func_002222A0",
+     "battleCurrentRosterCursorAdvance",
      2237088,
      192,
      2
     ],
     [
-     "func_00222360",
+     "battleRosterEntryIdIndexGet",
      2237280,
      132,
      2
@@ -44976,7 +44976,7 @@
      2
     ],
     [
-     "func_002224E8",
+     "battleRosterLinkedEntryIdGet",
      2237672,
      172,
      2

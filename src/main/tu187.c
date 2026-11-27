@@ -1,12 +1,5 @@
 #include "common.h"
-
-typedef unsigned char u8;
-
-typedef int s32;
-
-typedef signed char s8;
-
-typedef unsigned short u16;
+#include "main/tu176.h"
 
 typedef struct SeTableBlock {
     u8 unk000[0x200];
@@ -72,8 +65,6 @@ typedef struct SeVoiceTailBlock {
     s32 unk28;
     u8 unk2C[0xC];
 } SeVoiceTailBlock;
-
-typedef unsigned long u64;
 
 typedef union BitRows {
     u64 words[27];
@@ -228,7 +219,6 @@ void sheetStateReset(void);
 void pagedTableInit(void *table, s32 capacity);
 void pagedTableAppend(void *table, s32 entry, s32 kind);
 void pagedTableSetPageSizes(void *table, s32 a, s32 b);
-s32 battleRosterEntryIdCountGet(s32 kind);
 void pagedTableSetTextBox(void *table, s32 a, s32 b, s32 c);
 const char *messageTextGet(s32 id);
 void sheetSetIndex(void *text);
@@ -382,10 +372,6 @@ void cdStateDestroy(void) {
     memPoolFree(gSeVoiceState);
     gSeVoiceState = 0;
 }
-
-typedef short s16;
-
-typedef unsigned int u32;
 
 typedef struct SteppedValue {
     s16 level;
@@ -1905,7 +1891,6 @@ void seVoicePlayAndSetup(void) {
     mcStateSetupRequest(setupFlags, 0);
 }
 
-s32 battleRosterEntryIdGet(s32, s32);
 void func_002213A8(void *, const char *, s32, s32);
 
 static inline s32 voicePartyIndex(void) {

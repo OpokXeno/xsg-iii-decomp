@@ -6,6 +6,8 @@
 #include "main/xgl_cd.h"
 #include "gs.h"
 #include "main/xgl_debug_file_004.h"
+#include "main/tu176.h"
+#include "main/tu178.h"
 
 void *memset(void *destination, int value, unsigned int count);
 
@@ -202,8 +204,6 @@ void saveScreenSetMenu(SaveMenuCallback menu, SaveDrawCallback draw) {
     screen->displayState = 1;
 }
 
-typedef int s32;
-
 void setSteppedValue(s32 stepped, s32 value, s32 target);
 
 /*
@@ -238,8 +238,6 @@ struct McCardRequest {
     unsigned char unmodeled_08[4];
     void (*callback)(void);
 };
-
-typedef signed char s8;
 
 s32 sheetSetIndex(s32);
 
@@ -1051,14 +1049,6 @@ void pagedTableAppend(struct SaveMenuTable *table, s32 value, s32 flags);
 void pagedTableSeek(struct SaveMenuTable *table, u16 position);
 void saveScreenClearRecords(void);
 
-typedef struct SaveGameHeader {
-    s32 startTime; /* +0x00 */
-    unsigned char unmodeled_04[0x21];
-    unsigned char port;      /* +0x25 */
-    unsigned char fileIndex; /* +0x26 */
-} SaveGameHeader;
-
-extern SaveGameHeader D_003E6E30;
 void func_00221A88(void *obj, int a, int b);
 void addClampedCounter(void *obj, short value);
 void func_00221B40(void *obj, int value);
@@ -1115,14 +1105,14 @@ void saveScreenFileListUpdate(s32 setup) {
             }
             gSaveScreen->lastFile =
                 gSaveScreen->lastSavedFile;
-            if (D_003E6E30.port != gSaveScreen->port) {
-                D_003E6E30.fileIndex = -1;
+            if (gSaveGameHeader.port != gSaveScreen->port) {
+                gSaveGameHeader.fileIndex = -1;
             }
-            if (D_003E6E30.fileIndex == 0xFF) {
+            if (gSaveGameHeader.fileIndex == 0xFF) {
                 pagedTableSeek(&gSaveScreen->fileTable,
                                gSaveScreen->lastFile);
             } else {
-                pagedTableSeek(&gSaveScreen->fileTable, D_003E6E30.fileIndex);
+                pagedTableSeek(&gSaveScreen->fileTable, gSaveGameHeader.fileIndex);
             }
             gSaveScreen->uiState = 1;
         }
@@ -1549,7 +1539,6 @@ extern char *gFontEscapeBuffer;
 extern char D_00550BC8[];
 extern u8 D_004B378B[];
 extern BattleRosterEntry *func_A86DF8(s32 entryId);
-extern s32 battleRosterCursorEntryIdGet(s32 rosterIndex);
 extern s32 func_001894A0(s32 a, s32 b, s32 c);
 
 typedef struct MovieStatus {
@@ -1600,7 +1589,6 @@ struct McCardRequestFileRead {
     void (*callback)(void);
 };
 
-extern unsigned char gXglMcAgedEntries[];
 extern u8 *gSaveFileBuffer;
 void func_00224A80(void);
 
@@ -1651,8 +1639,8 @@ void saveScreenFileReadState(s32 setup) {
             break;
         }
         cardRequest.fileIndex = gSaveScreen->levelIndex[0];
-        cardRequest.screen = gXglMcAgedEntries;
-        cardRequest.size = 0x130B0;
+        cardRequest.screen = &gXglMcAgedEntries;
+        cardRequest.size = sizeof(gXglMcAgedEntries);
         func_00224A80();
         xglMcRequest(gSaveScreen->port, 5, &cardRequest,
                      gSaveScreen->scanBuffer);
@@ -1681,12 +1669,12 @@ void saveScreenFileReadState(s32 setup) {
                                          ->fileList
                                          .fileEntries[gSaveScreen->levelIndex[0]]
                                          .thumbnailSlot],
-                    gXglMcAgedEntries);
+                    &gXglMcAgedEntries);
             } else {
                 saveScreenStartPendingLoads();
             }
             saveScreenLoadFileRecord(gSaveScreen->levelIndex[0],
-                          (void *) gXglMcAgedEntries);
+                          (void *) &gXglMcAgedEntries);
             saveScreenSetMessageText(messageTextGet(0x28C));
             gSaveScreen->cardBusy = 0;
             ((void (*)(void)) saveScreenHandleError)();
@@ -1697,8 +1685,8 @@ void saveScreenFileReadState(s32 setup) {
             func_00220B90(0x20, 0);
             func_00220D28();
             gSaveScreen->uiState = 20;
-            D_003E6E30.port = gSaveScreen->port;
-            D_003E6E30.fileIndex = gSaveScreen->levelIndex[0];
+            gSaveGameHeader.port = gSaveScreen->port;
+            gSaveGameHeader.fileIndex = gSaveScreen->levelIndex[0];
             gSaveScreen->fileLoaded = 1;
             seVoiceStartDefault(0x1C);
         }
@@ -1757,8 +1745,8 @@ void saveScreenEntriesReadState(s32 setup) {
             break;
         }
         cardRequest.fileIndex = gSaveScreen->levelIndex[0];
-        cardRequest.screen = gXglMcAgedEntries;
-        cardRequest.size = 0x130B0;
+        cardRequest.screen = &gXglMcAgedEntries;
+        cardRequest.size = sizeof(gXglMcAgedEntries);
         xglMcRequest(gSaveScreen->port, 4, &cardRequest,
                      gSaveScreen->scanBuffer);
         gSaveScreen->uiState = 1;
@@ -1781,8 +1769,8 @@ void saveScreenEntriesReadState(s32 setup) {
             func_00220D28();
             gSaveScreen->uiState = 20;
             gSaveScreen->messagePending = 0;
-            D_003E6E30.port = gSaveScreen->port;
-            D_003E6E30.fileIndex = gSaveScreen->levelIndex[0];
+            gSaveGameHeader.port = gSaveScreen->port;
+            gSaveGameHeader.fileIndex = gSaveScreen->levelIndex[0];
             func_001B1D28(0);
             seVoiceStartDefault(0x1C);
         }
@@ -1867,7 +1855,7 @@ void saveScreenDraw(void) {
         }
     }
     xglClockReadBcd(clock);
-    func_0021BB68(0x200, 0x1C0, xglClockDayTime2UInt(clock) - D_003E6E30.startTime);
+    func_0021BB68(0x200, 0x1C0, xglClockDayTime2UInt(clock) - gSaveGameHeader.startTime);
     xglFontSetAlphaScale(saveScreenFadeAlpha());
     sheetDrawFrame(0x19F);
     xglFontSetAlphaScale(0x80);
@@ -1965,7 +1953,7 @@ void saveScreenSetup(void) {
     portMenu->flags |= 0x48;
     portMenu->columnFlags |= 0x100;
     if (gSaveScreen->mode == 0) {
-        pagedTableSeek(portMenu, D_003E6E30.port & 1);
+        pagedTableSeek(portMenu, gSaveGameHeader.port & 1);
     } else {
         pagedTableSeek(portMenu, 0);
     }
@@ -2395,17 +2383,6 @@ static inline void saveMenuKeySetAlt(struct SaveMenuTable *table, s32 index,
     }
 }
 
-struct AgedEntryFlags {
-    unsigned char unmodeled_00[0x28];
-    unsigned char flag28; /* +0x28 */
-    unsigned char unmodeled_29[0x3F - 0x29];
-    unsigned char flag3F; /* +0x3F */
-    unsigned char unmodeled_40[0x42 - 0x40];
-    unsigned char flag42; /* +0x42 */
-    unsigned char unmodeled_43[0x47 - 0x43];
-    unsigned char flag47; /* +0x47 */
-};
-
 s32 pagedTableGetCurrentEntry(struct SaveMenuTable *table);
 void padSetLatchedValue(s32 value);
 void Vibration_Set_Strong(s32 a, s32 b, s32 c);
@@ -2447,21 +2424,21 @@ void saveFileMenuUpdate(s32 setup) {
     } else if (getStatusHeader()->buttons & 0xA000) {
         switch (pagedTableGetCurrentEntry(&gSaveScreen->fileTable)) {
         case 0:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag28 ^= 1;
-            soundDriverSetStreamMode(((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag28);
+            gXglMcAgedEntries.flag28 ^= 1;
+            soundDriverSetStreamMode(gXglMcAgedEntries.flag28);
             seVoiceStartDefault(1);
             break;
         case 1:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag3F ^= 1;
+            gXglMcAgedEntries.flag3F ^= 1;
             seVoiceStartDefault(1);
             break;
         case 8:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag47 ^= 1;
+            gXglMcAgedEntries.flag47 ^= 1;
             seVoiceStartDefault(1);
             break;
         case 2:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag42 ^= 1;
-            if (((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag42 == 0) {
+            gXglMcAgedEntries.flag42 ^= 1;
+            if (gXglMcAgedEntries.flag42 == 0) {
                 Vibration_Stop();
                 padSetLatchedValue(10);
                 Vibration_Set_Strong(0x80, 0x10, 0x3C);

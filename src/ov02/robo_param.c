@@ -2,13 +2,7 @@
  * OV02 original TU 76: 0x00aa6518..0x00aa7010 (24 functions)
  */
 #include "common.h"
-
-typedef signed char s8;
-typedef short s16;
-typedef unsigned short u16;
-typedef int s32;
-typedef unsigned char u8;
-typedef unsigned int u32;
+#include "main/tu176.h"
 
 typedef struct RoboBattleStats RoboBattleStats;
 typedef struct RoboBattleUnit RoboBattleUnit;
@@ -226,16 +220,13 @@ s32 roboParamRollScore(RoboActor *actor) {
     return ((0x64 - battleStats->rollBias) * actor->gauge) + (random % 9U) + 1;
 }
 
-s32 func_00222238(s32, s32);
-s32 func_00222360(s32);
-
 void roboParamSetActive(RoboActor *actor, s32 isActive) {
     s32 effectHandle;
 
     if (isActive != 0) {
         actor->active = 1;
-        effectHandle = func_00222360(actor->key);
-        func_00222238(effectHandle, 1);
+        effectHandle = battleRosterEntryIdIndexGet(actor->key);
+        battleRosterCursorSet(effectHandle, 1);
         return;
     }
     actor->active = 0;

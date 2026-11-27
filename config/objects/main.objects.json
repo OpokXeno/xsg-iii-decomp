@@ -78121,9 +78121,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221C50",
+     "name": "newGameStateReset",
      "size": 460,
-     "splat_name": "func_00221C50",
+     "splat_name": "newGameStateReset",
      "va": "0x00221c50",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78193,18 +78193,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221F40",
+     "name": "battleRosterHasEntryId",
      "size": 96,
-     "splat_name": "func_00221F40",
+     "splat_name": "battleRosterHasEntryId",
      "va": "0x00221f40",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221FA0",
+     "name": "battleCurrentRosterIndexSet",
      "size": 24,
-     "splat_name": "func_00221FA0",
+     "splat_name": "battleCurrentRosterIndexSet",
      "va": "0x00221fa0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78220,9 +78220,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00222048",
+     "name": "battleRosterEntryIdRemove",
      "size": 180,
-     "splat_name": "func_00222048",
+     "splat_name": "battleRosterEntryIdRemove",
      "va": "0x00222048",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78238,36 +78238,36 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00222120",
+     "name": "battleRosterEntrySwap",
      "size": 280,
-     "splat_name": "func_00222120",
+     "splat_name": "battleRosterEntrySwap",
      "va": "0x00222120",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00222238",
+     "name": "battleRosterCursorSet",
      "size": 104,
-     "splat_name": "func_00222238",
+     "splat_name": "battleRosterCursorSet",
      "va": "0x00222238",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002222A0",
+     "name": "battleCurrentRosterCursorAdvance",
      "size": 192,
-     "splat_name": "func_002222A0",
+     "splat_name": "battleCurrentRosterCursorAdvance",
      "va": "0x002222a0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00222360",
+     "name": "battleRosterEntryIdIndexGet",
      "size": 132,
-     "splat_name": "func_00222360",
+     "splat_name": "battleRosterEntryIdIndexGet",
      "va": "0x00222360",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78310,9 +78310,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002224E8",
+     "name": "battleRosterLinkedEntryIdGet",
      "size": 172,
-     "splat_name": "func_002224E8",
+     "splat_name": "battleRosterLinkedEntryIdGet",
      "va": "0x002224e8",
      "name_basis": "address",
      "provenance": "estimated"

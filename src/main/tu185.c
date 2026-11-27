@@ -1,16 +1,5 @@
 #include "common.h"
-
-typedef signed char s8;
-
-typedef short s16;
-
-typedef int s32;
-
-typedef unsigned short u16;
-
-typedef unsigned int u32;
-
-typedef unsigned char u8;
+#include "main/tu176.h"
 
 typedef struct PagedTable {
     u16 cursor;           /* 0x00 */
@@ -797,10 +786,8 @@ s32 pagedTableGetStatus(PagedTable *pagedTable) {
     return ((pagedTable->pending + pagedTableGetPageLength(pagedTable)) < pagedTable->filledEntryCount) ? (statusBits | 2) : statusBits;
 }
 
-void func_00221C50();
-
 s32 pagedTableFlush(void) {
-    func_00221C50();
+    newGameStateReset();
     return 1;
 }
 
