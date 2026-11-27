@@ -2,6 +2,7 @@
 
 #include "shared.h"
 #include "gs.h"
+#include "main/tu162.h"
 typedef int s32;
 
 #define GS_TEX2_1 0x16
@@ -228,14 +229,6 @@ void xglFontQueueFrameCapLower(s32 x, s32 y) {
     cursor++;
     queueCommit(cursor, queueWriteStart);
 }
-
-/* Screen rectangle of a queued fill: left, top, right, bottom in pixels. */
-typedef struct FontRect {
-    u16 left;
-    u16 top;
-    u16 right;
-    u16 bottom;
-} FontRect;
 
 void fontQueueColorState(int mask);
 void fontQueueSprite(u16 startX, u16 startY, u16 endX, u16 endY);

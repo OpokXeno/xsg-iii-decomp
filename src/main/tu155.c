@@ -3,6 +3,8 @@
 #include "shared.h"
 #include "main/battle_shared.h"
 #include "main/tu176.h"
+#include "main/tu160.h"
+#include "main/tu156.h"
 
 typedef struct StateBudget {
     /* 0x00 */ s32 amountA;
@@ -283,7 +285,6 @@ void xglFontResetState(void);
 void dispatchCodeRange(u16 *pos, s32 handle, s32 a, s32 b, s32 c);
 void xglFontQueueBarRed(s32 a, s32 b, s32 c);
 void xglFontQueueBarBlue(s32 a, s32 b, s32 c);
-s32 xglFontGetFormattedWidth(void *text);
 void *func_00222D48(s32 a, s32 b, s32 c);
 void fontQueueLine(s32 a, s32 b, s32 c, s32 d);
 s32 Get_Rnd_001B8CD0(s32 a, s32 b);
@@ -749,7 +750,6 @@ void entryMessageReset(void) {
     }
 }
 
-u16 *getStatusHeader(void);
 s32 blockStatusBitsGet(void);
 s32 statusHeaderIsReadyMode20(void);
 s32 statusHeaderIsReadyMode40(void);
@@ -807,7 +807,7 @@ void budgetDisplayUpdate(void) {
         switch (gBudgetDisplayBlock.block->phase) {
         case BUDGET_DRAIN_PHASE_DRAIN:
             budgetTakeAmounts(1);
-            if (*getStatusHeader() & 0x20) {
+            if (getStatusHeader()->held & 0x20) {
                 budgetTakeAmounts(gBudgetDisplayBlock.block->drainStep + 1);
                 if ((blockStatusBitsGet() & 1) == 0) {
                     seVoiceStartDefault(10);
@@ -880,7 +880,7 @@ void budgetDisplayUpdate(void) {
         switch (gBudgetDisplayBlock.block->phase) {
         case BUDGET_DRAIN_PHASE_DRAIN:
             scaledAmountsDecay();
-            if (*getStatusHeader() & 0x20) {
+            if (getStatusHeader()->held & 0x20) {
                 scaledAmountsDecay();
                 if ((blockStatusBitsGet() & 1) == 0) {
                     seVoiceStartDefault(10);
@@ -980,7 +980,7 @@ void budgetDisplayUpdate(void) {
         switch (gBudgetDisplayBlock.block->phase) {
         case BUDGET_DRAIN_PHASE_DRAIN:
             stateBlockConsume(1);
-            if (*getStatusHeader() & 0x20) {
+            if (getStatusHeader()->held & 0x20) {
                 stateBlockConsume(gBudgetDisplayBlock.block->drainStep + 1);
                 if ((blockStatusBitsGet() & 1) == 0) {
                     seVoiceStartDefault(10);
@@ -1043,7 +1043,7 @@ void budgetDisplayUpdate(void) {
         case BUDGET_DRAIN_PHASE_DRAIN:
             gBudgetDisplayBlock.block->budget->spentAmount =
                 (s32) ((f32) gBudgetDisplayBlock.block->budget->spentAmount * 0.85f);
-            if (*getStatusHeader() & 0x20) {
+            if (getStatusHeader()->held & 0x20) {
                 gBudgetDisplayBlock.block->budget->spentAmount =
                     (s32) ((f32) gBudgetDisplayBlock.block->budget->spentAmount * 0.85f);
                 if ((blockStatusBitsGet() & 1) == 0) {

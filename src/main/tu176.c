@@ -3,10 +3,10 @@
 #include "main/tu173.h"
 #include "main/tu176.h"
 #include "main/tu178.h"
-#include "main/tu183.h"
 #include "main/sound_driver.h"
-
-s32 xglFontGetFormattedWidth(const char *text);
+#include "main/tu160.h"
+#include "main/tu162.h"
+#include "main/tu156.h"
 
 /* Starts the Yes/No prompt: title text, box width (widened to the text width + 0x30), selection state = stepDelta > 0,
    the other answer's highlight at 0x80, fade-in 0 and phase 0x80 (as clampedCounterInit). */
@@ -41,7 +41,7 @@ void clampedCounterInit(McGauge *gauge, s32 stepDelta)
   gauge->negative = (1 - isPositive) << 7;
 }
 
-/* headerFlags bits that toggle the prompt's selection (up and down in the pad's bit order). */
+/* Pressed pad bits that toggle the prompt's selection (up and down in the pad's bit order). */
 #define CHOICE_PROMPT_TOGGLE_BUTTONS 0x5000
 
 /* Signed as in the other TUs (choicePromptUpdate loads it with lb at 0x002214C4); counterEntryAdvancePhase reads it
@@ -50,7 +50,6 @@ extern s8 gVsyncsPerFrame;
 
 s32 statusHeaderIsReadyMode40(void);
 s32 statusHeaderIsReadyMode20(void);
-StatusHeader *getStatusHeader(void);
 
 /* Steps the Yes/No prompt one frame. While active, confirm selects the second answer and returns 1, cancel returns
    1, and pad bits 0x5000 toggle the selection with a sound. Then the fade-in, the phase and the highlight of the
@@ -72,7 +71,7 @@ s32 choicePromptUpdate(McGauge *gauge, s32 active)
     {
       decided = 1;
     }
-    else if (getStatusHeader()->headerFlags & CHOICE_PROMPT_TOGGLE_BUTTONS)
+    else if (getStatusHeader()->pressed & CHOICE_PROMPT_TOGGLE_BUTTONS)
     {
       gauge->state = 1 - gauge->state;
       seVoiceStartDefault(1);
@@ -83,7 +82,7 @@ s32 choicePromptUpdate(McGauge *gauge, s32 active)
   {
     gauge->fadeIn += step;
   }
-  if ((u8)(gauge->flag - 1) < 0x7F)
+  if (gauge->flag != 0 && gauge->flag < 0x80)
   {
     gauge->flag -= step;
   }
@@ -111,17 +110,8 @@ void counterEntryAdvancePhase(McGauge *gauge)
   }
 }
 
-/* Screen rectangle in GS coordinates: left/top corner and right/bottom corner. */
-typedef struct MenuRect {
-    u16 x;
-    u16 y;
-    u16 x1;
-    u16 y1;
-} MenuRect;
-
 int colorModulateByte(int sourceChannel, int scaleByte);
 void fontQueueColorState(int mask);
-void xglFontDrawBoxBlend(MenuRect *rect, s32 inset, s32 colour, s32 blendMode);
 void fontQueueSprite(u16 startX, u16 startY, u16 endX, u16 endY);
 void fontQueueLine(u16 startX, u16 startY, u16 endX, u16 endY);
 void func_0021E9A8(u16 x, u16 y, u16 width, u16 height);
@@ -145,7 +135,7 @@ u8 statusByte0Get(void);
    math wraps in 0..0xFF. */
 void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
 {
-  MenuRect rect;
+  FontRect rect;
   s32 alpha;
   s32 boxAlpha;
   s32 left;
@@ -159,22 +149,22 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
   boxAlpha = (u8) colorModulateByte(0x73, alpha);
   left = (0x100 - (gauge->width >> 1)) * 16 + 0x6FF8;
   top = (y << 4) + 0x71F8;
-  rect.x1 = left + (u16) gauge->width * 16;
-  rect.y1 = top + 0x530;
-  rect.x = left;
-  rect.y = top;
+  rect.right = left + (u16) gauge->width * 16;
+  rect.bottom = top + 0x530;
+  rect.left = left;
+  rect.top = top;
   fontQueueColorState(((u64) boxAlpha << 24) | 0x272120);
   xglFontDrawBoxBlend(&rect, 2, 0, 0);
   fontQueueColorState(((u64) boxAlpha << 24) | 0x554643);
-  fontQueueSprite(rect.x + 0x40, rect.y + 0x40, rect.x1 - 0x40, rect.y + 0x1B0);
-  rect.y += 0x1E0;
+  fontQueueSprite(rect.left + 0x40, rect.top + 0x40, rect.right - 0x40, rect.top + 0x1B0);
+  rect.top += 0x1E0;
   fontQueueColorState(((u64) (u8) alpha << 24) | 0x3C312F);
-  fontQueueLine(rect.x + 0x20, rect.y, rect.x1 - 0x20, rect.y);
-  rect.y += 0x160;
-  fontQueueLine(rect.x + 0x20, rect.y, rect.x1 - 0x20, rect.y);
-  rect.y += 0x160;
-  fontQueueLine(rect.x + 0x20, rect.y, rect.x1 - 0x20, rect.y);
-  rect.y = top;
+  fontQueueLine(rect.left + 0x20, rect.top, rect.right - 0x20, rect.top);
+  rect.top += 0x160;
+  fontQueueLine(rect.left + 0x20, rect.top, rect.right - 0x20, rect.top);
+  rect.top += 0x160;
+  fontQueueLine(rect.left + 0x20, rect.top, rect.right - 0x20, rect.top);
+  rect.top = top;
   xglFontPrintTitle();
   xglFontPrintEscapeByte(0x10);
   xglFontPrintExtendedColor(0, 0, 0);
@@ -182,25 +172,25 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
   if (gauge->text)
   {
     xglFontSetColor(0x2D, 0x2D, 0x56);
-    xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(gauge->text) >> 1), ((rect.y - 0x71F8) >> 4) + 4,
+    xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(gauge->text) >> 1), ((rect.top - 0x71F8) >> 4) + 4,
                         gauge->text);
   }
   if (visible)
   {
     fontQueueColorState(((u64) (u8) colorModulateByte(0x73, alpha) << 24) | 0xF98980);
-    func_0021E9A8(rect.x, rect.y + gauge->state * 0x160 + 0x1E0, gauge->width << 4, 0x160);
+    func_0021E9A8(rect.left, rect.top + gauge->state * 0x160 + 0x1E0, gauge->width << 4, 0x160);
   }
   else
   {
     fontQueueColorState(
         ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20), gauge->negative),
                                       alpha) << 24) | 0xE3FF5F);
-    func_0021E9A8(rect.x, rect.y + 0x1E0, gauge->width << 4, 0x160);
+    func_0021E9A8(rect.left, rect.top + 0x1E0, gauge->width << 4, 0x160);
     fontQueueColorState(
         ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20),
                                                         (u8) (0x80 - gauge->negative)),
                                       alpha) << 24) | 0xE3FF5F);
-    func_0021E9A8(rect.x, rect.y + 0x340, gauge->width << 4, 0x160);
+    func_0021E9A8(rect.left, rect.top + 0x340, gauge->width << 4, 0x160);
   }
   if (gauge->state == 0)
   {
@@ -218,7 +208,7 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
     xglFontSetColor(0x62, 0x62, 0x62);
   }
   xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(messageTextGet(CHOICE_PROMPT_FIRST_ANSWER_TEXT)) >> 1),
-                      ((rect.y - 0x71F8) >> 4) + 0x1E, messageTextGet(CHOICE_PROMPT_FIRST_ANSWER_TEXT));
+                      ((rect.top - 0x71F8) >> 4) + 0x1E, messageTextGet(CHOICE_PROMPT_FIRST_ANSWER_TEXT));
   if (gauge->state == 1)
   {
     if (visible)
@@ -235,7 +225,7 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
     xglFontSetColor(0x62, 0x62, 0x62);
   }
   xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(messageTextGet(CHOICE_PROMPT_SECOND_ANSWER_TEXT)) >> 1),
-                      ((rect.y - 0x71F8) >> 4) + 0x34, messageTextGet(CHOICE_PROMPT_SECOND_ANSWER_TEXT));
+                      ((rect.top - 0x71F8) >> 4) + 0x34, messageTextGet(CHOICE_PROMPT_SECOND_ANSWER_TEXT));
 }
 
 void drawEntryReset(void *drawEntry);
@@ -443,7 +433,6 @@ void battleCurrentRosterIndexSet(s32 rosterIndex)
    not hold it yet and still has room, and sets the id's bit in the table's entry mask. */
 void battleRosterEntryIdAdd(s32 entryId)
 {
-  BattleRosterTable *table;
   BattleRoster *roster;
   s32 rosterIndex;
   s32 mask;
@@ -454,7 +443,6 @@ void battleRosterEntryIdAdd(s32 entryId)
   }
   rosterIndex = entryId >= BATTLE_ROSTER1_FIRST_ENTRY_ID;
   roster = battleRosterGet(rosterIndex);
-  table = &gBattleRosterTable;
   mask = 1 << entryId;
   count = roster->entryIdCount;
   if (rosterIndex != 0 ? count >= BATTLE_ROSTER1_ENTRY_ID_CAPACITY : count >= BATTLE_ROSTER0_ENTRY_ID_CAPACITY)
@@ -463,7 +451,7 @@ void battleRosterEntryIdAdd(s32 entryId)
   }
   roster->entryIds[count] = entryId;
   roster->entryIdCount++;
-  table->entryMask |= mask;
+  gBattleRosterTable.entryMask |= mask;
 }
 
 /* Removes entry id from its roster: later entries move down one slot and the cursor follows its entry

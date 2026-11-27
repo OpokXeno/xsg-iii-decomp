@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/tu156.h"
 
 typedef signed char s8;
 
@@ -86,7 +87,6 @@ void fontQueueColorState(s32 value);
 void xglFontDrawBoxBlend(struct Box16 *box, s32 mode, s32 a2, s32 a3);
 void fontQueueSprite(s32 x0, s32 y0, s32 x1, s32 y1);
 void xglFontQueueFlaggedRow(s32 x, s32 y, void *image);
-s32 xglFontGetFormattedWidth(const char *text);
 void xglFontPrintIndexed(s32 x, s32 y, const char *text);
 void xglFontPrintTitle(void);
 void xglFontPrintEscapeByte(s32 value);

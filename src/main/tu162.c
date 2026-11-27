@@ -2,6 +2,7 @@
 
 #include "gs.h"
 #include "main/xgl_direct_queue.h"
+#include "main/tu162.h"
 
 extern XglDirectQueueEntry *xglDirectQueueBuffer;
 extern int xglDirectQueueCount;
@@ -426,13 +427,6 @@ typedef struct GifRecord {
     u64 address;
 } GifRecord;
 
-typedef struct FontRect {
-    u16 left;
-    u16 top;
-    u16 right;
-    u16 bottom;
-} FontRect;
-
 /* PRIM values of the packets below: the PRIM type in bits 0-2, IIP (gouraud) in bit 3, ABE (alpha blend) in bit 6. */
 #define FONT_PRIM_LINE_ABE 0x41
 #define FONT_PRIM_TRISTRIP_ABE 0x44
@@ -696,7 +690,7 @@ void fontQueueBevelFrameReversed(FontRect *rect, int inset, int firstColor, int 
  * a sprite-box fill of the same rect. inset packs the x inset (high bits) and the y
  * inset (low nibble); both are scaled to GS units (x16). kept: the innerInsetY term
  * ((insetY & 0xFF) >> 8) is zero for every inset, but its ops decide the emitted code. */
-void xglFontDrawBoxBlend(u16 *rect, int inset, u32 colour, u32 blendMode) {
+void xglFontDrawBoxBlend(FontRect *rect, int inset, u32 colour, u32 blendMode) {
     FontRect innerRect;
     u32 stateMask;
     u32 tintColour;
@@ -721,16 +715,16 @@ void xglFontDrawBoxBlend(u16 *rect, int inset, u32 colour, u32 blendMode) {
     if (blendMode != 0) {
         insetY = (inset & 0xF) * 16;
         innerInsetY = insetY + ((insetY & 0xFF) >> 8);
-        innerRect.left = rect[0] + insetX * 16;
-        innerRect.top = rect[1] + innerInsetY;
-        innerRect.right = rect[2] - insetX * 16;
-        innerRect.bottom = rect[3] - innerInsetY;
+        innerRect.left = rect->left + insetX * 16;
+        innerRect.top = rect->top + innerInsetY;
+        innerRect.right = rect->right - insetX * 16;
+        innerRect.bottom = rect->bottom - innerInsetY;
         fontQueueRectTwoColors(&innerRect, colour, stateMask, 0x1100);
         fontQueueColorState(stateMask);
     } else {
         insetY = (inset & 0xF) * 16;
         fontQueueSprite(
-            (rect[0] + insetX * 16), (rect[1] + insetY), (rect[2] - insetX * 16), (rect[3] - insetY));
+            (rect->left + insetX * 16), (rect->top + insetY), (rect->right - insetX * 16), (rect->bottom - insetY));
     }
 }
 
@@ -792,7 +786,7 @@ void xglFontDrawDefault(FontRect *rect, s32 level) {
 
 extern u8 gFontAlphaScale;
 
-void xglFontSetAlphaScale(s8 alphaScale) {
+void xglFontSetAlphaScale(s32 alphaScale) {
     gFontAlphaScale = alphaScale;
 }
 

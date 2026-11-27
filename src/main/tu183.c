@@ -1,7 +1,8 @@
 #include "common.h"
 #include "main/tu176.h"
-#include "main/tu183.h"
 #include "main/sound_driver.h"
+#include "main/tu160.h"
+#include "main/tu162.h"
 
 /* Voice record at SaveLoadMenu +0x720 (alpha at +0xAC). */
 typedef struct SeVoice {
@@ -168,8 +169,6 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_0022F498);
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_0022F910);
 
 s32 func_0021E390(s32, s32, void *, s32);
-/* Not main/tu162.h: its xglFontSetAlphaScale(s8) makes every caller here sign-extend the alpha byte. */
-void xglFontSetAlphaScale(s32 scale);
 void fontQueueSpriteBlack(void);
 
 void seVoiceDrawAlpha(s32 rawAlpha) {
@@ -183,7 +182,6 @@ void seVoiceDrawAlpha(s32 rawAlpha) {
     xglFontSetAlphaScale(fontAlpha);
 }
 
-StatusHeader *getStatusHeader(void);
 s32 func_002D3D38();
 s32 releaseStateBuffers();
 s32 soundFlagAIsSet();
@@ -196,7 +194,7 @@ void seVoiceRestart(void) {
     }
     gSaveLoadMenuStorage->voiceControlBits &= 0xFFFB;
     releaseStateBuffers();
-    if (getStatusHeader()->headerFlags & 0x10) {
+    if (getStatusHeader()->pressed & 0x10) {
         gSaveLoadMenuStorage->startPending = 1;
         seVoiceStartDefault(7);
         return;
@@ -237,7 +235,7 @@ void seVoiceRefreshState(void)
   {
     gSaveLoadMenuStorage->voiceControlBits &= 0xFFFB;
     seSystemShutdown();
-    if (getStatusHeader()->headerFlags & 0x10)
+    if (getStatusHeader()->pressed & 0x10)
     {
       seVoiceStartDefault(7);
       gSaveLoadMenuStorage->startPending = 1;

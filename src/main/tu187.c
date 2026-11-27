@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main/tu176.h"
+#include "main/tu160.h"
 
 typedef struct SeTableBlock {
     u8 unk000[0x200];
@@ -63,7 +64,7 @@ typedef struct SeVoiceTailBlock {
     s32 unk20;
     s32 unk24;
     s32 unk28;
-    u8 unk2C[0xC];
+    McGauge prompt;
 } SeVoiceTailBlock;
 
 typedef union BitRows {
@@ -620,11 +621,6 @@ void seVoiceUnitSetMode(s32 unitMode) {
     }
 }
 
-typedef struct StatusHeader {
-    u8 unk00[2];
-    u16 headerFlags;
-} StatusHeader;
-
 s32 pagedTableUpdate(void *, s32 *);
 void pagedTableAnimateSlots(void *);
 s16 *func_00222768(s32, s32);
@@ -634,7 +630,6 @@ s32 func_002282A0(u8);
 void movieStartPlayback(void *, s32);
 s32 statusHeaderIsReadyMode20(void);
 s32 statusHeaderIsReadyMode40(void);
-StatusHeader *getStatusHeader(void);
 void stepValueTowardTarget(SteppedValue *);
 void statusReadSync(u8 *, s32);
 void tiSheetCopyTrailingField(void *, void *);
@@ -660,20 +655,20 @@ void seVoiceUnitUpdate(void) {
     stepValueTowardTarget(&unit->levelB);
     stepValueTowardTarget(&unit->levelC);
     if ((unit->ctrl & 0xF) != 2 && (unit->ctrl & 0xF) != 7 && (unit->ctrl & 0xF) != 8) {
-        if (getStatusHeader()->headerFlags & 0xC) {
-            if (getStatusHeader()->headerFlags & 4) {
+        if (getStatusHeader()->pressed & 0xC) {
+            if (getStatusHeader()->pressed & 4) {
                 stepStarted = 1;
                 pagedTableMoveCursor(&gSeVoicePlayback->sheet3F4,
                                                         -1);
                 seVoiceStartDefault(1);
             }
-            if (getStatusHeader()->headerFlags & 8) {
+            if (getStatusHeader()->pressed & 8) {
                 stepStarted = 1;
                 pagedTableMoveCursor(&gSeVoicePlayback->sheet3F4,
                                                         1);
                 seVoiceStartDefault(1);
             }
-            seVoiceKindCursorSeek(getStatusHeader()->headerFlags & 4);
+            seVoiceKindCursorSeek(getStatusHeader()->pressed & 4);
         }
     }
 
@@ -728,7 +723,7 @@ void seVoiceUnitUpdate(void) {
                 unit->ctrl = unit->ctrl & ~0xF00;
                 mcStateSetupRequest(15, 0);
             }
-        } else if (((getStatusHeader()->headerFlags & 0x80) != 0) && (u32) (phase - 2) < 3u) {
+        } else if (((getStatusHeader()->pressed & 0x80) != 0) && (u32) (phase - 2) < 3u) {
             unit->ctrl = (unit->ctrl & ~0xF00) | 0x100;
             mcStateSetupRequest(15, 0);
             seVoiceStartDefault(6);
@@ -790,7 +785,7 @@ void seVoiceUnitUpdate(void) {
                 unit->ctrl = unit->ctrl & ~0xF00;
                 mcStateSetupRequest(15, 0);
             }
-        } else if (((getStatusHeader()->headerFlags & 0x80) != 0) &&
+        } else if (((getStatusHeader()->pressed & 0x80) != 0) &&
                    ((u32) (phase - 2) < 3u || phase == 10)) {
             unit->ctrl = (unit->ctrl & ~0xF00) | 0x100;
             mcStateSetupRequest(15, 0);
@@ -1323,7 +1318,7 @@ typedef struct TiFrameSheet {
     s16 entryCount; /* 0x1A */
     s16 frameBase;  /* 0x1C */
     u8 unk1E[0xE];
-    u8 unk2C[0xC];
+    McGauge prompt;
 } TiFrameSheet;
 
 typedef struct SeVoiceFrameView {
@@ -1373,8 +1368,7 @@ s32 func_00222848(s32, s32, s32);
 s32 func_00223778(s32, s32);
 void func_0021FCE0(TiFrameSheet *sheet);
 void func_00220130(TiFrameSheet *sheet, s32 index, s32 mask);
-void sheetFrameSetCellAlpha(TiFrameSheet *sheet, s32 index, s32 value);
-void choicePromptDraw(void *table, s32 a, s32 b);
+void sheetFrameSetCellAlpha(TiFrameSheet *sheet, s32 index, u64 alpha);
 void func_0021FAB8(s32 a, s32 b, void *table);
 void func_0021F260(s32 a, s32 b, s32 c, s32 d);
 void func_0021EBD0(s32 a, s32 b, s32 c, s32 d);
@@ -1635,7 +1629,7 @@ void seVoicePanelDraw(s32 alpha) {
     }
 
     xglFontResetState();
-    choicePromptDraw(&((SeVoiceFrameView *) gSeVoiceState)->frame.unk2C, 0, 174);
+    choicePromptDraw(&((SeVoiceFrameView *) gSeVoiceState)->frame.prompt, 0, 174);
     if (((SeVoiceFrameView *) gSeVoiceState)->scaleMode == 2) {
         xglFontSetColorScale(128);
         if (((SeVoiceFrameView *) gSeVoiceState)->voiceTableCount == 0) {
@@ -1951,7 +1945,7 @@ void seVoiceSceneEnter(s32 scene) {
         seVoiceListBuild(scene, 1);
         seVoicePlayAndSetup();
         gSeVoiceState->unk9C1 = 0;
-        choicePromptInit(&gSeVoiceState->unk430.unk2C, messageTextGet(114), 0, 201);
+        choicePromptInit(&gSeVoiceState->unk430.prompt, messageTextGet(114), 0, 201);
         if (!(gSeVoiceState->voiceFlags & 2)) {
             sheetSetIndex(messageTextGet(109));
         }
@@ -1963,7 +1957,7 @@ void seVoiceSceneEnter(s32 scene) {
         seVoiceListBuild(scene, 1);
         seVoicePlayAndSetup();
         gSeVoiceState->unk9C1 = 0;
-        choicePromptInit(&gSeVoiceState->unk430.unk2C, messageTextGet(115), 0, 201);
+        choicePromptInit(&gSeVoiceState->unk430.prompt, messageTextGet(115), 0, 201);
         if (!(gSeVoiceState->voiceFlags & 2)) {
             sheetSetIndex(messageTextGet(111));
         }
@@ -1999,9 +1993,7 @@ typedef struct SeVoiceScreenView {
     u8 stepValue0[4];
     u8 stepValue1[4];
     u8 stepValue2[4];
-    u8 clampedCounter[8];
-    u8 restartRequest;
-    u8 unk465[3];
+    McGauge prompt;
     u8 unk468[0xE8];
     u8 unk550[0x298];
     u8 sheetBlock[0x1D8];
@@ -2018,18 +2010,10 @@ typedef struct SeVoiceScreenView {
     u8 resetFlag;
 } SeVoiceScreenView;
 
-typedef struct SeStatusHeader {
-    u8 unk00[2];
-    u16 headerFlags;
-    u16 extFlags;
-} SeStatusHeader;
-
-s32 choicePromptUpdate(void *, s32);
 void pagedTableStepCursorUnmasked(void *, s32, s32);
 void func_00220E00(void);
 void func_002209C0(void);
 void func_001B8D08(s32, s32, s32);
-s32 clampedCounterInit(void *, s32);
 
 typedef struct SeVoiceRefView {
     SeVoiceScreenView *state;
@@ -2103,7 +2087,7 @@ void seVoiceScreenUpdate(void) {
                 voiceStateView()->endFlag = 1;
                 break;
             }
-        } else if (getStatusHeader()->headerFlags & 0x40) {
+        } else if (getStatusHeader()->pressed & 0x40) {
             seVoiceStartDefault(7);
             voiceStateView()->endFlag = 1;
         }
@@ -2132,7 +2116,7 @@ void seVoiceScreenUpdate(void) {
         switch (subState) {
         case 0:
         default: {
-            choicePromptUpdate(voiceStateView()->clampedCounter, 0);
+            choicePromptUpdate(&voiceStateView()->prompt, 0);
             if (pagedTableUpdate(voiceStateView()->voiceTableCursor, &pendingCount) != 0) {
                 if (voiceStateView()->voiceFlags & 2) {
                     seVoicePlayAndSetup();
@@ -2167,18 +2151,18 @@ void seVoiceScreenUpdate(void) {
                     }
                 }
                 if (voiceStateView()->timerMode >= 2) {
-                    if (getStatusHeader()->headerFlags & 4) {
+                    if (getStatusHeader()->pressed & 4) {
                         pagedTableStepCursorUnmasked(&voiceStateView()->unk3F4, -1, 256);
                     }
-                    if (getStatusHeader()->headerFlags & 8) {
+                    if (getStatusHeader()->pressed & 8) {
                         pagedTableStepCursorUnmasked(&voiceStateView()->unk3F4, 1, 256);
                     }
-                    if (getStatusHeader()->headerFlags & 0xc) {
+                    if (getStatusHeader()->pressed & 0xc) {
                         seVoiceStartDefault(1);
                     }
                 }
                 if (voiceStateView()->stage == 1) {
-                    if (getStatusHeader()->headerFlags & 0x80) {
+                    if (getStatusHeader()->pressed & 0x80) {
                         voiceStateView()->stage = 2;
                         seVoiceStartDefault(6);
                         seVoicePlayAndSetup();
@@ -2189,7 +2173,7 @@ void seVoiceScreenUpdate(void) {
         case 1: {
             s32 roll;
             s32 remainingSpan;
-            choicePromptUpdate(voiceStateView()->clampedCounter, 0);
+            choicePromptUpdate(&voiceStateView()->prompt, 0);
             if (statusHeaderIsReadyMode40()) {
                 seVoiceListBuild(voiceStateView()->phase, 0);
                 voiceStateView()->subState = 0;
@@ -2203,21 +2187,21 @@ void seVoiceScreenUpdate(void) {
                 }
             } else if (statusHeaderIsReadyMode20()) {
                 voiceStateView()->subState = 2;
-                clampedCounterInit(voiceStateView()->clampedCounter, 0);
+                clampedCounterInit(&voiceStateView()->prompt, 0);
                 sheetSetIndex(messageTextGet(113));
                 seVoiceStartDefault(2);
             } else {
                 oldTimer = voiceStateView()->timer;
-                if (((SeStatusHeader *) getStatusHeader())->extFlags & 0x1000) {
+                if (getStatusHeader()->repeated & 0x1000) {
                     voiceStateView()->timer += 1;
                 }
-                if (((SeStatusHeader *) getStatusHeader())->extFlags & 0x4000) {
+                if (getStatusHeader()->repeated & 0x4000) {
                     voiceStateView()->timer -= 1;
                 }
-                if (((SeStatusHeader *) getStatusHeader())->extFlags & 0x2000) {
+                if (getStatusHeader()->repeated & 0x2000) {
                     voiceStateView()->timer += 10;
                 }
-                if (((SeStatusHeader *) getStatusHeader())->extFlags & 0x8000) {
+                if (getStatusHeader()->repeated & 0x8000) {
                     voiceStateView()->timer -= 10;
                 }
                 if (voiceStateView()->timer <= 0) {
@@ -2239,7 +2223,7 @@ void seVoiceScreenUpdate(void) {
                 }
                 if (oldTimer != voiceStateView()->timer) {
                     seVoiceStartDefault(1);
-                } else if (getStatusHeader()->headerFlags & 0xf000) {
+                } else if (getStatusHeader()->pressed & 0xf000) {
                     seVoiceStartDefault(3);
                 }
             }
@@ -2247,8 +2231,8 @@ void seVoiceScreenUpdate(void) {
         case 2: {
             s32 roll;
             s32 remainingSpan;
-            if (choicePromptUpdate(voiceStateView()->clampedCounter, 1) != 0) {
-                if (voiceStateView()->restartRequest == 0) {
+            if (choicePromptUpdate(&voiceStateView()->prompt, 1) != 0) {
+                if (voiceStateView()->prompt.state == 0) {
                     roll = Get_Rnd_001B8CD0(voiceStateView()->voiceKind, selectedKey);
                     if (voiceStateView()->voiceFlags & 1) {
                         roll -= voiceStateView()->timer;
@@ -2308,7 +2292,7 @@ void seVoiceScreenUpdate(void) {
     if (voiceStateView()->level >= 65) {
         func_002209C0();
     }
-    if (getStatusHeader()->headerFlags & 0x10) {
+    if (getStatusHeader()->pressed & 0x10) {
         seVoiceStartDefault(7);
         voiceStateView()->endFlag = 1;
     }

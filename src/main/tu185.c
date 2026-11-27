@@ -1,5 +1,7 @@
 #include "common.h"
 #include "main/tu176.h"
+#include "main/tu160.h"
+#include "main/tu156.h"
 
 typedef struct PagedTable {
     u16 cursor;           /* 0x00 */
@@ -121,7 +123,6 @@ s32 pagedTableGetPageCount(PagedTable *pagedTable) {
     return 1;
 }
 
-u16 *getStatusHeader(void);
 s32 statusHeaderIsReadyMode20(void);
 s32 statusHeaderIsReadyMode40(void);
 u16 pagedTableGetPageLength(PagedTable *pagedTable);
@@ -160,22 +161,22 @@ s32 pagedTableUpdateCursorFromStatus(PagedTable *pagedTable, s32 *statusOut) {
             if ((pagedTable->altPageSize & 8) != 0) {
                 s32 headerWordA;
                 s32 headerWordB;
-                headerWordA = getStatusHeader()[2];
+                headerWordA = getStatusHeader()->repeated;
                 headerBitsA = headerWordA & 0x1000;
-                headerWordB = getStatusHeader()[2];
+                headerWordB = getStatusHeader()->repeated;
                 headerBitsB = headerWordB & 0x4000;
             } else {
                 s32 headerWordA;
                 s32 headerWordB;
-                headerWordA = getStatusHeader()[2];
+                headerWordA = getStatusHeader()->repeated;
                 headerBitsA = headerWordA & 0x8000;
-                headerWordB = getStatusHeader()[2];
+                headerWordB = getStatusHeader()->repeated;
                 headerBitsB = headerWordB & 0x2000;
             }
         }
         if ((pagedTable->altPageSize & 0x20) != 0) {
-            headerBitsA |= getStatusHeader()[5] & 0x90;
-            headerBitsB |= getStatusHeader()[5] & 0x60;
+            headerBitsA |= getStatusHeader()->unk_0A & 0x90;
+            headerBitsB |= getStatusHeader()->unk_0A & 0x60;
         }
         if (pageLength >= pagedTable->filledEntryCount) {
             headerBitsA = 0;
@@ -187,33 +188,33 @@ s32 pagedTableUpdateCursorFromStatus(PagedTable *pagedTable, s32 *statusOut) {
             if (lastIndex >= pagedTable->filledEntryCount) {
                 lastIndex = pagedTable->filledEntryCount - 1;
             }
-            if ((getStatusHeader()[2] & maskLow) != 0 && firstIndex < pagedTable->cursor) {
+            if ((getStatusHeader()->repeated & maskLow) != 0 && firstIndex < pagedTable->cursor) {
                 pagedTable->cursor = pagedTable->cursor + 0xFFFF;
                 statusBits = 1;
-            } else if ((getStatusHeader()[1] & maskLow) != 0) {
+            } else if ((getStatusHeader()->pressed & maskLow) != 0) {
                 pagedTable->cursor = lastIndex;
                 statusBits = 1;
             }
-            if ((getStatusHeader()[2] & maskHigh) != 0 && pagedTable->cursor < lastIndex) {
+            if ((getStatusHeader()->repeated & maskHigh) != 0 && pagedTable->cursor < lastIndex) {
                 statusBits |= 1;
                 pagedTable->cursor = pagedTable->cursor + 1;
-            } else if ((getStatusHeader()[1] & maskHigh) != 0) {
+            } else if ((getStatusHeader()->pressed & maskHigh) != 0) {
                 pagedTable->cursor = firstIndex;
                 statusBits |= 1;
             }
         } else {
-            if ((getStatusHeader()[2] & maskLow) != 0 && pagedTable->cursor != 0) {
+            if ((getStatusHeader()->repeated & maskLow) != 0 && pagedTable->cursor != 0) {
                 pagedTable->cursor = pagedTable->cursor + 0xFFFF;
                 statusBits = 1;
-            } else if (altEven != 0 && (getStatusHeader()[1] & maskLow) != 0) {
+            } else if (altEven != 0 && (getStatusHeader()->pressed & maskLow) != 0) {
                 pagedTable->cursor = pagedTable->filledEntryCount + 0xFFFF;
                 statusBits = 1;
             }
-            if ((getStatusHeader()[2] & maskHigh) != 0 &&
+            if ((getStatusHeader()->repeated & maskHigh) != 0 &&
                 pagedTable->cursor < pagedTable->filledEntryCount - 1) {
                 pagedTable->cursor = pagedTable->cursor + 1;
                 statusBits |= 1;
-            } else if (altEven != 0 && (getStatusHeader()[1] & maskHigh) != 0) {
+            } else if (altEven != 0 && (getStatusHeader()->pressed & maskHigh) != 0) {
                 pagedTable->cursor = 0;
                 statusBits |= 1;
             }
@@ -406,8 +407,6 @@ void pagedTableSetEntry(PagedTable *pagedTable, s32 entryIndex, void *entryPoint
         pagedTable->entryKeys[entryIndex] = storedKey;
     }
 }
-
-s32 xglFontGetFormattedWidth(void *entry);
 
 /*
  * Lays out the text box of the table: the extent is the widest font entry when width is 0, the span is
