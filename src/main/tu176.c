@@ -111,8 +111,7 @@ void counterEntryAdvancePhase(McGauge *gauge)
   }
 }
 
-/* Screen rectangle in GS coordinates (same layout as res_get_path.c's MenuRect; xglFontDrawBoxBlend's definition
-   in tu162.c spells the parameter u16 *). */
+/* Screen rectangle in GS coordinates: left/top corner and right/bottom corner. */
 typedef struct MenuRect {
     u16 x;
     u16 y;
@@ -275,7 +274,7 @@ void addClampedCounter(McFileList *fileList, s16 delta)
   }
 }
 
-/* DrawEntry (tu370.c) has no header: the list passes its leading DrawEntry as a pointer. */
+/* DrawEntry has no shared header: the list passes its leading DrawEntry as a pointer. */
 void drawEntrySetScale(void *drawEntry, s32 scale);
 
 /* Steps previousCursor toward position by step (straight to it when closer than step) and sets the bar's scale to

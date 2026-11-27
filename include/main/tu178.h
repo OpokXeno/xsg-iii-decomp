@@ -10,7 +10,7 @@
 #define XGL_MC_AGED_ENTRY_COUNT 50
 
 /* The 0x130B0-byte memory-card save image at gXglMcAgedEntries. The newGameCleared* members are the bytes and regions
-   newGameStateReset (tu176) zeroes; nothing else about them is known yet. */
+   newGameStateReset zeroes; nothing else about them is known yet. */
 typedef struct AgedEntryRing {
     unsigned char unmodeled_0000[0x10];                               /* +0x0000 */
     int newGameCounters[2];                                           /* +0x10: zeroed by the new-game reset */

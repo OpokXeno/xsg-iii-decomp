@@ -33,8 +33,8 @@ typedef struct BattleRosterPair {
     BattleRoster rosters[2];                                  /* +0x00 */
 } BattleRosterPair;
 
-/* 0x24-byte per-character record of gBattleRosterTable, from +0x48. func_00222768 (tu177) returns the address of
-   s16 slot n of a record. The stride-0x24 accessors in tu177 use other bases into the same array: the skill count
+/* 0x24-byte per-character record of gBattleRosterTable, from +0x48. func_00222768 returns the address of s16
+   slot n of a record. The stride-0x24 skill accessors use other bases into the same array: the skill count
    and cost of character c sit at table +0x28 + c * 0x24 (+0x04/+0x05 of record c - 1), and the skill-board nibbles
    at table +0x28 + c * 0x24 + (page >> 1) * 8 + row. */
 typedef struct BattleCharacterRecord {
@@ -61,7 +61,7 @@ typedef struct BattleRosterTable {
 
 /* Play-state header at gSaveGameHeader, 0x2C bytes (newGameStateReset clears it): the start time of the game, the
    copy of the roster pair battleRosterSnapshotTake (ptSaveUMNParty) takes, and the memory-card port and file of the
-   last save (res_get_path.c). */
+   last save. */
 typedef struct SaveGameHeader {
     s32 startTime;                                            /* +0x00: xglClockDayTime2UInt of the new-game clock */
     BattleRosterPair roster;                                  /* +0x04: copied from gBattleRosterTable.rosterPair */
@@ -72,7 +72,7 @@ typedef struct SaveGameHeader {
 } SaveGameHeader;
 
 /* 0xC-byte Yes/No choice prompt (choicePromptInit / clampedCounterInit, choicePromptUpdate, choicePromptDraw). The
-   save screen embeds one at +0x5B610 (res_get_path.c), the stream player and the SE/voice screen embed others. */
+   save screen embeds one at +0x5B610; the stream player and the SE/voice screen embed others. */
 typedef struct McGauge {
     const char *text;           /* +0x00: title text, drawn above the Yes/No pair */
     s32 width;                  /* +0x04: box width, at least the text width + 0x30 */
@@ -82,7 +82,7 @@ typedef struct McGauge {
     u8 flag;                    /* +0x0B: phase, 0x80 until counterEntryAdvancePhase starts the fade */
 } McGauge;
 
-/* One save file of the card directory, as read into the file list (layout from res_get_path.c). */
+/* One save file of the card directory, as read into the file list. */
 typedef struct McFileEntry {
     u32 playTime;               /* +0x00 */
     s32 unmodeled04;            /* +0x04 */
@@ -96,17 +96,17 @@ typedef struct McFileEntry {
 } McFileEntry;
 
 /* Save file list with its scroll bar (mcFileListScrollInit, addClampedCounter, mcFileListScrollStep). It starts with
-   the 0x1C-byte DrawEntry of tu370.c (drawEntryReset / SetValue / SetFlag / SetAlpha / SetScale) that draws the bar;
+   the 0x1C-byte DrawEntry (drawEntryReset / SetValue / SetFlag / SetAlpha / SetScale) that draws the bar;
    that entry's f32 at +0x10 is the scale base mcFileListScrollStep multiplies by. The save screen embeds the list at
-   +0x5B61C (res_get_path.c). addClampedCounter moves position (+0x20) and clamps it to 0..cursor (+0x1C);
+   +0x5B61C. addClampedCounter moves position (+0x20) and clamps it to 0..cursor (+0x1C);
    mcFileListScrollStep steps previousCursor (+0x1E) toward position. */
 typedef struct McFileList {
-    u8 unmodeled_00[0x10];      /* +0x00: DrawEntry (tu370.c) */
+    u8 unmodeled_00[0x10];      /* +0x00: DrawEntry */
     f32 spriteOffset;           /* +0x10: DrawEntry spriteOffset, the scale base of the bar */
     u8 unmodeled_14[0x1C - 0x14];
     s16 cursor;                 /* +0x1C: upper limit of position */
     s16 previousCursor;         /* +0x1E: displayed value, stepped toward position */
-    u16 position;               /* +0x20: u16 here (addClampedCounter loads it with lhu), short in res_get_path.c */
+    u16 position;               /* +0x20: u16, addClampedCounter loads it with lhu */
     u8 unmodeled_22[2];
     s16 drawAlpha;              /* +0x24 */
     u8 unmodeled_26[2];
