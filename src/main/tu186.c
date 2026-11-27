@@ -2,11 +2,11 @@
 
 typedef int s32;
 
-/* VM native: calls func_00221FB8 with each script argument, from the first to the last. Returns 1. */
+/* VM native: calls battleRosterEntryIdAdd with each script argument, from the first to the last. Returns 1. */
 s32 vmCallEachArgument(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
-    extern void func_00221FB8(s32);
+    extern void battleRosterEntryIdAdd(s32);
     s32 vmArgCount;
     s32 vmArgIndex;
 
@@ -15,7 +15,7 @@ s32 vmCallEachArgument(s32 vmThread) {
     if (vmArgCount > 0) {
         do {
             vmArgIndex += 1;
-            func_00221FB8(vmArgGet(vmThread, vmArgIndex));
+            battleRosterEntryIdAdd(vmArgGet(vmThread, vmArgIndex));
         } while (vmArgIndex < vmArgCount);
     }
     return 1;
@@ -39,11 +39,12 @@ s32 vmRunNativeWithPluginFlush(s32 vmThread) {
 s32 battleRosterEntrySwap(s32, s32, s32);
 s32 battleRosterEntryIdIndexGet(s32);
 
-/* VM native with two arguments: func_00221FB8(first) then a loop of battleRosterEntrySwap over the battleRosterEntryIdIndexGet kind count. */
+/* VM native with two arguments: battleRosterEntryIdAdd(first) then a loop of battleRosterEntrySwap over the
+   battleRosterEntryIdIndexGet kind count. */
 s32 vmRaiseEntryKindTo(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
-    extern void func_00221FB8(s32);
+    extern void battleRosterEntryIdAdd(s32);
     s32 vmArgCount;
     s32 vmFirstArg;
     s32 vmSecondArg;
@@ -57,7 +58,7 @@ s32 vmRaiseEntryKindTo(s32 vmThread) {
     vmFirstArg = vmArgGet(vmThread, 1);
     vmSecondArg = vmArgGet(vmThread, 2);
     vmKindFlag = vmFirstArg >= 13;
-    func_00221FB8(vmFirstArg);
+    battleRosterEntryIdAdd(vmFirstArg);
     vmKind = battleRosterEntryIdIndexGet(vmFirstArg);
     if (vmKind != -1 && vmSecondArg >= 0 && vmSecondArg < vmKind) {
         do {

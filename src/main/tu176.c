@@ -9,7 +9,7 @@ s32 xglFontGetFormattedWidth(const char *text);
 
 /* Starts the Yes/No prompt: title text, box width (widened to the text width + 0x30), selection state = stepDelta > 0,
    the other answer's highlight at 0x80, fade-in 0 and phase 0x80 (as clampedCounterInit). */
-void func_002213A8(McGauge *gauge, const char *text, s32 stepDelta, s32 width)
+void choicePromptInit(McGauge *gauge, const char *text, s32 stepDelta, s32 width)
 {
   s32 isPositive;
   s32 textWidth;
@@ -20,9 +20,11 @@ void func_002213A8(McGauge *gauge, const char *text, s32 stepDelta, s32 width)
   gauge->negative = (1 - isPositive) << 7;
   gauge->width = width;
   gauge->fadeIn = 0;
-  if (text != 0) {
+  if (text != 0)
+  {
     textWidth = xglFontGetFormattedWidth(text) + 0x30;
-    if (gauge->width < textWidth) {
+    if (gauge->width < textWidth)
+    {
       gauge->width = textWidth;
     }
   }
@@ -47,8 +49,8 @@ typedef struct StatusHeader {
 /* headerFlags bits that toggle the prompt's selection (up and down in the pad's bit order). */
 #define CHOICE_PROMPT_TOGGLE_BUTTONS 0x5000
 
-/* Signed as in the other TUs (func_00221440 loads it with lb at 0x002214C4); counterEntryAdvancePhase reads it through
-   a u8 cast, since without it the gate differed at 0x00221587 (lb instead of the original lbu). */
+/* Signed as in the other TUs (choicePromptUpdate loads it with lb at 0x002214C4); counterEntryAdvancePhase reads it
+   through a u8 cast, since without it the gate differed at 0x00221587 (lb instead of the original lbu). */
 extern s8 gVsyncsPerFrame;
 
 s32 statusHeaderIsReadyMode40(void);
@@ -58,7 +60,7 @@ StatusHeader *getStatusHeader(void);
 /* Steps the Yes/No prompt one frame. While active, confirm selects the second answer and returns 1, cancel returns
    1, and pad bits 0x5000 toggle the selection with a sound. Then the fade-in, the phase and the highlight of the
    other answer move by gVsyncsPerFrame * 0x10. */
-s32 func_00221440(McGauge *gauge, s32 active)
+s32 choicePromptUpdate(McGauge *gauge, s32 active)
 {
   s32 decided;
   s32 step;
@@ -147,7 +149,7 @@ u8 statusByte0Get(void);
    texts with the selected one in the highlight colour. left and top are the GS x/y of the box; the fade bytes
    fadeIn and negative are read unsigned here (lbu at 0x002215D0, 0x00221860 and 0x002218D0), so their colour
    math wraps in 0..0xFF. */
-void func_002215A0(McGauge *gauge, s32 visible, s32 y)
+void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
 {
   MenuRect rect;
   s32 alpha;
@@ -249,7 +251,7 @@ void drawEntrySetAlpha(void *drawEntry, s32 alpha);
 
 /* Resets the file list's draw entry and its own scroll fields: previousCursor to 0, cursor to the given
    limit, position to 0. */
-void func_00221A88(McFileList *fileList, s32 position, s32 cursor)
+void mcFileListScrollInit(McFileList *fileList, s32 position, s32 cursor)
 {
     drawEntryReset(fileList);
     drawEntrySetValue(fileList, position);
@@ -283,7 +285,7 @@ void drawEntrySetScale(void *drawEntry, s32 scale);
 
 /* Steps previousCursor toward position by step (straight to it when closer than step) and sets the bar's scale to
    previousCursor * spriteOffset / cursor. */
-void func_00221B40(McFileList *fileList, u16 step)
+void mcFileListScrollStep(McFileList *fileList, u16 step)
 {
   if (((s16)fileList->position - fileList->previousCursor < 0 ? fileList->previousCursor - (s16)fileList->position
                                                              : (s16)fileList->position - fileList->previousCursor)
@@ -313,7 +315,7 @@ void tableSelectValue(s32 drawEntry) {
 void func_00220130(TiFrameSheet *sheet, s32 index, s32 mask);
 
 /* Sets the sheet cell's colour mask to 0xE3FF5F with the given alpha in the top byte. */
-void func_00221C18(TiFrameSheet *sheet, s32 index, u64 alpha)
+void sheetFrameSetCellAlpha(TiFrameSheet *sheet, s32 index, u64 alpha)
 {
     func_00220130(sheet, index, (s32)(((alpha & 0xFF) << 24) | 0xE3FF5F));
 }
@@ -448,7 +450,7 @@ void battleCurrentRosterIndexSet(s32 rosterIndex)
 
 /* Appends entryId to its roster (roster 1 from BATTLE_ROSTER1_FIRST_ENTRY_ID on, else roster 0) when the roster does
    not hold it yet and still has room, and sets the id's bit in the table's entry mask. */
-void func_00221FB8(s32 entryId)
+void battleRosterEntryIdAdd(s32 entryId)
 {
   BattleRosterTable *table;
   BattleRoster *roster;
@@ -658,7 +660,7 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
         if (entryId != 0) {
             resolvedEntryIndex = battleRosterEntryIdIndexGet(entryId);
             if (resolvedEntryIndex == -1) {
-                func_00221FB8(entryIds[handleOrdinal]);
+                battleRosterEntryIdAdd(entryIds[handleOrdinal]);
                 retriedEntryIndex = battleRosterEntryIdIndexGet(entryIds[handleOrdinal]);
                 resolvedEntryIndex = retriedEntryIndex;
             }

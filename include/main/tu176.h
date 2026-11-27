@@ -71,8 +71,8 @@ typedef struct SaveGameHeader {
     u8 unmodeled_27[0x2C - 0x27];                             /* +0x27 */
 } SaveGameHeader;
 
-/* 0xC-byte Yes/No choice prompt (func_002213A8 init, func_00221440 update, func_002215A0 draw). The save screen
-   embeds one at +0x5B610 (res_get_path.c), the stream player and the SE/voice screen embed others. */
+/* 0xC-byte Yes/No choice prompt (choicePromptInit / clampedCounterInit, choicePromptUpdate, choicePromptDraw). The
+   save screen embeds one at +0x5B610 (res_get_path.c), the stream player and the SE/voice screen embed others. */
 typedef struct McGauge {
     const char *text;           /* +0x00: title text, drawn above the Yes/No pair */
     s32 width;                  /* +0x04: box width, at least the text width + 0x30 */
@@ -95,11 +95,11 @@ typedef struct McFileEntry {
     u8 thumbnailSlot;           /* +0x17: slot that loads the entry */
 } McFileEntry;
 
-/* Save file list with its scroll bar (func_00221A88 init, addClampedCounter, func_00221B40 step). It starts with the
-   0x1C-byte DrawEntry of tu370.c (drawEntryReset / SetValue / SetFlag / SetAlpha / SetScale) that draws the bar;
-   that entry's f32 at +0x10 is the scale base func_00221B40 multiplies by. The save screen embeds the list at
+/* Save file list with its scroll bar (mcFileListScrollInit, addClampedCounter, mcFileListScrollStep). It starts with
+   the 0x1C-byte DrawEntry of tu370.c (drawEntryReset / SetValue / SetFlag / SetAlpha / SetScale) that draws the bar;
+   that entry's f32 at +0x10 is the scale base mcFileListScrollStep multiplies by. The save screen embeds the list at
    +0x5B61C (res_get_path.c). addClampedCounter moves position (+0x20) and clamps it to 0..cursor (+0x1C);
-   func_00221B40 steps previousCursor (+0x1E) toward position. */
+   mcFileListScrollStep steps previousCursor (+0x1E) toward position. */
 typedef struct McFileList {
     u8 unmodeled_00[0x10];      /* +0x00: DrawEntry (tu370.c) */
     f32 spriteOffset;           /* +0x10: DrawEntry spriteOffset, the scale base of the bar */
@@ -123,10 +123,14 @@ typedef struct McFileList {
 extern BattleRosterTable gBattleRosterTable;
 extern SaveGameHeader gSaveGameHeader;
 
-void func_002213A8(McGauge *gauge, const char *text, s32 stepDelta, s32 width);
+void choicePromptInit(McGauge *gauge, const char *text, s32 stepDelta, s32 width);
 void clampedCounterInit(McGauge *gauge, s32 stepDelta);
+s32 choicePromptUpdate(McGauge *gauge, s32 active);
 void counterEntryAdvancePhase(McGauge *gauge);
+void choicePromptDraw(McGauge *gauge, s32 visible, s32 y);
+void mcFileListScrollInit(McFileList *fileList, s32 position, s32 cursor);
 void addClampedCounter(McFileList *fileList, s16 delta);
+void mcFileListScrollStep(McFileList *fileList, u16 step);
 void newGameStateReset(void);
 BattleRoster *battleRosterGet(s32 rosterIndex);
 u8 battleRosterEntryIdCountGet(s32 rosterIndex);
@@ -137,6 +141,7 @@ u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex);
 s32 battleCurrentRosterCursorEntryIdGet(void);
 u8 battleRosterHasEntryId(s32 entryId);
 void battleCurrentRosterIndexSet(s32 rosterIndex);
+void battleRosterEntryIdAdd(s32 entryId);
 void battleRosterEntryIdRemove(s32 entryId);
 void battleRosterPairReset(void);
 void battleRosterEntrySwap(s32 indexA, s32 indexB, s32 rosterIndex);

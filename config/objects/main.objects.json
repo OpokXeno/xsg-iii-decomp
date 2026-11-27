@@ -78022,9 +78022,9 @@
    "functions": [
     {
      "binding": "GLOBAL",
-     "name": "func_002213A8",
+     "name": "choicePromptInit",
      "size": 112,
-     "splat_name": "func_002213A8",
+     "splat_name": "choicePromptInit",
      "va": "0x002213a8",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78040,9 +78040,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221440",
+     "name": "choicePromptUpdate",
      "size": 312,
-     "splat_name": "func_00221440",
+     "splat_name": "choicePromptUpdate",
      "va": "0x00221440",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78058,18 +78058,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_002215A0",
+     "name": "choicePromptDraw",
      "size": 1252,
-     "splat_name": "func_002215A0",
+     "splat_name": "choicePromptDraw",
      "va": "0x002215a0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221A88",
+     "name": "mcFileListScrollInit",
      "size": 108,
-     "splat_name": "func_00221A88",
+     "splat_name": "mcFileListScrollInit",
      "va": "0x00221a88",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78085,9 +78085,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221B40",
+     "name": "mcFileListScrollStep",
      "size": 176,
-     "splat_name": "func_00221B40",
+     "splat_name": "mcFileListScrollStep",
      "va": "0x00221b40",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78103,9 +78103,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221C18",
+     "name": "sheetFrameSetCellAlpha",
      "size": 48,
-     "splat_name": "func_00221C18",
+     "splat_name": "sheetFrameSetCellAlpha",
      "va": "0x00221c18",
      "name_basis": "address",
      "provenance": "estimated"
@@ -78211,9 +78211,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00221FB8",
+     "name": "battleRosterEntryIdAdd",
      "size": 144,
-     "splat_name": "func_00221FB8",
+     "splat_name": "battleRosterEntryIdAdd",
      "va": "0x00221fb8",
      "name_basis": "address",
      "provenance": "estimated"

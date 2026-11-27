@@ -1387,8 +1387,8 @@ s32 func_00222848(s32, s32, s32);
 s32 func_00223778(s32, s32);
 void func_0021FCE0(TiFrameSheet *sheet);
 void func_00220130(TiFrameSheet *sheet, s32 index, s32 mask);
-void func_00221C18(TiFrameSheet *sheet, s32 index, s32 value);
-void func_002215A0(void *table, s32 a, s32 b);
+void sheetFrameSetCellAlpha(TiFrameSheet *sheet, s32 index, s32 value);
+void choicePromptDraw(void *table, s32 a, s32 b);
 void func_0021FAB8(s32 a, s32 b, void *table);
 void func_0021F260(s32 a, s32 b, s32 c, s32 d);
 void func_0021EBD0(s32 a, s32 b, s32 c, s32 d);
@@ -1450,7 +1450,7 @@ void seVoicePanelDraw(s32 alpha) {
             voiceEntry = (s32) ((void *(*) (void *table, s32 entryIndex)) pagedTableGetEntryAt)(
                 &((SeVoiceFrameView *) gSeVoiceState)->voiceTableCursor, i);
             if (((SeVoiceFrameView *) gSeVoiceState)->rowMode == 0) {
-                func_00221C18(
+                sheetFrameSetCellAlpha(
                     &((SeVoiceFrameView *) gSeVoiceState)->frame, i,
                     (pagedTableGetSlotByte(&((SeVoiceFrameView *) gSeVoiceState)->voiceTableCursor, i) >>
                      1) &
@@ -1649,7 +1649,7 @@ void seVoicePanelDraw(s32 alpha) {
     }
 
     xglFontResetState();
-    func_002215A0(&((SeVoiceFrameView *) gSeVoiceState)->frame.unk2C, 0, 174);
+    choicePromptDraw(&((SeVoiceFrameView *) gSeVoiceState)->frame.unk2C, 0, 174);
     if (((SeVoiceFrameView *) gSeVoiceState)->scaleMode == 2) {
         xglFontSetColorScale(128);
         if (((SeVoiceFrameView *) gSeVoiceState)->voiceTableCount == 0) {
@@ -1906,7 +1906,7 @@ void seVoicePlayAndSetup(void) {
 }
 
 s32 battleRosterEntryIdGet(s32, s32);
-void func_002213A8(void *, const char *, s32, s32);
+void choicePromptInit(void *, const char *, s32, s32);
 
 static inline s32 voicePartyIndex(void) {
     if (gSeVoiceState->voiceFlags & 4) {
@@ -1967,7 +1967,7 @@ void seVoiceSceneEnter(s32 scene) {
         seVoiceListBuild(scene, 1);
         seVoicePlayAndSetup();
         gSeVoiceState->unk9C1 = 0;
-        func_002213A8(&gSeVoiceState->unk430.unk2C, messageTextGet(114), 0, 201);
+        choicePromptInit(&gSeVoiceState->unk430.unk2C, messageTextGet(114), 0, 201);
         if (!(gSeVoiceState->voiceFlags & 2)) {
             sheetSetIndex(messageTextGet(109));
         }
@@ -1979,7 +1979,7 @@ void seVoiceSceneEnter(s32 scene) {
         seVoiceListBuild(scene, 1);
         seVoicePlayAndSetup();
         gSeVoiceState->unk9C1 = 0;
-        func_002213A8(&gSeVoiceState->unk430.unk2C, messageTextGet(115), 0, 201);
+        choicePromptInit(&gSeVoiceState->unk430.unk2C, messageTextGet(115), 0, 201);
         if (!(gSeVoiceState->voiceFlags & 2)) {
             sheetSetIndex(messageTextGet(111));
         }
@@ -2040,7 +2040,7 @@ typedef struct SeStatusHeader {
     u16 extFlags;
 } SeStatusHeader;
 
-s32 func_00221440(void *, s32);
+s32 choicePromptUpdate(void *, s32);
 void pagedTableStepCursorUnmasked(void *, s32, s32);
 void func_00220E00(void);
 void func_002209C0(void);
@@ -2148,7 +2148,7 @@ void seVoiceScreenUpdate(void) {
         switch (subState) {
         case 0:
         default: {
-            func_00221440(voiceStateView()->clampedCounter, 0);
+            choicePromptUpdate(voiceStateView()->clampedCounter, 0);
             if (pagedTableUpdate(voiceStateView()->voiceTableCursor, &pendingCount) != 0) {
                 if (voiceStateView()->voiceFlags & 2) {
                     seVoicePlayAndSetup();
@@ -2205,7 +2205,7 @@ void seVoiceScreenUpdate(void) {
         case 1: {
             s32 roll;
             s32 remainingSpan;
-            func_00221440(voiceStateView()->clampedCounter, 0);
+            choicePromptUpdate(voiceStateView()->clampedCounter, 0);
             if (statusHeaderIsReadyMode40()) {
                 seVoiceListBuild(voiceStateView()->phase, 0);
                 voiceStateView()->subState = 0;
@@ -2263,7 +2263,7 @@ void seVoiceScreenUpdate(void) {
         case 2: {
             s32 roll;
             s32 remainingSpan;
-            if (func_00221440(voiceStateView()->clampedCounter, 1) != 0) {
+            if (choicePromptUpdate(voiceStateView()->clampedCounter, 1) != 0) {
                 if (voiceStateView()->restartRequest == 0) {
                     roll = Get_Rnd_001B8CD0(voiceStateView()->voiceKind, selectedKey);
                     if (voiceStateView()->voiceFlags & 1) {

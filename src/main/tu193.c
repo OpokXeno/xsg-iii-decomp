@@ -216,7 +216,7 @@ void streamFrameSpriteSubmit(s32 x, s32 y, s32 packetRefAddress, s32 colour) {
 s32 messageTextGet(s32);
 void sheetSetIndex(s32);
 void mcStateSetupRequest(s32, s32);
-void func_002213A8(void *, s32, s32, s32);
+void choicePromptInit(void *, s32, s32, s32);
 
 void setStreamActive(s32 enableStream) {
     s32 primarySheetHandle;
@@ -227,7 +227,7 @@ void setStreamActive(s32 enableStream) {
         primarySheetHandle = messageTextGet(0x30F);
         sheetSetIndex(primarySheetHandle);
         secondarySheetHandle = messageTextGet(0x30D);
-        func_002213A8(&gStreamPlayer.sheetControlBlock, secondarySheetHandle, 1, 0);
+        choicePromptInit(&gStreamPlayer.sheetControlBlock, secondarySheetHandle, 1, 0);
         gStreamPlayer.active = 1;
         gStreamPlayer.playState = 1;
         gStreamPlayer.stopLatch = -0x80;
@@ -303,7 +303,7 @@ void streamPlayerSetup(void) {
     s32 i;
 
     gStreamPlayer.fadeInTimer = 0;
-    func_002213A8(&gStreamPlayer.sheetControlBlock, 0, 0, 0);
+    choicePromptInit(&gStreamPlayer.sheetControlBlock, 0, 0, 0);
     mcModuleReset();
     sheetStateReset();
     pagedTable = &gStreamPlayer.pagedTable;
@@ -449,7 +449,7 @@ void sheetDrawFrame(s32);
 void mcStateSeekEntry(s32);
 void func_0021A7E0(s32, s32, s32, s32);
 void func_0021ABB0(s32, s32, s32, s32);
-void func_002215A0(void *block, s32, s32);
+void choicePromptDraw(void *block, s32, s32);
 void fontDrawRotatedSpriteU143(StreamSpritePos *pos, s32, s32, s32);
 void fontDrawPanelFrame(StreamSpritePos *pos, s32, s32);
 u8 pagedTableGetSlotByte(StreamPagedTable *table, s32 slot);
@@ -585,7 +585,7 @@ void streamPlayerDraw(void) {
             ((((streamPlayer()->channelStartOffset - 0x3F0) * (u8) streamPlayer()->stopLatch) >> 7) + 0x3F0);
         streamSlotPanelDraw(streamPlayer()->channel, pos >> 4, 0x80);
     }
-    func_002215A0(streamPlayer()->sheetControlBlock, 0, 0xAE);
+    choicePromptDraw(streamPlayer()->sheetControlBlock, 0, 0xAE);
     xglFontSetColorScale(0x80);
 
     if (streamPlayer()->setupPending != 0) {
@@ -618,7 +618,7 @@ void pagedTableMoveCursor(void *block, s32 delta);
 u16 *getStatusHeader(void);
 s32 statusHeaderIsReadyMode20(void);
 s32 statusHeaderIsReadyMode40(void);
-s32 func_00221440(void *sheet, s32 flag);
+s32 choicePromptUpdate(void *sheet, s32 flag);
 void func_00220E00(void);
 void func_002209C0(void);
 
@@ -698,7 +698,7 @@ void streamPlayerUpdate(void) {
             seVoiceStartDefault(7);
         }
     } else if (streamPlayer()->active != 0) {
-        if (func_00221440(streamPlayer()->sheetControlBlock, 1) != 0) {
+        if (choicePromptUpdate(streamPlayer()->sheetControlBlock, 1) != 0) {
             if (streamPlayer()->sheetControlBlock[8] == 0) {
                 gStreamTrackIndex = streamPlayer()->channel;
                 streamPlayer()->streamPhase = 2;
@@ -709,7 +709,7 @@ void streamPlayerUpdate(void) {
             setStreamActive(0);
         }
     } else {
-        func_00221440(streamPlayer()->sheetControlBlock, 0);
+        choicePromptUpdate(streamPlayer()->sheetControlBlock, 0);
         if (statusHeaderIsReadyMode20() != 0) {
             if (pagedTableGetKeyAt(&streamPlayer()->pagedTable,
                                                                      streamPlayer()->pagedTable.key) &

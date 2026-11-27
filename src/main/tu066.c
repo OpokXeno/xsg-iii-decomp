@@ -339,7 +339,7 @@ void debugStageMenuStep(DebugSelection *selection) {
 }
 
 s32 battleRosterPairReset();
-s32 func_00221FB8();
+s32 battleRosterEntryIdAdd();
 s32 battleCurrentRosterIndexSet();
 s32 battleRosterCursorSet();
 s32 xglPadSetDefaults();
@@ -359,17 +359,17 @@ void gameStartSelectedMap(ResetComboBits *combo) {
         gGameLoopRuntime.unk_10C = pressed;
         memberIndex = 0;
         battleRosterPairReset();
-        func_00221FB8(pressed);
+        battleRosterEntryIdAdd(pressed);
         do {
             if (memberIndex + 1 != pressed) {
-                func_00221FB8(memberIndex + 1);
+                battleRosterEntryIdAdd(memberIndex + 1);
             }
             memberIndex++;
         } while (memberIndex < 10);
         memberIndex = 0;
         do {
             if (memberIndex + 13 != pressed) {
-                func_00221FB8(memberIndex + 13);
+                battleRosterEntryIdAdd(memberIndex + 13);
             }
             memberIndex++;
         } while (memberIndex < 4);
@@ -401,9 +401,9 @@ void func_001BC6A8(void) {
     gGameLoopResetComboHalves.resetComboHalves[1] = -1;
     ((void (*)()) battleRosterPairReset)();
     ((void (*)()) battleCurrentRosterIndexSet)(0);
-    ((void (*)()) func_00221FB8)(1);
-    ((void (*)()) func_00221FB8)(8);
-    ((void (*)()) func_00221FB8)(7);
+    ((void (*)()) battleRosterEntryIdAdd)(1);
+    ((void (*)()) battleRosterEntryIdAdd)(8);
+    ((void (*)()) battleRosterEntryIdAdd)(7);
     battleRosterCursorSet(0, 0);
     seScriptTablesClear();
     sbNativeValueSlotSet(func_001BC918, 0);
@@ -476,7 +476,7 @@ void func_001BC808(void) {
     func_00225108();
     battleRosterPairReset();
     battleCurrentRosterIndexSet(0);
-    func_00221FB8(1);
+    battleRosterEntryIdAdd(1);
     battleRosterCursorSet(0, 0);
     requestBits = mapRequest[0];
 

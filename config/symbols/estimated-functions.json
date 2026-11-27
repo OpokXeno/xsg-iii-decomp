@@ -44784,7 +44784,7 @@
      2
     ],
     [
-     "func_002213A8",
+     "choicePromptInit",
      2233256,
      112,
      2
@@ -44796,7 +44796,7 @@
      2
     ],
     [
-     "func_00221440",
+     "choicePromptUpdate",
      2233408,
      312,
      2
@@ -44808,13 +44808,13 @@
      2
     ],
     [
-     "func_002215A0",
+     "choicePromptDraw",
      2233760,
      1252,
      2
     ],
     [
-     "func_00221A88",
+     "mcFileListScrollInit",
      2235016,
      108,
      2
@@ -44826,7 +44826,7 @@
      2
     ],
     [
-     "func_00221B40",
+     "mcFileListScrollStep",
      2235200,
      176,
      2
@@ -44838,7 +44838,7 @@
      2
     ],
     [
-     "func_00221C18",
+     "sheetFrameSetCellAlpha",
      2235416,
      48,
      2
@@ -44910,7 +44910,7 @@
      2
     ],
     [
-     "func_00221FB8",
+     "battleRosterEntryIdAdd",
      2236344,
      144,
      2

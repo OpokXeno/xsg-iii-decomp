@@ -377,14 +377,14 @@ void saveScreenPlainMenuHandler(int setup) {
     }
 }
 
-void func_002213A8(void *dst, int a, int b, int zero);
+void choicePromptInit(void *dst, int a, int b, int zero);
 void mcStateSetupRequest(int a, int b);
 
 /* Starts the gauge with text and gaugeArg, stores the cancel and done callbacks and requests state 6. */
 void saveScreenStartGauge(int text, int gaugeArg, SaveMenuCallback onCancel, SaveDrawCallback onDone) {
     struct McScreen *screen;
 
-    func_002213A8(&gSaveScreen->gauge, text, gaugeArg, 0);
+    choicePromptInit(&gSaveScreen->gauge, text, gaugeArg, 0);
     screen = gSaveScreen;
     screen->onCancel = onCancel;
     screen->onDone = onDone;
@@ -392,11 +392,11 @@ void saveScreenStartGauge(int text, int gaugeArg, SaveMenuCallback onCancel, Sav
     gSaveScreen->requestBits[0] = 1;
 }
 
-int func_00221440(void *a, int b);
+int choicePromptUpdate(void *a, int b);
 
 /* Per-frame step of the gauge request: when it finishes, runs the stored callbacks and clears them. */
 void saveScreenGaugeStep(void) {
-    if (func_00221440(&gSaveScreen->gauge, 1)) {
+    if (choicePromptUpdate(&gSaveScreen->gauge, 1)) {
         if (gSaveScreen->gauge.state == 0) {
             saveScreenSetMenuAndDraw(gSaveScreen->onCancel,
                                   gSaveScreen->onDone);
@@ -1058,9 +1058,9 @@ typedef struct SaveGameHeader {
 } SaveGameHeader;
 
 extern SaveGameHeader gSaveGameHeader;
-void func_00221A88(void *obj, int a, int b);
+void mcFileListScrollInit(void *obj, int a, int b);
 void addClampedCounter(void *obj, short value);
-void func_00221B40(void *obj, int value);
+void mcFileListScrollStep(void *obj, int value);
 void saveScreenMenuStep(s32 setup);
 void saveScreenDrawFileList(u8 alpha);
 
@@ -1080,7 +1080,7 @@ void saveScreenFileListUpdate(s32 setup) {
         saveScreenSetMessageText(messageTextGet(0x28C));
         mcStateSetupRequest(0, 0);
         gSaveScreen->cardBusy = 0;
-        func_00221A88(&gSaveScreen->fileList, 0xC6, 4);
+        mcFileListScrollInit(&gSaveScreen->fileList, 0xC6, 4);
         addClampedCounter(&gSaveScreen->fileList,
                           gSaveScreen->fileList.cursor);
         fileMenu = &gSaveScreen->fileTable;
@@ -1162,7 +1162,7 @@ void saveScreenFileListUpdate(s32 setup) {
         saveScreenSetMenuAndDraw(saveScreenMenuStep, saveScreenDrawFileList);
         break;
     }
-    func_00221B40(&gSaveScreen->fileList, 1);
+    mcFileListScrollStep(&gSaveScreen->fileList, 1);
 }
 
 /* Pad state of the status header: pressed this frame, held, and auto-repeated. */
@@ -1611,7 +1611,7 @@ void saveScreenFileReadState(s32 setup) {
 
     if (setup != 0) {
         gSaveScreen->uiState = 0;
-        func_00221A88(&gSaveScreen->fileList, 0xC6, 0x160);
+        mcFileListScrollInit(&gSaveScreen->fileList, 0xC6, 0x160);
         saveScreenSetMessage(saveScreenFormatText(
             messageTextGet(0x297), gSaveScreen->port + 1, 0));
         gSaveScreen->cardBusy = 3;
@@ -1719,7 +1719,7 @@ void saveScreenFileReadState(s32 setup) {
         }
         break;
     }
-    func_00221B40(&gSaveScreen->fileList, 2);
+    mcFileListScrollStep(&gSaveScreen->fileList, 2);
 }
 
 struct McCardRequestEntriesRead {
@@ -1738,7 +1738,7 @@ void saveScreenEntriesReadState(s32 setup) {
 
     if (setup != 0) {
         gSaveScreen->uiState = 0;
-        func_00221A88(&gSaveScreen->fileList, 0xC6, 0xA);
+        mcFileListScrollInit(&gSaveScreen->fileList, 0xC6, 0xA);
         saveScreenSetMessage(saveScreenFormatText(
             messageTextGet(0x298), gSaveScreen->port + 1, 0));
         gSaveScreen->cardBusy = 3;
@@ -1796,7 +1796,7 @@ void saveScreenEntriesReadState(s32 setup) {
         }
         break;
     }
-    func_00221B40(&gSaveScreen->fileList, 1);
+    mcFileListScrollStep(&gSaveScreen->fileList, 1);
 }
 
 void func_00185A20(void);
@@ -1811,7 +1811,7 @@ void sheetDrawFrame(s32 frame);
 s32 sheetLatchedPositionGet(void);
 void mcStateSeekEntry(s32 entry);
 void func_0021ABB0(s32 a, s32 b, void *text, s32 c);
-void func_002215A0(struct McGauge *gauge, s32 visible, s32 y);
+void choicePromptDraw(struct McGauge *gauge, s32 visible, s32 y);
 
 static inline s32 saveScreenFadeAlpha(void) {
     if (gSaveScreen->fade < 16) {
@@ -1851,7 +1851,7 @@ void saveScreenDraw(void) {
         xglFontResetState();
     }
     xglFontSetAlphaScale(0x80);
-    func_002215A0(&gSaveScreen->gauge,
+    choicePromptDraw(&gSaveScreen->gauge,
                   gSaveScreen->requestBits[0] & 2,
                   gSaveScreen->mode >= 2 ? 0x10C : 0xAE);
     if (gSaveScreen->cardBusy != 0) {
@@ -1973,7 +1973,7 @@ void saveScreenSetup(void) {
     gSaveScreen->fileList.portResult[0] =
         gSaveScreen->fileList.portResult[1] = 0;
     gSaveScreen->fade = 0;
-    func_002213A8(
+    choicePromptInit(
         &gSaveScreen->gauge, 0, 0, 0);
     mcModuleReset();
     sheetStateReset();
@@ -2156,7 +2156,7 @@ int saveScreenStepFrame(void) {
         if (gSaveScreen->menu != 0) {
             gSaveScreen->menu(0);
         }
-        func_00221440(&gSaveScreen->gauge, 0);
+        choicePromptUpdate(&gSaveScreen->gauge, 0);
     }
     if (gSaveScreen->fadeStage != 0) {
         saveScreenStepFade();
@@ -2569,7 +2569,7 @@ void saveSlotListUpdate(int listLoadRequested)
         saveScreenSetMessage(saveScreenFormatText(messageTextGet(0x291), gSaveScreen->port + 1, 0));
         mcStateSetupRequest(0, 0);
         gSaveScreen->cardBusy = 1;
-        func_00221A88(&gSaveScreen->fileList, 198, 8);
+        mcFileListScrollInit(&gSaveScreen->fileList, 198, 8);
         addClampedCounter(&gSaveScreen->fileList, gSaveScreen->fileList.cursor);
         gSaveScreen->writeConfirmPending = 0;
         if (gSaveScreen->fileList.portResult[gSaveScreen->port] == 2) {
@@ -2615,7 +2615,7 @@ void saveSlotListUpdate(int listLoadRequested)
                       savePortMenuUpdate, saveDialogAnswer);
         break;
     }
-    func_00221B40(&gSaveScreen->fileList, 1);
+    mcFileListScrollStep(&gSaveScreen->fileList, 1);
 }
 
 unsigned char D_003E6E54[12] = { 0 };
