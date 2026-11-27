@@ -781,15 +781,6 @@ unsigned int func_0018F7E8(unsigned int count)
     return (count * 0xD511 + 0xDD11) / 0x800 * 0x800 + 0x8200;
 }
 
-typedef struct SoundWork {
-    s32 voiceHandle;              /* +0x00: the voice handle, 0 when none */
-    unsigned char *packetData;    /* +0x04: the packet data the voice plays */
-    s32 packetSize;               /* +0x08 */
-    unsigned char unk_0C[4];
-} SoundWork;
-
-extern SoundWork gSoundVoices[4];
-
 void *soundWorkSource(s32 soundSlotNumber, void *packetData, s32 packetSize)
 {
   void *currentPacketData;

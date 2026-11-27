@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main/xgl_cd.h"
+#include "main/sound_driver.h"
 
 typedef int s32;
 extern s32 gSoundVoiceVolume[];
@@ -8,7 +9,20 @@ void soundVoiceVolumeReset(s32 voiceIndex) {
     gSoundVoiceVolume[voiceIndex] = 0x200;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu019", func_0018E490);
+/* Returns the voice work record of slot when the slot is in range and has packet data, else 0. */
+SoundWork *func_0018E490(int slot)
+{
+    SoundWork *work;
+
+    if (slot >= SOUND_VOICE_COUNT) {
+        return 0;
+    }
+    work = &gSoundVoices[slot];
+    if (work->packetData == 0) {
+        return 0;
+    }
+    return work;
+}
 
 int sprintf(char *destination, const char *format, ...);
 /* "%08x.%08x": the location string of a sound file, its start sector and sector count in hex. */
