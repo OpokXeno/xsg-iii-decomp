@@ -101,7 +101,9 @@ typedef struct McFileEntry {
    +0x5B61C (res_get_path.c). addClampedCounter moves position (+0x20) and clamps it to 0..cursor (+0x1C);
    func_00221B40 steps previousCursor (+0x1E) toward position. */
 typedef struct McFileList {
-    u8 unmodeled_00[0x1C];      /* +0x00: DrawEntry (tu370.c) */
+    u8 unmodeled_00[0x10];      /* +0x00: DrawEntry (tu370.c) */
+    f32 spriteOffset;           /* +0x10: DrawEntry spriteOffset, the scale base of the bar */
+    u8 unmodeled_14[0x1C - 0x14];
     s16 cursor;                 /* +0x1C: upper limit of position */
     s16 previousCursor;         /* +0x1E: displayed value, stepped toward position */
     u16 position;               /* +0x20: u16 here (addClampedCounter loads it with lhu), short in res_get_path.c */

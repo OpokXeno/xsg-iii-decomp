@@ -3,6 +3,7 @@
 #include "main/tu173.h"
 #include "main/tu176.h"
 #include "main/tu178.h"
+#include "main/sound_driver.h"
 
 INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
 
@@ -16,15 +17,79 @@ void clampedCounterInit(McGauge *gauge, s32 stepDelta)
   gauge->negative = (1 - isPositive) << 7;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221440);
+/* Header returned by getStatusHeader() (tu183.c); flags at +2. */
+typedef struct StatusHeader {
+    u8 unk00[2];
+    u16 headerFlags;
+} StatusHeader;
 
-extern u8 gVsyncsPerFrame;
+/* headerFlags bits that toggle the prompt's selection (up and down in the pad's bit order). */
+#define CHOICE_PROMPT_TOGGLE_BUTTONS 0x5000
+
+/* Signed as in the other TUs (func_00221440 loads it with lb at 0x002214C4); counterEntryAdvancePhase reads it through
+   a u8 cast, since without it the gate differed at 0x00221587 (lb instead of the original lbu). */
+extern s8 gVsyncsPerFrame;
+
+s32 statusHeaderIsReadyMode40(void);
+s32 statusHeaderIsReadyMode20(void);
+StatusHeader *getStatusHeader(void);
+
+/* Steps the Yes/No prompt one frame. While active, confirm selects the second answer and returns 1, cancel returns
+   1, and pad bits 0x5000 toggle the selection with a sound. Then the fade-in, the phase and the highlight of the
+   other answer move by gVsyncsPerFrame * 0x10. */
+s32 func_00221440(McGauge *gauge, s32 active)
+{
+  s32 decided;
+  s32 step;
+  s32 target;
+  decided = 0;
+  if (active)
+  {
+    if (statusHeaderIsReadyMode40())
+    {
+      gauge->state = 1;
+      decided = 1;
+    }
+    else if (statusHeaderIsReadyMode20())
+    {
+      decided = 1;
+    }
+    else if (getStatusHeader()->headerFlags & CHOICE_PROMPT_TOGGLE_BUTTONS)
+    {
+      gauge->state = 1 - gauge->state;
+      seVoiceStartDefault(1);
+    }
+  }
+  step = gVsyncsPerFrame * 0x10;
+  if (active && gauge->fadeIn >= 0)
+  {
+    gauge->fadeIn += step;
+  }
+  if ((u8)(gauge->flag - 1) < 0x7F)
+  {
+    gauge->flag -= step;
+  }
+  if (decided && gauge->flag == 0x80)
+  {
+    gauge->flag -= step;
+  }
+  target = (1 - gauge->state) << 7;
+  if (target < (u8)gauge->negative)
+  {
+    gauge->negative -= step;
+  }
+  if ((u8)gauge->negative < target)
+  {
+    gauge->negative += step;
+  }
+  return decided;
+}
 
 void counterEntryAdvancePhase(McGauge *gauge)
 {
   if (gauge->flag == 0x80)
   {
-    gauge->flag = gauge->flag - (gVsyncsPerFrame * 0x10);
+    gauge->flag = gauge->flag - ((u8)gVsyncsPerFrame * 0x10);
   }
 }
 
@@ -66,7 +131,29 @@ void addClampedCounter(McFileList *fileList, s16 delta)
   }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_00221B40);
+/* DrawEntry (tu370.c) has no header: the list passes its leading DrawEntry as a pointer. */
+void drawEntrySetScale(void *drawEntry, s32 scale);
+
+/* Steps previousCursor toward position by step (straight to it when closer than step) and sets the bar's scale to
+   previousCursor * spriteOffset / cursor. */
+void func_00221B40(McFileList *fileList, u16 step)
+{
+  if (((s16)fileList->position - fileList->previousCursor < 0 ? fileList->previousCursor - (s16)fileList->position
+                                                             : (s16)fileList->position - fileList->previousCursor)
+      < step)
+  {
+    fileList->previousCursor = fileList->position;
+  }
+  else if (fileList->previousCursor < (s16)fileList->position)
+  {
+    fileList->previousCursor += step;
+  }
+  else
+  {
+    fileList->previousCursor -= step;
+  }
+  drawEntrySetScale(fileList, (f32)fileList->previousCursor * fileList->spriteOffset / (f32)fileList->cursor);
+}
 
 s32 drawEntrySetPosition();
 s32 func_002BE480(s32);
