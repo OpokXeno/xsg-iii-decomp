@@ -114,7 +114,134 @@ void counterEntryAdvancePhase(McGauge *gauge)
   }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002215A0);
+/* Screen rectangle in GS coordinates (same layout as res_get_path.c's MenuRect; xglFontDrawBoxBlend's definition
+   in tu162.c spells the parameter u16 *). */
+typedef struct MenuRect {
+    u16 x;
+    u16 y;
+    u16 x1;
+    u16 y1;
+} MenuRect;
+
+int colorModulateByte(int sourceChannel, int scaleByte);
+void fontQueueColorState(int mask);
+void xglFontDrawBoxBlend(MenuRect *rect, s32 inset, s32 colour, s32 blendMode);
+void fontQueueSprite(u16 startX, u16 startY, u16 endX, u16 endY);
+void fontQueueLine(u16 startX, u16 startY, u16 endX, u16 endY);
+void func_0021E9A8(u16 x, u16 y, u16 width, u16 height);
+void xglFontPrintTitle(void);
+void xglFontPrintEscapeByte(int escapeArgument);
+void xglFontPrintExtendedColor(int red, int green, int blue);
+void xglFontPrintAlphaCommand(int alphaMode, int alphaIndex, int alpha);
+void xglFontSetColor(int red, int green, int blue);
+s32 xglFontGetFormattedWidth(const char *text);
+void xglFontPrintIndexed(s32 x, s32 y, const char *text);
+char *messageTextGet(s32 textId);
+u8 statusByte0Get(void);
+
+/* Message ids of the two answers; McGauge.state selects the first (0) or the second (1). */
+#define CHOICE_PROMPT_FIRST_ANSWER_TEXT 0x74
+#define CHOICE_PROMPT_SECOND_ANSWER_TEXT 0x75
+
+/* Draws the Yes/No prompt box at row y: box, inner panel and three separator lines, the title text, the
+   highlight of the selected answer (visible) or the pulsing highlights of both answers, then the two answer
+   texts with the selected one in the highlight colour. left and top are the GS x/y of the box; the fade bytes
+   fadeIn and negative are read unsigned here (lbu at 0x002215D0, 0x00221860 and 0x002218D0), so their colour
+   math wraps in 0..0xFF. */
+void func_002215A0(McGauge *gauge, s32 visible, s32 y)
+{
+  MenuRect rect;
+  s32 alpha;
+  s32 boxAlpha;
+  s32 left;
+  s32 top;
+
+  alpha = colorModulateByte((u8) gauge->fadeIn, gauge->flag);
+  if (alpha == 0)
+  {
+    return;
+  }
+  boxAlpha = colorModulateByte(0x73, alpha) & 0xFF;
+  left = (0x100 - (gauge->width >> 1)) * 16 + 0x6FF8;
+  top = (y << 4) + 0x71F8;
+  rect.x1 = left + (u16) gauge->width * 16;
+  rect.y1 = top + 0x530;
+  rect.x = left;
+  rect.y = top;
+  fontQueueColorState(((u64) boxAlpha << 24) | 0x272120);
+  xglFontDrawBoxBlend(&rect, 2, 0, 0);
+  fontQueueColorState(((u64) boxAlpha << 24) | 0x554643);
+  fontQueueSprite(rect.x + 0x40, rect.y + 0x40, rect.x1 - 0x40, rect.y + 0x1B0);
+  rect.y += 0x1E0;
+  fontQueueColorState(((u64) (u8) alpha << 24) | 0x3C312F);
+  fontQueueLine(rect.x + 0x20, rect.y, rect.x1 - 0x20, rect.y);
+  rect.y += 0x160;
+  fontQueueLine(rect.x + 0x20, rect.y, rect.x1 - 0x20, rect.y);
+  rect.y += 0x160;
+  fontQueueLine(rect.x + 0x20, rect.y, rect.x1 - 0x20, rect.y);
+  rect.y = top;
+  xglFontPrintTitle();
+  xglFontPrintEscapeByte(0x10);
+  xglFontPrintExtendedColor(0, 0, 0);
+  xglFontPrintAlphaCommand(0x44, 0, alpha);
+  if (gauge->text)
+  {
+    xglFontSetColor(0x2D, 0x2D, 0x56);
+    xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(gauge->text) >> 1), ((rect.y - 0x71F8) >> 4) + 4,
+                        gauge->text);
+  }
+  if (visible)
+  {
+    fontQueueColorState(((u64) (u8) colorModulateByte(0x73, alpha) << 24) | 0xF98980);
+    func_0021E9A8(rect.x, rect.y + gauge->state * 0x160 + 0x1E0, gauge->width << 4, 0x160);
+  }
+  else
+  {
+    fontQueueColorState(
+        ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20), (u8) gauge->negative),
+                                      alpha) << 24) | 0xE3FF5F);
+    func_0021E9A8(rect.x, rect.y + 0x1E0, gauge->width << 4, 0x160);
+    fontQueueColorState(
+        ((u64) (u8) colorModulateByte(colorModulateByte((u8) ((statusByte0Get() >> 2) + 0x20),
+                                                        (u8) (0x80 - (u8) gauge->negative)),
+                                      alpha) << 24) | 0xE3FF5F);
+    func_0021E9A8(rect.x, rect.y + 0x340, gauge->width << 4, 0x160);
+  }
+  if (gauge->state == 0)
+  {
+    if (visible)
+    {
+      xglFontSetColor(0x40, 0x44, 0x7C);
+    }
+    else
+    {
+      xglFontSetColor(0x5D, 0x7B, 0x76);
+    }
+  }
+  else
+  {
+    xglFontSetColor(0x62, 0x62, 0x62);
+  }
+  xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(messageTextGet(CHOICE_PROMPT_FIRST_ANSWER_TEXT)) >> 1),
+                      ((rect.y - 0x71F8) >> 4) + 0x1E, messageTextGet(CHOICE_PROMPT_FIRST_ANSWER_TEXT));
+  if (gauge->state == 1)
+  {
+    if (visible)
+    {
+      xglFontSetColor(0x40, 0x44, 0x7C);
+    }
+    else
+    {
+      xglFontSetColor(0x5D, 0x7B, 0x76);
+    }
+  }
+  else
+  {
+    xglFontSetColor(0x62, 0x62, 0x62);
+  }
+  xglFontPrintIndexed(0x100 - (xglFontGetFormattedWidth(messageTextGet(CHOICE_PROMPT_SECOND_ANSWER_TEXT)) >> 1),
+                      ((rect.y - 0x71F8) >> 4) + 0x34, messageTextGet(CHOICE_PROMPT_SECOND_ANSWER_TEXT));
+}
 
 void drawEntryReset(void *drawEntry);
 void drawEntrySetValue(void *drawEntry, s32 spriteIndex);
