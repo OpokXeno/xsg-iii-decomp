@@ -82,7 +82,7 @@ struct CdFilePath {
 
 void xglCdFileRequestClear(struct CdFileRequest *fileRequest);
 s32 xglCdReadRecordPrepare(struct CdFileRequest *fileRequest);
-s32 GameMpeg2Play(char *destination, const char *format, ...);
+s32 sprintf(char *destination, const char *format, ...);
 s32 func_001B6FF8();
 
 /* Builds the file name from fileNumber, requests it on the CD channel into buffer 0
@@ -92,7 +92,7 @@ s32 sbNativeFileLoad(short fileNumber, s32 channel) {
     struct CdFilePath filePath;
     s32 succeeded;
 
-    GameMpeg2Play(filePath.fileName, "%04d", fileNumber);
+    sprintf(filePath.fileName, "%04d", fileNumber);
     func_001B6FF8(filePath.path, 0x6000000, filePath.fileName);
     xglCdFileRequestClear(&nativeFileRequest);
     nativeFileRequest.channel = channel;

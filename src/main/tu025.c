@@ -1,17 +1,16 @@
 #include "common.h"
+#include "main/sce_sif.h"
 
 typedef int s32;
 
-extern s32 gIoRpcCallBlock[];
+extern sceSifClientData gIoRpcCallBlock;
 extern s32 gIoRpcInputBlock[];
 extern s32 gIoRpcReplyBlock[];
 /* The reply word of the rpc block at gIoRpcReplyBlock. */
 #define ioRpcReply (gIoRpcReplyBlock[0])
 
-s32 func_002E80D8(s32 *rpc, s32 command, s32 extra, s32 *input, s32 inputSize, s32 *output, s32 outputSize, s32 flags, s32 option);
-
 s32 ioRpcCall(s32 command) {
-    return func_002E80D8(gIoRpcCallBlock, command, 0, gIoRpcInputBlock, 0x40, gIoRpcReplyBlock, 0x40, 0, 0);
+    return sceSifCallRpc(&gIoRpcCallBlock, command, 0, gIoRpcInputBlock, 0x40, gIoRpcReplyBlock, 0x40, 0, 0);
 }
 
 s32 ioRpcQueryValue(s32 queryValue) {
@@ -39,7 +38,7 @@ typedef struct IoRpcPostedRecord {
     s32 reserved;                       /* +0x0C, always 0 */
 } IoRpcPostedRecord;
 
-/* ioRpcCall returns the result of the rpc call (func_002E80D8). */
+/* ioRpcCall returns the result of the rpc call (sceSifCallRpc). */
 s32 ioRpcPostRecord(s32 command, s32 firstOperand, s32 secondOperand) {
     IoRpcPostedRecord postedRecord;
     s32 postResult;

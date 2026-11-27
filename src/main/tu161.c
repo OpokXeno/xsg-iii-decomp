@@ -258,10 +258,10 @@ void xglFontPrintTitle(void) {
 }
 
 extern const unsigned char gFontFormatString[];
-int GameMpeg2Play();
+int sprintf();
 
 void xglFontPrintLabel(int x, int y) {
-    GameMpeg2Play(gFontEscapeBuffer, gFontFormatString);
+    sprintf(gFontEscapeBuffer, gFontFormatString);
     xglFontPrint(x, y, gFontColorIndex + 2, gFontEscapeBuffer);
 }
 
@@ -271,7 +271,7 @@ int unsignedDecimalDigits();
 void xglFontPrintUnsignedRight(int x, int y, int charWidth, int unsignedValue) {
     int advance;
 
-    GameMpeg2Play(gFontNumberBuffer, gFontFormatString, unsignedValue);
+    sprintf(gFontNumberBuffer, gFontFormatString, unsignedValue);
     advance = unsignedDecimalDigits(unsignedValue);
     xglFontPrint(x - (charWidth * advance), y, gFontColorIndex + 2, gFontNumberBuffer);
 }

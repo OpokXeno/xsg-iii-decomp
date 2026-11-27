@@ -83,7 +83,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00227A38);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00227B60);
 
-s32 GameMpeg2Play(s32, s32, s32);
+s32 sprintf(s32, s32, s32);
 s32 messageTextGet(s32);
 s32 sheetSetIndex(s32);
 
@@ -93,7 +93,7 @@ void movieStartPlayback(s32 movieId, s32 audioTrack) {
 
     videoStream = messageTextGet(0xF3);
     audioStream = messageTextGet(audioTrack + 0x7B);
-    GameMpeg2Play(movieId, videoStream, audioStream);
+    sprintf(movieId, videoStream, audioStream);
     sheetSetIndex(0);
     sheetSetIndex(movieId);
 }

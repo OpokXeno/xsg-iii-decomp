@@ -175,7 +175,7 @@ extern u8 D_0055DDC0[];
 void func_001BE5B0();
 void xglCdFileRequestClear();
 void effectListsClear();
-s32 GameMpeg2Play();
+s32 sprintf();
 s32 func_001B6FF8();
 s32 xglCdReadRecordPrepare();
 
@@ -199,13 +199,13 @@ int func_001BE470(s16 id, s32 isPositive) {
     request.dest = D_0055DDC0;
     request.onDone = func_001BE5B0;
     request.signedId = isPositive ? id : -id;
-    GameMpeg2Play(names.name, "%04d", id);
+    sprintf(names.name, "%04d", id);
     func_001B6FF8(names.path, 0x1020000, names.name);
     if (xglCdReadRecordPrepare(&request) != 0) {
         gGameStateBlock.pendingValue = id;
         return 1;
     }
-    GameMpeg2Play(names.name, "%04d", id);
+    sprintf(names.name, "%04d", id);
     func_001B6FF8(names.path, 0x1030000, names.name);
     if (xglCdReadRecordPrepare(&request) != 0) {
         gGameStateBlock.pendingValue = id;

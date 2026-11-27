@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/ee_stdarg.h"
 #include "shared.h"
 #include "gs.h"
 
@@ -29,8 +30,6 @@ typedef struct SRenderState {
 } SRenderState;
 typedef int s32;
 typedef signed char s8;
-typedef char *va_list;
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
 typedef long long s64;
 extern unsigned char D_0055A850[];
 void *memset(void *dest, s32 value, u32 size);
@@ -116,7 +115,7 @@ INCLUDE_ASM("asm/main/nonmatchings/gs_packet_setup", func_00264898);
 extern unsigned char xglFontDebugTextFormat[];
 char *func_0030C440();
 s32 func_0030C498();
-s32 func_0030E8E4();
+s32 strlen();
 s32 vsprintf();
 s32 xglFontDebugPrintf();
 
@@ -128,7 +127,7 @@ void xglFontDebugPrintAt(s32 x, s32 y, const char *format, ...)
   s32 pixelY;
   pixelX = x;
   pixelY = y;
-  formatLength = func_0030E8E4(format);
+  formatLength = strlen(format);
   text = func_0030C440(formatLength + 10);
   vsprintf(text, format, ((va_list) __builtin_next_arg(format)) - ((8 - __builtin_args_info(2)) * 8));
   xglFontDebugPrintf(pixelX >> 1, pixelY >> 1, xglFontDebugTextFormat, text);

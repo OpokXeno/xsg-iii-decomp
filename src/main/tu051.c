@@ -21,7 +21,7 @@ void testOverlayEntryCall(int menuIndex)
 
 typedef int s32;
 extern char gHeapOverviewTitle[];
-void func_001997D0(void *);
+void xglPacketTextureTrans(void *);
 const char *messageTextGet(int id);
 void sceVif1PkAddDataN(s32, void *, s32);
 void sceVif1PkCnt(s32, unsigned int);
@@ -54,7 +54,7 @@ void heapOverviewMenuDraw(HeapOverviewRecord *overview) {
     packetBase = overview->packetBase;
     packetData = (HeapOverviewData *) (overview->packetBase + overview->packetDataOffset);
     if (packetBase != 0) {
-        func_001997D0(packetBase);
+        xglPacketTextureTrans(packetBase);
     }
     sceVif1PkCnt(packet, 0);
     sceVif1PkAddDataN(packet, packetData, (packetData->quadwordCount * 4) + 4);

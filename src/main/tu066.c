@@ -260,7 +260,7 @@ typedef struct GameLoopResetComboBitsView {
 void gameStartSelectedMap(ResetComboBits *combo);
 void sbNativeValueSlotPush();
 s32 saveScreenRun();
-s32 GameMpeg2Play();
+s32 sprintf();
 s32 xglFontDebugPrintf();
 
 /* Debug stage menu: four rows (mode, map number, table entry, restore). Circle on the number row hands the map to gameStartSelectedMap. */
@@ -329,7 +329,7 @@ void debugStageMenuStep(DebugSelection *selection) {
         }
         break;
     }
-    GameMpeg2Play(title, "\022\010\010Compiled on %s %s", "Jul 12 2006", "13:22:53");
+    sprintf(title, "\022\010\010Compiled on %s %s", "Jul 12 2006", "13:22:53");
     xglFontDebugPrintf(16, 16, title);
     xglFontDebugPrintf(16, 32, "Map :%s", D_003E5290[gDebugMenuMode]);
     xglFontDebugPrintf(16, 42, "No. :%4d", gDebugMenuNumber);

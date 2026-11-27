@@ -10,13 +10,7 @@
  * address arithmetic of the w stores, so the casts to Vector4 * at the calls stay. */
 /* One 16-byte entry of the direct queue (a GIF packet of A+D pairs): data and register address, or four words (the tag,
  * then the header words, are written through the word view). */
-typedef union XglDirectQueueEntry {
-    struct {
-        u64 registerValue;
-        u64 registerAddress;
-    };
-    u32 tagAndHeaderWords[4];
-} XglDirectQueueEntry;
+#include "main/xgl_direct_queue.h"
 
 struct PxyDrawPartRange;
 union Matrix;

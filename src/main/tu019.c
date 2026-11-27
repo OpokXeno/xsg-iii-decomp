@@ -10,7 +10,7 @@ void soundVoiceVolumeReset(s32 voiceIndex) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu019", func_0018E490);
 
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 /* "%08x.%08x": the location string of a sound file, its start sector and sector count in hex. */
 extern const char soundCdLocationFormat[];
 
@@ -47,7 +47,7 @@ void func_0018E4C0(char *path, const char *dirName, const char *fileName, const 
     while ((*cursor++ = *src++) != 0) {
     }
     xglCdCheckFile(path, &position);
-    GameMpeg2Play(path, soundCdLocationFormat, position.lbn,
+    sprintf(path, soundCdLocationFormat, position.lbn,
                   (position.stored_bytes + SOUND_SECTOR_SIZE - 1) / SOUND_SECTOR_SIZE);
 }
 

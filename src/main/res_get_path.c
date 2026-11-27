@@ -5,10 +5,11 @@
 #include "main/xgl_render.h"
 #include "main/xgl_cd.h"
 #include "gs.h"
+#include "main/xgl_debug_file_004.h"
 
 void *memset(void *destination, int value, unsigned int count);
 
-void GameMpeg2Play(const char *name);
+void sprintf(const char *name);
 u8 *resCmdMpeg2(u8 *cursor);
 
 struct Func430Row {
@@ -172,7 +173,7 @@ extern struct McScreen *gSaveScreen;
 /* Formats text (a messageTextGet result) with value into the screen message; clears the message when text is 0. */
 void saveScreenSetFormattedMessage(int text, int value) {
     if (text != 0) {
-        ((void (*)()) GameMpeg2Play)(&gSaveScreen->message[0], text, value);
+        ((void (*)()) sprintf)(&gSaveScreen->message[0], text, value);
         return;
     }
     gSaveScreen->message[0] = 0;
@@ -253,7 +254,7 @@ void saveScreenSetMessage(s32 sheetIndex) {
  * resCmd handlers do.
  */
 u8 *resCmdMpeg2(u8 *cursor) {
-    GameMpeg2Play(cursor);
+    sprintf(cursor);
     return cursor;
 }
 
@@ -1586,7 +1587,7 @@ s32 saveScreenPlayTitleMovie(s32 fileBuffer, s32 fileNumber) {
         titleText = messageTextGet(641);
     }
     labelText = messageTextGet(630);
-    ((int (*)(char *destination, ...)) GameMpeg2Play)(movieName, labelText,
+    ((int (*)(char *destination, ...)) sprintf)(movieName, labelText,
                                                       messageTextGet(battleRosterCursorEntryIdGet(0) + 679),
                                                       tensText, onesText, titleText);
     return func_001894A0(fileBuffer, fileNumber, movieName);
@@ -1799,7 +1800,7 @@ void saveScreenEntriesReadState(s32 setup) {
     func_00221B40(&gSaveScreen->fileList, 1);
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void fontQueueSpriteReset(void);
 void shardFieldUpdate(void *fields);
@@ -1826,7 +1827,7 @@ void saveScreenDraw(void) {
     u8 clock[8];
     s32 text;
 
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();
@@ -1939,7 +1940,6 @@ void pagedTableInit(struct SaveMenuTable *table, s32 capacity);
 void mcModuleReset(void);
 void sheetStateReset(void);
 void memPoolFree(void *block);
-void func_00181C18(void *file);
 s32 xglCdServiceIfPending(void);
 void scratchpadSendCmd23Mode1(ScratchpadCommand *command);
 void scratchpadSendCmd23Mode0(ScratchpadCommand *command);
@@ -1988,7 +1988,7 @@ void saveScreenSetup(void) {
         memPoolFree(thumbnailBuffer);
         gSaveFileBuffer = memPoolAlloc(0x4000);
         gSaveScreen->fileImageReady = 0;
-        func_00181C18(gSaveImagePath + 4);
+        xglGetLanguageCode(gSaveImagePath + 4);
         xglCdReadFile(gSaveImagePath, gSaveFileBuffer, 1, saveFileReadCallback);
         if (gSaveScreen->unmodeled_5BB2D != 0) {
             while (xglCdServiceIfPending()) {

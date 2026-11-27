@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/sound_driver.h"
 
 /* Kept as its own helper: merging it with the QuadwordCopy macro renumbers the compiler's labels. */
 static inline void QuadwordCopyT0(Vector4 *destination, Vector4 *source) {
@@ -214,7 +215,6 @@ void soundCueListenerUpdate() {
     gSoundCue.listenerPos.w = gSoundCue.panReferencePos.w = 1.0f;
 }
 
-void func_0018F098(int);
 void func_0018E698(int, int);
 
 /* Cue list entry point: pushes a record of the given kind, or runs one of the SOUND_CUE_OP_*
@@ -642,7 +642,6 @@ void soundCueUpdate() {
     }
 }
 
-void func_0018F1D0(void);
 
 /* Snapshots the voices the cue list depends on into savedVoices (and the start argument of each
  * sound slot), then calls func_0018F1D0. soundCueSnapshotRestore starts them again. */

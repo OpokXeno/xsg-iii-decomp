@@ -334,7 +334,7 @@ void InitRgHeap(struct RgHeap *pHeap, void *pMemory, int arenaSize)
     pHeap->mapStride = HEAP_MAP_STRIDE_DEFAULT;
 }
 
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 
 
 void func_0030ED88(char *pDest, const char *pSrc, u32 count);
@@ -378,7 +378,7 @@ void *RgHeapAllocById(u32 heapId, u32 requestedBytes, const char *pSourceFile, i
         heapBlock = heapBlock->chainNext;
     } while (heapBlock != pFreeHead);
     if (pFit == 0) {
-        GameMpeg2Play(dumpComment, "no heap %d\n", heapId);
+        sprintf(dumpComment, "no heap %d\n", heapId);
         RgHeapDump_sub(pHeap, dumpComment, "test.euc.c", 255);
         printf("too big size (%d) of allocation\nat %s,%d\nfrom data heap", requestedBytes, pSourceFile, line);
         return 0;
@@ -567,7 +567,7 @@ void RgHeapDumpById(u32 heapId)
 
     if (heapId < HEAP_MAX) {
         pHeap = InstanceOfRgHeapById(heapId);
-        GameMpeg2Play(comment, "heapId %d", heapId);
+        sprintf(comment, "heapId %d", heapId);
         RgHeapDump_sub(pHeap, comment, "test.euc.c", 491);
     }
 }

@@ -141,7 +141,9 @@ void soundSlotVoiceStart(s32 soundSlot, s32 idOffset) {
     }
 }
 
-s32 func_0018F098(s32 handle);
+/* As in main/sound_driver.h; this unit calls seVoiceStartDefault without its argument, so it cannot
+ * include the header. */
+void func_0018F098(int id);
 
 void soundSlotVoiceStop(s32 soundSlot, s32 idOffset) {
     if (soundSlot != -1) {

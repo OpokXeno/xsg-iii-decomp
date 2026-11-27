@@ -284,7 +284,8 @@ struct FontStateQueue {
     unsigned short fontFlags;
     unsigned char font_selection;
     unsigned char unmodeled_07;
-    unsigned short unmodeled_08;
+    /* Glyph images uploaded since the font packet was built (the glyph draw counts them). */
+    unsigned short glyph_upload_count;
     unsigned char unmodeled_0a[2];
     unsigned char default_width;
     /* Added to each glyph advance; "$xx7,N;". */
@@ -296,7 +297,8 @@ struct FontStateQueue {
     unsigned char text_mode;
     /* FONT_CONFIG_PROPORTIONAL_MODE, "$xx3,N;". */
     unsigned char proportional_mode;
-    unsigned char unmodeled_13;
+    /* Slant of the glyphs in pixels: the glyph draw shifts the top corners right by it (X2 horizontal_shift). */
+    unsigned char horizontal_shift;
     /* Set: the glyphs are depth tested (TEST_1 GEQUAL) and do not write Z. */
     unsigned char depth_test;
     unsigned char unmodeled_15[7];
@@ -1174,7 +1176,7 @@ int xglFontCmdInit(FontDrawCursor *cursor, const char **text)
     xglFontState.glyph_default_width = 4;
     xglFontState.character_spacing = 0;
     xglFontState.proportional_mode = 0;
-    xglFontState.unmodeled_13 = 0;
+    xglFontState.horizontal_shift = 0;
     (*text)++;
     xglFontState.ruby_offset_y = 2;
     xglFontState.unmodeled_0e = 0;
@@ -1199,7 +1201,26 @@ int xglFontCmdCol(FontDrawCursor *cursor, const char **text)
     return 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00183660);
+/* Inline background command: "N;" with N = 0..3 selects the glyph effect; func_001820D0 sends its
+ * TEST_1 setting. */
+int xglFontCmdBg(FontDrawCursor *cursor, const char **text)
+{
+    const unsigned char *next = (const unsigned char *) *text;
+    int digit;
+
+    if (next[1] == ';') {
+        digit = next[0];
+        if (digit < '4') {
+            if (digit >= '0') {
+                *text = (const char *) (next + 2);
+                cursor->effect = next[0] - '0';
+                func_001820D0(cursor);
+                return 1;
+            }
+        }
+    }
+    return 0;
+}
 
 int xglFontCmdShadow(FontDrawCursor *cursor, const char **text)
 {
@@ -1621,7 +1642,52 @@ int xglFontGetGlyphIndex(unsigned char eucRow, unsigned char eucColumn)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184B30);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185770);
+/* The glyph span table behind the glyph pixels of the font texture: per glyph a halfword with the
+ * first column in the low byte and the column after the last in the high byte, both stored minus one
+ * (the read adds 0x100). */
+#define FONT_GLYPH_SPAN_OFFSET 0x78000
+#define FONT_GLYPH_SPAN_BIAS 0x100
+/* The fixed cell (proportional_mode set): half = mode / 2, FONT_FIXED_DEFAULT_HALF when that is 0;
+ * the glyph spans columns FONT_FIXED_CENTER + 1 - half up to FONT_FIXED_CENTER + half. */
+#define FONT_FIXED_CENTER 10
+#define FONT_FIXED_DEFAULT_HALF 5
+
+/* The drawn width of a glyph: the fixed cell when proportional_mode is set, the default width for
+ * glyph 0, else the glyph's span from the table. A non-null leftBound receives the first column in
+ * 1/16 pixel units. */
+int func_00185770(int glyph, int *leftBound)
+{
+    unsigned char left;
+    int right;
+    unsigned char mode;
+
+    if (xglFontState.proportional_mode != 0) {
+        mode = xglFontState.proportional_mode;
+        left = mode >> 1;
+        if (left == 0) {
+            left = FONT_FIXED_DEFAULT_HALF;
+        }
+        right = left + FONT_FIXED_CENTER;
+        left = FONT_FIXED_CENTER + 1 - left;
+    } else if (glyph == 0) {
+        right = xglFontState.glyph_default_width;
+        left = 0;
+    } else {
+        unsigned short span;
+
+        span = ((unsigned short *) (xglFontState.texture_buffer + FONT_GLYPH_SPAN_OFFSET))[glyph]
+            + FONT_GLYPH_SPAN_BIAS;
+        left = span;
+        right = span >> 8;
+        if (left != 0) {
+            left = left - 1;
+        }
+    }
+    if (leftBound != 0) {
+        *leftBound = left << 4;
+    }
+    return right - left + 1;
+}
 
 extern unsigned char D_004B1E20[];
 extern unsigned char D_004B3320[];
@@ -1680,10 +1746,10 @@ unsigned char *func_00184B30(FontDrawCursor *cursor, unsigned char *text);
 /* The two quadwords that end the font packet (X2 test_15). */
 extern unsigned char D_004B3410[];
 
-/* XS2 xglFontFlush: sets up the drawing cursor at the base of the scratchpad, starts the font packet,
+/* Sets up the drawing cursor at the base of the scratchpad, starts the font packet,
  * draws every text queued behind xglFontState (zero-separated, ended by an empty one), closes the packet
  * and empties the queue. */
-void func_00185A20(void)
+void xglFontFlush(void)
 {
     FontDrawCursor *cursor = (FontDrawCursor *) SCRATCHPAD_BASE;
     unsigned char *text;
@@ -1708,7 +1774,7 @@ void func_00185A20(void)
     cursor->scale_y = FONT_SCALE_ONE;
     cursor->packet = xglPacketGetCurrent();
     xglFontBuildPacket(cursor, 0);
-    xglFontState.unmodeled_08 = 0;
+    xglFontState.glyph_upload_count = 0;
     text = (unsigned char *) (&xglFontState + 1);
     while (*text != 0) {
         text = func_00184B30(cursor, text) + 1;
@@ -1721,7 +1787,7 @@ void func_00185A20(void)
 
 void xglFontUpdateState(void)
 {
-    func_00185A20();
+    xglFontFlush();
 }
 
 /* The FontState flags halfword (0x007E7E04), read and written through the splat symbol. */

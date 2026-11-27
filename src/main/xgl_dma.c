@@ -1,13 +1,12 @@
 #include "common.h"
 #include "shared.h"
+#include "main/xgl_dma.h"
 
 /* DMA tag ID (bits 28..30 of the first tag word). */
 #define DMA_TAG_ID_CNT 0x10000000U
 
 #define DMA_TAG_ID_REF 0x30000000U
 
-void xglDmaDirectNormal(unsigned int channel, unsigned int memoryAddress, unsigned int quadwordCount);
-void xglDmaDirectSrcChain(unsigned int channel, unsigned int tagAddress);
 
 extern u8 *buffer;
 

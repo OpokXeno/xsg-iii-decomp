@@ -275,7 +275,7 @@ void MMathRotateMatrixX(SlotMatrix*,SlotMatrix*,f32);
 void slotSetValueSelector();
 void func_0027AB00();
 
-s32 func_0030EBD0();
+s32 strncmp();
 
 
 
@@ -327,7 +327,7 @@ int slotEntryDoorCreate(TableSlotRequest *request) {
     entry->flags = 0;
     entry->mode = 0;
     entry->rateCopy = 0;
-    if (func_0030EBD0(entry->name, "door_c", 6) == 0) {
+    if (strncmp(entry->name, "door_c", 6) == 0) {
         entry->voiceA = 0x60;
         entry->voiceB = 0x61;
         entry->flags |= ENTRY_FLAG_NORMAL;

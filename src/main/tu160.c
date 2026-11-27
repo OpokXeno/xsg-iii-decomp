@@ -340,9 +340,9 @@ void completionCallbackAdd(CompletionCallback completionCallback) {
     }
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 
-/* Runs the completion callbacks in order until the null terminator, then clears the list and calls func_00185A20. */
+/* Runs the completion callbacks in order until the null terminator, then clears the list and calls xglFontFlush. */
 void completionCallbacksRun(void) {
     int callbackIndex = 0;
 
@@ -350,7 +350,7 @@ void completionCallbacksRun(void) {
         gCompletionCallbacks[callbackIndex++]();
     }
     completionCallbackAdd(0);
-    func_00185A20();
+    xglFontFlush();
 }
 
 /* Command template of swapWordsSendCommand: the 8-byte packet header. */

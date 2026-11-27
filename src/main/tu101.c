@@ -11,7 +11,7 @@ typedef struct NameMapEntry {
 extern NameMapEntry gNameMapTable[];
 extern u64 gGameLoopRuntimeStorage;
 char *func_001B6DA0(int requestId);
-int func_0030E68C(char *a, char *b);
+int strcmp(char *a, char *b);
 
 /* Maps a name through the table; with the runtime bits set, the first 264 entries
  * answer with the fixed name of request 0x0300001B instead. */
@@ -24,7 +24,7 @@ char *nameMapLookup(char *name) {
     fixedName = func_001B6DA0(0x0300001B);
     nameRow = 0;
     for (; nameMapRow->name != 0; nameMapRow++, nameRow++) {
-        if (func_0030E68C(nameMapRow->name, name) == 0) {
+        if (strcmp(nameMapRow->name, name) == 0) {
             if ((gGameLoopRuntimeStorage & 0x0800000002000000ULL) != 0 && nameRow < 264) {
                 return fixedName;
             }
