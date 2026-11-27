@@ -42,7 +42,35 @@ struct FontMarkPacket {
     struct FontMarkCorner corners[4];
 };
 
-typedef struct FontDrawCursor { struct XglPacket *packet; short origin_x; unsigned char unmodeled_06[2]; unsigned short x; unsigned short y; int depth; unsigned short offset_x; unsigned short offset_y; unsigned char red; unsigned char green; unsigned char blue; unsigned char unmodeled_17; unsigned char drawFlags; unsigned char effect; unsigned char attributes; unsigned char draw_state_high; unsigned char unmodeled_1c[4]; signed char effect_x; signed char effect_y; unsigned char unmodeled_22[2]; unsigned char effect_red; unsigned char effect_green; unsigned char effect_blue; unsigned char effect_alpha; /* The GS ALPHA_1 value: the A/B/C/D selectors and FIX. */ unsigned char alpha_abcd; unsigned char alpha_fix; unsigned char alpha; unsigned char unmodeled_2b; unsigned short scale_x; unsigned short scale_y; union { struct FontEffectScratchPacket effect_packet; u64 qwords[(0x4000 - 0x30) / sizeof(u64)]; struct { unsigned char unmodeled_30[0x100 - 0x30]; struct FontMarkPacket sprite; } mark; } effectArea; } FontDrawCursor;
+/* One corner of the glyph packet: UV (corner 2's u, v and backup words keep the plain sprite's corners while
+ * the effects are drawn) and XYZF2. */
+typedef struct FontGlyphCorner {
+    int texture_u_or_x;
+    int texture_v_or_y;
+    int backup_x;
+    int backup_y;
+    int x;
+    int y;
+    int depth;
+    int depth_upper;
+} FontGlyphCorner;
+
+/* The GIF packet a glyph is drawn with, in the scratchpad behind the draw cursor: the tag, TEXFLUSH (A+D),
+ * TEX0, RGBAQ and the corners (two for the sprite, four for the slanted strip). */
+typedef struct FontGlyphPacket {
+    unsigned int tag[4];
+    u64 flush_data;
+    u64 flush_register;
+    u64 texture;
+    u64 unmodeled_28;
+    unsigned int red;
+    unsigned int green;
+    unsigned int blue;
+    unsigned int alpha;
+    FontGlyphCorner corners[4];
+} FontGlyphPacket;
+
+typedef struct FontDrawCursor { struct XglPacket *packet; short origin_x; unsigned char unmodeled_06[2]; unsigned short x; unsigned short y; int depth; unsigned short offset_x; unsigned short offset_y; unsigned char red; unsigned char green; unsigned char blue; unsigned char unmodeled_17; unsigned char drawFlags; unsigned char effect; unsigned char attributes; unsigned char draw_state_high; unsigned char unmodeled_1c[4]; signed char effect_x; signed char effect_y; unsigned char unmodeled_22[2]; unsigned char effect_red; unsigned char effect_green; unsigned char effect_blue; unsigned char effect_alpha; /* The GS ALPHA_1 value: the A/B/C/D selectors and FIX. */ unsigned char alpha_abcd; unsigned char alpha_fix; unsigned char alpha; unsigned char unmodeled_2b; unsigned short scale_x; unsigned short scale_y; union { struct FontEffectScratchPacket effect_packet; u64 qwords[(0x4000 - 0x30) / sizeof(u64)]; struct { unsigned char unmodeled_30[0x100 - 0x30]; struct FontMarkPacket sprite; } mark; struct { unsigned char unmodeled_30[0x100 - 0x30]; FontGlyphPacket sprite; } glyph; } effectArea; } FontDrawCursor;
 
 int xglFontGetStringWidth(const char *text);
 int xglFontGetSPcodeSize(int opcode, const unsigned char *text);
@@ -1708,7 +1736,188 @@ void xglFontBufferReset(void)
     xglFontState.debug_prefix = 0;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184188);
+/* GIF tag: EOP, one loop; PRE with a blended, textured sprite (PRIM 0x156) or strip, and the registers
+ * A+D, TEX0, RGBAQ, then UV / XYZF2 pairs. Without TEXFLUSH the first register is NOP (0xF). */
+#define FONT_GLYPH_TAG_LOW (GIF_TAG_EOP | 1)
+#define FONT_GLYPH_SPRITE_TAG_HIGH 0x70AB4000
+#define FONT_GLYPH_STRIP_TAG_HIGH 0xB0AA4000
+#define FONT_GLYPH_OPAQUE_TAG_HIGH 0x708B4000 /* the sprite without alpha blending */
+#define FONT_GLYPH_REGISTERS_LOW 0x3535316E
+#define FONT_GLYPH_REGISTERS_LOW_NO_FLUSH 0x3535316F
+#define FONT_GLYPH_REGISTERS_HIGH 0x535
+#define FONT_GLYPH_SPRITE_QWORDS 8
+#define FONT_GLYPH_STRIP_QWORDS 12
+#define GS_TEXFLUSH 0x3F
+/* TEX0 of the uploaded glyph (4-bit texture at 0x3FE0); the glyph code's CLUT bits pick the CLUT from 0x3FC0. */
+#define FONT_GLYPH_TEX0 0x2000000599307FE0ULL
+#define FONT_GLYPH_CBP 0x3FC0
+#define FONT_GLYPH_CLUT_MASK 0xC00
+/* The CLUT bits of the code select a CLUT 4 pages apart; CBP sits at bit 37 of TEX0. */
+#define FONT_GLYPH_CLUT_SHIFT 8
+#define GS_TEX0_CBP_SHIFT 37
+#define FONT_GLYPH_INDEX_MASK 0x3FF
+/* A glyph image is 30 quadwords; the upload packet (BITBLTBUF, TRXPOS, TRXREG, TRXDIR, IMAGE tag) is 7. */
+#define FONT_GLYPH_IMAGE_BYTES 0x1E0
+#define FONT_GLYPH_IMAGE_QUADWORDS 0x1E
+#define FONT_GLYPH_UPLOAD_SETUP_QUADWORDS 7
+#define VIF_DIRECT_FONT_GLYPH (0x51000000 | FONT_GLYPH_IMAGE_QUADWORDS)
+/* The widest glyph texture span (texels) and the clip limit of the 12.4 corner positions. */
+#define FONT_GLYPH_TEXTURE_SPAN_MAX 0x140
+#define FONT_GLYPH_CLIP_LIMIT 0xF000
+/* The corners sit half a pixel up and left of the cursor (12.4 fixed point). */
+#define FONT_GLYPH_LEFT_BIAS 8
+#define FONT_GLYPH_TOP_BIAS 9
+#define FONT_EFFECT_SHADOW 2
+#define FONT_EFFECT_OUTLINE 3
+#define FONT_EFFECT_BOLD 4
+
+extern unsigned char fontGlyphUploadSetup[];
+/* The effect offsets (x, y pairs in effect units, ended by 0, 0): shadow, outline, bold. */
+extern signed char fontEffectShadowOffsets[];
+extern signed char fontEffectOutlineOffsets[];
+extern signed char fontEffectBoldOffsets[];
+void sceVif1PkCnt(XglPacket *packet, unsigned int count);
+void sceVif1PkOpenDirectHLCode(XglPacket *packet, unsigned int count);
+void sceVif1PkCloseDirectHLCode(XglPacket *packet);
+
+/* Draws one glyph at the draw cursor: uploads its image (index and CLUT from code) and sends a textured sprite
+ * (a slanted strip with the horizontal shift) of size texels from (textureU, 0) to (textureU + size, height),
+ * then the shadow, outline or bold copies of the cursor's effect. The cursor advances by the drawn width. */
+void func_00184188(int code, int textureU, int size, int height)
+{
+    FontDrawCursor *cursor = (FontDrawCursor *) 0x70000000;
+    FontGlyphPacket *sprite = &((FontDrawCursor *) 0x70000000)->effectArea.glyph.sprite;
+    unsigned int *directState;
+    unsigned char *glyph;
+    signed char *offset;
+    int drawWidth;
+    int drawHeight;
+    int effectX;
+    int effectY;
+    unsigned int left;
+    unsigned int top;
+    int shiftedLeft;
+    int depth;
+
+    if (cursor->packet->directCode != 0) {
+        directState = cursor->packet->directState;
+        if (directState != 0) {
+            sceVif1PkCloseDirectHLCode(cursor->packet);
+            if (directState[0] == 0x51000000) {
+                cursor->packet->write_cursor -= 4;
+            }
+        }
+    }
+    /* kept: the original clamps size itself to the texture span and keeps the unclamped copy in drawWidth;
+     * a separate span variable allocates the registers the other way round. */
+    drawWidth = size;
+    size = size > FONT_GLYPH_TEXTURE_SPAN_MAX ? FONT_GLYPH_TEXTURE_SPAN_MAX : size;
+    drawWidth = (drawWidth * (short) cursor->scale_x) >> 4;
+    left = (((short) cursor->offset_x + (short) cursor->x) << 4) - FONT_GLYPH_LEFT_BIAS;
+    top = (((short) cursor->offset_y + (short) cursor->y) << 4) - FONT_GLYPH_TOP_BIAS;
+    effectX = cursor->effect_x * (short) cursor->scale_x;
+    effectY = cursor->effect_y * (short) cursor->scale_y;
+    drawHeight = (height * (short) cursor->scale_y) >> 4;
+    cursor->x += (drawWidth + xglFontState.character_spacing * (short) cursor->scale_x) >> 4;
+    if (left > FONT_GLYPH_CLIP_LIMIT || top > FONT_GLYPH_CLIP_LIMIT) {
+        return;
+    }
+    xglFontState.glyph_upload_count++;
+    glyph = xglFontState.texture_buffer + (code & FONT_GLYPH_INDEX_MASK) * FONT_GLYPH_IMAGE_BYTES;
+    sceVif1PkRef(cursor->packet, fontGlyphUploadSetup, FONT_GLYPH_UPLOAD_SETUP_QUADWORDS, 0, 0, 0);
+    sceVif1PkRef(cursor->packet, glyph, FONT_GLYPH_IMAGE_QUADWORDS, 0, VIF_DIRECT_FONT_GLYPH, 0);
+    sceVif1PkCnt(cursor->packet, 0);
+    sceVif1PkOpenDirectHLCode(cursor->packet, 0);
+    /* kept: the first block writes through its own short-lived pointer (a base register); sprite lives across
+     * the calls below and becomes absolute stores, as in the original. */
+    {
+        FontGlyphPacket *head = &((FontDrawCursor *) 0x70000000)->effectArea.glyph.sprite;
+
+        head->tag[0] = FONT_GLYPH_TAG_LOW;
+        head->tag[1] = FONT_GLYPH_SPRITE_TAG_HIGH;
+        head->tag[2] = FONT_GLYPH_REGISTERS_LOW;
+        head->tag[3] = FONT_GLYPH_REGISTERS_HIGH;
+        head->flush_register = GS_TEXFLUSH;
+        head->texture = FONT_GLYPH_TEX0 | ((u64) (((code & FONT_GLYPH_CLUT_MASK) >> FONT_GLYPH_CLUT_SHIFT) + FONT_GLYPH_CBP) << GS_TEX0_CBP_SHIFT);
+        head->red = cursor->red;
+        head->green = cursor->green;
+        head->blue = cursor->blue;
+        head->alpha = cursor->alpha;
+        head->corners[0].texture_u_or_x = textureU;
+        head->corners[0].texture_v_or_y = 0;
+        shiftedLeft = left + (xglFontState.horizontal_shift << 4);
+        head->corners[0].x = shiftedLeft;
+        head->corners[0].y = top;
+        depth = cursor->depth;
+        head->corners[0].depth = depth;
+        head->corners[0].depth_upper = 0;
+    }
+    if (xglFontState.horizontal_shift != 0) {
+        sprite->tag[1] = FONT_GLYPH_STRIP_TAG_HIGH;
+        sprite->corners[1].texture_u_or_x = textureU + size;
+        sprite->corners[1].texture_v_or_y = 0;
+        sprite->corners[1].x = shiftedLeft + drawWidth;
+        sprite->corners[1].y = top;
+        sprite->corners[1].depth = depth;
+        sprite->corners[1].depth_upper = 0;
+        sprite->corners[2].texture_u_or_x = textureU;
+        sprite->corners[2].texture_v_or_y = height;
+        sprite->corners[2].x = left;
+        sprite->corners[2].y = top + drawHeight;
+        sprite->corners[2].depth = depth;
+        sprite->corners[2].depth_upper = 0;
+        sprite->corners[3].texture_u_or_x = textureU + size;
+        sprite->corners[3].texture_v_or_y = height;
+        sprite->corners[3].x = left + drawWidth;
+        sprite->corners[3].y = top + drawHeight;
+        sprite->corners[3].depth = depth;
+        sprite->corners[3].depth_upper = 0;
+        sceVif1PkAddDirectDataN(cursor->packet, sprite, FONT_GLYPH_STRIP_QWORDS);
+        return;
+    }
+    sprite->corners[1].texture_u_or_x = textureU + size;
+    sprite->corners[1].texture_v_or_y = height;
+    sprite->corners[1].x = left + drawWidth;
+    sprite->corners[1].y = top + drawHeight;
+    sprite->corners[1].depth = depth;
+    sprite->corners[1].depth_upper = 0;
+    sceVif1PkAddDirectDataN(cursor->packet, sprite, FONT_GLYPH_SPRITE_QWORDS);
+    if (cursor->effect < FONT_EFFECT_SHADOW) {
+        return;
+    }
+    if (cursor->effect == FONT_EFFECT_BOLD) {
+        offset = fontEffectBoldOffsets;
+    } else {
+        sprite->red = cursor->effect_red;
+        sprite->green = cursor->effect_green;
+        sprite->blue = cursor->effect_blue;
+        if (cursor->effect == FONT_EFFECT_SHADOW) {
+            offset = fontEffectShadowOffsets;
+        } else {
+            offset = fontEffectOutlineOffsets;
+        }
+        if (cursor->effect_alpha == 1) {
+            sprite->tag[1] = FONT_GLYPH_OPAQUE_TAG_HIGH;
+        }
+    }
+    sprite->tag[2] = FONT_GLYPH_REGISTERS_LOW_NO_FLUSH;
+    sprite->corners[0].depth--;
+    sprite->corners[1].depth--;
+    sprite->corners[2].texture_u_or_x = sprite->corners[0].x;
+    sprite->corners[2].texture_v_or_y = sprite->corners[0].y;
+    sprite->corners[2].backup_x = sprite->corners[1].x;
+    sprite->corners[2].backup_y = sprite->corners[1].y;
+    for (; offset[0] != 0 || offset[1] != 0; offset += 2) {
+        int offsetX = offset[0] * effectX;
+        int offsetY = offset[1] * effectY;
+
+        sprite->corners[0].x = sprite->corners[2].texture_u_or_x + offsetX;
+        sprite->corners[0].y = sprite->corners[2].texture_v_or_y + offsetY;
+        sprite->corners[1].x = sprite->corners[2].backup_x + offsetX;
+        sprite->corners[1].y = sprite->corners[2].backup_y + offsetY;
+        sceVif1PkAddDirectDataN(cursor->packet, sprite, FONT_GLYPH_SPRITE_QWORDS);
+    }
+}
 
 
 /* The mark sprite: one textured sprite (GIF tag NLOOP 1, EOP, PRE with PRIM 0x116, six
@@ -1925,7 +2134,6 @@ struct FontExtCommand {
 };
 
 extern unsigned char fontGsResetPacket[];
-void func_00184188(int code, int textureU, int size, int height);
 
 /* XS2 xglFontFlushCore: draws the queued text at the cursor, running the control codes below 32 and the inline
  * "$" commands; returns the text position it stopped at (the terminator). */
