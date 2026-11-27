@@ -32,7 +32,8 @@ s32 vmRunNativeWithPluginFlush(s32 vmThread) {
     return nativeResult;
 }
 
-/* VM native with two arguments: battleRosterEntryIdAdd(first) then a loop of battleRosterEntrySwap over the battleRosterEntryIdIndexGet kind count. */
+/* VM native with two arguments: battleRosterEntryIdAdd(first) then a loop of battleRosterEntrySwap over the
+   battleRosterEntryIdIndexGet kind count. */
 s32 vmRaiseEntryKindTo(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
@@ -286,7 +287,8 @@ s32 vmInvokePairFromArgs(s32 vmThread) {
     return 1;
 }
 
-/* VM native: sets bit 0 of the roster table's unlock flags when its argument is nonzero (default 1), clears it otherwise. */
+/* VM native: sets bit 0 of the roster table's unlock flags when its argument is nonzero (default 1), clears it
+   otherwise. */
 s32 vmSetRosterTableFlag(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
