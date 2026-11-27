@@ -3649,12 +3649,13 @@ void pxyPlayEntryGroupFive(XglPacket *packet) {
     pxyPlayEntryGroup(5);
 }
 
-extern s32 D_00551240;
+/* Profile draw flag of the pxy module (X2 pxyProfileDrawFlag). */
+extern s32 pxyProfileDrawFlag;
 
 /* Init the pxy module: the reset helpers, then its two final packet callbacks (frame copy, entry group 5). */
 void nmlModelConstruct(void)
 {
-    D_00551240 = 0;
+    pxyProfileDrawFlag = 0;
     pxyClearPacketSlots();
     pxyInitModelCounters();
     pxyInitTables();

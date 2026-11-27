@@ -1818,7 +1818,7 @@
       "D_0055124C"
      ],
      "also_referenced_by_c": [
-      "D_00551240",
+      "pxyProfileDrawFlag",
       "gPxyDirtyFlag",
       "pxyShadowTexturesReady"
      ],

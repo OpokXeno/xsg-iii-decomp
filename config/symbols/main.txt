@@ -10136,6 +10136,7 @@ sw = 0x005511A4;
 intrTimerActive = 0x005511BC;
 intrTimerStart = 0x005511C0;
 intrTimerAccum = 0x005511C4;
+pxyProfileDrawFlag = 0x00551240;
 xglPacketMode = 0x0055125C;
 pxyTextureTableCache = 0x00551264;
 pxyTextureChannelCache = 0x00551268;
