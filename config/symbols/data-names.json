@@ -250,6 +250,7 @@
    "0x00771180": "svDrawList",
    "0x00771184": "svDrawListFlushCode",
    "0x007e7e0c": "fontStateFromWindow",
+   "0x007ea380": "fontTextureBuffer",
    "0x00863380": "fontExpandedPlane",
    "0x00897588": "LW",
    "0x008975b8": "xglCdStreamsActive",

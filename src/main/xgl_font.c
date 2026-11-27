@@ -2621,4 +2621,30 @@ unsigned char xglFontLoad(int fontIndex, CdCompletionCallback *notify)
     return previousFont;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185D58);
+/* The font texture the loader reads into (X2 fontTextureBuffer). */
+extern unsigned char fontTextureBuffer[];
+
+/* fontFlags bit: scaled glyphs are allowed (the glyph draw checks it). */
+#define FONT_STATE_SCALE 0x10
+#define FONT_SELECTION_NONE 0xFF
+#define FONT_DEFAULT_FONT 1
+
+/* Resets the font state, loads the default font and sets the default layout (X2 xglFontInitial). */
+void func_00185D58(void)
+{
+    xglFontState.font_selection = FONT_SELECTION_NONE;
+    xglFontState.texture_buffer = fontTextureBuffer;
+    xglFontLoad(FONT_DEFAULT_FONT, CD_NOTIFY_CURRENT);
+    xglFontBufferReset();
+    xglFontState.fontFlags = FONT_STATE_SCALE;
+    xglFontState.default_width = 24;
+    xglFontState.glyph_default_width = 4;
+    xglFontState.depth_test = 1;
+    xglFontState.character_spacing = 0;
+    xglFontState.proportional_mode = 0;
+    xglFontState.horizontal_shift = 0;
+    xglFontState.wrap_width = 0;
+    xglFontState.compact_width = FONT_SCALE_ONE;
+    xglFontState.compact_height = FONT_SCALE_ONE;
+    xglFontState.ruby_offset_y = 2;
+}

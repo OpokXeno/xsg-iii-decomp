@@ -10171,6 +10171,7 @@ sefActiveLightSet = 0x0076D660;
 svDrawList = 0x00771180;
 svDrawListFlushCode = 0x00771184;
 fontStateFromWindow = 0x007E7E0C;
+fontTextureBuffer = 0x007EA380;
 LW = 0x00897588;
 xglCdStreamsActive = 0x008975B8;
 xglCdStreamService = 0x0089B5C8;
