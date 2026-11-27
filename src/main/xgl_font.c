@@ -1783,7 +1783,7 @@ void sceVif1PkCloseDirectHLCode(XglPacket *packet);
 /* Draws one glyph at the draw cursor: uploads its image (index and CLUT from code) and sends a textured sprite
  * (a slanted strip with the horizontal shift) of size texels from (textureU, 0) to (textureU + size, height),
  * then the shadow, outline or bold copies of the cursor's effect. The cursor advances by the drawn width. */
-void func_00184188(int code, int textureU, int size, int height)
+void xglFontFlushSub(int code, int textureU, int size, int height)
 {
     FontDrawCursor *cursor = (FontDrawCursor *) 0x70000000;
     FontGlyphPacket *sprite = &((FontDrawCursor *) 0x70000000)->effectArea.glyph.sprite;
@@ -2568,14 +2568,14 @@ unsigned char *xglFontFlushCore(FontDrawCursor *cursor, unsigned char *text)
 
                     code = (unsigned short) xglFontGetProportionalSize(code);
                     width = func_00185770(code, &left);
-                    func_00184188(code + FONT_GLYPH_SPAN_BASE, left, width << 4, FONT_GLYPH_COMPACT_HEIGHT);
+                    xglFontFlushSub(code + FONT_GLYPH_SPAN_BASE, left, width << 4, FONT_GLYPH_COMPACT_HEIGHT);
                 } else if ((cursor->drawFlags & FONT_CURSOR_PROPORTIONAL) && code < FONT_PROPORTIONAL_GLYPHS) {
                     int left;
                     int width = func_00185770(code, &left);
 
-                    func_00184188(code + FONT_GLYPH_SPAN_BASE, left, width << 4, FONT_GLYPH_HEIGHT);
+                    xglFontFlushSub(code + FONT_GLYPH_SPAN_BASE, left, width << 4, FONT_GLYPH_HEIGHT);
                 } else {
-                    func_00184188(code, 0, FONT_GLYPH_FIXED_SPAN, FONT_GLYPH_HEIGHT);
+                    xglFontFlushSub(code, 0, FONT_GLYPH_FIXED_SPAN, FONT_GLYPH_HEIGHT);
                 }
             }
             break;
