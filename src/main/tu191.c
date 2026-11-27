@@ -1,5 +1,6 @@
 #include "common.h"
 #include "gs.h"
+#include "main/tu162.h"
 #define GS_TEX2_1 0x16
 #define GIF_PUT(cursor, registerValue, registerAddress) \
     (cursor)->packedValue = (registerValue);            \
@@ -188,13 +189,6 @@ void fontDrawRotatedSpriteU232(ScreenPoint *pos, s32 cornerIndex, s32 offsetX, s
     xglDirectQueueCount += ((u32) gifCursor - (u32) gifStart) >> 4;
     xglDirectQueueSubmitRef();
 }
-
-typedef struct FontRect {
-    u16 left;
-    u16 top;
-    u16 right;
-    u16 bottom;
-} FontRect;
 
 typedef struct QueueCounter {
     s32 queuedRecords;

@@ -1,9 +1,9 @@
 #include "common.h"
+#include "main/tu176.h"
+#include "main/tu160.h"
 
 extern char *gFontEscapeBuffer;
 void sprintf();
-
-typedef int s32;
 
 s32 streamSlotLoadFrame(s32 streamSlot);
 
@@ -14,16 +14,6 @@ s32 streamSlotLoadFrame(s32 streamSlot) {
     sprintf(gFontEscapeBuffer, moviePath, streamSlot + 1);
     return (s32) gFontEscapeBuffer;
 }
-
-typedef signed char s8;
-
-typedef unsigned char u8;
-
-typedef short s16;
-
-typedef unsigned short u16;
-
-typedef unsigned int u32;
 
 s32 memset(void *dst, s32 value, s32 size);
 s32 xglJpegDecode(void *jpegRequest);
@@ -63,7 +53,8 @@ typedef struct StreamPlayer {
     u8 cdSectorBuffer[0xE000];  /* +0x70000: the buffer address passed to xglCdReadFile */
     u8 decodeBlock[0x340];      /* +0x7E000: the block whose address shardFieldInit takes */
     StreamPagedTable pagedTable;    /* +0x7E340: the paged table of the decode block */
-    u8 sheetControlBlock[0x14]; /* +0x7E37C: the block whose address setStreamActive passes on */
+    McGauge prompt;             /* +0x7E37C: the Yes/No prompt setStreamActive starts */
+    u8 unmodeled_7E388[8];
     s32 scrollPosition;         /* +0x7E390 */
     s32 channelBaseOffset;      /* +0x7E394 */
     s32 scrollPrevious;         /* +0x7E398 */
@@ -216,7 +207,6 @@ void streamFrameSpriteSubmit(s32 x, s32 y, s32 packetRefAddress, s32 colour) {
 s32 messageTextGet(s32);
 void sheetSetIndex(s32);
 void mcStateSetupRequest(s32, s32);
-void func_002213A8(void *, s32, s32, s32);
 
 void setStreamActive(s32 enableStream) {
     s32 primarySheetHandle;
@@ -227,7 +217,7 @@ void setStreamActive(s32 enableStream) {
         primarySheetHandle = messageTextGet(0x30F);
         sheetSetIndex(primarySheetHandle);
         secondarySheetHandle = messageTextGet(0x30D);
-        func_002213A8(&gStreamPlayer.sheetControlBlock, secondarySheetHandle, 1, 0);
+        choicePromptInit(&gStreamPlayer.prompt, (const char *) secondarySheetHandle, 1, 0);
         gStreamPlayer.active = 1;
         gStreamPlayer.playState = 1;
         gStreamPlayer.stopLatch = -0x80;
@@ -282,7 +272,6 @@ void streamPlayerShutdown(void) {
 }
 
 s32 saveStateIndexGet(void);
-s32 battleRosterEntryIdCountGet(s32 rosterIndex);
 void pagedTableAppend(void *table, s32 index, s32 value);
 s32 pagedTableGetKeyAt(void *table, s32 index);
 void mcModuleReset(void);
@@ -303,7 +292,7 @@ void streamPlayerSetup(void) {
     s32 i;
 
     gStreamPlayer.fadeInTimer = 0;
-    func_002213A8(&gStreamPlayer.sheetControlBlock, 0, 0, 0);
+    choicePromptInit(&gStreamPlayer.prompt, 0, 0, 0);
     mcModuleReset();
     sheetStateReset();
     pagedTable = &gStreamPlayer.pagedTable;
@@ -444,12 +433,10 @@ void shardFieldUpdate(void *block);
 s32 colorModulateByte(u8 level, u8 flag);
 u8 statusByte0Get(void);
 u8 statusByte1Get(void);
-s32 sheetLatchedPositionGet(void);
 void sheetDrawFrame(s32);
 void mcStateSeekEntry(s32);
 void func_0021A7E0(s32, s32, s32, s32);
 void func_0021ABB0(s32, s32, s32, s32);
-void func_002215A0(void *block, s32, s32);
 void fontDrawRotatedSpriteU143(StreamSpritePos *pos, s32, s32, s32);
 void fontDrawPanelFrame(StreamSpritePos *pos, s32, s32);
 u8 pagedTableGetSlotByte(StreamPagedTable *table, s32 slot);
@@ -491,8 +478,8 @@ void streamPlayerDraw(void) {
     xglFontSetAlphaScale(streamPlayer()->fadeInTimer < 16 ? ((u8) streamPlayer()->fadeInTimer * 8) & 0xFF : 0x80);
     shardFieldUpdate(streamPlayer()->decodeBlock);
     xglFontFreeBuffer();
-    xglFontSetAlphaScale((0x80 - colorModulateByte(streamPlayer()->sheetControlBlock[0xA],
-                                                   streamPlayer()->sheetControlBlock[0xB])) &
+    xglFontSetAlphaScale((0x80 - colorModulateByte((u8) streamPlayer()->prompt.fadeIn,
+                                                   streamPlayer()->prompt.flag)) &
                          0xFF);
 
     smoothed =
@@ -585,7 +572,7 @@ void streamPlayerDraw(void) {
             ((((streamPlayer()->channelStartOffset - 0x3F0) * (u8) streamPlayer()->stopLatch) >> 7) + 0x3F0);
         streamSlotPanelDraw(streamPlayer()->channel, pos >> 4, 0x80);
     }
-    func_002215A0(streamPlayer()->sheetControlBlock, 0, 0xAE);
+    choicePromptDraw(&streamPlayer()->prompt, 0, 0xAE);
     xglFontSetColorScale(0x80);
 
     if (streamPlayer()->setupPending != 0) {
@@ -615,10 +602,8 @@ extern s8 gVsyncsPerFrame;
 void seVoiceStartDefault(unsigned int handle);
 void pagedTableAnimateSlots(void *cursor);
 void pagedTableMoveCursor(void *block, s32 delta);
-u16 *getStatusHeader(void);
 s32 statusHeaderIsReadyMode20(void);
 s32 statusHeaderIsReadyMode40(void);
-s32 func_00221440(void *sheet, s32 flag);
 void func_00220E00(void);
 void func_002209C0(void);
 
@@ -634,7 +619,7 @@ void streamPlayerUpdate(void) {
     pagedTableAnimateSlots(cursor);
     if (streamPlayer()->active == 0 && streamPlayer()->setupPending == 0) {
         if (streamPlayer()->ringSlotCount < 3) {
-            if ((getStatusHeader()[1] & 0x1000) || (getStatusHeader()[1] & 0x4000)) {
+            if ((getStatusHeader()->pressed & 0x1000) || (getStatusHeader()->pressed & 0x4000)) {
                 if (streamPlayer()->ringSlotCount >= 2) {
                     pagedTableMoveCursor(cursor, 1);
                     streamPlayer()->ringOffset ^= 1;
@@ -642,8 +627,8 @@ void streamPlayerUpdate(void) {
                 }
             }
         } else {
-            if ((getStatusHeader()[2] & 0x1000) && !(getStatusHeader()[0] & 0x4000) &&
-                (cursor->key != 0 || (getStatusHeader()[1] & 0x1000))) {
+            if ((getStatusHeader()->repeated & 0x1000) && !(getStatusHeader()->held & 0x4000) &&
+                (cursor->key != 0 || (getStatusHeader()->pressed & 0x1000))) {
                 pagedTableMoveCursor(cursor, -1);
                 if (streamPlayer()->ringOffset > 0) {
                     streamPlayer()->ringOffset -= 1;
@@ -659,8 +644,8 @@ void streamPlayerUpdate(void) {
                 }
                 seVoiceStartDefault(1);
             }
-            if ((getStatusHeader()[2] & 0x4000) && !(getStatusHeader()[0] & 0x1000) &&
-                (cursor->key != streamPlayer()->ringSlotCount - 1 || (getStatusHeader()[1] & 0x4000))) {
+            if ((getStatusHeader()->repeated & 0x4000) && !(getStatusHeader()->held & 0x1000) &&
+                (cursor->key != streamPlayer()->ringSlotCount - 1 || (getStatusHeader()->pressed & 0x4000))) {
                 pagedTableMoveCursor(cursor, 1);
                 if (streamPlayer()->ringOffset < 2) {
                     streamPlayer()->ringOffset += 1;
@@ -693,13 +678,13 @@ void streamPlayerUpdate(void) {
             streamPlayer()->setupPending = 0;
             setStreamActive(0);
             seVoiceStartDefault(8);
-        } else if (getStatusHeader()[1] & 0x10) {
+        } else if (getStatusHeader()->pressed & 0x10) {
             streamPlayer()->streamPhase = 1;
             seVoiceStartDefault(7);
         }
     } else if (streamPlayer()->active != 0) {
-        if (func_00221440(streamPlayer()->sheetControlBlock, 1) != 0) {
-            if (streamPlayer()->sheetControlBlock[8] == 0) {
+        if (choicePromptUpdate(&streamPlayer()->prompt, 1) != 0) {
+            if (streamPlayer()->prompt.state == 0) {
                 gStreamTrackIndex = streamPlayer()->channel;
                 streamPlayer()->streamPhase = 2;
                 seVoiceStartDefault(2);
@@ -709,7 +694,7 @@ void streamPlayerUpdate(void) {
             setStreamActive(0);
         }
     } else {
-        func_00221440(streamPlayer()->sheetControlBlock, 0);
+        choicePromptUpdate(&streamPlayer()->prompt, 0);
         if (statusHeaderIsReadyMode20() != 0) {
             if (pagedTableGetKeyAt(&streamPlayer()->pagedTable,
                                                                      streamPlayer()->pagedTable.key) &
@@ -722,7 +707,7 @@ void streamPlayerUpdate(void) {
                 setStreamActive(1);
                 seVoiceStartDefault(2);
             }
-        } else if (statusHeaderIsReadyMode40() != 0 || (getStatusHeader()[1] & 0x10)) {
+        } else if (statusHeaderIsReadyMode40() != 0 || (getStatusHeader()->pressed & 0x10)) {
             streamPlayer()->streamPhase = 1;
             seVoiceStartDefault(7);
         }

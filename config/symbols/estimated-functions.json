@@ -44784,7 +44784,7 @@
      2
     ],
     [
-     "func_002213A8",
+     "choicePromptInit",
      2233256,
      112,
      2
@@ -44796,7 +44796,7 @@
      2
     ],
     [
-     "func_00221440",
+     "choicePromptUpdate",
      2233408,
      312,
      2
@@ -44808,13 +44808,13 @@
      2
     ],
     [
-     "func_002215A0",
+     "choicePromptDraw",
      2233760,
      1252,
      2
     ],
     [
-     "func_00221A88",
+     "mcFileListScrollInit",
      2235016,
      108,
      2
@@ -44826,7 +44826,7 @@
      2
     ],
     [
-     "func_00221B40",
+     "mcFileListScrollStep",
      2235200,
      176,
      2
@@ -44838,7 +44838,7 @@
      2
     ],
     [
-     "func_00221C18",
+     "sheetFrameSetCellAlpha",
      2235416,
      48,
      2
@@ -44850,7 +44850,7 @@
      2
     ],
     [
-     "func_00221C50",
+     "newGameStateReset",
      2235472,
      460,
      2
@@ -44898,25 +44898,25 @@
      2
     ],
     [
-     "func_00221F40",
+     "battleRosterHasEntryId",
      2236224,
      96,
      2
     ],
     [
-     "func_00221FA0",
+     "battleCurrentRosterIndexSet",
      2236320,
      24,
      2
     ],
     [
-     "func_00221FB8",
+     "battleRosterEntryIdAdd",
      2236344,
      144,
      2
     ],
     [
-     "func_00222048",
+     "battleRosterEntryIdRemove",
      2236488,
      180,
      2
@@ -44928,25 +44928,25 @@
      2
     ],
     [
-     "func_00222120",
+     "battleRosterEntrySwap",
      2236704,
      280,
      2
     ],
     [
-     "func_00222238",
+     "battleRosterCursorSet",
      2236984,
      104,
      2
     ],
     [
-     "func_002222A0",
+     "battleCurrentRosterCursorAdvance",
      2237088,
      192,
      2
     ],
     [
-     "func_00222360",
+     "battleRosterEntryIdIndexGet",
      2237280,
      132,
      2
@@ -44976,7 +44976,7 @@
      2
     ],
     [
-     "func_002224E8",
+     "battleRosterLinkedEntryIdGet",
      2237672,
      172,
      2

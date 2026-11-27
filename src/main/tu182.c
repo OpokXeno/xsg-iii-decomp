@@ -93,7 +93,7 @@ void sceneReset(void) {
 
 s32 fontQueueColorState(s32 value);
 s32 fontQueueSprite(s32 left, s32 top, s32 right, s32 bottom);
-s32 xglFontSetAlphaScale(s32 alpha);
+void xglFontSetAlphaScale(s32 scale);
 s32 func_0021A7E0(s32 x, s32 y, s32 secondTextId, s32 firstTextId);
 void xglFontResetState(void);
 

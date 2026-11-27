@@ -2,11 +2,7 @@
  * OV02 original TU 44: 0x00a8fb00..0x00a914d0 (36 functions)
  */
 #include "common.h"
-
-typedef int s32;
-typedef signed char s8;
-typedef unsigned char u8;
-typedef short s16;
+#include "main/tu176.h"
 
 /* Cursor of a command queue; the slot index sits at +0x04. */
 typedef struct MonsQueueCursor {
@@ -137,17 +133,14 @@ s32 monsSlotQueueEmpty(void) {
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu044", func_00A8FED0);
 
-s32 func_00222120(s32, s32, s32);
-s32 func_00222360();
-
-void monsLinkActorToTarget(s32 unusedValue, s32 targetActorHandle) {
+void monsLinkActorToTarget(s32 actorEntryId, s32 targetActorHandle) {
     s32 actorSlotIndex;
     s32 targetActorSlotIndex;
 
-    actorSlotIndex = func_00222360();
-    targetActorSlotIndex = func_00222360(targetActorHandle);
+    actorSlotIndex = battleRosterEntryIdIndexGet(actorEntryId);
+    targetActorSlotIndex = battleRosterEntryIdIndexGet(targetActorHandle);
     if ((actorSlotIndex != -1) && (targetActorSlotIndex != -1)) {
-        func_00222120(actorSlotIndex, targetActorSlotIndex, 0);
+        battleRosterEntrySwap(actorSlotIndex, targetActorSlotIndex, 0);
     }
 }
 

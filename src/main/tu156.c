@@ -1,16 +1,17 @@
 #include "common.h"
+#include "main/tu156.h"
 
 typedef int s32;
 
 extern char *gFontEscapeBuffer;
-s32 func_0030E3D0(void *text, s32 value);
+char *func_0030E3D0(char *destination, const char *source);
 s32 xglFontGetStringWidth(const char *text);
 
-s32 xglFontGetFormattedWidth(s32 formattedNumber) {
+s32 xglFontGetFormattedWidth(const char *text) {
     gFontEscapeBuffer[0] = 0x19;
     gFontEscapeBuffer[1] = 3;
     gFontEscapeBuffer[2] = 0;
-    func_0030E3D0(gFontEscapeBuffer, formattedNumber);
+    func_0030E3D0(gFontEscapeBuffer, text);
     return xglFontGetStringWidth(gFontEscapeBuffer);
 }
 

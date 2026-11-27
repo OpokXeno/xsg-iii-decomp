@@ -1,32 +1,8 @@
 #include "common.h"
+#include "main/tu173.h"
 
 typedef signed char s8;
-typedef short s16;
-typedef unsigned short u16;
 typedef int s32;
-typedef unsigned int u32;
-typedef unsigned char u8;
-
-typedef struct TiFramePos {
-    u16 x;
-    u16 y;
-} TiFramePos;
-
-/* Frame sheet header: a grid of frames drawn from a sheet's origin, with per-column cell widths. */
-typedef struct TiFrameSheet {
-    u8 unk_00[0xC];
-    s8 columns;                     /* 0x0C */
-    s8 rows;                        /* 0x0D */
-    u8 valueColumn;                      /* 0x0E, scales the x offset by 0x50 */
-    u8 unk_0F;
-    u16 originX;                    /* 0x10 */
-    u16 originY;                    /* 0x12 */
-    u16 cellWidthA;                 /* 0x14 */
-    u16 cellWidthB;                 /* 0x16 */
-    u16 cellWidthC;                 /* 0x18 */
-    s16 unk_1A;                     /* 0x1A, passed to the box draw */
-    s16 frameBase;                  /* 0x1C, subtracted from the tick */
-} TiFrameSheet;
 
 typedef struct TiFrameBox {
     s16 left;
@@ -117,7 +93,7 @@ void sheetFrameDrawBox(TiFrameSheet *sheet)
   frameBase = sheet->frameBase;
   box.left = left;
   box.top = top;
-  func_0021B740(&box.left, sheet->unk_1A, rows, frameBase);
+  func_0021B740(&box.left, sheet->entryCount, rows, frameBase);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu173", func_00220488);

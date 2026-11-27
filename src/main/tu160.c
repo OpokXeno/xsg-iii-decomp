@@ -1,33 +1,14 @@
 #include "common.h"
 
 #include "main/tu007.h"
+#include "main/tu176.h"
+#include "main/tu160.h"
 
 void xglPadSetRepeat(int, int, int, int);
-
-typedef int s32;
-
-typedef signed char s8;
-
-typedef short s16;
-
-typedef unsigned char u8;
-
-typedef unsigned short u16;
 
 static u16 gStatusBitsLow;
 static u16 gStatusBitsHigh;
 static unsigned char gPadStatusMasks[16];
-
-/* Status header record at gPadStatusMasks: the pad masks of the frame (+0x00 held, +0x02 pressed, +0x04 repeated,
- * +0x06 pressed in the previous frame) and the two group words at +0x08 and +0x0A. */
-typedef struct PadStatusMasks {
-    unsigned short held;
-    unsigned short pressed;
-    unsigned short repeated;
-    unsigned short previousPressed;
-    unsigned short unk_08;
-    unsigned short unk_0A;
-} PadStatusMasks;
 
 #define gPadStatus (*(PadStatusMasks *) gPadStatusMasks)
 
@@ -231,7 +212,6 @@ void swapWordsRestore(void) {
 extern s32 gFontEscapeBuffer;
 extern s32 gFontNumberBuffer;
 void bufferCursorClear();
-void func_00221C50();
 void func_00225780();
 void sceneReset();
 
@@ -240,7 +220,7 @@ void initScratchpadBuffers(void) {
     gFontNumberBuffer = 0x70000100;
     bufferCursorClear();
     sceneReset();
-    func_00221C50();
+    newGameStateReset();
     func_00225780();
 }
 
@@ -287,9 +267,8 @@ void statusBlockFrameUpdate(void) {
     BLOCK_STATUS_ADVANCE();
 }
 
-/* Pointer to the status header record at gPadStatusMasks. */
-u8 *getStatusHeader(void) {
-    return gPadStatusMasks;
+PadStatusMasks *getStatusHeader(void) {
+    return &gPadStatus;
 }
 
 void blockStatusBitsSet(s32 newStatusBits) {
