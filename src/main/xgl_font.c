@@ -15,7 +15,34 @@ struct FontEffectScratchPacket {
     u64 payload_count;
 };
 
-typedef struct FontDrawCursor { struct XglPacket *packet; short origin_x; unsigned char unmodeled_06[2]; unsigned short x; unsigned short y; int depth; unsigned short offset_x; unsigned short offset_y; unsigned char red; unsigned char green; unsigned char blue; unsigned char unmodeled_17; unsigned char drawFlags; unsigned char effect; unsigned char attributes; unsigned char draw_state_high; unsigned char unmodeled_1c[4]; signed char effect_x; signed char effect_y; unsigned char unmodeled_22[2]; unsigned char effect_red; unsigned char effect_green; unsigned char effect_blue; unsigned char effect_alpha; /* The GS ALPHA_1 value: the A/B/C/D selectors and FIX. */ unsigned char alpha_abcd; unsigned char alpha_fix; unsigned char alpha; unsigned char unmodeled_2b; unsigned short scale_x; unsigned short scale_y; union { struct FontEffectScratchPacket effect_packet; u64 qwords[(0x4000 - 0x30) / sizeof(u64)]; } effectArea; } FontDrawCursor;
+/* One corner of the mark sprite: texture u/v, two unused words, x, y and z. */
+struct FontMarkCorner {
+    unsigned int texture_u_or_x;
+    unsigned int texture_v_or_y;
+    unsigned int backup_x;
+    unsigned int backup_y;
+    unsigned int x;
+    unsigned int y;
+    unsigned int depth;
+    unsigned int depth_upper;
+};
+
+/* The GIF packet a mark is drawn with, in the scratchpad at +0x100 (the draw cursor's effect area). */
+struct FontMarkPacket {
+    unsigned int tag_low;
+    unsigned int tag_high;
+    unsigned int registers_low;
+    unsigned int registers_high;
+    unsigned long long texture;
+    unsigned char unmodeled_18[8];
+    unsigned int red;
+    unsigned int green;
+    unsigned int blue;
+    unsigned int alpha;
+    struct FontMarkCorner corners[4];
+};
+
+typedef struct FontDrawCursor { struct XglPacket *packet; short origin_x; unsigned char unmodeled_06[2]; unsigned short x; unsigned short y; int depth; unsigned short offset_x; unsigned short offset_y; unsigned char red; unsigned char green; unsigned char blue; unsigned char unmodeled_17; unsigned char drawFlags; unsigned char effect; unsigned char attributes; unsigned char draw_state_high; unsigned char unmodeled_1c[4]; signed char effect_x; signed char effect_y; unsigned char unmodeled_22[2]; unsigned char effect_red; unsigned char effect_green; unsigned char effect_blue; unsigned char effect_alpha; /* The GS ALPHA_1 value: the A/B/C/D selectors and FIX. */ unsigned char alpha_abcd; unsigned char alpha_fix; unsigned char alpha; unsigned char unmodeled_2b; unsigned short scale_x; unsigned short scale_y; union { struct FontEffectScratchPacket effect_packet; u64 qwords[(0x4000 - 0x30) / sizeof(u64)]; struct { unsigned char unmodeled_30[0x100 - 0x30]; struct FontMarkPacket sprite; } mark; } effectArea; } FontDrawCursor;
 
 int xglFontGetStringWidth(const char *text);
 int xglFontGetSPcodeSize(int opcode, const unsigned char *text);
@@ -1683,9 +1710,59 @@ void xglFontBufferReset(void)
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184188);
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00184798);
 
-void func_00184798(int code, int v);
+/* The mark sprite: one textured sprite (GIF tag NLOOP 1, EOP, PRE with PRIM 0x116, six
+ * registers TEX0, RGBAQ, UV, XYZ2, UV, XYZ2) from the mark texture (TEX0 word). */
+#define FONT_MARK_TAG_LOW 0x8001
+#define FONT_MARK_TAG_HIGH 0x608B4000
+#define FONT_MARK_REGISTERS 0x535316
+#define FONT_MARK_TEX0 0x2007F80665B20000ULL
+/* Marks are 64 to a texture row pair: column (code & 0x3F) * 128 texels, row (code & 0xC0) * 2. */
+#define FONT_MARK_COLUMN_MASK 0x3F
+#define FONT_MARK_ROW_MASK 0xC0
+#define FONT_MARK_HEIGHT 0x80
+#define FONT_MARK_QWORDS 7
+
+/* Draws mark `code` (width texels wide, 128 high) at the scratchpad draw cursor, scaled by its
+ * scale, and moves the cursor on by the drawn width. */
+void func_00184798(int code, int width)
+{
+    FontDrawCursor *cursor = (FontDrawCursor *) 0x70000000;
+    struct FontMarkPacket *sprite = &cursor->effectArea.mark.sprite;
+    unsigned int left = (((short) cursor->offset_x + (short) cursor->x) * 16) - 8;
+    unsigned int top = (((short) cursor->offset_y + (short) cursor->y) * 16) - 9;
+    int texture_u = (code & FONT_MARK_COLUMN_MASK) << 7;
+    int texture_v = (code & FONT_MARK_ROW_MASK) << 1;
+    int draw_width = (width * (short) cursor->scale_x) >> 3;
+    int advance = draw_width / 16;
+    /* kept: the mark height and the full alpha are both 0x80; the original adds the register it stores the alpha
+     * from (written as two constants, the add takes an immediate). */
+    int full = FONT_MARK_HEIGHT;
+
+    sprite->tag_low = FONT_MARK_TAG_LOW;
+    sprite->tag_high = FONT_MARK_TAG_HIGH;
+    sprite->registers_low = FONT_MARK_REGISTERS;
+    sprite->registers_high = 0;
+    sprite->texture = FONT_MARK_TEX0;
+    sprite->red = cursor->red;
+    sprite->green = cursor->green;
+    sprite->blue = cursor->blue;
+    sprite->alpha = full;
+    sprite->corners[0].texture_u_or_x = texture_u;
+    sprite->corners[0].texture_v_or_y = texture_v;
+    sprite->corners[0].x = left;
+    sprite->corners[0].y = top;
+    sprite->corners[0].depth = cursor->depth;
+    sprite->corners[0].depth_upper = 0;
+    sprite->corners[1].texture_u_or_x = texture_u + width;
+    sprite->corners[1].texture_v_or_y = texture_v + full;
+    sprite->corners[1].x = left + draw_width;
+    sprite->corners[1].y = top + (short) cursor->scale_y * 16;
+    sprite->corners[1].depth = cursor->depth;
+    sprite->corners[1].depth_upper = 0;
+    cursor->x += advance;
+    sceVif1PkAddDirectDataN(cursor->packet, sprite, FONT_MARK_QWORDS);
+}
 
 void xglFontFlushSubMark(int markIndex)
 {
