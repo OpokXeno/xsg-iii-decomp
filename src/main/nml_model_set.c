@@ -274,7 +274,7 @@ typedef struct PxyModelRenderState {
     int unk6F4;
     u8 unk6F8[8];
     void (*drawCallbacks[16])(int); /* +0x700: registered by func_0019ED68 */
-    Vector4 boundSphere; /* +0x740: pxyBoundSphere, centre and radius */
+    DoublewordVector4 boundSphere; /* +0x740: pxyBoundSphere, centre and radius */
     PxyVector globalFogColor; /* +0x750 */
     AlignedVector4 globalFogParams; /* +0x760 */
     PxyBatch *overlayBatches[32]; /* +0x770: drawn before and after the sorted batches */
@@ -1599,7 +1599,34 @@ float pxyCalcFadeMetric(int cameraIndex, const Vector4 *point, float scale) {
     return fadeMetric;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A12A0);
+#define BYTE_OFFSET(base, off) ((u8 *) (base) + (off))
+
+/* The model's bounding sphere in world space: the centre through the draw matrix, the radius
+ * the larger one of the pack and its sub pack, scaled; the shadow heights follow the model's height. */
+void pxyCalcModelBounds(PxyModelHeader *modelHeader)
+{
+    DoublewordVector4 sphere;
+    PxyModelHeader *subPack;
+
+    xglVectorScaleXYZ(&sphere.vector, &pxyState.modelPosition, 1.0f / pxyState.modelScaleMax);
+    if (pxyState.jointMatrices == 0) {
+        QuadwordCopy(&sphere, &modelHeader->sphere);
+    }
+    sphere.vector.w = 1.0f;
+    xglVectorMulMat(&pxyState.modelPosition, pxyState.drawMatrix.rows, &sphere.vector);
+    QuadwordCopy(&sphere, &pxyState.modelPosition);
+    subPack = (PxyModelHeader *) BYTE_OFFSET(modelHeader, modelHeader->subPackOffset);
+    if (subPack->sphere.w < modelHeader->sphere.w) {
+        sphere.vector.w = modelHeader->sphere.w * pxyState.modelScaleMax;
+    } else {
+        sphere.vector.w = subPack->sphere.w * pxyState.modelScaleMax;
+    }
+    pxyState.modelPosition.w = sphere.vector.w;
+    pxyState.boundSphere = sphere;
+    pxyState.shadowHeightLower += pxyState.drawMatrix.rows[3][1];
+    pxyState.shadowHeightUpper += pxyState.drawMatrix.rows[3][1];
+    pxyState.fadeMetric = pxyCalcFadeMetric(0, &pxyState.modelPosition, sphere.vector.w);
+}
 
 void _ModelCalcClipInitMat1(float (*planeSet)[4], Matrix4 matrix);
 int _ModelCalcClipMat1(Vector4 *point);
@@ -1626,9 +1653,9 @@ void pxyCalcCameraVisibility(void)
                 gPxyModelRenderStateStorage.cameraVisible[i] = 1;
             } else {
                 _ModelCalcClipInitMat1(camera->volume[0].planeSet[0], clipMatrix);
-                visible = _ModelCalcClipMat1(&gPxyModelRenderStateStorage.boundSphere);
+                visible = _ModelCalcClipMat1(&gPxyModelRenderStateStorage.boundSphere.vector);
                 if (visible && (modelHeader->flags & 2)) {
-                    visible = xglCullingPollCheck(camera, &gPxyModelRenderStateStorage.boundSphere) == 0;
+                    visible = xglCullingPollCheck(camera, &gPxyModelRenderStateStorage.boundSphere.vector) == 0;
                 }
                 if ((gPxyModelRenderStateStorage.cameraVisible[i] = visible)) {
                     anyVisible = 1;
@@ -1690,14 +1717,14 @@ void pxyCalcFogFactors(PxyModelHeader *modelHeader)
                 pxyState.cameraFog[i] = 0xA00;
             } else {
                 pxyState.cameraFog[i] =
-                    nmlModelGetFogParaStudio(&pxyState.boundSphere, i) << 4;
+                    nmlModelGetFogParaStudio(&pxyState.boundSphere.vector, i) << 4;
             }
             if (pxyState.geometryFogFactors != 0) {
                 for (j = 0; j < modelHeader->geometryCount; j++) {
                     AlignedVector4 position;
 
                     pxyVectorAddXYZ(&position, (Vector4 *) pxyState.partMatrices[j].rows[3],
-                                    &pxyState.boundSphere);
+                                    &pxyState.boundSphere.vector);
                     ((PxyGeometryFog *) pxyState.geometryFogFactors)[j].camera[i] =
                         nmlModelGetFogParaStudio(&position, i) << 4;
                 }
@@ -1813,7 +1840,7 @@ typedef struct PxySortWork {
 #define PXY_HEADER_AT(header, offset) ((void *)((u8 *)(header) + (offset)))
 
 void func_001A0A10(PxyModelHeader *header);
-void func_001A12A0(PxyModelHeader *header);
+void pxyCalcModelBounds(PxyModelHeader *header);
 void pxyCalcFogFactors(PxyModelHeader *header);
 void func_001A17F8(PxyModelHeader *header);
 void pxySetupShadowProjector(PxyModelHeader *header);
@@ -2011,7 +2038,7 @@ int pxySubmitModel(PxyModelHeader *modelHeader)
         if (pxyState.slotWriteIndex >= PXY_SLOT_COUNT) {
             pxyState.slotWriteIndex = 0;
         }
-        func_001A12A0(modelHeader);
+        pxyCalcModelBounds(modelHeader);
         pxyCalcCameraVisibility();
         pxyCalcFogFactors(modelHeader);
     }

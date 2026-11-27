@@ -47554,9 +47554,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A12A0",
+     "name": "pxyCalcModelBounds",
      "size": 288,
-     "splat_name": "func_001A12A0",
+     "splat_name": "pxyCalcModelBounds",
      "va": "0x001a12a0",
      "name_basis": "address",
      "provenance": "estimated"
