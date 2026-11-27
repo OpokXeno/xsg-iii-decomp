@@ -135,11 +135,11 @@ BattleRoster *battleRosterGet(s32 rosterIndex) {
     return &gBattleRosterTable.rosterPair.rosters[rosterIndex];
 }
 
-u8 battleRosterEntryIdCountGet(s32 rosterIndex) {
+s32 battleRosterEntryIdCountGet(s32 rosterIndex) {
     return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIdCount;
 }
 
-u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
+s32 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
 {
   if (!(entryIdIndex < battleRosterEntryIdCountGet(rosterIndex)))
   {
@@ -148,34 +148,29 @@ u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex)
   return gBattleRosterTable.rosterPair.rosters[rosterIndex].entryIds[entryIdIndex];
 }
 
-/* The call goes through an int-returning view of battleRosterEntryIdGet. Plain forms tried: the direct call and
-   `entryId = battleRosterEntryIdGet(...); return entryId;` compile to a jal and a return instead of the original's
-   tail jump (the u8 result type blocks the sibling call), so the two cursor getters come out 8 bytes longer in
-   total and the link no longer fits. */
 s32 battleRosterCursorEntryIdGet(s32 rosterIndex) {
-    return ((s32 (*)()) battleRosterEntryIdGet)(gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor, rosterIndex);
+    return battleRosterEntryIdGet(gBattleRosterTable.rosterPair.rosters[rosterIndex].cursor, rosterIndex);
 }
 
-u8 battleCurrentRosterEntryCountGet(void)
+s32 battleCurrentRosterEntryCountGet(void)
 {
   return gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].entryIdCount;
 }
 
-u8 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
+s32 battleCurrentRosterEntryIdGet(s32 entryIdIndex)
 {
   return gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].entryIds[entryIdIndex];
 }
 
-/* Same int-returning view of battleRosterEntryIdGet as battleRosterCursorEntryIdGet. */
 s32 battleCurrentRosterCursorEntryIdGet(void)
 {
-  return ((s32 (*)()) battleRosterEntryIdGet)(
+  return battleRosterEntryIdGet(
       gBattleRosterTable.rosterPair.rosters[gBattleRosterTable.currentRosterIndex].cursor,
       gBattleRosterTable.currentRosterIndex);
 }
 
 /* Returns 1 when entryId is in its roster (roster 0 below BATTLE_ROSTER1_FIRST_ENTRY_ID, else roster 1), else 0. */
-u8 battleRosterHasEntryId(s32 entryId)
+s32 battleRosterHasEntryId(s32 entryId)
 {
   BattleRoster *roster;
   s32 index;
@@ -216,18 +211,13 @@ void battleRosterEntryIdRemove(s32 entryId)
       {
         roster->cursor = 0;
       }
-      index++;
-      if (index < roster->entryIdCount)
+      for (index++; index < roster->entryIdCount; index++)
       {
-        do
+        if (roster->cursor == index)
         {
-          if (roster->cursor == index)
-          {
-            roster->cursor = index - 1;
-          }
-          roster->entryIds[index - 1] = roster->entryIds[index];
-          index++;
-        } while (index < roster->entryIdCount);
+          roster->cursor = index - 1;
+        }
+        roster->entryIds[index - 1] = roster->entryIds[index];
       }
       roster->entryIdCount--;
       return;
@@ -370,8 +360,6 @@ s32 battleRosterEntryIdIndexGet(s32 entryId)
   return result;
 }
 
-void func_00221FB8(s32 entryId);
-
 void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryId) {
     s32 entryIds[3];
     s32 entryId;
@@ -397,7 +385,7 @@ void battleUpdateEntryKinds(s32 firstEntryId, s32 secondEntryId, s32 thirdEntryI
     }
 }
 
-u8 battleCurrentRosterIndexGet(void) {
+s32 battleCurrentRosterIndexGet(void) {
     return gBattleRosterTable.currentRosterIndex;
 }
 

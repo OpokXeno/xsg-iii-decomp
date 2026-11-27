@@ -1,12 +1,10 @@
 #include "common.h"
-
-typedef int s32;
+#include "main/tu176.h"
 
 /* VM native: calls func_00221FB8 with each script argument, from the first to the last. Returns 1. */
 s32 vmCallEachArgument(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
-    extern void func_00221FB8(s32);
     s32 vmArgCount;
     s32 vmArgIndex;
 
@@ -21,8 +19,6 @@ s32 vmCallEachArgument(s32 vmThread) {
     return 1;
 }
 
-typedef unsigned char u8;
-
 s32 func_001B9228();
 
 s32 vmRunNativeWithPluginFlush(s32 vmThread) {
@@ -36,14 +32,10 @@ s32 vmRunNativeWithPluginFlush(s32 vmThread) {
     return nativeResult;
 }
 
-s32 battleRosterEntrySwap(s32, s32, s32);
-s32 battleRosterEntryIdIndexGet(s32);
-
 /* VM native with two arguments: func_00221FB8(first) then a loop of battleRosterEntrySwap over the battleRosterEntryIdIndexGet kind count. */
 s32 vmRaiseEntryKindTo(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
-    extern void func_00221FB8(s32);
     s32 vmArgCount;
     s32 vmFirstArg;
     s32 vmSecondArg;
@@ -79,9 +71,6 @@ s32 vmRunSecondNativeWithPluginFlush(s32 vmThread) {
     return secondNativeResult;
 }
 
-void battleRosterEntryIdRemove(s32);
-void battleRosterPairReset();
-
 s32 vmForEachArgCall(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET();
     extern s32 vmArgGet(s32, s32);
@@ -108,7 +97,6 @@ s32 vmForEachArgCall(s32 vmThread) {
 s32 vmForEachArgCall(s32 context);
 
 s32 vmForEachArgCallWithFlush(void) {
-    extern s32 battleCurrentRosterEntryCountGet();
     extern s32 vmForEachArgCall();
     s32 vmForEachResult;
 
@@ -118,8 +106,6 @@ s32 vmForEachArgCallWithFlush(void) {
     }
     return vmForEachResult;
 }
-
-void battleUpdateEntryKinds(s32, s32, s32);
 
 /* VM native with three arguments: all nonzero arguments must share one kind class (value >= 13), then battleUpdateEntryKinds runs. */
 s32 vmUpdateEntryKinds(s32 vmThread) {
@@ -176,10 +162,7 @@ s32 vmRunNativeFlushOnResult(s32 vmThread) {
     return nativeResult;
 }
 
-s32 battleCurrentRosterIndexSet();
-
 s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
-    extern u8 gBattleCurrentRosterIndex[];
     extern s32 VM_PLUGIN_CNT_GET();
     extern s32 vmArgGet(s32, s32);
     s32 vmArgValue;
@@ -188,7 +171,7 @@ s32 vmSetFlagFromArgOrDefault(s32 vmThread) {
         vmArgValue = vmArgGet(vmThread, 1);
         battleCurrentRosterIndexSet(vmArgValue > 0);
     } else {
-        battleCurrentRosterIndexSet(gBattleCurrentRosterIndex[0] == 0, 1);
+        battleCurrentRosterIndexSet(gBattleRosterTable.currentRosterIndex == 0);
     }
     return 1;
 }
@@ -205,11 +188,8 @@ s32 vmSetFlagFromArgWithFlush(void) {
 }
 
 s32 vmIsFlagSet(void) {
-    extern u8 gBattleCurrentRosterIndex[];
-    return gBattleCurrentRosterIndex[0] != 0;
+    return gBattleRosterTable.currentRosterIndex != 0;
 }
-
-s32 battleRosterCursorSet(s32, s32);
 
 s32 vmApplyIndexedKindArg(s32 vmThread)
 {
@@ -244,9 +224,6 @@ s32 vmApplyIndexedKindWithFlush(void) {
     return vmApplyKindResult;
 }
 
-s32 battleRosterCursorEntryIdGet(s32);
-s32 battleCurrentRosterCursorEntryIdGet(s32, s32);
-
 void vmSetModeFromArgOrDefault(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET();
     extern s32 vmArgGet(s32, s32);
@@ -257,13 +234,11 @@ void vmSetModeFromArgOrDefault(s32 vmThread) {
         battleRosterCursorEntryIdGet(vmArgValue > 0);
         return;
     }
-    battleCurrentRosterCursorEntryIdGet(vmThread, 1);
+    battleCurrentRosterCursorEntryIdGet();
 }
 
 void vmSetTableFromArgOrDefault(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET();
-    extern s32 battleRosterEntryIdCountGet(s32);
-    extern s32 battleCurrentRosterEntryCountGet(s32, s32);
     extern s32 vmArgGet(s32, s32);
     s32 vmArgValue;
 
@@ -272,22 +247,18 @@ void vmSetTableFromArgOrDefault(s32 vmThread) {
         battleRosterEntryIdCountGet(vmArgValue > 0);
         return;
     }
-    battleCurrentRosterEntryCountGet(vmThread, 1);
+    battleCurrentRosterEntryCountGet();
 }
-
-s32 battleRosterEntryIdGet();
 
 s32 vmGetRecordSubEntryFromArgs(s32 vmThread)
 {
-    extern unsigned char gBattleCurrentRosterIndex[];
     extern s32 VM_PLUGIN_CNT_GET();
-    extern s32 battleRosterEntryIdCountGet();
     extern s32 vmArgGet();
     s32 vmRecordIndex;
     s32 vmSelectFlag;
 
     vmRecordIndex = vmArgGet(vmThread, 1);
-    vmSelectFlag = gBattleCurrentRosterIndex[0];
+    vmSelectFlag = gBattleRosterTable.currentRosterIndex;
     if (VM_PLUGIN_CNT_GET(vmThread) >= 2) {
         vmSelectFlag = vmArgGet(vmThread, 2) > 0;
     }
@@ -297,27 +268,12 @@ s32 vmGetRecordSubEntryFromArgs(s32 vmThread)
     return 0;
 }
 
-typedef struct BattleRosterWords {
-    s32 rosterEntryWords[8];
-} BattleRosterWords;
-
-typedef struct BattleRosterSnapshot {
-    u8 unmodeled_00[4];
-    BattleRosterWords roster;
-    u8 snapshotFlags;
-} BattleRosterSnapshot;
-
-extern BattleRosterSnapshot gSaveGameHeader;
-extern unsigned char gBattleRosterTable[];
-
-/* Copies the 8-word battle roster table into the snapshot and sets bit 1 of snapshotFlags. */
+/* Copies the roster pair into the save header and sets bit 1 of snapshotFlags. */
 s32 battleRosterSnapshotTake(void) {
     gSaveGameHeader.snapshotFlags |= 2;
-    gSaveGameHeader.roster = *(BattleRosterWords *) gBattleRosterTable;
+    gSaveGameHeader.roster = gBattleRosterTable.rosterPair;
     return 1;
 }
-
-s32 battleRosterHeaderPairSet();
 
 s32 vmInvokePairFromArgs(s32 vmThread) {
     extern s32 vmArgGet();
@@ -330,7 +286,7 @@ s32 vmInvokePairFromArgs(s32 vmThread) {
     return 1;
 }
 
-/* VM native: sets bit 0 of roster table byte 0x27 when its argument is nonzero (default 1), clears it otherwise. */
+/* VM native: sets bit 0 of the roster table's unlock flags when its argument is nonzero (default 1), clears it otherwise. */
 s32 vmSetRosterTableFlag(s32 vmThread) {
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
@@ -343,9 +299,9 @@ s32 vmSetRosterTableFlag(s32 vmThread) {
         vmArgValue = vmArgGet(vmThread, 1);
     }
     if (vmArgValue != 0) {
-        gBattleRosterTable[0x27] |= 1;
+        gBattleRosterTable.unlockFlags |= 1;
     } else {
-        gBattleRosterTable[0x27] &= 0xFE;
+        gBattleRosterTable.unlockFlags &= 0xFE;
     }
     return 1;
 }
@@ -355,7 +311,6 @@ s32 func_0025F5C0(s32);
 
 /* VM native: builds the roster flags from the current roster index and an optional shifted bit, then calls func_00230218 between func_0025F5C0(1) and func_0025F5C0(0). */
 s32 vmSetRosterFlagsFromArgs(s32 vmThread) {
-    extern u8 gBattleCurrentRosterIndex[];
     extern s32 VM_PLUGIN_CNT_GET(s32);
     extern s32 vmArgGet(s32, s32);
     s32 rosterBit;
@@ -364,7 +319,7 @@ s32 vmSetRosterFlagsFromArgs(s32 vmThread) {
     s32 rosterFlags;
 
     rosterBit = 1;
-    rosterFlags = gBattleCurrentRosterIndex[0] == rosterBit;
+    rosterFlags = gBattleRosterTable.currentRosterIndex == rosterBit;
     vmArgCount = VM_PLUGIN_CNT_GET(vmThread);
     if (vmArgCount > 0) {
         vmArgValue = vmArgGet(vmThread, 1);

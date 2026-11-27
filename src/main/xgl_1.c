@@ -2,6 +2,7 @@
 #include "main/xgl_dma.h"
 #include "shared.h"
 #include "gs.h"
+#include "main/tu178.h"
 /* The DMAC takes scratchpad addresses (0x7000xxxx) as an offset with the SPR flag in bit 31. */
 #define DMA_SPR_ADDRESS_HIGH 0x7000U
 #define DMA_SPR_OFFSET_MASK 0x3fffU
@@ -22,14 +23,13 @@ extern int EIntr(void);
 
 extern void func_002F8C18(void);
 extern void xglMcReset(void);
-extern u8 gXglMcAgedEntries[];
 void *memset(void *destination, int value, unsigned int count);
 
 void xglMcInitial(void)
 {
     func_002F8C18();
     xglMcReset();
-    memset(gXglMcAgedEntries, 0, 0x130b0);
+    memset(&gXglMcAgedEntries, 0, sizeof(gXglMcAgedEntries));
 }
 
 /* Starts a DMA from the IPU output (DMAC channel 3) into memory; count is in quadwords. */

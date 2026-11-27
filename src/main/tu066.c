@@ -4,15 +4,7 @@
 #include "main/xgl_render.h"
 #include "quadword.h"
 #include "main/battle_shared.h"
-typedef signed char s8;
-
-typedef int s32;
-
-typedef unsigned char u8;
-
-typedef short s16;
-
-typedef unsigned short u16;
+#include "main/tu176.h"
 
 typedef long long s64;
 
@@ -338,10 +330,6 @@ void debugStageMenuStep(DebugSelection *selection) {
     xglFontDebugPrintf(8, gDebugMenuRow * 10 + 32, ">");
 }
 
-s32 battleRosterPairReset();
-s32 func_00221FB8();
-s32 battleCurrentRosterIndexSet();
-s32 battleRosterCursorSet();
 s32 xglPadSetDefaults();
 void func_001BC918(s16 *out);
 
@@ -399,11 +387,11 @@ void func_001BC6A8(void) {
     gGameLoopRuntime.unk_1C4 = 0;
     gGameLoopResetComboHalves.resetComboHalves[0] = 7000;
     gGameLoopResetComboHalves.resetComboHalves[1] = -1;
-    ((void (*)()) battleRosterPairReset)();
-    ((void (*)()) battleCurrentRosterIndexSet)(0);
-    ((void (*)()) func_00221FB8)(1);
-    ((void (*)()) func_00221FB8)(8);
-    ((void (*)()) func_00221FB8)(7);
+    battleRosterPairReset();
+    battleCurrentRosterIndexSet(0);
+    func_00221FB8(1);
+    func_00221FB8(8);
+    func_00221FB8(7);
     battleRosterCursorSet(0, 0);
     seScriptTablesClear();
     sbNativeValueSlotSet(func_001BC918, 0);
@@ -988,7 +976,6 @@ typedef struct SlotEnumView {
 extern const s32 D_00531340[];
 s32 padStartAndSoftResetHeld();
 s32 Get_Rnd_001B8CD0();
-s32 battleCurrentRosterCursorAdvance();
 s32 slotModelStateIsFour();
 s32 MMathRandomNext();
 void sefFlagSetBit26();

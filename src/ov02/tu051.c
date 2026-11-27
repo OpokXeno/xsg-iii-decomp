@@ -2,14 +2,11 @@
  * OV02 original TU 51: 0x00a947e8..0x00a94c68 (3 functions)
  */
 #include "common.h"
+#include "main/tu176.h"
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu051", func_00A947E8);
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu051", func_00A949B0);
-
-typedef signed char s8;
-typedef unsigned char u8;
-typedef int s32;
 
 /* Battle entry header: the first slot number of the entry sits at +0x14. */
 typedef struct BattleEntry {
@@ -23,8 +20,6 @@ typedef struct BattleItem {
     unsigned char quantity;
 } BattleItem;
 
-u8 battleCurrentRosterEntryCountGet(void);
-s32 battleCurrentRosterEntryIdGet(s32);
 s32 *advanceBlockGet();
 s32 func_00A85160(u8 itemId, u8 quantity);
 s32 *sceneStateGet(s32);
