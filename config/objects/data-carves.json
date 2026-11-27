@@ -136,7 +136,7 @@
       "0x00540154"
      ],
      "generated_by": [
-      "func_00184B30",
+      "xglFontFlushCore",
       "xglFontGetGlyphIndex"
      ],
      "c_owned_symbols": [

@@ -1852,7 +1852,7 @@ void func_00184188(int code, int textureU, int size, int height);
 
 /* XS2 xglFontFlushCore: draws the queued text at the cursor, running the control codes below 32 and the inline
  * "$" commands; returns the text position it stopped at (the terminator). */
-unsigned char *func_00184B30(FontDrawCursor *cursor, unsigned char *text)
+unsigned char *xglFontFlushCore(FontDrawCursor *cursor, unsigned char *text)
 {
     signed char real_digits[16];
     signed char integer_digits[32];
@@ -2184,7 +2184,7 @@ unsigned char *func_00184B30(FontDrawCursor *cursor, unsigned char *text)
                 + command->text_low);
 
             text += sizeof(*command);
-            func_00184B30(cursor, included);
+            xglFontFlushCore(cursor, included);
             break;
         }
         case FONT_OP_CALLBACK: {
@@ -2434,7 +2434,7 @@ void xglFontFlush(void)
     xglFontState.glyph_upload_count = 0;
     text = (unsigned char *) (&xglFontState + 1);
     while (*text != 0) {
-        text = func_00184B30(cursor, text) + 1;
+        text = xglFontFlushCore(cursor, text) + 1;
     }
     sceVif1PkAddDirectDataN(cursor->packet, D_004B3410, 2);
     sceVif1PkCloseDirectHLCode(cursor->packet);

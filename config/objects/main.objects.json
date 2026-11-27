@@ -37517,9 +37517,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00184B30",
+     "name": "xglFontFlushCore",
      "size": 3132,
-     "splat_name": "func_00184B30",
+     "splat_name": "xglFontFlushCore",
      "va": "0x00184b30",
      "name_basis": "address",
      "provenance": "estimated"
