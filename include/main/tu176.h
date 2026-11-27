@@ -123,6 +123,7 @@ typedef struct McFileList {
 extern BattleRosterTable gBattleRosterTable;
 extern SaveGameHeader gSaveGameHeader;
 
+void func_002213A8(McGauge *gauge, const char *text, s32 stepDelta, s32 width);
 void clampedCounterInit(McGauge *gauge, s32 stepDelta);
 void counterEntryAdvancePhase(McGauge *gauge);
 void addClampedCounter(McFileList *fileList, s16 delta);

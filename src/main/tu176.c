@@ -5,7 +5,28 @@
 #include "main/tu178.h"
 #include "main/sound_driver.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu176", func_002213A8);
+s32 xglFontGetFormattedWidth(const char *text);
+
+/* Starts the Yes/No prompt: title text, box width (widened to the text width + 0x30), selection state = stepDelta > 0,
+   the other answer's highlight at 0x80, fade-in 0 and phase 0x80 (as clampedCounterInit). */
+void func_002213A8(McGauge *gauge, const char *text, s32 stepDelta, s32 width)
+{
+  s32 isPositive;
+  s32 textWidth;
+  isPositive = stepDelta > 0;
+  gauge->text = text;
+  gauge->flag = 0x80;
+  gauge->state = isPositive;
+  gauge->negative = (1 - isPositive) << 7;
+  gauge->width = width;
+  gauge->fadeIn = 0;
+  if (text != 0) {
+    textWidth = xglFontGetFormattedWidth(text) + 0x30;
+    if (gauge->width < textWidth) {
+      gauge->width = textWidth;
+    }
+  }
+}
 
 void clampedCounterInit(McGauge *gauge, s32 stepDelta)
 {
