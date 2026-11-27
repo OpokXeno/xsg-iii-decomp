@@ -129,17 +129,20 @@
     {
      "range": [
       "0x00540080",
-      "0x005400c0"
+      "0x00540158"
      ],
      "generated": [
       "0x00540080",
-      "0x005400b4"
+      "0x00540154"
      ],
      "generated_by": [
+      "func_00184B30",
       "xglFontGetGlyphIndex"
      ],
      "c_owned_symbols": [
-      "jtbl_00540080"
+      "jtbl_00540080",
+      "jtbl_005400C0",
+      "jtbl_00540140"
      ],
      "also_referenced_by_c": [],
      "basis": {

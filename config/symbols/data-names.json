@@ -62,6 +62,7 @@
    "0x004b30a0": "fontPlaneUploadSetup",
    "0x004b3150": "spcode_0",
    "0x004b31b0": "fontInlineCommands",
+   "0x004b32e0": "fontGsResetPacket",
    "0x004b3430": "tbl",
    "0x004b3470": "PadData",
    "0x004b3570": "monthday",

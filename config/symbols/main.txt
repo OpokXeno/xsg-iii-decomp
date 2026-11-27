@@ -9989,6 +9989,7 @@ fontColorPatternB = 0x004B2690;
 asciiEucTable = 0x004B2E50;
 spcode_0 = 0x004B3150;
 fontInlineCommands = 0x004B31B0;
+fontGsResetPacket = 0x004B32E0;
 tbl = 0x004B3430;
 PadData = 0x004B3470;
 monthday = 0x004B3570;
