@@ -3,6 +3,7 @@
 #include "main/tu045.h"
 #include "main/tu141.h"
 #include "main/xgl_2.h"
+#include "main/xgl_render.h"
 #include "vu0_macro.h"
 #include "quadword.h"
 
@@ -1220,18 +1221,7 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019FA20);
 #include "gs.h"
 
 
-/* The render targets of xgl_render.c's state block (D_004C8390). */
-typedef struct XglRenderTargets {
-    u8 unk00[2];
-    s16 psm;                 /* +0x02 */
-    s16 screenWidth;         /* +0x04 */
-    s16 screenHeight;        /* +0x06 */
-    u16 depthBase;           /* +0x08 */
-    u8 unk0A[0x12 - 0x0A];
-    u16 renderTextureBase;   /* +0x12 */
-} XglRenderTargets;
-
-extern XglRenderTargets D_004C8390;
+extern XglRenderStateBlock D_004C8390;
 
 #define PXY_SHADOW_QUADWORDS 0x36
 /* A vector the pxy code also moves as four words. */
@@ -1450,8 +1440,8 @@ void pxySetupShadowProjector(PxyModelHeader *modelHeader)
         xglMatrixStackInverse();
         xglMatrixStackSave(inverse.rows);
         xglMatrixStackUnit();
-        offset.vector.x -= (D_004C8390.screenWidth - size.vector.x) * 0.5f;
-        offset.vector.y -= (D_004C8390.screenHeight - size.vector.y) * 0.5f;
+        offset.vector.x -= (D_004C8390.frame_width - size.vector.x) * 0.5f;
+        offset.vector.y -= (D_004C8390.frame_height - size.vector.y) * 0.5f;
         xglMatrixStackTrans(&offset.vector);
         xglMatrixStackScale(&scale.vector);
         xglMatrixStackMul(inverse.rows);
@@ -1468,7 +1458,7 @@ void pxySetupShadowProjector(PxyModelHeader *modelHeader)
         shadow->height = 0x40;
         shadow->repeatU = 0;
         shadow->repeatV = 0;
-        shadow->frameBase = D_004C8390.renderTextureBase;
+        shadow->frameBase = D_004C8390.texture_base;
         shadow->scale.vector.x = 64.0f / (zoom * 128.0f);
         shadow->scale.vector.y = 64.0f / (zoom * 128.0f);
         shadow->unk330 = 0;
@@ -2595,7 +2585,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
         queueIndex = xglDirectQueueCount;
         gifWrite = (u64 *)&xglDirectQueueBuffer[queueIndex];
         gifStart = gifWrite;
-        GS_PUT(gifWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.depthBase, 1, 1));
+        GS_PUT(gifWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.zbuf_base, 1, 1));
         GS_PUT(gifWrite, GS_FBA_1, 0);
         GS_PUT(gifWrite, GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
         GS_PUT(gifWrite, GS_CLAMP_1, shadow->clamp);
@@ -2642,9 +2632,9 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
             queueIndex = xglDirectQueueCount;
             gifWrite = (u64 *)&xglDirectQueueBuffer[queueIndex];
             gifStart = gifWrite;
-            GS_PUT(gifWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm,
+            GS_PUT(gifWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm,
                                                drawWork->batch->packet->frameMask | 0xFF000000));
-            GS_PUT(gifWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm,
+            GS_PUT(gifWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm,
                                                drawWork->batch->packet->frameMask | 0xFF000000));
             xglDirectQueueCount = queueIndex + (((u32)gifWrite - (u32)gifStart) >> 4);
         }
@@ -2903,8 +2893,8 @@ void func_001A52C8(u32 frameBase);
 void func_001A5108(u32 frameBase);
 void func_001A57A0(u32 frameBase);
 
-#define SCREEN_HALF_W (D_004C8390.screenWidth / 2)
-#define SCREEN_HALF_H (D_004C8390.screenHeight / 2)
+#define SCREEN_HALF_W (D_004C8390.frame_width / 2)
+#define SCREEN_HALF_H (D_004C8390.frame_height / 2)
 
 void pxyDrawBatches(int drawMode, u32 frameBase)
 {
@@ -3005,7 +2995,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                 *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                 nmlPacketAddGsFlush();
             }
-            for (y = 0; y < D_004C8390.screenHeight; y += SCREEN_HALF_H) {
+            for (y = 0; y < D_004C8390.frame_height; y += SCREEN_HALF_H) {
                 int pass;
 
                 {
@@ -3017,9 +3007,9 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     queueIndex = xglDirectQueueCount;
                     queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
                     queueStart = queueWrite;
-                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(D_004C8390.renderTextureBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
+                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(D_004C8390.texture_base, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
                     GS_PUT(queueWrite, GS_TEXFLUSH, 0);
-                    GS_PUT(queueWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.depthBase, 1, 1));
+                    GS_PUT(queueWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.zbuf_base, 1, 1));
                     GS_PUT(queueWrite, GS_CLAMP_1, 0);
                     GS_PUT(queueWrite, GS_RGBAQ, GS_SET_RGBAQ(0x80, 0x80, 0x80, 0, 0x3F800000));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
@@ -3028,8 +3018,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
                     GS_PUT(queueWrite, GS_UV, GS_SET_UV(0, (y << 4)));
                     GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4), ((SCREEN_HALF_H + y) << 4)));
-                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
+                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4), ((SCREEN_HALF_H + y) << 4)));
+                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
                     GS_PUT(queueWrite, GS_RGBAQ, GS_SET_RGBAQ(color.rgba[0], color.rgba[1], color.rgba[2], color.rgba[3], 0x3F800000));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(1, 5, 0x80, 0, 0, 0, 1, 1));
                     GS_PUT(queueWrite, GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
@@ -3058,8 +3048,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV(9, (y << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((shift - SCREEN_HALF_W + 0x800) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV(((D_004C8390.screenWidth - shift) << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV(((D_004C8390.frame_width - shift) << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3075,8 +3065,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV((shift << 4) + 9, (y << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W - shift + 0x800) << 4), 0x8000, 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W - shift + 0x800) << 4), 0x8000, 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3092,8 +3082,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV(8, ((shift + y) << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4) + 8, ((SCREEN_HALF_H + y) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x800) << 4), ((0x800 - shift) << 4), 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4) + 8, ((SCREEN_HALF_H + y) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x800) << 4), ((0x800 - shift) << 4), 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3109,8 +3099,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV(8, (y << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((shift - SCREEN_HALF_H + 0x800) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4) + 8, ((SCREEN_HALF_H + y - shift) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4) + 8, ((SCREEN_HALF_H + y - shift) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3131,8 +3121,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
                     GS_PUT(queueWrite, GS_UV, GS_SET_UV(0, (y << 4)));
                     GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4), ((SCREEN_HALF_H + y) << 4)));
-                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
+                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4), ((SCREEN_HALF_H + y) << 4)));
+                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
                     *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                     nmlPacketAddGsFlushWide();
                 }
@@ -3145,17 +3135,17 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     queueIndex = xglDirectQueueCount;
                     queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
                     queueStart = queueWrite;
-                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
+                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
                     GS_PUT(queueWrite, GS_TEXFLUSH, 0);
                     GS_PUT(queueWrite, GS_RGBAQ, GS_SET_RGBAQ(0x80, 0x80, 0x80, 0x80, 0x3F800000));
-                    GS_PUT(queueWrite, GS_TEX0_1, GS_SET_TEX0(D_004C8390.renderTextureBase << 5, 8, 0, 9, 9, 1, 0, 0, 0, 0, 0, 1));
+                    GS_PUT(queueWrite, GS_TEX0_1, GS_SET_TEX0(D_004C8390.texture_base << 5, 8, 0, 9, 9, 1, 0, 0, 0, 0, 0, 1));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(1, 5, 0x80, 0, 1, 0, 1, 1));
                     GS_PUT(queueWrite, GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
                     GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
                     GS_PUT(queueWrite, GS_UV, GS_SET_UV(0, 0));
                     GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((y - SCREEN_HALF_H + 0x800) << 4), 0));
-                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4), (SCREEN_HALF_H << 4)));
-                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x7FF) << 4), ((y + 0x7FF) << 4), 0));
+                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4), (SCREEN_HALF_H << 4)));
+                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x7FF) << 4), ((y + 0x7FF) << 4), 0));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
                     *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                     nmlPacketAddGsFlushWide();
@@ -3183,8 +3173,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         queueIndex = xglDirectQueueCount;
         queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
         queueStart = queueWrite;
-        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
-        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0xFF000000));
+        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
+        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0xFF000000));
         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
         nmlPacketAddGsFlush();
     }
@@ -3373,8 +3363,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         queueIndex = xglDirectQueueCount;
         queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
         queueStart = queueWrite;
-        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
-        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0xFF000000));
+        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
+        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0xFF000000));
         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
         nmlPacketAddGsFlush();
     }
