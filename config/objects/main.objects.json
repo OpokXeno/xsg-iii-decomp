@@ -47617,18 +47617,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A3D90",
+     "name": "pxyPlayEntryGroup",
      "size": 156,
-     "splat_name": "func_001A3D90",
+     "splat_name": "pxyPlayEntryGroup",
      "va": "0x001a3d90",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A3E30",
+     "name": "pxyPlayEntryGroupFiltered",
      "size": 220,
-     "splat_name": "func_001A3E30",
+     "splat_name": "pxyPlayEntryGroupFiltered",
      "va": "0x001a3e30",
      "name_basis": "address",
      "provenance": "estimated"

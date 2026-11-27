@@ -143,6 +143,28 @@ typedef struct PxyBatchTable {
     PxyBatchTableTail tail; /* +0x2000 */
 } PxyBatchTable;
 
+/* One 16-byte record of the pxy entry table pxyEntryQueue. */
+typedef struct PxyPacketRequest {
+    void *packetData; /* +0x00: the packet data, copied to the attribute buffer when the key is even */
+    unsigned short quadwordCount; /* +0x04: low half of the second argument */
+    unsigned char groupBit; /* +0x06: bit index into pxyEntryGroupMask */
+    unsigned char sendFlag; /* +0x07 */
+    int sendState; /* +0x08 */
+    unsigned char row; /* +0x0C: key / 12 */
+    unsigned char unmodeled_0d[3];
+} PxyPacketRequest;
+
+/* The entry queue fills the block up to flagSearchHeaders (+0x10880). */
+#define PXY_ENTRY_QUEUE_SIZE 3035
+/* The original stops queueing at this count, beyond the end of the queue it reserves (the X2 bound as well). */
+#define PXY_ENTRY_QUEUE_LIMIT 3048
+/* A direct send key: bit 0 keeps the data in place (else it is copied to the packet buffer), key % 12 / 2 is the
+ * entry group and key / 12 the row. */
+#define PXY_SEND_KEY_IN_PLACE 1
+#define PXY_SEND_KEY_ROW 12
+/* Entries of this row go to func_001AD7D8 instead of being referenced. */
+#define PXY_ENTRY_ROW_DIRECT 1
+
 typedef struct PxyModelRenderState {
     XglLightSet light;
     float lightSlotTable[24][4]; /* +0x180 (X2 pxyLightSlotTable) */
@@ -238,9 +260,10 @@ typedef struct PxyModelRenderState {
     int camera; /* +0x6b0: camera being drawn */
     int drawPass; /* +0x6b4: 0 opaque, 1 translucent; selects batchTables */
     u8 unk6B8[4];
-    int entryGroupMask; /* +0x6bc */
+    u32 entryGroupMask; /* +0x6bc: one bit per entry group */
     int entryCount; /* +0x6c0 */
-    u8 unk6C4[0x6D8 - 0x6C4];
+    u8 unk6C4[0x6D4 - 0x6C4];
+    int flushDoneFlag; /* +0x6d4: set once the frame's flush ran; the direct sends are dropped */
     int opaqueEntryCursor; /* +0x6d8 */
     int translucentEntryCursor; /* +0x6dc */
     float opaqueEntryUsagePercent; /* +0x6e0 */
@@ -259,23 +282,12 @@ typedef struct PxyModelRenderState {
     u8 unk870[0xA70 - 0x870];
     PxyBatchTable batchTables[2]; /* +0xa70: one per draw pass */
     PxyDrawSlot slots[PXY_SLOT_COUNT]; /* +0x4a90 */
-    u8 unk4AD0[0x10880 - 0x4AD0];
+    PxyPacketRequest entryQueue[PXY_ENTRY_QUEUE_SIZE]; /* +0x4ad0 */
     int flagSearchHeaders[256]; /* +0x10880: headers of the flags-0x10 search, count at +0x5c0; bound from the object extent up to pxyDrawEntryTable at 0x97A980 */
     u8 unk10C80[0x10D50 - 0x10C80];
     PxyDrawEntry drawEntryTable[6656]; /* +0x10d50: opaque entries below 4096, translucent from 4096 */
     u8 resetWork[0x30]; /* +0x1dd50 */
 } PxyModelRenderState;
-
-/* One 16-byte record of the pxy entry table pxyEntryQueue. */
-typedef struct PxyPacketRequest {
-    void *packetData; /* +0x00: the packet data, copied to the attribute buffer when the key is even */
-    unsigned short quadwordCount; /* +0x04: low half of the second argument */
-    unsigned char groupBit; /* +0x06: bit index into pxyEntryGroupMask */
-    unsigned char sendFlag; /* +0x07 */
-    int sendState; /* +0x08 */
-    unsigned char row; /* +0x0C: key / 12 */
-    unsigned char unmodeled_0d[3];
-} PxyPacketRequest;
 
 extern PxyPacketRequest pxyEntryQueue[400];
 void xglVectorClear(Vector4 *destination);
@@ -2445,9 +2457,48 @@ int pxySubmitModel(PxyModelHeader *modelHeader)
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3638);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3D90);
+void xglPacketAddRefFlagged(void *refDmaBytes, u32 qwc, u32 refControlBits);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3E30);
+/* Sends the queued entries of one group. */
+void pxyPlayEntryGroup(int group)
+{
+    int i;
+    PxyPacketRequest *entry;
+
+    if ((pxyState.entryGroupMask & (1 << group)) != 0) {
+        for (i = 0; i < pxyState.entryCount; i++) {
+            entry = &pxyState.entryQueue[i];
+            if (entry->groupBit == group) {
+                xglPacketAddRefFlagged(entry->packetData, entry->quadwordCount, entry->sendState);
+            }
+        }
+    }
+}
+
+void func_001AD7D8(void *data, unsigned int qwc);
+
+/* Sends the queued entries of one group whose send flag is filter: PXY_ENTRY_ROW_DIRECT entries through
+ * func_001AD7D8, the others by reference. */
+void pxyPlayEntryGroupFiltered(int group, int filter)
+{
+    int i;
+    PxyPacketRequest *entry;
+
+    if ((pxyState.entryGroupMask & (1 << group)) != 0) {
+        for (i = 0; i < pxyState.entryCount; i++) {
+            entry = &pxyState.entryQueue[i];
+            if (entry->groupBit == group) {
+                if (entry->sendFlag == filter) {
+                    if ((signed char) entry->row == PXY_ENTRY_ROW_DIRECT) {
+                        func_001AD7D8(entry->packetData, entry->quadwordCount);
+                    } else {
+                        xglPacketAddRefFlagged(entry->packetData, entry->quadwordCount, entry->sendState);
+                    }
+                }
+            }
+        }
+    }
+}
 
 void nmlModelDirectSend(int key, void *packetData, int qwc)
 {
@@ -2462,7 +2513,29 @@ void nmlModelDirectSendWithFlag(s32 key, void *packetData, s32 qwc, s32 sendFlag
     nmlModelDirectSendFull(key, packetData, qwc, sendFlag, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", nmlModelDirectSendFull);
+void nmlModelDirectSendFull(int key, void *packetData, int qwc, int sendFlag, int sendState)
+{
+    PxyPacketRequest *entry;
+
+    if (pxyState.flushDoneFlag != 0) {
+        return;
+    }
+    if (pxyState.entryCount < PXY_ENTRY_QUEUE_LIMIT) {
+        entry = &pxyState.entryQueue[pxyState.entryCount];
+        entry->quadwordCount = qwc;
+        entry->sendFlag = sendFlag;
+        if ((key & PXY_SEND_KEY_IN_PLACE) == 0) {
+            entry->packetData = xglPacketCopy16(packetData, qwc);
+        } else {
+            entry->packetData = packetData;
+        }
+        entry->groupBit = (key % PXY_SEND_KEY_ROW) >> 1;
+        entry->row = key / PXY_SEND_KEY_ROW;
+        entry->sendState = sendState;
+        pxyState.entryGroupMask |= 1 << entry->groupBit;
+        pxyState.entryCount++;
+    }
+}
 
 /* Draw state kept in the EE scratchpad while the batches are drawn. */
 typedef struct PxyDrawWork {
@@ -2906,7 +2979,7 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A69D8);
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A7690);
 
 void func_0019D990(int frameMask, u32 frameBase);
-void func_001A3E30(int group, int camera);
+void pxyPlayEntryGroupFiltered(int group, int camera);
 void func_001A69D8(int mode, PxyBatch *batch, u32 frameBase, int flags);
 void func_001A7690(int mode, PxyBatch *batch, u32 frameBase, int flags);
 void func_001A62A8(PxyBatch *batch, u32 frameBase);
@@ -2952,7 +3025,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         }
     }
     if (drawMode == 0) {
-        func_001A3E30(4, pxyState.camera);
+        pxyPlayEntryGroupFiltered(4, pxyState.camera);
     }
     lightFlags = 0;
     batchTable = &pxyState.batchTables[pxyState.drawPass];
@@ -3202,7 +3275,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         nmlPacketAddGsFlush();
     }
     if (drawMode == 0) {
-        func_001A3E30(0, pxyState.camera);
+        pxyPlayEntryGroupFiltered(0, pxyState.camera);
     }
     pxyState.drawPass = 1;
     pxyPacketSetCacheValue(pxyState.drawPass);
@@ -3395,7 +3468,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         if (func_001AEE50() > 85.0f || func_001AEF08() > 85.0f) {
             return;
         }
-        func_001A3E30(1, pxyState.camera);
+        pxyPlayEntryGroupFiltered(1, pxyState.camera);
     }
 }
 
@@ -3478,10 +3551,9 @@ void func_001AA828(XglPacket *packet);
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA828);
 
-s32 func_001A3D90(s32 mode);
 
 void pxyPlayEntryGroupFive(XglPacket *packet) {
-    func_001A3D90(5);
+    pxyPlayEntryGroup(5);
 }
 
 extern s32 D_00551240;
