@@ -162,7 +162,7 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y)
   {
     return;
   }
-  boxAlpha = colorModulateByte(0x73, alpha) & 0xFF;
+  boxAlpha = (u8) colorModulateByte(0x73, alpha);
   left = (0x100 - (gauge->width >> 1)) * 16 + 0x6FF8;
   top = (y << 4) + 0x71F8;
   rect.x1 = left + (u16) gauge->width * 16;
@@ -314,7 +314,9 @@ void tableSelectValue(s32 drawEntry) {
 
 void func_00220130(TiFrameSheet *sheet, s32 index, s32 mask);
 
-/* Sets the sheet cell's colour mask to 0xE3FF5F with the given alpha in the top byte. */
+/* Sets the sheet cell's colour mask to 0xE3FF5F with the given alpha in the top byte. alpha is 64-bit: with an s32
+   or u8 parameter the compiler drops the original's andi/dsll/dsra32 steps, and a (u8) cast in place of the mask
+   makes the function 8 bytes longer. */
 void sheetFrameSetCellAlpha(TiFrameSheet *sheet, s32 index, u64 alpha)
 {
     func_00220130(sheet, index, (s32)(((alpha & 0xFF) << 24) | 0xE3FF5F));
