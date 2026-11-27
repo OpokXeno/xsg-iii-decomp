@@ -102,22 +102,29 @@ typedef struct XglRenderStateBlock {
     unsigned char fade_level;           /* +0x87 */
 } XglRenderStateBlock;
 
+/* Sprites of the clear packet: 64-pixel strips over the 512-pixel frame. */
+#define RENDER_CLEAR_SPRITES 8
+
 /* The clear packet at gEnvFlags (0x004C8240, 0x150 = 0x15 quadwords, sent whole by the base swap in movie
- * mode): one quadword, then the GIF packet that xglRenderMove sends by DMA from +0x10 (the
- * ClearEnv label). Its A+D writes include the TEST value that xglRenderClearDepth / xglRenderClearFrame select
- * (+0x20) and the clear colour, a packed RGBAQ (+0x40). */
+ * mode): the VIF words (a DIRECT code for the rest), then the GIF packet that xglRenderMove sends by DMA
+ * from +0x10 (the ClearEnv label): A+D writes of TEST (the value xglRenderClearDepth / xglRenderClearFrame
+ * select), PRIM (a sprite), RGBAQ (the clear colour) and the two corners of each clear sprite. */
 typedef struct XglClearPacket {
-    unsigned char unmodeled_00[0x10];
+    u64 vifCodes[2];                    /* +0x00: two VIF NOPs, then DIRECT with the packet's quadword count */
     u64 gifTag[2];                      /* +0x10: the GIF tag, start of the packet xglRenderMove sends */
     u64 test;                           /* +0x20: GS TEST_1 value of the clear */
-    unsigned char unmodeled_28[0x18];
+    u64 testRegister;                   /* +0x28 */
+    u64 prim;                           /* +0x30 */
+    u64 primRegister;                   /* +0x38 */
     struct {
         unsigned char red;              /* +0x40 */
         unsigned char green;            /* +0x41 */
         unsigned char blue;             /* +0x42 */
         unsigned char alpha;            /* +0x43 */
     } color;
-    unsigned char unmodeled_44[0x10C];
+    unsigned char unmodeled_44[4];      /* +0x44: the Q word of RGBAQ */
+    u64 colorRegister;                  /* +0x48 */
+    GsAdPair corners[RENDER_CLEAR_SPRITES][2]; /* +0x50: top left and bottom right of each sprite */
 } XglClearPacket;
 
 extern XglClearPacket gEnvFlags;
