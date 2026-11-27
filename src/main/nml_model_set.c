@@ -6,6 +6,7 @@
 #include "main/xgl_render.h"
 #include "vu0_macro.h"
 #include "quadword.h"
+#include "main/nml_model_set.h"
 
 typedef int s32;
 typedef signed char s8;
@@ -20,7 +21,6 @@ struct PxyShadow;
 struct PxyHideMask;
 void *nmlPacketSetAttributeData16N(void *matrices, int count);
 void nmlModelDirectSend(int key, void *packetData, int qwc);
-void nmlModelDirectSendFull(int key, void *packetData, int qwc, int sendFlag, int sendState);
 void pxyAbortModel(void);
 struct PxyModelHeader;
 void *memset(void *destination, int value, unsigned int size);
@@ -1908,7 +1908,6 @@ typedef struct PxySortWork {
 #define PXY_HEADER_AT(header, offset) ((void *)((u8 *)(header) + (offset)))
 
 void func_001A0A10(PxyModelHeader *header);
-void pxyCalcModelBounds(PxyModelHeader *header);
 void pxyCalcFogFactors(PxyModelHeader *header);
 void func_001A17F8(PxyModelHeader *header);
 void pxySetupShadowProjector(PxyModelHeader *header);
@@ -3074,7 +3073,6 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A69D8);
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A7690);
 
 void func_0019D990(int frameMask, u32 frameBase);
-void pxyPlayEntryGroupFiltered(int group, int camera);
 void func_001A69D8(int mode, PxyBatch *batch, u32 frameBase, int flags);
 void func_001A7690(int mode, PxyBatch *batch, u32 frameBase, int flags);
 void func_001A62A8(PxyBatch *batch, u32 frameBase);
@@ -3653,7 +3651,7 @@ void pxyPlayEntryGroupFive(XglPacket *packet) {
 
 extern s32 D_00551240;
 
-/* Init the pxy module: the reset helpers, then the two final packet callbacks it installs (frame copy, entry group 5). */
+/* Init the pxy module: the reset helpers, then its two final packet callbacks (frame copy, entry group 5). */
 void nmlModelConstruct(void)
 {
     D_00551240 = 0;

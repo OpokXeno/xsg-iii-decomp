@@ -301,7 +301,6 @@ int func_0018EC68(int channel)
 }
 
 s32 func_001808E0();
-int func_0018EDD8(int id, int volume, int pan);
 void soundVoiceVolumeReset(s32 voiceIndex);
 
 void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan) {

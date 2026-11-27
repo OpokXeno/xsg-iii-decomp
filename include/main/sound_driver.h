@@ -6,6 +6,8 @@ void seVoiceStartDefault(unsigned int voice);
 void func_0018F098(int id);
 /* Sends driver command 0xA0000100 and clears the channel states. */
 void func_0018F1D0(void);
+/* Starts the sound id at volume and pan (-1 keeps a value); returns the voice handle. */
+int func_0018EDD8(int id, int volume, int pan);
 /* Per cue slot four bytes, the volume at gSoundCueVolumeTable[slot * 4] and the pan right after it. */
 extern unsigned char gSoundCueVolumeTable[];
 /* The sound voice work records (the slot records of the sound record block seen from the voice side). */

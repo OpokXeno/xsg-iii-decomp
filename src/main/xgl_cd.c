@@ -1452,7 +1452,6 @@ unsigned char *xglCdArcInitSub2(unsigned char *archive_data)
     return cursor;
 }
 
-void func_00187AB8(void);
 extern unsigned char xglCdArchiveTocBuffer[];
 extern char xglCdArchiveFileName00[];
 extern char xglCdSlotThreeArchiveFileName[];

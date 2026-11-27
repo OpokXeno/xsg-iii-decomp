@@ -4,6 +4,7 @@
 #include "main/tu045.h"
 #include "main/tu141.h"
 #include "main/xgl_2.h"
+#include "main/nml_model_set.h"
 
 /* Row-major 4x4 float matrix. */
 /* A vector kept as a plain float[4] (like sceVu0FVECTOR); its w is element 3. Vector4 here changes the
@@ -828,7 +829,6 @@ INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AECC0);
 INCLUDE_ASM("asm/main/nonmatchings/pxy_packet_state", func_001AECF8);
 
 extern s32 pxySecondaryCount;
-void nmlModelDirectSendFull(s32 key, void *buffer, s32 count, s32 flag, s32 refOffset);
 
 void xglDirectQueueDefer(s32 sendFlag, s32 key) {
     XglPacket *packet;

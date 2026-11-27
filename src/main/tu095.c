@@ -14,7 +14,6 @@ s32 vmArgTagIsZero(s32 vm, s32 argIndex);
 
 s32 func_0018F118(s32 voice);
 
-s32 func_0018EDD8(s32 voice, s32 volume, s32 pan);
 
 /* Record of kind 2 handed out by soundCueCommand. */
 typedef struct SoundKind2Record {

@@ -3,6 +3,7 @@
 #include "quadword.h"
 #include "vu0_macro.h"
 #include "main/tu031.h"
+#include "main/nml_model_set.h"
 
 float xglFRand(void);
 int F2I(float scalar);
@@ -202,7 +203,6 @@ typedef struct XglLightCurve {
 #define LIGHT_CURVE_FIXED_ONE 256.0f
 #define LIGHT_CURVE_KEY_WEIGHT 0.2f
 
-float pxyInterpolateKeys(int count, Vector4 *keyframes, float time, float weight);
 
 /* Samples the curve at *cursor at time and moves *cursor past it. */
 f32 xglLightPackSampleCurve(XglLightStreamWord **cursor, f32 time)

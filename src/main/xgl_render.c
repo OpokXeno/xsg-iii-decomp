@@ -5,6 +5,7 @@
 #include "main/xgl_render.h"
 #include "gs.h"
 #include "main/xgl_dma.h"
+#include "main/nml_model_set.h"
 
 /* The render state block at 0x004C8390 (X3 scaffold label). */
 extern XglRenderStateBlock D_004C8390;
@@ -786,7 +787,6 @@ void xglRenderStart(s32 renderStartMode) {
 }
 
 void func_00199FE8(void);
-void xglRenderClearEnvInit(void);
 void xglStudioReset(void);
 void xglStudioMainCameraInit(void);
 
@@ -922,7 +922,6 @@ void func_0019AC80(s32 active)
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
 void xglRenderGlobalFadeReset(void);
-void nmlModelConstruct(void);
 u8 stateExchangeOff(void);
 
 #define RENDER_FADE_NEUTRAL 0x80

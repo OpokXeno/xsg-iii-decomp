@@ -342,7 +342,6 @@ int soundPanAngleFromOffset(float offsetX, float offsetZ) {
     return panAngle;
 }
 
-int func_0018EDD8(int voice, int volume, int pan);
 
 /* kept as an inline helper: spelling the test inline changes the emitted order */
 static inline int soundCueHasVoice(SoundCueRecord *cueRecord) {
