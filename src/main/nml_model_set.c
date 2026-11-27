@@ -1254,7 +1254,50 @@ void pxySetClipPlaneMasked(PxyRowBits *plane, PxyRowBits *angle, int maskedPlane
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019FA20);
+float pxyKeyInterpolate(const Vector4 *keyA, const Vector4 *keyB, float time, float blend);
+
+/* A key value with bit 0 set is held (not interpolated) when the weight reaches PXY_KEY_HOLD_WEIGHT. */
+#define PXY_KEY_HOLD_WEIGHT 0.2f
+#define PXY_KEY_HOLD_BIT 1
+
+/* The value of a key track (x time, y value) at time. */
+float pxyInterpolateKeys(int count, Vector4 *keyframes, float time, float weight)
+{
+    int i;
+
+    if (time <= keyframes[0].x) {
+        return keyframes[0].y;
+    }
+    if (time >= keyframes[count - 1].x) {
+        return keyframes[count - 1].y;
+    }
+    if (count == 1) {
+        return keyframes[0].y;
+    }
+    i = 0;
+    while (i < count) {
+        if (time < keyframes[i].x) {
+            break;
+        }
+        i++;
+    }
+    i--;
+    if (i < 0) {
+        return keyframes[0].y;
+    }
+    if (weight >= PXY_KEY_HOLD_WEIGHT) {
+        union {
+            float value;
+            u32 bits;
+        } key;
+
+        key.value = keyframes[i].y;
+        if (key.bits & PXY_KEY_HOLD_BIT) {
+            return keyframes[i].y;
+        }
+    }
+    return pxyKeyInterpolate(&keyframes[i], &keyframes[i + 1], time, 1.0f);
+}
 
 #include "gs.h"
 

@@ -47491,9 +47491,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019FA20",
+     "name": "pxyInterpolateKeys",
      "size": 260,
-     "splat_name": "func_0019FA20",
+     "splat_name": "pxyInterpolateKeys",
      "va": "0x0019fa20",
      "name_basis": "address",
      "provenance": "estimated"

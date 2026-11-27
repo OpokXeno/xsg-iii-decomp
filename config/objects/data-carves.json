@@ -1748,42 +1748,24 @@
     {
      "range": [
       "0x0054ffec",
-      "0x0054fff4"
+      "0x00550060"
      ],
      "generated": [
       "0x0054ffec",
-      "0x0054fff4"
+      "0x00550060"
      ],
      "generated_by": [
       "CONSTRUCT_CIRCLR_SHADOW",
-      "pxyBuildFadeRamp"
-     ],
-     "c_owned_symbols": [
-      "D_0054FFEC",
-      "D_0054FFF0"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/nml_model_set.o"
-     }
-    },
-    {
-     "range": [
-      "0x0054fff8",
-      "0x00550060"
-     ],
-     "generated": [
-      "0x0054fff8",
-      "0x00550060"
-     ],
-     "generated_by": [
+      "pxyBuildFadeRamp",
       "pxyCalcFadeMetric",
+      "pxyInterpolateKeys",
       "pxySetupShadowProjector",
       "pxySubmitModel"
      ],
      "c_owned_symbols": [
+      "D_0054FFEC",
+      "D_0054FFF0",
+      "D_0054FFF4",
       "D_0054FFF8",
       "D_0054FFFC",
       "D_00550000",
@@ -1836,6 +1818,7 @@
       "D_0055124C"
      ],
      "also_referenced_by_c": [
+      "D_00551240",
       "gPxyDirtyFlag",
       "pxyShadowTexturesReady"
      ],

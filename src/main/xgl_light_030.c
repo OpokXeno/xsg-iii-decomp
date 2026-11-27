@@ -202,7 +202,7 @@ typedef struct XglLightCurve {
 #define LIGHT_CURVE_FIXED_ONE 256.0f
 #define LIGHT_CURVE_KEY_WEIGHT 0.2f
 
-float func_0019FA20(int count, Vector4 *keyframes, float time, float weight);
+float pxyInterpolateKeys(int count, Vector4 *keyframes, float time, float weight);
 
 /* Samples the curve at *cursor at time and moves *cursor past it. */
 f32 xglLightPackSampleCurve(XglLightStreamWord **cursor, f32 time)
@@ -220,7 +220,7 @@ f32 xglLightPackSampleCurve(XglLightStreamWord **cursor, f32 time)
         record->sampleTime = record->minimum << 8;
     }
     keys = record->keys;
-    result = func_0019FA20(record->count, keys,
+    result = pxyInterpolateKeys(record->count, keys,
                            (float) (record->sampleTime / 256)
                                + (float) (record->sampleTime % 256) / LIGHT_CURVE_FIXED_ONE,
                            LIGHT_CURVE_KEY_WEIGHT);
