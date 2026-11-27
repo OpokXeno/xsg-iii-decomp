@@ -319,13 +319,13 @@ void xenoActorEventEmptyHookB(void) {
 
 extern unsigned char D_00539440[];
 extern unsigned char D_00539450[];
-s32 func_0030E68C();
+s32 strcmp();
 
 s32 xenoActorEventClassifyId(s32 id) {
-    if (func_0030E68C(id, D_00539440) == 0) {
+    if (strcmp(id, D_00539440) == 0) {
         return 1;
     }
-    return (func_0030E68C(id, D_00539450) != 0) ? 0 : 2;
+    return (strcmp(id, D_00539450) != 0) ? 0 : 2;
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/XenoActorEvent", func_00250768);

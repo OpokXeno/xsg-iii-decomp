@@ -509,7 +509,7 @@ typedef struct PxyCircleShadowTexture {
 extern PxyCircleShadowTexture pxyCircleShadowTexture;
 /* The palette upload header of the circle shadow; the colours are pxyBuildFadeRamp's table right after it. */
 extern PxyUploadHeader pxyCircleShadowClut;
-/* Set once func_0019E5B0 has built the circle shadow texture and its palette. */
+/* Set once CONSTRUCT_CIRCLR_SHADOW has built the circle shadow texture and its palette. */
 extern int pxyShadowTexturesReady;
 
 /* Radius (in texels) of the circle shadow and its fade width. */
@@ -520,9 +520,9 @@ extern int pxyShadowTexturesReady;
 /* The fade ramp spread of the shadow palette. */
 #define PXY_CIRCLE_SHADOW_RAMP_SPREAD 0.3f
 
-/* X2 CONSTRUCT_CIRCLR_SHADOW: builds the 64x64 circle shadow levels once (full inside radius 1, fading to 0 at
+/* Builds the 64x64 circle shadow levels once (full inside radius 1, fading to 0 at
  * radius 32), the upload headers of the texture and palette, and the palette's fade ramp. */
-void func_0019E5B0(void)
+void CONSTRUCT_CIRCLR_SHADOW(void)
 {
     int row;
     float maxLevel;
@@ -649,7 +649,7 @@ void cfeDirectionFromAngles(float *direction, const float *angles)
 }
 
 
-int func_0030E68C(unsigned char *geometryEntry, const char *name);
+int strcmp(unsigned char *geometryEntry, const char *name);
 
 /* Index of the first geometry geometryEntry (112 bytes each) of a "pxy" pack whose name matches partName; -1 when none does. */
 /* A "pxy" pack as cfeModelFindPart reads it: the first doubleword holds the "pxy" magic in its low three bytes. */
@@ -665,7 +665,7 @@ int cfeModelFindPart(PxyPackView *pack, const char *partName) {
     if (partName != 0 && pack != 0 && (pack->signature & 0xFFFFFF) == 0x797870) {
         geometryEntry = (unsigned char *)pack + pack->header.geometryOffset;
         for (i = 0; i < pack->header.geometryCount; i++) {
-            if (func_0030E68C(geometryEntry, partName) == 0) {
+            if (strcmp(geometryEntry, partName) == 0) {
                 return i;
             }
             geometryEntry += 112;
@@ -2449,13 +2449,7 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A4058);
 
 /* The X3 layout of the packet a batch draws: X2's PxyPacket with 0x10 more bytes below +0x9c. */
 
-typedef union XglDirectQueueEntry {
-    struct {
-        u64 registerValue;
-        u64 registerAddress;
-    };
-    u32 tagAndHeaderWords[4];
-} XglDirectQueueEntry;
+#include "main/xgl_direct_queue.h"
 
 /* ---- pxyDrawBatches ---- */
 

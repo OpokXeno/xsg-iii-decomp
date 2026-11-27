@@ -374,19 +374,25 @@
     {
      "range": [
       "0x00540250",
-      "0x005402c0"
+      "0x00540360"
      ],
      "generated": [
       "0x00540250",
-      "0x005402c0"
+      "0x0054035c"
      ],
      "generated_by": [
-      "xglMcStartQueuedRequest",
-      "xglMcAdvanceCreateRequest"
+      "xglMcAdvanceCreateRequest",
+      "xglMcMain",
+      "xglMcStartQueuedRequest"
      ],
      "c_owned_symbols": [
       "jtbl_00540250",
-      "jtbl_00540280"
+      "jtbl_00540280",
+      "D_005402C0",
+      "D_005402D0",
+      "jtbl_005402F0",
+      "jtbl_00540320",
+      "jtbl_00540340"
      ],
      "also_referenced_by_c": [],
      "basis": {
@@ -1393,8 +1399,32 @@
       "D_005412D0"
      ],
      "also_referenced_by_c": [
-      "xglLightConeEdgeTemplate"
+      "xglLightConeEdgeTemplate",
+      "xglLightKeyAxisTemplate"
      ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_light_030.o"
+     }
+    },
+    {
+     "range": [
+      "0x00541300",
+      "0x00541380"
+     ],
+     "generated": [
+      "0x00541300",
+      "0x00541374"
+     ],
+     "generated_by": [
+      "xglLightPackBuildLightSet"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00541300",
+      "jtbl_00541330"
+     ],
+     "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
@@ -1413,7 +1443,7 @@
       "0x0054ffb4"
      ],
      "generated_by": [
-      "func_00197A00",
+      "xglLightPackSampleCurve",
       "xglLightBoxColor"
      ],
      "c_owned_symbols": [
@@ -1608,7 +1638,7 @@
       "0x0054ffec"
      ],
      "generated_by": [
-      "func_0019CBB0",
+      "pxyProfileEndMs",
       "pxyProfileDrawEntries",
       "pxyProfileEnd",
       "pxyProfileGetMs",
@@ -1696,7 +1726,7 @@
       "0x0054fff4"
      ],
      "generated_by": [
-      "func_0019E5B0",
+      "CONSTRUCT_CIRCLR_SHADOW",
       "pxyBuildFadeRamp"
      ],
      "c_owned_symbols": [
@@ -29004,7 +29034,7 @@
       "0x0054ffd4"
      ],
      "generated_by": [
-      "func_00199A20"
+      "xglPacketMove"
      ],
      "c_owned_symbols": [
       "D_0054FFD0"

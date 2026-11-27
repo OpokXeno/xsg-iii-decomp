@@ -14,7 +14,7 @@ typedef struct MovieState
   s32 movieSlotIndex;
 } MovieState;
 
-/* gMovieObject holds the address of the movie object; the buffer at its +0x30 receives the text that GameMpeg2Play formats.
+/* gMovieObject holds the address of the movie object; the buffer at its +0x30 receives the text that sprintf formats.
  * Only the address of textBuffer is used; its size is not confirmed. */
 typedef struct MovieObject
 {
@@ -65,7 +65,7 @@ extern ChannelParams gMovieChannelsResetC[];
 extern ChannelParams gMovieChannelsResetD[];
 extern ChannelParams gMovieChannelsResetE[];
 
-s32 GameMpeg2Play();
+s32 sprintf();
 MovieState *movieFirstStateGet();
 s32 channelTableSelectedEndGet();
 
@@ -93,7 +93,7 @@ void moviePlayFromStateTable(void) {
     formatArgTable = gMovieFormatArgs;
     textBuffer = gMovieObject->textBuffer;
     auxFirstMovieSlot = movieFirstStateGet();
-    GameMpeg2Play(textBuffer, formatString, formatArgTable[auxFirstMovieSlot->movieSlotIndex]);
+    sprintf(textBuffer, formatString, formatArgTable[auxFirstMovieSlot->movieSlotIndex]);
 }
 
 void movieCueActivate02(void) {
@@ -112,7 +112,7 @@ void moviePlayStateIndex(void) {
     formatString = gMovieFormatSlotIndex;
     textBuffer = gMovieObject->textBuffer;
     auxFirstMovieSlot = movieFirstStateGet();
-    GameMpeg2Play(textBuffer, formatString, auxFirstMovieSlot->movieSlotIndex);
+    sprintf(textBuffer, formatString, auxFirstMovieSlot->movieSlotIndex);
 }
 
 
@@ -317,7 +317,7 @@ void movieCueDeactivate02Twin(void) {
 }
 
 void moviePlayBank01(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankOneOffsets[gMoviePlayBankOneSelector[0]]);
+    sprintf(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankOneOffsets[gMoviePlayBankOneSelector[0]]);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu310", func_00287DA8);
@@ -335,7 +335,7 @@ void movieCueDeactivate01(void) {
 }
 
 void moviePlayBank02(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankTwoOffsets[gMoviePlayBankTwoSelector[0]]);
+    sprintf(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankTwoOffsets[gMoviePlayBankTwoSelector[0]]);
 }
 
 void movieChannelResetC(void)
@@ -381,7 +381,7 @@ void movieCueDeactivate08(void) {
 }
 
 void moviePlayBank03(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatBank03, gMoviePlayBankThreeOffsets[gMoviePlayBankThreeSelector[0]]);
+    sprintf(gMovieObject->textBuffer, gMovieFormatBank03, gMoviePlayBankThreeOffsets[gMoviePlayBankThreeSelector[0]]);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu310", func_00288098);
@@ -426,7 +426,7 @@ void movieCueDeactivate03(void) {
 }
 
 void moviePlayBank04(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankFourOffsets[gMoviePlayBankFourSelector[0]]);
+    sprintf(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankFourOffsets[gMoviePlayBankFourSelector[0]]);
 }
 
 void movieChannelResetE(void)
@@ -499,7 +499,7 @@ extern unsigned char gMovieFormatFloat[];
 
 void moviePlayFloatBankA(void)
 {
-  GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatFloat, fptodp(gMoviePlayFloatBankAValues[gMoviePlayFloatBankASelector[0]]));
+  sprintf(gMovieObject->textBuffer, gMovieFormatFloat, fptodp(gMoviePlayFloatBankAValues[gMoviePlayFloatBankASelector[0]]));
 }
 
 void movieCueActivate09(void) {
@@ -512,7 +512,7 @@ void movieCueDeactivate09(void) {
 
 void moviePlayFloatBankB(void)
 {
-  GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatFloat, fptodp(gMoviePlayFloatBankBValues[gMoviePlayFloatBankBSelector[0]]));
+  sprintf(gMovieObject->textBuffer, gMovieFormatFloat, fptodp(gMoviePlayFloatBankBValues[gMoviePlayFloatBankBSelector[0]]));
 }
 
 extern ChannelParams gMovieSetupChannels[];
@@ -549,7 +549,7 @@ void movieCueDeactivate05Latch(void) {
 }
 
 void moviePlayBank05(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankFiveOffsets[gMoviePlayBankFiveSelector[0]]);
+    sprintf(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankFiveOffsets[gMoviePlayBankFiveSelector[0]]);
 }
 
 void movieCueActivate02Latch(void) {
@@ -573,7 +573,7 @@ void movieCueDeactivate02Latch(void) {
 }
 
 void moviePlayBank06(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankSixOffsets[gMoviePlayBankSixSelector[0]]);
+    sprintf(gMovieObject->textBuffer, gMovieFormatMain, gMoviePlayBankSixOffsets[gMoviePlayBankSixSelector[0]]);
 }
 
 void movieStateSetActive(void) {
@@ -583,7 +583,7 @@ void movieStateSetActive(void) {
 extern unsigned char gMovieFormatDefault[];
 
 void moviePlayDefault(void) {
-    GameMpeg2Play(gMovieObject->textBuffer, gMovieFormatDefault);
+    sprintf(gMovieObject->textBuffer, gMovieFormatDefault);
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/tu310", func_00288988);

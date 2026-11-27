@@ -149,11 +149,11 @@ void movieSetFrameAlpha(f32 alpha) {
 }
 
 extern unsigned char gMoviePathBuffer[];
-s32 GameMpeg2Play();
+s32 sprintf();
 s32 moviePlaySetup();
 
 s32 playMpeg2(s32 movieFormat, s32 movieFormatArg) {
-    GameMpeg2Play(gMoviePathBuffer, movieFormat, movieFormatArg);
+    sprintf(gMoviePathBuffer, movieFormat, movieFormatArg);
     return moviePlaySetup(gMoviePathBuffer, 0, 0, 0);
 }
 

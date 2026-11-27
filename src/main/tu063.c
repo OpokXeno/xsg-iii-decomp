@@ -38,7 +38,7 @@ extern char gDebugFlagFormat[];
 extern s32 gDebugMenuPage;
 extern s32 gDebugAngleFlag;
 extern s32 gDebugAngle;
-int GameMpeg2Play();
+int sprintf();
 extern DebugPadState PadData[];
 s32 func_001B8B58();
 void func_001B8BA0();
@@ -101,11 +101,11 @@ void debugAngleMenuUpdate(void)
 
   }
 
-  GameMpeg2Play(&menuTextBuffer[0], gDebugCursorString);
+  sprintf(&menuTextBuffer[0], gDebugCursorString);
   xglFontDebugPrintf(8, (gDebugMenuPage * 8) + 0x18, &menuTextBuffer[0]);
-  GameMpeg2Play(&menuTextBuffer[0], gDebugFlagFormat, D_003E63A0[gDebugAngleFlag]);
+  sprintf(&menuTextBuffer[0], gDebugFlagFormat, D_003E63A0[gDebugAngleFlag]);
   xglFontDebugPrintf(0x10, 0x18, &menuTextBuffer[0]);
-  GameMpeg2Play(&menuTextBuffer[0], gDebugAngleFormat, gDebugAngle, angleValid);
+  sprintf(&menuTextBuffer[0], gDebugAngleFormat, gDebugAngle, angleValid);
   xglFontDebugPrintf(0x10, 0x20, &menuTextBuffer[0]);
 }
 

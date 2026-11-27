@@ -7,14 +7,14 @@ typedef int s32;
 typedef long long s64;
 typedef float f32;
 static unsigned char gDebugLineText[256];
-s32 GameMpeg2Play();
+s32 sprintf();
 s32 vprintf();
 
 void debugInfoPrintf(s32 messageText, ...) {
     va_list formatArgs;
     va_start(formatArgs, messageText);
 
-    GameMpeg2Play(gDebugLineText, "\033[1;36mCF3:\033[m %s\n", messageText);
+    sprintf(gDebugLineText, "\033[1;36mCF3:\033[m %s\n", messageText);
     vprintf(gDebugLineText, formatArgs);
 }
 
@@ -23,7 +23,7 @@ void debugNotePrintf(s32 messageText, ...) {
     va_list formatArgs;
     va_start(formatArgs, messageText);
 
-    GameMpeg2Play(gDebugLineText, "\033[1;35mCF3: %s\033[m\n", messageText);
+    sprintf(gDebugLineText, "\033[1;35mCF3: %s\033[m\n", messageText);
     vprintf(gDebugLineText, formatArgs);
 }
 
@@ -32,6 +32,6 @@ void debugWarnPrintf(s32 messageText, ...) {
     va_list formatArgs;
     va_start(formatArgs, messageText);
 
-    GameMpeg2Play(gDebugLineText, "\033[1;33mCF3:\033[m %s\n", messageText);
+    sprintf(gDebugLineText, "\033[1;33mCF3:\033[m %s\n", messageText);
     vprintf(gDebugLineText, formatArgs);
 }

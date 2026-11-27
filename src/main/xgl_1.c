@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_dma.h"
 #include "shared.h"
 #include "gs.h"
 /* The DMAC takes scratchpad addresses (0x7000xxxx) as an offset with the SPR flag in bit 31. */
@@ -287,7 +288,6 @@ static inline void setD3_CHCR(u32 chcrValue)
 typedef unsigned int MovieQuadword __attribute__((mode(TI)));
 int sceGsSyncPath(int mode, int timeout);
 int printf(const char *format, ...);
-void xglDmaDirectSrcChain(int channel, void *tag);
 int xglMovieRewind(XglMovieWork *movie);
 
 int xglMoviePlay(XglMovieWork *info)
@@ -352,7 +352,7 @@ int xglMoviePlay(XglMovieWork *info)
                     break;
                 }
             }
-            xglDmaDirectSrcChain(XGL_DMA_CHANNEL_GIF, info->packetAddress[info->activeBuffer]);
+            xglDmaDirectSrcChain(XGL_DMA_CHANNEL_GIF, (u32) info->packetAddress[info->activeBuffer]);
             info->activeBuffer ^= 1;
         }
         sceGsSyncPath(0, 0);

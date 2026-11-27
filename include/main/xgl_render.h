@@ -68,11 +68,11 @@ typedef struct XglRenderStateBlock {
     unsigned short zbuf_base;           /* +0x08: the Z-buffer page xglRenderDrawEnvMove copies into both zbuf fields */
     unsigned short dispfb_base;         /* +0x0A */
     unsigned short prev_dispfb_base;    /* +0x0C */
-    /* +0x0E: the third full-screen page (X2 work_buffer_base; label movieBackdropBasePage) */
+    /* +0x0E: the third full-screen page (X2 work_buffer_base; tu163.c reads it as movieBackdropBasePage) */
     unsigned short work_buffer_base;
-    unsigned short aux_page;            /* +0x10: a VRAM page func_0019A6F0 sets; no reader in this build */
+    unsigned short aux_page;            /* +0x10: a VRAM page xglRenderSetReso sets; no reader in this build */
     unsigned short texture_base;        /* +0x12: the texture buffer page (Packet.c's texture transfer) */
-    unsigned short aux_page2;           /* +0x14: a VRAM page func_0019A6F0 sets; no reader in this build */
+    unsigned short aux_page2;           /* +0x14: a VRAM page xglRenderSetReso sets; no reader in this build */
     /* +0x16: the page shown (X2 sRenderDisplayBase); swapped with flip_base every frame; read by the drop-shadow
      * packets of XenoActorUnpack.c */
     unsigned short display_buffer_base;
@@ -90,12 +90,12 @@ typedef struct XglRenderStateBlock {
     short skipped_frame_count;
     unsigned char unmodeled_7e[2];      /* +0x7E..+0x7F */
     /* +0x80 / +0x81: the video mode xglRenderScanLineInit resets the GS with (PAL, else 480p when
-     * progressiveMode is set, else NTSC interlaced); xglRenderStart sets +0x81 (xglRenderStartFlag). */
+     * progressiveMode is set, else NTSC interlaced); xglRenderStart sets progressiveMode. */
     unsigned char palMode;              /* +0x80 */
     unsigned char progressiveMode;      /* +0x81 */
-    /* +0x82: the base swap sends the movie frame instead of swapping pages (label gXglRenderFadeDisabled) */
+    /* +0x82: the base swap sends the movie frame instead of swapping pages */
     unsigned char movieMode;
-    unsigned char unmodeled_83;         /* +0x83 */
+    unsigned char movieFullColor;       /* +0x83: the movie frame is PSMCT32 without dithering (else PSMCT16) */
     unsigned char syncBacklogFull;      /* +0x84 */
     unsigned char unmodeled_85;         /* +0x85 */
     unsigned char fade_gain;            /* +0x86 */

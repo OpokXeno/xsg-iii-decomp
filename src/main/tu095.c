@@ -333,7 +333,7 @@ void soundParamRecordCreate(s32 vm) {
 }
 
 
-void GameMpeg2Play(void *moviePath, const unsigned char *format, s32 movieName);
+void sprintf(void *moviePath, const unsigned char *format, s32 movieName);
 
 void soundSlotStartNumbered(s32 index, void *moviePath);
 
@@ -360,7 +360,7 @@ void soundSlotPlayMovie(s32 vm) {
     movieName = vmKeyedEntryGet(vm, movieKey);
     soundSlot = vmArgGetOrDefault(vm, 2, 1);
     moviePath = &gSoundSlotPaths[soundSlot];
-    GameMpeg2Play(moviePath, "mev/%s", movieName);
+    sprintf(moviePath, "mev/%s", movieName);
     soundSlotSetPause(soundSlot, 1);
     soundSlotSetVolume(soundSlot, -1, 0);
     soundSlotStartNumbered(soundSlot, moviePath);

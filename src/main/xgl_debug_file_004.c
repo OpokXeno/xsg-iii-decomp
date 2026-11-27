@@ -2,6 +2,7 @@
 #include "shared.h"
 
 #include "debug_break.h"
+#include "main/xgl_debug_file_004.h"
 
 int xglDebFileSize(const char *name);
 int xglDebFileRead(const char *name, void *fileBytes);
@@ -28,7 +29,35 @@ int xglTimer0Get(void)
     return *T0_COUNT & T0_COUNT_MASK;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_debug_file_004", func_00181C18);
+/* The two-letter language codes "jp", "jp", "us", "en", "de", "fr", "it", "es", "zh" and "ko", each read as one
+ * halfword (first letter in the low byte). */
+typedef struct XglLanguageCodes {
+    unsigned short code[10];
+} XglLanguageCodes;
+
+extern const XglLanguageCodes xglLanguageCodeTable;
+/* The language setting byte; 0 selects entry 2. */
+extern unsigned char xglLanguageSetting[];
+
+#define XGL_LANGUAGE_DEFAULT 2
+
+/* Returns the code of the selected language; a non-null buffer receives its two bytes. */
+unsigned short xglGetLanguageCode(char *buffer)
+{
+    XglLanguageCodes codes = xglLanguageCodeTable;
+    unsigned int language = xglLanguageSetting[0];
+
+    if (language == 0) {
+        language = XGL_LANGUAGE_DEFAULT;
+    }
+    /* From here on language holds the code of the selected language. */
+    language = codes.code[language];
+    if (buffer != 0) {
+        buffer[0] = language;
+        buffer[1] = language >> 8;
+    }
+    return language;
+}
 
 void xglDebFileEmpty(void) {
 

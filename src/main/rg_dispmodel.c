@@ -329,7 +329,7 @@ typedef struct GameLoopRuntimeStorage {
 void MMathCalcDirVector(AlignedVector4 *clearedVector, void *source, AlignedVector4 *extra);
 float MMathVectorDotProduct(AlignedVector4 *left, AlignedVector4 *right);
 s32 MMathRotTransPersClip(s32 *screen, RgCamera *camera, void *left, void *right);
-void GameMpeg2Play(void *clearedVector, void *source, s32 actorId);
+void sprintf(void *clearedVector, void *source, s32 actorId);
 extern const char D_00531520[];
 extern const char D_00531528[];
 void xglFontDebugPrintf(s32 x, s32 y, void *text, ...);
@@ -360,11 +360,11 @@ void func_001BFC50(RgDispModel *model) {
     labelX = cellX - 902;
     labelY = cellY - 916;
     if ((loopRuntime->labelFlags & 0x10000) != 0) {
-        GameMpeg2Play(labelText, D_00531520, model->lookupKey);
+        sprintf(labelText, D_00531520, model->lookupKey);
         xglFontDebugPrintf(labelX, labelY, labelText);
     }
     if ((loopRuntime->labelFlags & 0x20000) != 0) {
-        GameMpeg2Play(labelText, D_00531528, model->stateBits);
+        sprintf(labelText, D_00531528, model->stateBits);
         xglFontDebugPrintf(cellX - 912, cellY - 911, labelText);
     }
 }

@@ -16,9 +16,9 @@ typedef struct PxyProfileEntry {
 
 /* The profile slots, scaffold .bss at 0x008C06B0. */
 extern PxyProfileEntry pxyProfileEntries[PXY_ENTRY_COUNT];
-int func_0030E68C(const char *, const char *);
+int strcmp(const char *, const char *);
 char *strcpy(char *, const char *);
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 
 /* Frees every profile slot. */
 void func_0019C8D0(void)
@@ -40,7 +40,7 @@ void pxyProfileBegin(const char *name)
     profileSlot = -1;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -75,7 +75,7 @@ float pxyProfileEnd(const char *name)
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -85,14 +85,14 @@ float pxyProfileEnd(const char *name)
         msPerTick = 0.0052173799f;
         pxyProfileEntries[profileSlot].totalTicks = pxyProfileEntries[profileSlot].totalTicks + (*T1_COUNT - pxyProfileEntries[profileSlot].startTicks);
         elapsedMs = pxyProfileEntries[profileSlot].totalTicks * msPerTick;
-        GameMpeg2Play(pxyProfileEntries[profileSlot].text, "%s  %3.2f", pxyProfileEntries[profileSlot].name, elapsedMs);
+        sprintf(pxyProfileEntries[profileSlot].text, "%s  %3.2f", pxyProfileEntries[profileSlot].name, elapsedMs);
     }
     return elapsedMs;
 }
 
-/* XS2 pxyProfileEndMs: adds the ticks since the slot's start to its total and returns the total in
+/* Adds the ticks since the slot's start to its total and returns the total in
  * milliseconds, without formatting the text line; 0 when no slot has the name. */
-float func_0019CBB0(const char *name)
+float pxyProfileEndMs(const char *name)
 {
     int i;
     int profileSlot;
@@ -103,7 +103,7 @@ float func_0019CBB0(const char *name)
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -129,7 +129,7 @@ float pxyProfileGetMs(const char *name)
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
         if (pxyProfileEntries[i].inUse != 0) {
-            if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+            if (strcmp(pxyProfileEntries[i].name, name) == 0) {
                 profileSlot = i;
                 break;
             }
@@ -142,7 +142,7 @@ float pxyProfileGetMs(const char *name)
     return elapsedMs;
 }
 
-void func_0019D4E8(const char *text, int x, int y, float scale, int color, int shadowColor, int flag);
+int func_0019D4E8(const char *text, int x, int y, float scale, int color, int shadowColor, int flag);
 
 float pxyProfileGetMsUnchecked(const char *name)
 {
@@ -154,7 +154,7 @@ float pxyProfileGetMsUnchecked(const char *name)
     profileSlot = -1;
     elapsedMs = 0.0f;
     for (i = 0; i < PXY_ENTRY_COUNT; i++) {
-        if (func_0030E68C(pxyProfileEntries[i].name, name) == 0) {
+        if (strcmp(pxyProfileEntries[i].name, name) == 0) {
             profileSlot = i;
             break;
         }

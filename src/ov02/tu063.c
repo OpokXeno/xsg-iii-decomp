@@ -23,13 +23,13 @@ f32 xglCameraGetDefaultScale(void) {
 INCLUDE_ASM("asm/nonmatchings/ov02/tu063", func_00A9AD10);
 
 extern unsigned char D_00AB91D0[];
-s32 GameMpeg2Play();
+s32 sprintf();
 s32 func_0030ED88();
 
 s32 formatCopyName(s32 nameBuffer, s32 nameBufferSize) {
     s32 formattedName[0x80];
 
-    GameMpeg2Play(&formattedName[0], D_00AB91D0);
+    sprintf(&formattedName[0], D_00AB91D0);
     func_0030ED88(nameBuffer, &formattedName[0], nameBufferSize);
     return nameBuffer;
 }

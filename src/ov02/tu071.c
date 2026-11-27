@@ -247,13 +247,13 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu071", func_00AA33D0);
 
 extern s32 D_00ABA1E0;
 extern s32 gBattleMoviePlayer;
-s32 GameMpeg2Play(s32 *, s32 *, s32, s32);
+s32 sprintf(s32 *, s32 *, s32, s32);
 s32 func_00AA1300();
 
 s32 *battleActorPlayMovie(BattleActor *actor) {
     s32 movieId;
     movieId = func_00AA1300();
-    GameMpeg2Play(&gBattleMoviePlayer, &D_00ABA1E0, movieId, actor->battle_key);
+    sprintf(&gBattleMoviePlayer, &D_00ABA1E0, movieId, actor->battle_key);
     return &gBattleMoviePlayer;
 }
 

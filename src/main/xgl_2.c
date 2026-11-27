@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_dma.h"
 #include "shared.h"
 #include "main/xgl_2.h"
 
@@ -1311,7 +1312,6 @@ void xglSRandInit(void) {
     gXglRandomSeed[0] = 0x12345678;
 }
 
-void xglDmaDirectSrcChain(u32 channel, u32 address);
 extern char xglVu0ResidentMicroprogram[];
 
 /* Geometry start-up: seeds the VU0 random generator and xglRand, then sends the VU0 resident microprogram. */

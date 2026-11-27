@@ -1,13 +1,10 @@
 #include "common.h"
+#include "main/ee_stdarg.h"
 #include "shared.h"
 
 void LOG(const void *loggedVector, const char *format, ...);
 void tracePrint(const char *format, ...);
 
-typedef char *va_list;
-
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
-#define va_end(ap) ((void)0)
 
 extern int printf(const char *format, ...);
 extern int vsprintf(char *output, const char *format, va_list formatArgs);
