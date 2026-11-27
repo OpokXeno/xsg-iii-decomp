@@ -1728,7 +1728,6 @@ void xglFontPrintExtendedColorByte(s32 a, s32 b, s32 c, s32 d);
 void xglClockReadBcd(void *clock);
 void func_0021BB68(s32 x, s32 y, s32 seconds);
 void sheetDrawFrame(s32 frame);
-s32 sheetLatchedPositionGet(void);
 void mcStateSeekEntry(s32 entry);
 void func_0021ABB0(s32 a, s32 b, void *text, s32 c);
 

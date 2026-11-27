@@ -308,7 +308,7 @@ void sheetFrameSetCellAlpha(TiFrameSheet *sheet, s32 index, u64 alpha)
 
 extern s8 D_0055144A;
 
-s8 sheetLatchedPositionGet(void) {
+s32 sheetLatchedPositionGet(void) {
     return D_0055144A;
 }
 

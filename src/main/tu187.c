@@ -1209,7 +1209,6 @@ void func_0021ABB0(s32 a0, s32 a1, s32 a2, s32 a3);
 void func_0021CB90(s32 a0, s32 a1, void *a2, s32 a3);
 void xglFontResetState(void);
 void seVoicePanelDraw(s32 alpha);
-s32 sheetLatchedPositionGet(void);
 void sheetDrawFrame(s32 frame);
 void mcStateSeekEntry(s32 value);
 

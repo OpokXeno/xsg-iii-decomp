@@ -433,7 +433,6 @@ void shardFieldUpdate(void *block);
 s32 colorModulateByte(u8 level, u8 flag);
 u8 statusByte0Get(void);
 u8 statusByte1Get(void);
-s32 sheetLatchedPositionGet(void);
 void sheetDrawFrame(s32);
 void mcStateSeekEntry(s32);
 void func_0021A7E0(s32, s32, s32, s32);

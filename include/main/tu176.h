@@ -131,6 +131,8 @@ void choicePromptDraw(McGauge *gauge, s32 visible, s32 y);
 void mcFileListScrollInit(McFileList *fileList, s32 position, s32 cursor);
 void addClampedCounter(McFileList *fileList, s16 delta);
 void mcFileListScrollStep(McFileList *fileList, u16 step);
+s32 sheetLatchedPositionGet(void);
+s32 testFlagBit(s32 bitIndex);
 void newGameStateReset(void);
 BattleRoster *battleRosterGet(s32 rosterIndex);
 s32 battleRosterEntryIdCountGet(s32 rosterIndex);
