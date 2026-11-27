@@ -5,10 +5,13 @@
 #include "main/xgl_render.h"
 #include "main/xgl_cd.h"
 #include "gs.h"
+#include "main/xgl_debug_file_004.h"
+#include "main/tu176.h"
+#include "main/tu178.h"
 
 void *memset(void *destination, int value, unsigned int count);
 
-void GameMpeg2Play(const char *name);
+void sprintf(const char *name);
 u8 *resCmdMpeg2(u8 *cursor);
 
 struct Func430Row {
@@ -172,7 +175,7 @@ extern struct McScreen *gSaveScreen;
 /* Formats text (a messageTextGet result) with value into the screen message; clears the message when text is 0. */
 void saveScreenSetFormattedMessage(int text, int value) {
     if (text != 0) {
-        ((void (*)()) GameMpeg2Play)(&gSaveScreen->message[0], text, value);
+        ((void (*)()) sprintf)(&gSaveScreen->message[0], text, value);
         return;
     }
     gSaveScreen->message[0] = 0;
@@ -200,8 +203,6 @@ void saveScreenSetMenu(SaveMenuCallback menu, SaveDrawCallback draw) {
     }
     screen->displayState = 1;
 }
-
-typedef int s32;
 
 void setSteppedValue(s32 stepped, s32 value, s32 target);
 
@@ -238,8 +239,6 @@ struct McCardRequest {
     void (*callback)(void);
 };
 
-typedef signed char s8;
-
 s32 sheetSetIndex(s32);
 
 void saveScreenSetMessage(s32 sheetIndex) {
@@ -253,7 +252,7 @@ void saveScreenSetMessage(s32 sheetIndex) {
  * resCmd handlers do.
  */
 u8 *resCmdMpeg2(u8 *cursor) {
-    GameMpeg2Play(cursor);
+    sprintf(cursor);
     return cursor;
 }
 
@@ -1050,15 +1049,6 @@ void pagedTableAppend(struct SaveMenuTable *table, s32 value, s32 flags);
 void pagedTableSeek(struct SaveMenuTable *table, u16 position);
 void saveScreenClearRecords(void);
 
-typedef struct SaveGameHeader {
-    s32 startTime; /* +0x00 */
-    unsigned char unmodeled_04[0x21];
-    unsigned char port;      /* +0x25 */
-    unsigned char fileIndex; /* +0x26 */
-} SaveGameHeader;
-
-extern SaveGameHeader gSaveGameHeader;
-void mcFileListScrollInit(void *obj, int a, int b);
 void addClampedCounter(void *obj, short value);
 void mcFileListScrollStep(void *obj, int value);
 void saveScreenMenuStep(s32 setup);
@@ -1548,7 +1538,6 @@ extern char *gFontEscapeBuffer;
 extern char D_00550BC8[];
 extern u8 D_004B378B[];
 extern BattleRosterEntry *func_A86DF8(s32 entryId);
-extern s32 battleRosterCursorEntryIdGet(s32 rosterIndex);
 extern s32 func_001894A0(s32 a, s32 b, s32 c);
 
 typedef struct MovieStatus {
@@ -1586,7 +1575,7 @@ s32 saveScreenPlayTitleMovie(s32 fileBuffer, s32 fileNumber) {
         titleText = messageTextGet(641);
     }
     labelText = messageTextGet(630);
-    ((int (*)(char *destination, ...)) GameMpeg2Play)(movieName, labelText,
+    ((int (*)(char *destination, ...)) sprintf)(movieName, labelText,
                                                       messageTextGet(battleRosterCursorEntryIdGet(0) + 679),
                                                       tensText, onesText, titleText);
     return func_001894A0(fileBuffer, fileNumber, movieName);
@@ -1599,7 +1588,6 @@ struct McCardRequestFileRead {
     void (*callback)(void);
 };
 
-extern unsigned char gXglMcAgedEntries[];
 extern u8 *gSaveFileBuffer;
 void func_00224A80(void);
 
@@ -1650,8 +1638,8 @@ void saveScreenFileReadState(s32 setup) {
             break;
         }
         cardRequest.fileIndex = gSaveScreen->levelIndex[0];
-        cardRequest.screen = gXglMcAgedEntries;
-        cardRequest.size = 0x130B0;
+        cardRequest.screen = &gXglMcAgedEntries;
+        cardRequest.size = sizeof(gXglMcAgedEntries);
         func_00224A80();
         xglMcRequest(gSaveScreen->port, 5, &cardRequest,
                      gSaveScreen->scanBuffer);
@@ -1680,12 +1668,12 @@ void saveScreenFileReadState(s32 setup) {
                                          ->fileList
                                          .fileEntries[gSaveScreen->levelIndex[0]]
                                          .thumbnailSlot],
-                    gXglMcAgedEntries);
+                    &gXglMcAgedEntries);
             } else {
                 saveScreenStartPendingLoads();
             }
             saveScreenLoadFileRecord(gSaveScreen->levelIndex[0],
-                          (void *) gXglMcAgedEntries);
+                          (void *) &gXglMcAgedEntries);
             saveScreenSetMessageText(messageTextGet(0x28C));
             gSaveScreen->cardBusy = 0;
             ((void (*)(void)) saveScreenHandleError)();
@@ -1756,8 +1744,8 @@ void saveScreenEntriesReadState(s32 setup) {
             break;
         }
         cardRequest.fileIndex = gSaveScreen->levelIndex[0];
-        cardRequest.screen = gXglMcAgedEntries;
-        cardRequest.size = 0x130B0;
+        cardRequest.screen = &gXglMcAgedEntries;
+        cardRequest.size = sizeof(gXglMcAgedEntries);
         xglMcRequest(gSaveScreen->port, 4, &cardRequest,
                      gSaveScreen->scanBuffer);
         gSaveScreen->uiState = 1;
@@ -1799,7 +1787,7 @@ void saveScreenEntriesReadState(s32 setup) {
     mcFileListScrollStep(&gSaveScreen->fileList, 1);
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void fontQueueSpriteReset(void);
 void shardFieldUpdate(void *fields);
@@ -1826,7 +1814,7 @@ void saveScreenDraw(void) {
     u8 clock[8];
     s32 text;
 
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();
@@ -1939,7 +1927,6 @@ void pagedTableInit(struct SaveMenuTable *table, s32 capacity);
 void mcModuleReset(void);
 void sheetStateReset(void);
 void memPoolFree(void *block);
-void func_00181C18(void *file);
 s32 xglCdServiceIfPending(void);
 void scratchpadSendCmd23Mode1(ScratchpadCommand *command);
 void scratchpadSendCmd23Mode0(ScratchpadCommand *command);
@@ -1988,7 +1975,7 @@ void saveScreenSetup(void) {
         memPoolFree(thumbnailBuffer);
         gSaveFileBuffer = memPoolAlloc(0x4000);
         gSaveScreen->fileImageReady = 0;
-        func_00181C18(gSaveImagePath + 4);
+        xglGetLanguageCode(gSaveImagePath + 4);
         xglCdReadFile(gSaveImagePath, gSaveFileBuffer, 1, saveFileReadCallback);
         if (gSaveScreen->unmodeled_5BB2D != 0) {
             while (xglCdServiceIfPending()) {
@@ -2395,17 +2382,6 @@ static inline void saveMenuKeySetAlt(struct SaveMenuTable *table, s32 index,
     }
 }
 
-struct AgedEntryFlags {
-    unsigned char unmodeled_00[0x28];
-    unsigned char flag28; /* +0x28 */
-    unsigned char unmodeled_29[0x3F - 0x29];
-    unsigned char flag3F; /* +0x3F */
-    unsigned char unmodeled_40[0x42 - 0x40];
-    unsigned char flag42; /* +0x42 */
-    unsigned char unmodeled_43[0x47 - 0x43];
-    unsigned char flag47; /* +0x47 */
-};
-
 s32 pagedTableGetCurrentEntry(struct SaveMenuTable *table);
 void padSetLatchedValue(s32 value);
 void Vibration_Set_Strong(s32 a, s32 b, s32 c);
@@ -2447,21 +2423,21 @@ void saveFileMenuUpdate(s32 setup) {
     } else if (getStatusHeader()->buttons & 0xA000) {
         switch (pagedTableGetCurrentEntry(&gSaveScreen->fileTable)) {
         case 0:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag28 ^= 1;
-            soundDriverSetStreamMode(((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag28);
+            gXglMcAgedEntries.flag28 ^= 1;
+            soundDriverSetStreamMode(gXglMcAgedEntries.flag28);
             seVoiceStartDefault(1);
             break;
         case 1:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag3F ^= 1;
+            gXglMcAgedEntries.flag3F ^= 1;
             seVoiceStartDefault(1);
             break;
         case 8:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag47 ^= 1;
+            gXglMcAgedEntries.flag47 ^= 1;
             seVoiceStartDefault(1);
             break;
         case 2:
-            ((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag42 ^= 1;
-            if (((struct AgedEntryFlags *) &gXglMcAgedEntries)->flag42 == 0) {
+            gXglMcAgedEntries.flag42 ^= 1;
+            if (gXglMcAgedEntries.flag42 == 0) {
                 Vibration_Stop();
                 padSetLatchedValue(10);
                 Vibration_Set_Strong(0x80, 0x10, 0x3C);

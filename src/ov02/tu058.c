@@ -106,7 +106,7 @@ s32 *messageGetOrEmpty(s32 messageId) {
 }
 
 s32 func_002E9DD0(s32, s32, s32);
-s32 func_0030E8E4(s32);
+s32 strlen(s32);
 s32 func_00A981B8(s32);
 
 /* Derives a key from seed, then checks that value matches the keyed expectation for it. */
@@ -116,9 +116,9 @@ s32 ov02ValidateKeyedValue(s32 keyedValue, s32 seed) {
     s32 expected;
 
     key = func_00A981B8(seed);
-    expected = func_0030E8E4(key);
+    expected = strlen(key);
     recomputedValue = func_002E9DD0(keyedValue, key, expected);
-    return recomputedValue == func_0030E8E4(key);
+    return recomputedValue == strlen(key);
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu058", func_00A977D0);

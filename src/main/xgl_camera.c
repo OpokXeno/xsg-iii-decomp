@@ -223,8 +223,6 @@ void func_00193A78(XglCamera *camera);
 
 void func_00193BD0(XglCamera *camera);
 
-void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
-
 void xglVectorScaleAddXYZ(Vector4 *destination, const Vector4 *source, float scale, const Vector4 *addend);
 
 void xglMatrixStackUnit(void);

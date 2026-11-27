@@ -1,13 +1,7 @@
 #include "common.h"
 
 #include "gs.h"
-typedef union XglDirectQueueEntry {
-    struct {
-        u64 registerValue;
-        u64 registerAddress;
-    };
-    u32 tagAndHeaderWords[4];
-} XglDirectQueueEntry;
+#include "main/xgl_direct_queue.h"
 
 extern XglDirectQueueEntry *xglDirectQueueBuffer;
 extern int xglDirectQueueCount;

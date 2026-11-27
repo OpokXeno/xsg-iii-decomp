@@ -374,51 +374,31 @@
     {
      "range": [
       "0x00540250",
-      "0x005402c0"
+      "0x00540360"
      ],
      "generated": [
       "0x00540250",
-      "0x005402c0"
+      "0x0054035c"
      ],
      "generated_by": [
-      "xglMcStartQueuedRequest",
-      "xglMcAdvanceCreateRequest"
+      "xglMcAdvanceCreateRequest",
+      "xglMcMain",
+      "xglMcStartQueuedRequest"
      ],
      "c_owned_symbols": [
       "jtbl_00540250",
-      "jtbl_00540280"
+      "jtbl_00540280",
+      "D_005402C0",
+      "D_005402D0",
+      "jtbl_005402F0",
+      "jtbl_00540320",
+      "jtbl_00540340"
      ],
      "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/xgl_mc_request.o"
-     }
-    }
-   ]
-  },
-  "main/tu014": {
-   ".rodata": [
-    {
-     "range": [
-      "0x00540360",
-      "0x00540378"
-     ],
-     "generated": [
-      "0x00540360",
-      "0x00540371"
-     ],
-     "generated_by": [
-      "xglMoviePlay"
-     ],
-     "c_owned_symbols": [
-      "D_00540360"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/xgl_1.o"
      }
     }
    ]
@@ -1161,36 +1141,6 @@
     }
    ]
   },
-  "main/tu020": {
-   ".rodata": [
-    {
-     "range": [
-      "0x00540418",
-      "0x005404d8"
-     ],
-     "generated": [
-      "0x00540418",
-      "0x005404d8"
-     ],
-     "generated_by": [
-      "func_0018E6F0"
-     ],
-     "c_owned_symbols": [
-      "D_00540418"
-     ],
-     "also_referenced_by_c": [
-      "gSeBankFileExt",
-      "gSeMasterBankPath",
-      "gSeAdxFileExt"
-     ],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/sound_driver.o"
-     }
-    }
-   ]
-  },
   "main/tu025": {
    ".bss": [
     {
@@ -1449,8 +1399,32 @@
       "D_005412D0"
      ],
      "also_referenced_by_c": [
-      "xglLightConeEdgeTemplate"
+      "xglLightConeEdgeTemplate",
+      "xglLightKeyAxisTemplate"
      ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_light_030.o"
+     }
+    },
+    {
+     "range": [
+      "0x00541300",
+      "0x00541380"
+     ],
+     "generated": [
+      "0x00541300",
+      "0x00541374"
+     ],
+     "generated_by": [
+      "xglLightPackBuildLightSet"
+     ],
+     "c_owned_symbols": [
+      "jtbl_00541300",
+      "jtbl_00541330"
+     ],
+     "also_referenced_by_c": [],
      "basis": {
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
@@ -1469,7 +1443,7 @@
       "0x0054ffb4"
      ],
      "generated_by": [
-      "func_00197A00",
+      "xglLightPackSampleCurve",
       "xglLightBoxColor"
      ],
      "c_owned_symbols": [
@@ -1513,32 +1487,6 @@
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/main/build/c/xgl_light_031.o"
-     }
-    }
-   ]
-  },
-  "main/tu032": {
-   ".lit4": [
-    {
-     "range": [
-      "0x0054ffd0",
-      "0x0054ffd4"
-     ],
-     "generated": [
-      "0x0054ffd0",
-      "0x0054ffd4"
-     ],
-     "generated_by": [
-      "func_00199A20"
-     ],
-     "c_owned_symbols": [
-      "D_0054FFD0"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/Packet.o"
      }
     }
    ]
@@ -1690,7 +1638,7 @@
       "0x0054ffec"
      ],
      "generated_by": [
-      "func_0019CBB0",
+      "pxyProfileEndMs",
       "pxyProfileDrawEntries",
       "pxyProfileEnd",
       "pxyProfileGetMs",
@@ -1778,7 +1726,7 @@
       "0x0054fff4"
      ],
      "generated_by": [
-      "func_0019E5B0",
+      "CONSTRUCT_CIRCLR_SHADOW",
       "pxyBuildFadeRamp"
      ],
      "c_owned_symbols": [
@@ -24362,32 +24310,6 @@
     }
    ]
   },
-  "main/tu176": {
-   ".rodata": [
-    {
-     "range": [
-      "0x00537df0",
-      "0x00537e00"
-     ],
-     "generated": [
-      "0x00537df0",
-      "0x00537df8"
-     ],
-     "generated_by": [
-      "battleRosterLinkedEntryIdGet"
-     ],
-     "c_owned_symbols": [
-      "D_00537DF0"
-     ],
-     "also_referenced_by_c": [],
-     "basis": {
-      "kind": "derived",
-      "tool": "tools/tu/data_carve.py derive",
-      "object": "build/main/build/c/tu176.o"
-     }
-    }
-   ]
-  },
   "main/tu184": {
    ".data": [
     {
@@ -29096,6 +29018,114 @@
       "kind": "derived",
       "tool": "tools/tu/data_carve.py derive",
       "object": "build/ov04/build/scaffold/src/ov04/tu019.o"
+     }
+    }
+   ]
+  },
+  "main/tu032": {
+   ".lit4": [
+    {
+     "range": [
+      "0x0054ffd0",
+      "0x0054ffd4"
+     ],
+     "generated": [
+      "0x0054ffd0",
+      "0x0054ffd4"
+     ],
+     "generated_by": [
+      "xglPacketMove"
+     ],
+     "c_owned_symbols": [
+      "D_0054FFD0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/Packet.o"
+     }
+    }
+   ]
+  },
+  "main/tu020": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00540418",
+      "0x005404d8"
+     ],
+     "generated": [
+      "0x00540418",
+      "0x005404d8"
+     ],
+     "generated_by": [
+      "func_0018E6F0"
+     ],
+     "c_owned_symbols": [
+      "D_00540418"
+     ],
+     "also_referenced_by_c": [
+      "gSeBankFileExt",
+      "gSeMasterBankPath",
+      "gSeAdxFileExt"
+     ],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/sound_driver.o"
+     }
+    }
+   ]
+  },
+  "main/tu014": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00540360",
+      "0x00540378"
+     ],
+     "generated": [
+      "0x00540360",
+      "0x00540371"
+     ],
+     "generated_by": [
+      "xglMoviePlay"
+     ],
+     "c_owned_symbols": [
+      "D_00540360"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/xgl_1.o"
+     }
+    }
+   ]
+  },
+  "main/tu176": {
+   ".rodata": [
+    {
+     "range": [
+      "0x00537df0",
+      "0x00537e00"
+     ],
+     "generated": [
+      "0x00537df0",
+      "0x00537df8"
+     ],
+     "generated_by": [
+      "battleRosterLinkedEntryIdGet"
+     ],
+     "c_owned_symbols": [
+      "D_00537DF0"
+     ],
+     "also_referenced_by_c": [],
+     "basis": {
+      "kind": "derived",
+      "tool": "tools/tu/data_carve.py derive",
+      "object": "build/main/build/c/tu176.o"
      }
     }
    ]

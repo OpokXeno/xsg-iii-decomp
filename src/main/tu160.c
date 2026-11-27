@@ -1,18 +1,9 @@
 #include "common.h"
 
 #include "main/tu007.h"
+#include "main/tu176.h"
 
 void xglPadSetRepeat(int, int, int, int);
-
-typedef int s32;
-
-typedef signed char s8;
-
-typedef short s16;
-
-typedef unsigned char u8;
-
-typedef unsigned short u16;
 
 static u16 gStatusBitsLow;
 static u16 gStatusBitsHigh;
@@ -231,7 +222,6 @@ void swapWordsRestore(void) {
 extern s32 gFontEscapeBuffer;
 extern s32 gFontNumberBuffer;
 void bufferCursorClear();
-void newGameStateReset();
 void func_00225780();
 void sceneReset();
 
@@ -340,9 +330,9 @@ void completionCallbackAdd(CompletionCallback completionCallback) {
     }
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 
-/* Runs the completion callbacks in order until the null terminator, then clears the list and calls func_00185A20. */
+/* Runs the completion callbacks in order until the null terminator, then clears the list and calls xglFontFlush. */
 void completionCallbacksRun(void) {
     int callbackIndex = 0;
 
@@ -350,7 +340,7 @@ void completionCallbacksRun(void) {
         gCompletionCallbacks[callbackIndex++]();
     }
     completionCallbackAdd(0);
-    func_00185A20();
+    xglFontFlush();
 }
 
 /* Command template of swapWordsSendCommand: the 8-byte packet header. */

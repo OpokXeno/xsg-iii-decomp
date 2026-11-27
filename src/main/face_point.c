@@ -243,7 +243,7 @@ typedef struct CullingMapRecord {
     unsigned char unmodeled_00[0x8];
     s32 volumeFlags;
     unsigned char unmodeled_0C[0x4];
-    unsigned char query[0x160 - 0x10];  /* +0x10: the query block func_0030E68C reads */
+    unsigned char query[0x160 - 0x10];  /* +0x10: the query block strcmp reads */
 } CullingMapRecord;
 
 typedef struct CullingMap {
@@ -319,7 +319,7 @@ typedef struct CullingMapEntry {
  * original site is two absolute hi/lo instructions.
  */
 extern const CullingMapEntry gCullingNameTable[];
-s32 func_0030E68C(void *, void *);
+s32 strcmp(void *, void *);
 
 /*
  * Finds a named culling-map entry in the current map table and returns its
@@ -331,7 +331,7 @@ s32 check_culling_map(const char *name) {
     s32 rowIndex;
 
     for (rowIndex = 0; gCullingNameTable[rowIndex].entryCount != 0 || gCullingNameTable[rowIndex].source != 0; rowIndex++) {
-        if (func_0030E68C((void *)gCullingNameTable[rowIndex].name, (void *)name) == 0) {
+        if (strcmp((void *)gCullingNameTable[rowIndex].name, (void *)name) == 0) {
             foundRowIndex = rowIndex;
             break;
         }
@@ -344,7 +344,7 @@ s32 xglCullingRecordQuery(CullingMapRecord *volumeRecord) {
 
     queryResult = volumeRecord->volumeFlags & 0x81;
     if (queryResult != 0) {
-        queryResult = func_0030E68C(gCullingVolumeTable, volumeRecord->query);
+        queryResult = strcmp(gCullingVolumeTable, volumeRecord->query);
         if (queryResult == 0) {
             /* xglCullingMapClear returns void; the call through this type is what the original emits. */
             queryResult = ((s32 (*)()) xglCullingMapClear)();

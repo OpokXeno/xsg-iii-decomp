@@ -1,12 +1,5 @@
 #include "common.h"
-
-typedef unsigned char u8;
-
-typedef int s32;
-
-typedef signed char s8;
-
-typedef unsigned short u16;
+#include "main/tu176.h"
 
 typedef struct SeTableBlock {
     u8 unk000[0x200];
@@ -72,8 +65,6 @@ typedef struct SeVoiceTailBlock {
     s32 unk28;
     u8 unk2C[0xC];
 } SeVoiceTailBlock;
-
-typedef unsigned long u64;
 
 typedef union BitRows {
     u64 words[27];
@@ -210,7 +201,7 @@ s32 func_00224600(s32 arg);
 void completionBlockClear(void);
 void pagedTablePoolInit(void);
 void bufferPointersRewind(void);
-int GameMpeg2Play();
+int sprintf();
 s32 xglCdReadFile(void *dst, void *aux, s32 a, s32 b);
 s32 xglCdServiceIfPending();
 void scratchpadSendCmd23Mode1(void *command);
@@ -228,7 +219,6 @@ void sheetStateReset(void);
 void pagedTableInit(void *table, s32 capacity);
 void pagedTableAppend(void *table, s32 entry, s32 kind);
 void pagedTableSetPageSizes(void *table, s32 a, s32 b);
-s32 battleRosterEntryIdCountGet(s32 kind);
 void pagedTableSetTextBox(void *table, s32 a, s32 b, s32 c);
 const char *messageTextGet(s32 id);
 void sheetSetIndex(void *text);
@@ -287,7 +277,7 @@ s32 seVoiceScreenInit(s32 playMode) {
     seMenuBlockClear(gSeMenuBlock);
     if (playMode != 0) {
         cdFilePath = gSeVoiceCdFilePath;
-        GameMpeg2Play(gSeVoiceState->cdPath, &cdFilePath, playMode);
+        sprintf(gSeVoiceState->cdPath, &cdFilePath, playMode);
         xglCdReadFile(gSeVoiceState->cdPath, gSeMenuBlock, 1, 0);
         cdCommand = gSeVoiceCdCommand;
         scratchpadSendCmd23Mode1(&cdCommand);
@@ -382,10 +372,6 @@ void cdStateDestroy(void) {
     memPoolFree(gSeVoiceState);
     gSeVoiceState = 0;
 }
-
-typedef short s16;
-
-typedef unsigned int u32;
 
 typedef struct SteppedValue {
     s16 level;
@@ -1217,7 +1203,7 @@ void seVoiceRecordTableDraw(s32 voiceSlot, s32 kindSlot, s32 index) {
     }
 }
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void xglFontSetAlphaScale(unsigned char scale);
 void fontQueueSpriteReset(void);
@@ -1235,7 +1221,7 @@ void mcStateSeekEntry(s32 value);
 /* Draws one frame of the voice screen: fade alpha from fadePhase, the sheets and glyph overlays, the
  * mode heading and the onFinish callback. */
 void seVoiceScreenDraw(void) {
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(128);
     fontQueueSpriteReset();
@@ -1857,7 +1843,7 @@ void seVoicePlayAndSetup(void) {
     seekPending = 1;
     playTitleText = messageTextGet((gSeVoiceState->voiceFlags & 1) ? 0x79 : 0x77);
     voiceKindEntry = pagedTableGetCurrentEntry(&gSeVoiceState->voiceKind);
-    GameMpeg2Play(
+    sprintf(
         &gSeVoiceState->cdPath[0x80], playTitleText, messageTextGet(voiceKindEntry + 0x7B));
     sheetSetIndex(0);
     sheetSetIndex((s32) &gSeVoiceState->cdPath[0x80]);
@@ -1905,8 +1891,6 @@ void seVoicePlayAndSetup(void) {
     mcStateSetupRequest(setupFlags, 0);
 }
 
-s32 battleRosterEntryIdGet(s32, s32);
-void choicePromptInit(void *, const char *, s32, s32);
 
 static inline s32 voicePartyIndex(void) {
     if (gSeVoiceState->voiceFlags & 4) {

@@ -2,13 +2,7 @@
 
 #include "shared.h"
 #include "main/battle_shared.h"
-typedef signed char s8;
-
-typedef unsigned char u8;
-
-typedef int s32;
-
-typedef unsigned int u32;
+#include "main/tu176.h"
 
 typedef struct StateBudget {
     /* 0x00 */ s32 amountA;
@@ -125,7 +119,7 @@ s32 xglFontPrintExtendedColorByte(s32, s32, s32, s32);
 s32 func_00A85160(u8 itemId, u8 quantity);
 s32 *func_A87550(s32 recordNumber);
 const char *messageTextGet(s32 id);
-void GameMpeg2Play(char *moviePath, const char *format, s32 movieName);
+void sprintf(char *moviePath, const char *format, s32 movieName);
 extern char *gFontEscapeBuffer;
 
 /* Draws one row of the battle result list for entry `slot`: the message with its fade-in when the entry has
@@ -204,7 +198,7 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
                                      0xFE & (-128 - ((((u8) gBudgetDisplayBlock->messageFade[rowIndex]) - 64) << 1)));
         }
         xglFontSetColor(90, 91, 172);
-        GameMpeg2Play(gFontEscapeBuffer, messageTextGet(150), messageText);
+        sprintf(gFontEscapeBuffer, messageTextGet(150), messageText);
         xglFontPrintIndexed(315, ((baseX - 0x71F8) >> 4) + 15, gFontEscapeBuffer);
         xglFontPrintAlphaCommand(68, 0, 128);
         return;
@@ -278,7 +272,7 @@ void budgetDisplayDrawRow(unsigned short baseX, s32 recordId, s32 rowIndex, s32 
 
 typedef long long s64;
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32 step);
 void xglFontSetAlphaScale(u8 alpha);
 void fontQueueSpriteReset(void);
@@ -286,7 +280,6 @@ void shardFieldUpdate(void *block);
 void xglFontFreeBuffer(void);
 void func_0021CB90(s32 a, s32 b, s32 c, s32 d);
 void xglFontResetState(void);
-s32 battleCurrentRosterIndexGet(void);
 void dispatchCodeRange(u16 *pos, s32 handle, s32 a, s32 b, s32 c);
 void xglFontQueueBarRed(s32 a, s32 b, s32 c);
 void xglFontQueueBarBlue(s32 a, s32 b, s32 c);
@@ -300,7 +293,6 @@ void mcStateSeekEntry(s32 id);
 s32 xglFontTextWidth(void *text, s32 b);
 s32 xglFontDrawDigitsMinTwo(s32 x, s32 y, s32 value, s32 digits);
 void xglFontDrawDigits(s32 x, s32 y, s32 value, s32 digits);
-extern unsigned char gBattleRosterTable[];
 
 /* Draws the whole result page: the fonts, the entry rows (activeEntryCount rows highlighted), the record list,
  * the budget figures and the play-time line at the bottom. */
@@ -312,7 +304,7 @@ void budgetDisplayDrawPage(void) {
     u32 minutesTotal;
     u32 hoursTotal;
     s32 textOffset;
-    u8 savedRoster;
+    u8 savedCursor;
     u8 rowsNow;
     s32 i;
     s32 entryCount;
@@ -329,7 +321,7 @@ void budgetDisplayDrawPage(void) {
     void *text;
 
     totalSeconds = gBudgetDisplayBlock->totalSeconds;
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();
@@ -345,9 +337,9 @@ void budgetDisplayDrawPage(void) {
     }
 
     if (gBudgetDisplayBlock->fontAlpha[0] != 0) {
-        savedRoster = gBattleRosterTable[1];
+        savedCursor = gBattleRosterTable.rosterPair.rosters[0].cursor;
         if (battleCurrentRosterIndexGet() != 0) {
-            gBattleRosterTable[1] = -1;
+            gBattleRosterTable.rosterPair.rosters[0].cursor = -1;
         }
         entryCount = gBudgetDisplayBlock->entryCount;
         xglFontSetAlphaScale(gBudgetDisplayBlock->fontAlpha[0]);
@@ -370,7 +362,7 @@ void budgetDisplayDrawPage(void) {
         if (inactiveRows > 0) {
             xglFontQueueBarBlue(28936, ((gBudgetDisplayBlock->activeEntryCount * 768) + 30008) & 0xfff8, inactiveRows * 48);
         }
-        gBattleRosterTable[1] = savedRoster;
+        gBattleRosterTable.rosterPair.rosters[0].cursor = savedCursor;
         xglFontResetState();
     }
 
@@ -414,7 +406,7 @@ void budgetDisplayDrawPage(void) {
                 if (text != 0) {
                     xglFontPrintIndexed(74, rect[1], text);
                 }
-                GameMpeg2Play(gFontEscapeBuffer, "%d", gBudgetDisplayBlock->recordAmount[i]);
+                sprintf(gFontEscapeBuffer, "%d", gBudgetDisplayBlock->recordAmount[i]);
                 xglFontPrintIndexed(400, rect[1], gFontEscapeBuffer);
                 text = messageTextGet(154);
                 xglFontPrintIndexed(417, rect[1], text);
@@ -1248,9 +1240,6 @@ s32 entryLevelsApplyAll(void) {
 u32 func_AA1590(void);
 s32 func_A88B40(void);
 StateBudget *func_A871D8(void);
-u8 battleRosterEntryIdCountGet(s32 rosterIndex);
-u8 battleRosterEntryIdGet(s32 entryIdIndex, s32 rosterIndex);
-s32 battleRosterLinkedEntryIdGet(s32 entryId, s32 index);
 s32 statusHeaderTestFlags(void);
 void sefFlagSetBit26(void);
 void swapWordsSendCommand(s32 frames);

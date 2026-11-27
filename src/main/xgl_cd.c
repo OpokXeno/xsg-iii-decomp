@@ -367,9 +367,6 @@ int queue_next(void)
 int func_0015D3A0(int handle);
 int func_0015D408(int handle);
 void func_00160200(void);
-u32 func_002F7E38(void);
-int func_002E9B60(int descriptor, void *buffer, int bytes);
-int func_002E9920(int descriptor, int offset, int whence);
 
 /* One step of the active asynchronous read. A disc read reports its position and, once the drive
  * (or the device handle, when one is open) is done, unpacks the data and starts the next queued
@@ -396,7 +393,7 @@ void xglCdServiceRead(void)
             func_00160200();
         } else {
             if (xglCdServiceActive == 0) {
-                LW.completion_callback(CD_EVENT_PROGRESS_ASYNC, func_002F7E38(),
+                LW.completion_callback(CD_EVENT_PROGRESS_ASYNC, sceCdGetReadPos(),
                                        LW.callback_argument);
             }
             if (sceCdSync(1) != 0) {
@@ -414,7 +411,7 @@ void xglCdServiceRead(void)
         if (requested_bytes > CD_FILE_CHUNK_BYTES) {
             requested_bytes = CD_FILE_CHUNK_BYTES;
         }
-        transferred = func_002E9B60(LW.active_file_descriptor, LW.write_cursor, requested_bytes);
+        transferred = sceRead(LW.active_file_descriptor, LW.write_cursor, requested_bytes);
         if (transferred < 0) {
             LW.queue_cursor = (LW.queue_cursor + CD_QUEUE_INDEX_MASK) & CD_QUEUE_INDEX_MASK;
             break;
@@ -423,7 +420,7 @@ void xglCdServiceRead(void)
         LW.remaining_bytes -= transferred;
         if (xglCdServiceActive == 0) {
             LW.completion_callback(CD_EVENT_PROGRESS_ASYNC,
-                                   func_002E9920(LW.active_file_descriptor, 0, SCE_SEEK_CUR),
+                                   sceLseek(LW.active_file_descriptor, 0, SCE_SEEK_CUR),
                                    LW.callback_argument);
         }
         if (LW.remaining_bytes > 0) {
@@ -949,7 +946,7 @@ CdFilePosition *xglCdGetFilePos(CdFilePosition *position, const char *name, CdCo
         } else {
             position->lbn = 0;
             position->packed = 0;
-            fileSize = func_002E9920(fileDescriptor, 0, SCE_SEEK_END);
+            fileSize = sceLseek(fileDescriptor, 0, SCE_SEEK_END);
             position->stored_bytes = fileSize;
             if (position->packed == 0) {
                 position->file_size = fileSize;
@@ -1089,7 +1086,7 @@ int xglCdReadFilePart(const char *name, void *transferBuffer, int readOptions,
             }
         } else {
             while (sceCdSync(1) > 0) {
-                notify(CD_EVENT_PROGRESS, func_002F7E38(), xglCdReadTag);
+                notify(CD_EVENT_PROGRESS, sceCdGetReadPos(), xglCdReadTag);
             }
         }
         if (xglCdDeviceHandle != 0) {
@@ -1098,7 +1095,7 @@ int xglCdReadFilePart(const char *name, void *transferBuffer, int readOptions,
                 goto retry_cd;
             }
         } else {
-            result = func_002F8288();
+            result = sceCdGetError();
             if ((unsigned int) result > SCECdErABRT) {
                 notify(CD_EVENT_READ_ERROR, result, xglCdReadTag);
                 goto retry_cd;
@@ -1112,12 +1109,12 @@ int xglCdReadFilePart(const char *name, void *transferBuffer, int readOptions,
         LW.remaining_bytes = position.stored_bytes;
         /* sceLseek takes an int offset: seek from the start in steps of at most CD_SEEK_STEP. */
         seekBytes = (long long) position.lbn << CD_SECTOR_SHIFT;
-        func_002E9920(LW.active_file_descriptor, 0, SCE_SEEK_SET);
+        sceLseek(LW.active_file_descriptor, 0, SCE_SEEK_SET);
         while (seekBytes > CD_SEEK_STEP) {
-            func_002E9920(LW.active_file_descriptor, CD_SEEK_STEP, SCE_SEEK_CUR);
+            sceLseek(LW.active_file_descriptor, CD_SEEK_STEP, SCE_SEEK_CUR);
             seekBytes -= CD_SEEK_STEP;
         }
-        func_002E9920(LW.active_file_descriptor, seekBytes, SCE_SEEK_CUR);
+        sceLseek(LW.active_file_descriptor, seekBytes, SCE_SEEK_CUR);
         if (asynchronous != 0) {
             LW.threadActivity = CD_STATE_ASYNC_READ;
             return position.file_size;
@@ -1127,9 +1124,9 @@ int xglCdReadFilePart(const char *name, void *transferBuffer, int readOptions,
          * a failed read restarts the request. */
         do {
             if (LW.remaining_bytes > CD_FILE_CHUNK_BYTES - 1) {
-                result = func_002E9B60(LW.active_file_descriptor, LW.write_cursor, CD_FILE_CHUNK_BYTES);
+                result = sceRead(LW.active_file_descriptor, LW.write_cursor, CD_FILE_CHUNK_BYTES);
             } else {
-                result = func_002E9B60(LW.active_file_descriptor, LW.write_cursor, LW.remaining_bytes);
+                result = sceRead(LW.active_file_descriptor, LW.write_cursor, LW.remaining_bytes);
             }
             if (result < 0) {
                 LW.threadActivity = CD_STATE_IDLE;
@@ -1489,7 +1486,6 @@ void xglCdArcReset(void)
 }
 
 int sceClose(int descriptor);
-int func_002F8288(void);
 int func_0015D000(int handle, unsigned int lbn, int mode);
 int func_0015CBF0(int handle, int sectors, void *buffer);
 int func_002EC4C8(int size);

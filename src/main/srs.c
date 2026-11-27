@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main/sv_get_image_item_142.h"
+#include "main/xgl_debug_file_004.h"
 
 typedef int s32;
 
@@ -23,18 +24,18 @@ int xglDebFileReadSize(void *fileBuffer, const char *name)
     return -1;
 }
 
-unsigned int func_0030E8E4(const char *text);
+unsigned int strlen(const char *text);
 
 /* Returns the file name stored at +0x14 of a resource, or 0 when the name is empty. */
 char *xglDebFileBufferSize(char *resource) {
     char *name;
 
     name = resource + 0x14;
-    return (func_0030E8E4(name) == 0) ? 0 : name;
+    return (strlen(name) == 0) ? 0 : name;
 }
 
 /* Sprintf-shaped varargs callee; the link name of 0x0030E1B8 (test_050.c declares it the same way). */
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 
 /* Kind-prefix pointer table at 0x004AD6A0 (scaffold data of this TU). */
 extern char *srsEffectKindPrefix[4];
@@ -46,23 +47,23 @@ void srsFormatEffectStem(int effectNo, char *stemBuffer, int withSubNo)
     int effectSub = effectNo & 0x3ff;
 
     if (effectNo < 0) {
-        GameMpeg2Play(stemBuffer, "bad effect no:%d", effectNo);
+        sprintf(stemBuffer, "bad effect no:%d", effectNo);
         return;
     }
     if (effectKind == 3) {
-        GameMpeg2Play(stemBuffer, "%s%04d", srsEffectKindPrefix[3], effectNo & 0x0fffffff);
+        sprintf(stemBuffer, "%s%04d", srsEffectKindPrefix[3], effectNo & 0x0fffffff);
         return;
     }
     if (withSubNo != 0) {
-        GameMpeg2Play(stemBuffer, "%s%03d_%03d", srsEffectKindPrefix[effectKind], effectIndex, effectSub);
+        sprintf(stemBuffer, "%s%03d_%03d", srsEffectKindPrefix[effectKind], effectIndex, effectSub);
         return;
     }
-    GameMpeg2Play(stemBuffer, "%s%03d", srsEffectKindPrefix[effectKind], effectIndex);
+    sprintf(stemBuffer, "%s%03d", srsEffectKindPrefix[effectKind], effectIndex);
 }
 
 s32 sefMakeEffectHandle(s32 kind, s32 index, s32 sub);
 
-s32 func_0030E68C(signed char *text, const signed char *other);
+s32 strcmp(signed char *text, const signed char *other);
 
 extern const signed char gSrsEffectFileExtension[];
 
@@ -79,13 +80,13 @@ s32 srsParseEffectFileName(char *fileName) {
     if (fileName == 0) {
         return 0;
     }
-    fileNameLength = func_0030E8E4(fileName);
+    fileNameLength = strlen(fileName);
     if (fileNameLength == 0) {
         return 0;
     }
     hasDotExtension = fileName[fileNameLength - 4] == '.';
     if (hasDotExtension) {
-        suffixMatches = func_0030E68C(fileName + fileNameLength - 3, gSrsEffectFileExtension) == 0;
+        suffixMatches = strcmp(fileName + fileNameLength - 3, gSrsEffectFileExtension) == 0;
     } else {
         suffixMatches = fileName[fileNameLength - 4] != '_';
     }
@@ -164,8 +165,6 @@ const s8 gSrsAssetFormatNameOnly[16] = "ef\\esp\\%s";
 
 static s8 gSrsAssetNameBuffer[64];
 
-u32 func_00181C18();
-
 s32 xglCdGetFileSize();
 
 char *srsBuildAssetName(char *name, s32 isLoaded)
@@ -176,19 +175,19 @@ char *srsBuildAssetName(char *name, s32 isLoaded)
 
     if (isLoaded != 0) {
         if (name[0] == 'c' && name[1] == 'e' && (nameSixthChar = name[6]) == '9' && (nameSeventhChar = name[7]) == nameSixthChar && name[8] == nameSeventhChar) {
-            position = func_00181C18(0);
-            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatCeRepeatTag, position, (position >> 8) & 0xFFFF, name);
+            position = xglGetLanguageCode(0);
+            sprintf(gSrsAssetNameBuffer, gSrsAssetFormatCeRepeatTag, position, (position >> 8) & 0xFFFF, name);
         } else {
-            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatCdChars, name[0], name[1], name[2], name);
+            sprintf(gSrsAssetNameBuffer, gSrsAssetFormatCdChars, name[0], name[1], name[2], name);
         }
     } else if (name[0] == 'e' && name[1] == 'f') {
-        position = func_00181C18(0);
-        GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatEfPosition, position, (position >> 8) & 0xFFFF, name);
+        position = xglGetLanguageCode(0);
+        sprintf(gSrsAssetNameBuffer, gSrsAssetFormatEfPosition, position, (position >> 8) & 0xFFFF, name);
         if (xglCdGetFileSize(gSrsAssetNameBuffer) < 0) {
-            GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatEfFallback, name);
+            sprintf(gSrsAssetNameBuffer, gSrsAssetFormatEfFallback, name);
         }
     } else {
-        GameMpeg2Play(gSrsAssetNameBuffer, gSrsAssetFormatNameOnly, name);
+        sprintf(gSrsAssetNameBuffer, gSrsAssetFormatNameOnly, name);
     }
     return gSrsAssetNameBuffer;
 }
@@ -376,7 +375,7 @@ extern SvTypeList svResourceTypeLists[];
 
 void srsFormatEffectStem(int effectNo, char *buffer, int flag);
 
-int func_0030EBD0(const char *left, const char *right, unsigned int length);
+int strncmp(const char *left, const char *right, unsigned int length);
 
 /* Finds the entry of a mapper whose name starts with the stem of effectId; *effectTypeKind receives the record's type kind. */
 SvTypeListEntry *svFindEffectEntryByStem(int mapperIndex, int effectId, int *effectTypeKind);
@@ -424,7 +423,7 @@ SvTypeListEntry *svFindEffectEntryByStem(int mapperIndex, int effectId, int *eff
         if (mapperTypeList->entries[mapperEntryIndex].used != 0 &&
             mapperTypeList->entries[mapperEntryIndex].resourceKind == 5 &&
             mapperTypeList->entries[mapperEntryIndex].name != (char *) -1) {
-            if (func_0030EBD0(stem, mapperTypeList->entries[mapperEntryIndex].name, func_0030E8E4(stem)) ==
+            if (strncmp(stem, mapperTypeList->entries[mapperEntryIndex].name, strlen(stem)) ==
                 0) {
                 if (effectTypeKind != 0) {
                     *effectTypeKind = mapperTypeList->typeKind;

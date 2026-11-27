@@ -1,29 +1,18 @@
 #include "common.h"
+#include "main/tu176.h"
 
 extern char *gFontEscapeBuffer;
-void GameMpeg2Play();
-
-typedef int s32;
+void sprintf();
 
 s32 streamSlotLoadFrame(s32 streamSlot);
 
-/* Calls GameMpeg2Play with the slot's file name, mnu\umn\<slot + 1>.jpg, and gFontEscapeBuffer. Returns that buffer address. */
+/* Calls sprintf with the slot's file name, mnu\umn\<slot + 1>.jpg, and gFontEscapeBuffer. Returns that buffer address. */
 s32 streamSlotLoadFrame(s32 streamSlot) {
     char moviePath[15] = "mnu\\umn\\%d.jpg";
 
-    GameMpeg2Play(gFontEscapeBuffer, moviePath, streamSlot + 1);
+    sprintf(gFontEscapeBuffer, moviePath, streamSlot + 1);
     return (s32) gFontEscapeBuffer;
 }
-
-typedef signed char s8;
-
-typedef unsigned char u8;
-
-typedef short s16;
-
-typedef unsigned short u16;
-
-typedef unsigned int u32;
 
 s32 memset(void *dst, s32 value, s32 size);
 s32 xglJpegDecode(void *jpegRequest);
@@ -282,7 +271,6 @@ void streamPlayerShutdown(void) {
 }
 
 s32 saveStateIndexGet(void);
-s32 battleRosterEntryIdCountGet(s32 rosterIndex);
 void pagedTableAppend(void *table, s32 index, s32 value);
 s32 pagedTableGetKeyAt(void *table, s32 index);
 void mcModuleReset(void);
@@ -434,7 +422,7 @@ typedef struct StreamWord {
     s32 channelWord;
 } StreamWord;
 
-void func_00185A20(void);
+void xglFontFlush(void);
 void xglFontSetDigitStep(s32);
 void xglFontSetAlphaScale(s32);
 void xglFontSetColorScale(s32);
@@ -484,7 +472,7 @@ void streamPlayerDraw(void) {
     s32 messageText;
     u16 key;
 
-    func_00185A20();
+    xglFontFlush();
     xglFontSetDigitStep(10);
     xglFontSetAlphaScale(0x80);
     fontQueueSpriteReset();

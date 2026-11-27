@@ -1,6 +1,8 @@
 #include "common.h"
+#include "main/xgl_dma.h"
 #include "shared.h"
 #include "gs.h"
+#include "main/tu178.h"
 /* The DMAC takes scratchpad addresses (0x7000xxxx) as an offset with the SPR flag in bit 31. */
 #define DMA_SPR_ADDRESS_HIGH 0x7000U
 #define DMA_SPR_OFFSET_MASK 0x3fffU
@@ -21,14 +23,13 @@ extern int EIntr(void);
 
 extern void func_002F8C18(void);
 extern void xglMcReset(void);
-extern u8 gXglMcAgedEntries[];
 void *memset(void *destination, int value, unsigned int count);
 
 void xglMcInitial(void)
 {
     func_002F8C18();
     xglMcReset();
-    memset(gXglMcAgedEntries, 0, 0x130b0);
+    memset(&gXglMcAgedEntries, 0, sizeof(gXglMcAgedEntries));
 }
 
 /* Starts a DMA from the IPU output (DMAC channel 3) into memory; count is in quadwords. */
@@ -287,7 +288,6 @@ static inline void setD3_CHCR(u32 chcrValue)
 typedef unsigned int MovieQuadword __attribute__((mode(TI)));
 int sceGsSyncPath(int mode, int timeout);
 int printf(const char *format, ...);
-void xglDmaDirectSrcChain(int channel, void *tag);
 int xglMovieRewind(XglMovieWork *movie);
 
 int xglMoviePlay(XglMovieWork *info)
@@ -352,7 +352,7 @@ int xglMoviePlay(XglMovieWork *info)
                     break;
                 }
             }
-            xglDmaDirectSrcChain(XGL_DMA_CHANNEL_GIF, info->packetAddress[info->activeBuffer]);
+            xglDmaDirectSrcChain(XGL_DMA_CHANNEL_GIF, (u32) info->packetAddress[info->activeBuffer]);
             info->activeBuffer ^= 1;
         }
         sceGsSyncPath(0, 0);

@@ -408,7 +408,7 @@ extern unsigned char D_00531028[];
 
 extern unsigned char moviePathBuffer[];
 
-s32 GameMpeg2Play();
+s32 sprintf();
 
 s32 messageTextGet();
 
@@ -420,7 +420,7 @@ void moviePlayLocalized(s32 movieId, s32 variant) {
 
     firstTextId = messageTextGet(0x17);
     secondTextId = messageTextGet(0x18);
-    GameMpeg2Play(moviePathBuffer, D_00531028, D_00530FE0, movieId, firstTextId, D_00530FF0, variant, secondTextId);
+    sprintf(moviePathBuffer, D_00531028, D_00530FE0, movieId, firstTextId, D_00530FF0, variant, secondTextId);
     func_0026CD38(moviePathBuffer);
 }
 

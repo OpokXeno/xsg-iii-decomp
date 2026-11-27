@@ -1,6 +1,14 @@
 #include "common.h"
+#include "main/sce_libgraph.h"
+#include "main/ee_stdarg.h"
 #include "shared.h"
 #include "main/tu018.h"
+#include "main/sound_driver.h"
+
+/* Sends a sound driver command (0xA0nn0000 group) for a channel with one argument. */
+int func_00180978(int channel, unsigned int command, int argument);
+int func_0018EC68(int channel);
+void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
 
 /* >>> CHUNK se_bank_load */
 
@@ -63,7 +71,7 @@ typedef struct SoundRecordBlock {
     unsigned char unmodeled_05[3];
     unsigned char *driver_work;  /* +0x08: the driver work area D_0089BF00 */
     VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
-    unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | a1 << 16 | a2 << 8 | index */
+    unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | kind << 16 | group << 8 | index */
     SoundChannelState channelStates[SOUND_CHANNEL_COUNT]; /* +0x530: indexed by channel (1..63; 0 unused) */
     SoundSlot soundSlotRecords[4]; /* +0x630 */
 } SoundRecordBlock;
@@ -81,10 +89,10 @@ extern unsigned char gSeBankDirName[];
 /* The range set (row of the range table) of each song number. */
 extern unsigned char soundSongRangeSet[];
 
-/* Assigns the channels of `id` to (id, a1, a2): ids below SOUND_RANGE_IDS use the range between
+/* Assigns the channels of `id` to (id, kind, group): ids below SOUND_RANGE_IDS use the range between
  * their boundary and the next one in the current song's range set, other ids the one channel
  * id & 0xFF. A nonzero `range` (first << 16 | count) gives the range relative to that start. */
-void func_0018E6F0(int id, int a1, int a2, unsigned int range)
+void func_0018E6F0(int id, int kind, int group, unsigned int range)
 {
     unsigned short boundaries[SOUND_RANGE_SET_COUNT][SOUND_RANGE_BOUNDARIES] = {
         { 0x001, 0x013, 0x020, 0x02B, 0x100, 0x118, 0x130, 0x040, 0x042, 0x046, 0x04A, 0x04E,
@@ -110,16 +118,64 @@ void func_0018E6F0(int id, int a1, int a2, unsigned int range)
         last = first + (range & 0xFFFF);
     }
     for (channel = first; channel < last; channel++) {
-        gSoundRecordBlock.channelAssign[channel] = (id << 24) + (a1 << 16) + (a2 << 8) + (channel - first);
+        gSoundRecordBlock.channelAssign[channel] = (id << 24) + (kind << 16) + (group << 8) + (channel - first);
     }
 }
 
-void seBgmLoadDefault(int a0, int a1, int a2)
+void seBgmLoadDefault(int id, int kind, int group)
 {
-    func_0018E6F0(a0, a1, a2, 0);
+    func_0018E6F0(id, kind, group, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018E870);
+/* A sound bank file: the offset of its entry table at +0xA4. The table's first byte is the last
+ * entry index; entry i (4 bytes) holds the offset of its length byte, the group and the kind. */
+typedef union SeBankEntry {
+    struct {
+        unsigned short lengthOffset;
+        unsigned char group;
+        unsigned char flags; /* the kind in the low nibble */
+    };
+    unsigned char lastIndex; /* entry 0: the last entry index */
+} SeBankEntry;
+
+typedef struct SeBankHeader {
+    unsigned char unmodeled_00[0xA4];
+    int entryTableOffset; /* +0xA4 */
+} SeBankHeader;
+
+#define SE_BANK_KIND_MASK 0xF
+
+void func_0017D6E8(int slot, void *bank);
+void func_0017D5A0(int slot, void *bank);
+
+/* Registers a sound bank with the driver and assigns the channel ranges of its entries. */
+void func_0018E870(int slot, void *bank, int numbered)
+{
+    SeBankHeader *header;
+    SeBankEntry *entries;
+    int index;
+    int start;
+    int length;
+
+    if (numbered != 0) {
+        func_0017D6E8(slot, bank);
+    } else {
+        /* kept: this assignment and the one after the join give the original's copy of bank in both branches. */
+        header = bank;
+        func_0017D5A0(slot, bank);
+    }
+    header = bank;
+    entries = (SeBankEntry *) ((unsigned char *) header + header->entryTableOffset);
+    if ((SeBankEntry *) header != entries) {
+        start = 0;
+        for (index = entries->lastIndex + 1; index > 0; index--) {
+            length = ((unsigned char *) entries)[entries[index].lengthOffset] + 1;
+            func_0018E6F0(slot, entries[index].flags & SE_BANK_KIND_MASK, entries[index].group,
+                          (start << 16) + length);
+            start += length;
+        }
+    }
+}
 
 /* Bank slots that share their channels, as byte pairs (first and last slot of a group); the list ends with a
  * first slot of 0. */
@@ -131,12 +187,10 @@ extern unsigned char soundBankGroups[];
 /* Banks of a list start at 64-byte boundaries after the offset table. */
 #define SOUND_BANK_ALIGN 64
 
-void func_0018E870(int slot, void *bank, int numbered);
-
 /* Registers the bank file at bankAddress in slot id & 0xFF (or only stops the slot when there is none). A single bank
  * goes to that slot; a bank list fills consecutive slots, one per nonempty entry. Without a current song, a slot of a
  * bank group first stops every slot of its group (once per group). */
-void func_0018E940(int a0, void *bankAddress)
+void func_0018E940(int id, void *bankAddress)
 {
     unsigned int *header;
     unsigned int *offset;
@@ -151,7 +205,7 @@ void func_0018E940(int a0, void *bankAddress)
     int first;
     int last;
 
-    slot = a0 & 0xFF;
+    slot = id & 0xFF;
     if (bankAddress == 0) {
         func_0018EC68(slot);
         return;
@@ -159,7 +213,7 @@ void func_0018E940(int a0, void *bankAddress)
     header = bankAddress;
     if (header[0] == SOUND_BANK_SINGLE_MAGIC) {
         func_0018EC68(slot);
-        func_0018E870(slot, bankAddress, a0 <= SOUND_RANGE_IDS);
+        func_0018E870(slot, bankAddress, id <= SOUND_RANGE_IDS);
         return;
     }
     tableBytes = header[0];
@@ -199,8 +253,6 @@ void func_0018E940(int a0, void *bankAddress)
 }
 
 void func_001801C0();
-int func_0018EC68(int channel);
-void func_0018E4C0(char *path, const char *dirName, const char *fileName, const char *ext);
 
 void seBankLoadNumbered(s32 id, const char *number) {
     s8 name[0x100];
@@ -217,7 +269,7 @@ INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EBE8);
 void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan);
 extern const char gSeMasterBankPath[];
 int xglCdReadFile(const char *name, void *buffer, int mode, void *notify);
-void func_0018E940(int a0, void *bankAddress);
+void func_0018E940(int id, void *bankAddress);
 void func_00180DD8(unsigned int a0, int a1);
 
 void seLoadMasterBank(void)
@@ -262,8 +314,6 @@ void seVoiceStartDefault(unsigned int voice)
     seVoiceStart(voice, 127, 0xffff);
 }
 
-s32 func_0018F1D0();
-
 void soundDriverCheckStatus(s32 driverStatus) {
     if (driverStatus < 0) {
         func_0018F1D0();
@@ -292,12 +342,32 @@ s32 seVoiceStartDriver(s32 voice) {
     return func_0018EDD8(voice, 0x7F, 0xFFFF);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F098);
+void soundVoiceVolumeReset(s32 voiceIndex);
+
+/* Resets the voice volume of every channel `id` occupies. */
+void func_0018F098(int id)
+{
+    int channel;
+
+    if (id > 0) {
+        if (id < SOUND_RANGE_IDS) {
+            for (channel = 1; channel < SOUND_CHANNEL_COUNT; channel++) {
+                if (gSoundRecordBlock.channelStates[channel].bytes.counter == id) {
+                    soundVoiceVolumeReset(channel);
+                }
+            }
+        } else {
+            /* kept: the do-while(0) block keeps this call a jal (no tail call), as in the original. */
+            do {
+                soundVoiceVolumeReset(id & 0xFF);
+            } while (0);
+        }
+    }
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F118);
 
 void soundDriverSetOutputMode(s32 outputSelect) {
-    extern s32 func_00180978();
     if (outputSelect != 0) {
         func_00180978(0, 0xA0000500, 0);
         return;
@@ -305,7 +375,16 @@ void soundDriverSetOutputMode(s32 outputSelect) {
     func_00180978(outputSelect, 0xA0000600, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018F1D0);
+/* Sends driver command 0xA0000100 and clears the channel states. */
+void func_0018F1D0(void)
+{
+    int channel;
+
+    func_00180978(0, 0xA0000100, 0);
+    for (channel = 1; channel < SOUND_CHANNEL_COUNT; channel++) {
+        gSoundRecordBlock.channelStates[channel].word = 0;
+    }
+}
 
 /* <<< CHUNK se_bank_load */
 
@@ -364,10 +443,7 @@ void soundSlotStartNumbered(s32 soundSlotNumber, const char *fileNumber) {
     soundSlotStartFile(soundSlotNumber, fileKey);
 }
 
-/* The EE va_start spelling (as in the other variadic definitions of this tree); every
- * variadic argument takes one 8-byte slot. */
-typedef char *va_list;
-#define va_start(ap, last) ((ap) = (va_list)__builtin_next_arg(last) - (8 - __builtin_args_info(2)) * 8)
+/* Every variadic argument takes one 8-byte slot (main/ee_stdarg.h). */
 #define VA_SLOT_SIZE 8
 
 /* The pool the playlist's file keys are written to, one after another (the driver keeps
@@ -661,7 +737,6 @@ void soundSlotStartKey(int soundSlotNumber, const char *fileKey)
 s32 func_0016A3F8(s32);
 
 void soundDriverSetStreamMode(s32 streamEnable) {
-    extern s32 func_00180978(s32, s32, s32);
     if (streamEnable != 0) {
         func_0016A3F8(0);
         func_00180978(0, 0xA0000800, 0);
@@ -867,11 +942,9 @@ typedef struct SoundIopSetup {
 #define SOUND_SONG_NONE 0xFF
 /* The slot records of the record block. */
 #define SOUND_SLOT_RECORDS 4
-#define SOUND_CHANNEL_STATES (SOUND_CHANNEL_COUNT - 1) /* channels 1..63 */
 extern unsigned char D_0089BF00[];
 void func_00166B30(int value);
 void func_0015F8C8(int value);
-int sceGsSyncVCallback(int (*callback)(void));
 void func_0015DD88(void);
 void func_0017CE40(SoundIopSetup *setup);
 void func_0017D020(void);

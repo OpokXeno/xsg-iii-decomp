@@ -112,12 +112,12 @@ INCLUDE_ASM("asm/nonmatchings/ov02/tu065", func_00A9DFB0);
 
 extern s32 gMoviePlayFormat;
 extern s32 gMoviePlayBuffer;
-s32 GameMpeg2Play(s32 *destination, s32 *format, s32 trackNumber);
+s32 sprintf(s32 *destination, s32 *format, s32 trackNumber);
 s32 soundSlotStartNumbered(s32 soundSlotNumber, s32 *buffer);
 
 void soundPlayMovieTrack(s32 *trackNumber) {
     if (trackNumber != 0) {
-        GameMpeg2Play(&gMoviePlayBuffer, &gMoviePlayFormat, *trackNumber);
+        sprintf(&gMoviePlayBuffer, &gMoviePlayFormat, *trackNumber);
         soundSlotStartNumbered(1, &gMoviePlayBuffer);
     }
 }

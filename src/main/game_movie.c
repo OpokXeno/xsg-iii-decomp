@@ -1,5 +1,6 @@
 #include "common.h"
 #include "shared.h"
+#include "main/xgl_debug_file_004.h"
 
 char *caption_nextline(char *cursor);
 struct XglPacket;
@@ -387,7 +388,7 @@ void GameSynopsisDrawPanel(GameSynopsisPanel *panel, int x, int y, int alpha)
     sceVif1PkAddDataN(packet, &gameSynopsisPanelRectPacket, 44);
 }
 
-extern u16 movieBackdropBasePage[];
+extern XglRenderStateBlock D_004C8390;
 
 
 
@@ -405,7 +406,7 @@ void DrawBack(int alpha)
     nonnegative_alpha = alpha < 0 ? 0 : alpha;
     gs_frame_address_bits = 0xc800;
     movieBackdropPacket.doublewords[6] =
-        (0x24120000 | (movieBackdropBasePage[0] << 5)) |
+        (0x24120000 | (D_004C8390.work_buffer_base << 5)) |
         (gs_frame_address_bits << 0x13);
     movieBackdropPacket.doublewords[8] = (nonnegative_alpha << 32) | 100;
     FlushCache(0);
@@ -425,12 +426,11 @@ INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B41E8);
 INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B43C8);
 
 extern unsigned char movieCdReadBuffer[];
-s32 func_00181C18();
 s32 func_001B43C8();
 s32 xglCdReadFile();
 
 void movieCdLoadAndStart(s32 location, s32 mode) {
-    func_00181C18(movieCdReadBuffer);
+    xglGetLanguageCode(movieCdReadBuffer);
     xglCdReadFile(movieCdReadBuffer - 4, location, 0, 0);
     func_001B43C8(location, mode);
 }
@@ -503,7 +503,7 @@ INCLUDE_ASM("asm/main/nonmatchings/game_movie", func_001B5618);
 extern GameSynopsisWaitState synopsisCrossfadeState;
 extern const char synopsisAlphaLabelFormat[];
 extern PadRecord PadData[2];
-int GameMpeg2Play(char *destination, const char *format, ...);
+int sprintf(char *destination, const char *format, ...);
 void seVoiceStartDefault(unsigned int handle);
 void sefFlagSetBit26(void);
 
@@ -524,9 +524,9 @@ int GameSynopsisCrossfadeWait(void)
         if (alpha > 128) {
             alpha = 128;
         }
-        GameMpeg2Play(labelBuffer, synopsisAlphaLabelFormat, 128 - alpha);
+        sprintf(labelBuffer, synopsisAlphaLabelFormat, 128 - alpha);
         moviePrintLabelValue(labelBuffer, synopsisCrossfadeState.crossfadeOutValue);
-        GameMpeg2Play(labelBuffer, synopsisAlphaLabelFormat, alpha);
+        sprintf(labelBuffer, synopsisAlphaLabelFormat, alpha);
         moviePrintLabelValue(labelBuffer, synopsisCrossfadeState.crossfadeInValue);
         if ((PadData[0].heldAndPressed & 0x800010c) == 0x800010c) {
             sefFlagSetBit26();

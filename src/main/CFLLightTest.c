@@ -22,7 +22,7 @@ typedef struct MovieSlotPlayback {
     u8 unk_58[0x38];
     unsigned int stateFlags; /* +0x90: bit 0x1000 is set on slot 1 */
     u8 unk_94[0x45C];
-    float frameTime; /* +0x4F0: converted to int for GameMpeg2Play */
+    float frameTime; /* +0x4F0: converted to int for sprintf */
     u8 unk_4F4[0x20];
     MovieSlotCycle *cycle; /* +0x514 */
 } MovieSlotPlayback;
@@ -277,7 +277,7 @@ void cflLightTestViewLoadAll(CflLightTestView **viewerSlot, char *fileName, char
     }
 }
 
-s32 GameMpeg2Play();
+s32 sprintf();
 
 void XenoActorSetMode(void *actor, s32 mode);
 
@@ -289,7 +289,7 @@ void cflLightTestViewReloadXap(CflLightTestView **viewerSlot, char *fileName) {
 
     extension = func_0030EF98(fileName, ".xap");
     if (extension == 0) {
-        GameMpeg2Play(movieName, ".xap\244\307\244\317\244\242\244\352\244\336\244\273\244\363");
+        sprintf(movieName, ".xap\244\307\244\317\244\242\244\352\244\336\244\273\244\363");
         cflLightTestSetMessage(movieName);
         return;
     }
@@ -391,7 +391,7 @@ s32 movieFileRequest(const char *fileName)
 typedef struct MovieSlotEntry {
     char fileName[0x20];      /* +0x00 */
     MovieSlotPlayback *actor; /* +0x20 */
-    s32 id;                   /* +0x24: third GameMpeg2Play argument */
+    s32 id;                   /* +0x24: third sprintf argument */
     s32 playMode;             /* +0x28 */
 } MovieSlotEntry;
 
@@ -439,7 +439,7 @@ void moviePlaybackStartSwapIds(void) {
 /* One movie slot as the slot functions see it; the entries are 0x2C bytes each. */
 typedef struct MovieSlotView {
     MovieSlotPlayback *playback; /* +0x00 */
-    char *messageText;           /* +0x04: third GameMpeg2Play argument */
+    char *messageText;           /* +0x04: third sprintf argument */
     s32 frameIndex;              /* +0x08 */
     char nextFileName[0x20];     /* +0x0C: file name of the following slot */
 } MovieSlotView;
@@ -485,7 +485,7 @@ void moviePlaybackDrawInfo(s32 x, s32 y) {
     char infoText[0x40];
 
     if (gMovieSlotTable.movieSlots[gMovieSlotIndex].actor != 0 && gMovieSlotTable.movieSlots[gMovieSlotIndex].actor->cycle != 0) {
-        GameMpeg2Play(infoText, "ID %3d -> NEXT %3d / %3d", gMovieSlotTable.movieSlots[gMovieSlotIndex].id,
+        sprintf(infoText, "ID %3d -> NEXT %3d / %3d", gMovieSlotTable.movieSlots[gMovieSlotIndex].id,
                       gMovieSlotTable.movieSlots[gMovieSlotIndex].playMode,
                       gMovieSlotTable.movieSlots[gMovieSlotIndex].actor->cycle->frameCount - 1);
         xglFontPrint(x + 0x82, y, 0xFFFFFF, "$bg3;$prop1;$han1;$xx0,36;$xx1,8;$xx2,0;$col707070;");
@@ -501,9 +501,9 @@ void movieTextWindowInit(const char *text);
 
 s32 movieFileRequest(const char *fileName);
 
-s32 func_0030E68C();
+s32 strcmp();
 
-s32 func_0030E8E4();
+s32 strlen();
 
 
 s32 memset();
@@ -517,13 +517,13 @@ void movieFileLoadNext(void) {
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInit(gMovieMessageText);
     if (movieFileRequest(gMovieSourceFileName) == 1) {
-        if (func_0030E68C(gMovieFileNameStorage, "")) {
+        if (strcmp(gMovieFileNameStorage, "")) {
             char *scanStart = gMovieSourceFileName - 1;
             char *baseNameStart;
 
-            GameMpeg2Play(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
+            sprintf(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
             strcpy(gMovieSourceFileName, gMovieFileNameStorage);
-            baseNameStart = scanStart + func_0030E8E4(gMovieSourceFileName);
+            baseNameStart = scanStart + strlen(gMovieSourceFileName);
             while (baseNameStart != gMovieSourceFileName) {
                 if (*baseNameStart == '/') {
                     baseNameStart++;
@@ -549,8 +549,8 @@ void movieDecodeToFixed(void) {
 
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInit(gMovieMessageText);
-    if ((movieFileRequest(gMovieSourceFileName) == 1) && (func_0030E68C(gMovieFileNameStorage, "") != 0)) {
-        GameMpeg2Play(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
+    if ((movieFileRequest(gMovieSourceFileName) == 1) && (strcmp(gMovieFileNameStorage, "") != 0)) {
+        sprintf(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
         cflLightTestViewLoadPxyTxy(&gMovieFixedSlot, formattedMessage);
     }
 }
@@ -562,8 +562,8 @@ void movieDecodeToSlot(void) {
 
     memset(formattedMessage, 0, 0x100);
     movieTextWindowInit(gMovieMessageText);
-    if ((movieFileRequest(gMovieSourceFileName) == 1) && (func_0030E68C(gMovieFileNameStorage, "") != 0)) {
-        GameMpeg2Play(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
+    if ((movieFileRequest(gMovieSourceFileName) == 1) && (strcmp(gMovieFileNameStorage, "") != 0)) {
+        sprintf(formattedMessage, "%s%s", gMovieMessageText, gMovieFileNameStorage);
         cflLightTestViewReloadXap(&gMovieSlotTable.movieSlots[gMovieSlotIndex].actor, formattedMessage);
     }
 }
@@ -593,17 +593,17 @@ void moviePlaybackDrawText(s32 x, s32 y) {
     char infoText[0x40];
     MovieSlotPlayback *actor = gMovieSlotTable.movieSlots[gMovieSlotIndex].actor;
 
-    if (func_0030E68C(gMovieSlotTable.movieSlots[gMovieSlotIndex].fileName, "")) {
-        GameMpeg2Play(infoText, "ID %3d Name %s", gMovieSlotIndex,
+    if (strcmp(gMovieSlotTable.movieSlots[gMovieSlotIndex].fileName, "")) {
+        sprintf(infoText, "ID %3d Name %s", gMovieSlotIndex,
                       gMovieSlotTable.movieSlots[gMovieSlotIndex].fileName);
     } else {
-        GameMpeg2Play(infoText, "ID %3d Empty", gMovieSlotIndex);
+        sprintf(infoText, "ID %3d Empty", gMovieSlotIndex);
     }
     xglFontPrint(x + 130, y, 0xFFFFFF, "$bg3;$prop1;$han1;$xx0,36;$xx1,8;$xx2,0;$col707070;");
     xglFontPrintDirect(infoText);
     if (actor != 0) {
         xglFontPrint(330, 380, 0xFFFFFF, "$bg3;$prop1;$han1;$xx0,36;$xx1,8;$xx2,0;$col707070;");
-        GameMpeg2Play(infoText, "FRAME %4d\n", (s32) actor->frameTime);
+        sprintf(infoText, "FRAME %4d\n", (s32) actor->frameTime);
         xglFontPrintDirect(infoText);
     }
 }

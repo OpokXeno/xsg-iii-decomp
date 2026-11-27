@@ -41,13 +41,7 @@ void nmlPacketGsInit(void);
 void xglDirectQueueSubmitRef(void);
 void xglVectorMulMat(Vector4 *dst, Matrix4 matrix, const Vector4 *src);
 
-typedef union XglDirectQueueEntry {
-    struct {
-        u64 registerValue;
-        u64 registerAddress;
-    };
-    u32 tagAndHeaderWords[4];
-} XglDirectQueueEntry;
+#include "main/xgl_direct_queue.h"
 
 extern XglDirectQueueEntry *xglDirectQueueBuffer;
 

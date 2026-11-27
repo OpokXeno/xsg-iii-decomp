@@ -49,7 +49,7 @@ typedef struct QueueBufferView {
 void nmlPacketGsInit(void);
 void xglDirectQueueSubmitRef(void);
 extern u16 gFontClutBase[];
-void func_001997D0(void);
+void xglPacketTextureTrans(void);
 
 /* Queues the bind of the font texture (TEX0 with the font CLUT, then TEX1), then submits the packet. */
 void xglFontQueueTextureBind(u8 *fontBuffer) {
@@ -57,7 +57,7 @@ void xglFontQueueTextureBind(u8 *fontBuffer) {
     QueueRecord *queueWriteStart;
 
     if (fontBuffer != 0) {
-        func_001997D0();
+        xglPacketTextureTrans();
         nmlPacketGsInit();
         queueWriteStart = cursor = &xglDirectQueueBuffer[xglDirectQueueCount];
         cursor->registerAddress = GS_TEXFLUSH;
@@ -89,13 +89,13 @@ void xglFontQueueTextureFlush(void) {
     xglDirectQueueSubmitRef();
 }
 
-s32 func_00185A20();
+s32 xglFontFlush();
 s32 fontQueueDepthTest(s32);
 s32 xglFontColorIndexAdd(s32);
 void xglFontFreeBuffer();
 
 void xglFontResetState(void) {
-    func_00185A20();
+    xglFontFlush();
     xglFontFreeBuffer();
     fontQueueDepthTest(0);
     xglFontColorIndexAdd(2);

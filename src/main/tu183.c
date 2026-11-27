@@ -1,9 +1,7 @@
 #include "common.h"
+#include "main/tu176.h"
 #include "main/tu183.h"
 #include "main/sound_driver.h"
-
-typedef int s32;
-typedef signed char s8;
 
 /* Voice record at SaveLoadMenu +0x720 (alpha at +0xAC). */
 typedef struct SeVoice {
@@ -32,7 +30,6 @@ s32 pagedTablePoolInit();
 s32 memset(void *dst, s32 value, s32 size);
 s32 xglClockReadBcd();
 s32 xglPadSetRepeat(s32, s32, s32, s32);
-u8 battleRosterEntryIdCountGet(s32 index);
 void *func_00226F18(s32 mode);
 
 /* Seeds the random generator from the clock and, when roster 0 has entries, allocates and clears the 0x10E0-byte
@@ -77,7 +74,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00227A38);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00227B60);
 
-s32 GameMpeg2Play(s32, s32, s32);
+s32 sprintf(s32, s32, s32);
 s32 messageTextGet(s32);
 s32 sheetSetIndex(s32);
 
@@ -87,7 +84,7 @@ void movieStartPlayback(s32 movieId, s32 audioTrack) {
 
     videoStream = messageTextGet(0xF3);
     audioStream = messageTextGet(audioTrack + 0x7B);
-    GameMpeg2Play(movieId, videoStream, audioStream);
+    sprintf(movieId, videoStream, audioStream);
     sheetSetIndex(0);
     sheetSetIndex(movieId);
 }
