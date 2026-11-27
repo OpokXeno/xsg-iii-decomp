@@ -82,17 +82,6 @@ typedef struct SoundCueRecord {
     } u;
 } SoundCueRecord;
 
-/* One word of the voice table (gSoundRecordBlock +0x530), as bytes or as a whole. */
-typedef union SoundVoiceWord {
-    s32 word;
-    struct {
-        u8 soundNumber;
-        u8 voiceHandleByte;
-        u8 volume;
-        u8 pan;
-    } voiceByteView;
-} SoundVoiceWord;
-
 /* A voice saved by soundCueSnapshotSave: the voice table word with the handle byte replaced. */
 typedef struct SavedVoice {
     u8 soundNumber;
@@ -368,17 +357,6 @@ void soundCueVoiceSync(SoundCueRecord *cueRecord, int voicePreStarted, int volum
     }
 }
 
-/* The voice table of the sound block: one SoundVoiceWord per voice, from +0x530. The cue code
- * indexes it with a handle byte. */
-typedef struct SoundVoiceView {
-    u8 unmodeled_00[0x530];
-    SoundVoiceWord voices[64];
-} SoundVoiceView;
-
-extern SoundVoiceView gSoundRecordBlock;
-
-#define gSoundVoices (gSoundRecordBlock.voices)
-
 /* The game loop runtime block: its flag word at +0x00 (bit 0x100 lets the positional cues run). */
 typedef struct GameLoopFlagsView {
     s32 loopFlagBits;
@@ -403,7 +381,7 @@ void soundCueUpdate() {
     soundCueListenerUpdate();
     {
         unsigned short ambientHandle = gSoundCue.cues.ambientHandle;
-        if (ambientHandle != 0 && gSoundVoices[ambientHandle & 0xff].voiceByteView.soundNumber == 0) {
+        if (ambientHandle != 0 && gSoundRecordBlock.channelStates[ambientHandle & 0xff].bytes.counter == 0) {
             gSoundCue.cues.ambientHandle = 0;
         }
     }
@@ -415,14 +393,14 @@ void soundCueUpdate() {
         cueKind = cueRecord->kind;
         switch (cueKind) {
         case SOUND_CUE_TRACK: {
-            if (cueRecord->voiceHandle == 0 || gSoundVoices[(cueRecord->voiceHandle & 0xff)].voiceByteView.soundNumber == 0) {
+            if (cueRecord->voiceHandle == 0 || gSoundRecordBlock.channelStates[(cueRecord->voiceHandle & 0xff)].bytes.counter == 0) {
                 cueRecord->kind = SOUND_CUE_FREE;
                 gSoundCue.cues.ambientHandle = 0;
                 gSoundCue.cues.ambientSoundNumber = 0;
             } else {
                 if (gSoundCue.cues.ambientHandle != cueRecord->voiceHandle) {
                     if (gSoundCue.cues.ambientHandle != 0 &&
-                        cueRecord->u.zone.soundNumber != gSoundVoices[(gSoundCue.cues.ambientHandle & 0xff)].voiceByteView.soundNumber) {
+                        cueRecord->u.zone.soundNumber != gSoundRecordBlock.channelStates[(gSoundCue.cues.ambientHandle & 0xff)].bytes.counter) {
                         soundCueAmbientFadeOut();
                     }
                     gSoundCue.cues.ambientHandle = cueRecord->voiceHandle;
@@ -435,7 +413,7 @@ void soundCueUpdate() {
         }
         case SOUND_CUE_VOLUME_FADE:
         case SOUND_CUE_PAN_FADE:
-            if (gSoundVoices[(cueRecord->voiceHandle & 0xff)].voiceByteView.soundNumber == 0) {
+            if (gSoundRecordBlock.channelStates[(cueRecord->voiceHandle & 0xff)].bytes.counter == 0) {
                 cueRecord->kind = SOUND_CUE_FREE;
                 break;
             }
@@ -468,7 +446,7 @@ void soundCueUpdate() {
             int volume;
             int pan;
             float distance;
-            if (cueRecord->u.positional.voicePreStarted != 0 && gSoundVoices[(cueRecord->voiceHandle & 0xff)].word == 0) {
+            if (cueRecord->u.positional.voicePreStarted != 0 && gSoundRecordBlock.channelStates[(cueRecord->voiceHandle & 0xff)].word == 0) {
                 cueRecord->kind = SOUND_CUE_FREE;
                 break;
             }
@@ -495,7 +473,7 @@ void soundCueUpdate() {
             int volume;
             int pan;
             float nearestDistance;
-            if (cueRecord->u.positional.voicePreStarted != 0 && gSoundVoices[(cueRecord->voiceHandle & 0xff)].word == 0) {
+            if (cueRecord->u.positional.voicePreStarted != 0 && gSoundRecordBlock.channelStates[(cueRecord->voiceHandle & 0xff)].word == 0) {
                 cueRecord->kind = SOUND_CUE_FREE;
                 break;
             }
@@ -614,7 +592,7 @@ void soundCueUpdate() {
                 gSoundCue.cues.ambientSoundNumber = cueRecord->u.zone.soundNumber;
                 if (cueRecord->u.zone.zoneFlags & 1) {
                     fadeRecord = soundCueCommand(SOUND_CUE_VOLUME_FADE, ambientVoiceHandle);
-                    fadeRecord->u.fade.startVolume = gSoundVoices[ambientVoiceHandle & 0xff].voiceByteView.volume;
+                    fadeRecord->u.fade.startVolume = gSoundRecordBlock.channelStates[ambientVoiceHandle & 0xff].bytes.volume;
                     fadeRecord->u.fade.endVolume = cueRecord->u.zone.voiceLevel;
                     fadeRecord->u.fade.fadeTick = 0;
                     fadeRecord->u.fade.durationTicks = 10;
@@ -660,7 +638,7 @@ void soundCueSnapshotSave(void) {
         case SOUND_CUE_LINE_SOURCE: {
             /* kept: the char read of the handle byte is reloaded after the word store */
             *(s32 *) &gSoundCue.cues.savedVoices.halfAlignedVoices[savedCount] =
-                gSoundVoices[*(unsigned char *) &cueList->cueRecords[i].voiceHandle].word;
+                gSoundRecordBlock.channelStates[*(unsigned char *) &cueList->cueRecords[i].voiceHandle].word;
             gSoundCue.cues.savedVoices.halfAlignedVoices[savedCount].voiceHandleByte = cueList->cueRecords[i].voiceHandle;
             savedCount++;
         } break;

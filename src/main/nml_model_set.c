@@ -262,7 +262,8 @@ typedef struct PxyModelRenderState {
     u8 unk6B8[4];
     u32 entryGroupMask; /* +0x6bc: one bit per entry group */
     int entryCount; /* +0x6c0 */
-    u8 unk6C4[0x6D4 - 0x6C4];
+    int frameCopyRequest; /* +0x6c4: set by pxyWorkFlag2F74Set, cleared by nmlModelConstruct */
+    u8 unk6C8[0x6D4 - 0x6C8];
     int flushDoneFlag; /* +0x6d4: set once the frame's flush ran; the direct sends are dropped */
     int opaqueEntryCursor; /* +0x6d8 */
     int translucentEntryCursor; /* +0x6dc */
@@ -3634,10 +3635,8 @@ f32 pxyWorkFloat2F94Get(void) {
     return D_008C2F94[0];
 }
 
-extern s32 D_008C2F74[];
-
 void pxyWorkFlag2F74Set(void) {
-    D_008C2F74[0] = 1;
+    pxyState.frameCopyRequest = 1;
 }
 
 void func_001AA828(XglPacket *packet);
@@ -3661,7 +3660,7 @@ void nmlModelConstruct(void)
     pxyInitTables();
     pxyResetBatchTables();
     CONSTRUCT_CIRCLR_SHADOW();
-    D_008C2F74[0] = 0;
+    pxyState.frameCopyRequest = 0;
     D_004C8390.finalPacketCallbacks[RENDER_CALLBACK_PXY_FRAME_COPY] = func_001AA828;
     D_004C8390.finalPacketCallbacks[RENDER_CALLBACK_PXY_ENTRY_GROUP] = pxyPlayEntryGroupFive;
 }

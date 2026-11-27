@@ -2853,16 +2853,10 @@ unsigned char xglFontLoad(int fontIndex, CdCompletionCallback *notify)
     if (fontIndex < 0) {
         return previousFont;
     }
-    /* kept: the same statements in both branches; GCC merges them, and the original's store and register
-     * choice come out only with this branch before the notify test (one copy before it differs). */
+    xglFontState.font_selection = fontIndex;
     if (notify != CD_NOTIFY_CURRENT) {
-        xglFontState.font_selection = fontIndex;
         readMode = CD_READ_ASYNC;
     } else {
-        xglFontState.font_selection = fontIndex;
-        readMode = CD_READ_ASYNC;
-    }
-    if (notify == CD_NOTIFY_CURRENT) {
         readMode = 0;
         notify = CD_NOTIFY_DUMMY;
     }
