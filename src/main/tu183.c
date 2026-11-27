@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main/tu183.h"
+#include "main/sound_driver.h"
 
 typedef int s32;
 typedef signed char s8;
@@ -33,9 +34,11 @@ s32 xglClockReadBcd();
 s32 xglPadSetRepeat(s32, s32, s32, s32);
 u8 battleRosterEntryIdCountGet(s32 index);
 void *func_00226F18(s32 mode);
-void *seVoiceStartDefault(s32 id);
 
-s32 seEngineAllocate(void) {
+/* Seeds the random generator from the clock and, when roster 0 has entries, allocates and clears the 0x10E0-byte
+ * save/load menu block. Returns 1 on success, 0 when roster 0 is empty. seStartEngine passes its start options,
+ * which are not read. */
+s32 seEngineAllocate(s32 startOptions) {
     u8 clockBcd[0x10];
     SaveLoadMenu *saveLoadMenu;
     s32 soundTableRecords;
@@ -168,9 +171,11 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_0022F498);
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_0022F910);
 
 s32 func_0021E390(s32, s32, void *, s32);
+/* Not main/tu162.h: its xglFontSetAlphaScale(s8) makes every caller here sign-extend the alpha byte. */
+void xglFontSetAlphaScale(s32 scale);
+void fontQueueSpriteBlack(void);
 
 void seVoiceDrawAlpha(s32 rawAlpha) {
-    extern s32 xglFontSetAlphaScale(s32);
     s32 fontAlpha;
     SeVoice *voice;
 
@@ -186,26 +191,25 @@ s32 func_002D3D38();
 s32 releaseStateBuffers();
 s32 soundFlagAIsSet();
 
-void *seVoiceRestart(void) {
+void seVoiceRestart(void) {
     func_002D3D38();
     gSaveLoadMenuStorage->voiceControlBits |= 2;
-    if (soundFlagAIsSet() != 0) {
-        gSaveLoadMenuStorage->voiceControlBits &= 0xFFFB;
-        releaseStateBuffers();
-        if (getStatusHeader()->headerFlags & 0x10) {
-            gSaveLoadMenuStorage->startPending = 1;
-            return seVoiceStartDefault(7);
-        }
-        return func_00226F18(0);
+    if (soundFlagAIsSet() == 0) {
+        return;
     }
-    return gSaveLoadMenuStorage;
+    gSaveLoadMenuStorage->voiceControlBits &= 0xFFFB;
+    releaseStateBuffers();
+    if (getStatusHeader()->headerFlags & 0x10) {
+        gSaveLoadMenuStorage->startPending = 1;
+        seVoiceStartDefault(7);
+        return;
+    }
+    func_00226F18(0);
 }
 
 s32 frameStateUpdate();
 
 void seFontApplyAlpha(s32 rawAlpha) {
-    extern s32 fontQueueSpriteBlack();
-    extern s32 xglFontSetAlphaScale(s32);
     xglFontSetAlphaScale(rawAlpha & 0xFF);
     frameStateUpdate();
     fontQueueSpriteBlack();
@@ -249,8 +253,6 @@ void seVoiceRefreshState(void)
 void func_002CA198();
 
 void seFontApplyFullAlpha(s32 rawAlpha) {
-    extern void fontQueueSpriteBlack();
-    extern void xglFontSetAlphaScale(s32);
     s32 fontAlpha;
 
     fontAlpha = rawAlpha & 0xFF;
@@ -266,7 +268,6 @@ INCLUDE_ASM("asm/main/nonmatchings/tu183", func_0022FE10);
 
 INCLUDE_ASM("asm/main/nonmatchings/tu183", func_00230218);
 
-s32 seEngineAllocate(void);
 extern s8 gSeStartInProgress;
 s32 shardFieldInit(void *block);
 s32 func_00226190(s32);
@@ -275,7 +276,6 @@ s32 func_00230348(s32);
 
 s32 seStartEngine(s32 requested)
 {
-    extern s32 seEngineAllocate();
   s32 sequenceResult;
   s32 startOptions;
   s32 flagBit;
