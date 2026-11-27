@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_font.h"
 
 INCLUDE_ASM("asm/main/nonmatchings/EventViewer", func_002437A0);
 
@@ -48,14 +49,13 @@ INCLUDE_ASM("asm/main/nonmatchings/EventViewer", func_00244C38);
 extern s32 gEventViewerExchangeSuspended;
 extern s32 D_00550C90;
 extern s32 gEventViewerWindowTop;
-s32 func_00185CB0(s32, s32);
 s32 xglCdSetReadyFlag();
 s32 gifStateResetTimings();
 s32 XenoActorPoolInitDefault();
 s32 xglCdServiceIfPending();
 
 void eventViewerReset(void) {
-    func_00185CB0(0, 0);
+    xglFontLoad(0, 0);
     do {
 
     } while (xglCdServiceIfPending() != 0);

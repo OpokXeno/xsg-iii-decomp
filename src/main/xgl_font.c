@@ -1,6 +1,8 @@
 #include "common.h"
 #include "shared.h"
 #include "main/xgl_font.h"
+#include "main/xgl_cd.h"
+#include "main/xgl_debug_file_004.h"
 
 struct XglPacket;
 
@@ -1989,6 +1991,41 @@ void func_00185B68(const unsigned int *colors)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185CB0);
+/* The font texture file name; the language code goes in at +4 and the font digit at +0xB. */
+extern char *xglFontTexturePath;
+#define FONT_PATH_LANGUAGE_OFFSET 4
+#define FONT_PATH_DIGIT_OFFSET 0xB
+
+/* XS2 xglFontLoad: selects font fontIndex and reads its texture (waiting for the read when notify is
+ * CD_NOTIFY_CURRENT, with the dummy callback); a negative index only reports the current font. Returns
+ * the previous selection. */
+unsigned char xglFontLoad(int fontIndex, CdCompletionCallback *notify)
+{
+    unsigned char previousFont;
+    int readMode;
+
+    previousFont = xglFontState.font_selection;
+    if (fontIndex < 0) {
+        return previousFont;
+    }
+    /* kept: the same statements in both branches; GCC merges them, and the original's store and register
+     * choice come out only with this branch before the notify test (one copy before it differs). */
+    if (notify != CD_NOTIFY_CURRENT) {
+        xglFontState.font_selection = fontIndex;
+        readMode = CD_READ_ASYNC;
+    } else {
+        xglFontState.font_selection = fontIndex;
+        readMode = CD_READ_ASYNC;
+    }
+    if (notify == CD_NOTIFY_CURRENT) {
+        readMode = 0;
+        notify = CD_NOTIFY_DUMMY;
+    }
+    xglGetLanguageCode(xglFontTexturePath + FONT_PATH_LANGUAGE_OFFSET);
+    xglFontTexturePath[FONT_PATH_DIGIT_OFFSET] = fontIndex + '0';
+    xglCdReadFile(xglFontTexturePath, xglFontState.texture_buffer, readMode, notify);
+    func_00181FA0();
+    return previousFont;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xgl_font", func_00185D58);

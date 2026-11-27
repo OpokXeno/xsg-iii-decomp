@@ -202,6 +202,7 @@
    "0x00551128": "XenoActorPoolCount",
    "0x00551130": "XenoActorActiveTable",
    "0x00551134": "XenoActorHoldFlag",
+   "0x00551184": "xglFontTexturePath",
    "0x005511a4": "sw",
    "0x005511bc": "intrTimerActive",
    "0x005511c0": "intrTimerStart",

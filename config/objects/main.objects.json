@@ -37589,9 +37589,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00185CB0",
+     "name": "xglFontLoad",
      "size": 164,
-     "splat_name": "func_00185CB0",
+     "splat_name": "xglFontLoad",
      "va": "0x00185cb0",
      "name_basis": "address",
      "provenance": "estimated"

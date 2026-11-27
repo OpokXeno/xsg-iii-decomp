@@ -50,4 +50,21 @@ typedef struct CdFilePosition {
     int file_size;
 } CdFilePosition;
 
+/* A callback gets a third argument: the current read tag from xglCdGetFilePos (lw $6 at
+ * 0x19BA04), the request's argument from the read service. */
+typedef void CdCompletionCallback(int event, int eventValue, int tag);
+
+/* xglCdReadFilePart's callback argument may instead select one: the current global callback,
+ * the dummy or the default one (xglCdReadFile passes its notify argument through as it). */
+#define CD_NOTIFY_CURRENT ((CdCompletionCallback *) 0)
+#define CD_NOTIFY_DUMMY ((CdCompletionCallback *) 1)
+#define CD_NOTIFY_DEFAULT ((CdCompletionCallback *) 2)
+#define CD_READ_ASYNC 1
+#define CD_READ_NO_EXTRACT 2
+#define CD_READ_WHILE_BUSY 4
+
+int xglCdReadFilePart(const char *name, void *transferBuffer, int readOptions,
+                      CdCompletionCallback *notify, int offset, int length);
+int xglCdReadFile(const char *name, void *transferBuffer, int readOptions, CdCompletionCallback *notify);
+
 #endif
