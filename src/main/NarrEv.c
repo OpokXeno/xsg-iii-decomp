@@ -1279,7 +1279,7 @@ extern char *D_00550DF0;
 extern signed char gVsyncsPerFrame;
 void func_001B6AB0(void);
 void xglRenderLockClear(void);
-s32 func_00185CB0(s32, s32);
+s32 xglFontLoad(s32, s32);
 s32 func_0018F7E8(s32);
 void soundWorkSource(s32, s32, s32);
 s32 soundSlotStatus(s32);
@@ -1305,7 +1305,7 @@ void narrEvPlayEpisode(s32 episode) {
     while (xglCdGetServicePending() != 0) {
         xglSleep();
     }
-    func_00185CB0(0, 0);
+    xglFontLoad(0, 0);
     gVsyncsPerFrame = 1;
     soundWorkSize = func_0018F7E8(12);
     gNarrEvEntryOther.pSoundBuf = func_001B6520(soundWorkSize);
@@ -1393,7 +1393,7 @@ void narrEvPlayEpisode(s32 episode) {
     while (xglCdGetServicePending() != 0) {
         xglSleep();
     }
-    func_00185CB0(1, 0);
+    xglFontLoad(1, 0);
     gVsyncsPerFrame = 1;
 }
 

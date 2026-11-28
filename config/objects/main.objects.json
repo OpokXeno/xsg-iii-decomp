@@ -37402,9 +37402,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00183B68",
+     "name": "xglFontCmdRuby",
      "size": 1052,
-     "splat_name": "func_00183B68",
+     "splat_name": "xglFontCmdRuby",
      "va": "0x00183b68",
      "name_basis": "address",
      "provenance": "estimated"
@@ -37447,9 +37447,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00184188",
+     "name": "xglFontFlushSub",
      "size": 1552,
-     "splat_name": "func_00184188",
+     "splat_name": "xglFontFlushSub",
      "va": "0x00184188",
      "name_basis": "address",
      "provenance": "estimated"
@@ -37501,9 +37501,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00184B30",
+     "name": "xglFontFlushCore",
      "size": 3132,
-     "splat_name": "func_00184B30",
+     "splat_name": "xglFontFlushCore",
      "va": "0x00184b30",
      "name_basis": "address",
      "provenance": "estimated"
@@ -37573,18 +37573,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00185CB0",
+     "name": "xglFontLoad",
      "size": 164,
-     "splat_name": "func_00185CB0",
+     "splat_name": "xglFontLoad",
      "va": "0x00185cb0",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_00185D58",
+     "name": "xglFontInitial",
      "size": 140,
-     "splat_name": "func_00185D58",
+     "splat_name": "xglFontInitial",
      "va": "0x00185d58",
      "name_basis": "address",
      "provenance": "estimated"
@@ -44922,9 +44922,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019A558",
+     "name": "xglRenderClearEnvInit",
      "size": 196,
-     "splat_name": "func_0019A558",
+     "splat_name": "xglRenderClearEnvInit",
      "va": "0x0019a558",
      "name_basis": "address",
      "provenance": "estimated"
@@ -47457,9 +47457,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019F778",
+     "name": "pxyAddClipPlanePair",
      "size": 340,
-     "splat_name": "func_0019F778",
+     "splat_name": "pxyAddClipPlanePair",
      "va": "0x0019f778",
      "name_basis": "address",
      "provenance": "estimated"
@@ -47475,9 +47475,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_0019FA20",
+     "name": "pxyInterpolateKeys",
      "size": 260,
-     "splat_name": "func_0019FA20",
+     "splat_name": "pxyInterpolateKeys",
      "va": "0x0019fa20",
      "name_basis": "address",
      "provenance": "estimated"
@@ -47538,9 +47538,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A12A0",
+     "name": "pxyCalcModelBounds",
      "size": 288,
-     "splat_name": "func_001A12A0",
+     "splat_name": "pxyCalcModelBounds",
      "va": "0x001a12a0",
      "name_basis": "address",
      "provenance": "estimated"
@@ -47601,18 +47601,18 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A3D90",
+     "name": "pxyPlayEntryGroup",
      "size": 156,
-     "splat_name": "func_001A3D90",
+     "splat_name": "pxyPlayEntryGroup",
      "va": "0x001a3d90",
      "name_basis": "address",
      "provenance": "estimated"
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001A3E30",
+     "name": "pxyPlayEntryGroupFiltered",
      "size": 220,
-     "splat_name": "func_001A3E30",
+     "splat_name": "pxyPlayEntryGroupFiltered",
      "va": "0x001a3e30",
      "name_basis": "address",
      "provenance": "estimated"
@@ -47889,9 +47889,9 @@
     },
     {
      "binding": "GLOBAL",
-     "name": "func_001AA968",
+     "name": "nmlModelConstruct",
      "size": 104,
-     "splat_name": "func_001AA968",
+     "splat_name": "nmlModelConstruct",
      "va": "0x001aa968",
      "name_basis": "address",
      "provenance": "estimated"

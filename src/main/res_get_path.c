@@ -5,6 +5,7 @@
 #include "main/xgl_render.h"
 #include "main/xgl_cd.h"
 #include "gs.h"
+#include "main/xgl_dma.h"
 #include "main/xgl_debug_file_004.h"
 
 void *memset(void *destination, int value, unsigned int count);
@@ -562,7 +563,6 @@ s32 saveScreenGrantFileStates(void) {
 
 void func_002E7348(void *start, void *end);
 int sceGsSyncPath(int mode, int timeout);
-void xglDmaDirectNormal(unsigned int channel, unsigned int address, unsigned int count);
 int xglJpegEncode(JpegEncodeRequest *request);
 extern XglRenderState sRender;
 extern unsigned long long D_003E6F80[24];

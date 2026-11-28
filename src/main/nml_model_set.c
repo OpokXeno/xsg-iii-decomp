@@ -3,8 +3,10 @@
 #include "main/tu045.h"
 #include "main/tu141.h"
 #include "main/xgl_2.h"
+#include "main/xgl_render.h"
 #include "vu0_macro.h"
 #include "quadword.h"
+#include "main/nml_model_set.h"
 
 typedef int s32;
 
@@ -21,7 +23,6 @@ struct PxyHideMask;
 void *nmlPacketSetAttributeData16N(void *matrices, int count);
 
 void nmlModelDirectSend(int key, void *packetData, int qwc);
-void nmlModelDirectSendFull(int key, void *packetData, int qwc, int sendFlag, int sendState);
 void pxyAbortModel(void);
 struct PxyModelHeader;
 void *memset(void *destination, int value, unsigned int size);
@@ -151,6 +152,28 @@ typedef struct PxyBatchTable {
     PxyBatchTableTail tail; /* +0x2000 */
 } PxyBatchTable;
 
+/* One 16-byte record of the pxy entry table pxyEntryQueue. */
+typedef struct PxyPacketRequest {
+    void *packetData; /* +0x00: the packet data, copied to the attribute buffer when the key is even */
+    unsigned short quadwordCount; /* +0x04: low half of the second argument */
+    unsigned char groupBit; /* +0x06: bit index into pxyEntryGroupMask */
+    unsigned char sendFlag; /* +0x07 */
+    int sendState; /* +0x08 */
+    unsigned char row; /* +0x0C: key / 12 */
+    unsigned char unmodeled_0d[3];
+} PxyPacketRequest;
+
+/* The entry queue fills the block up to flagSearchHeaders (+0x10880). */
+#define PXY_ENTRY_QUEUE_SIZE 3035
+/* The original stops queueing at this count, beyond the end of the queue it reserves (the X2 bound as well). */
+#define PXY_ENTRY_QUEUE_LIMIT 3048
+/* A direct send key: bit 0 keeps the data in place (else it is copied to the packet buffer), key % 12 / 2 is the
+ * entry group and key / 12 the row. */
+#define PXY_SEND_KEY_IN_PLACE 1
+#define PXY_SEND_KEY_ROW 12
+/* Entries of this row go to func_001AD7D8 instead of being referenced. */
+#define PXY_ENTRY_ROW_DIRECT 1
+
 typedef struct PxyModelRenderState {
     XglLightSet light;
     float lightSlotTable[24][4]; /* +0x180 (X2 pxyLightSlotTable) */
@@ -246,9 +269,11 @@ typedef struct PxyModelRenderState {
     int camera; /* +0x6b0: camera being drawn */
     int drawPass; /* +0x6b4: 0 opaque, 1 translucent; selects batchTables */
     u8 unk6B8[4];
-    int entryGroupMask; /* +0x6bc */
+    u32 entryGroupMask; /* +0x6bc: one bit per entry group */
     int entryCount; /* +0x6c0 */
-    u8 unk6C4[0x6D8 - 0x6C4];
+    int frameCopyRequest; /* +0x6c4: set by pxyWorkFlag2F74Set, cleared by nmlModelConstruct */
+    u8 unk6C8[0x6D4 - 0x6C8];
+    int flushDoneFlag; /* +0x6d4: set once the frame's flush ran; the direct sends are dropped */
     int opaqueEntryCursor; /* +0x6d8 */
     int translucentEntryCursor; /* +0x6dc */
     float opaqueEntryUsagePercent; /* +0x6e0 */
@@ -259,7 +284,7 @@ typedef struct PxyModelRenderState {
     int unk6F4;
     u8 unk6F8[8];
     void (*drawCallbacks[16])(int); /* +0x700: registered by func_0019ED68 */
-    Vector4 boundSphere; /* +0x740: pxyBoundSphere, centre and radius */
+    DoublewordVector4 boundSphere; /* +0x740: pxyBoundSphere, centre and radius */
     PxyVector globalFogColor; /* +0x750 */
     AlignedVector4 globalFogParams; /* +0x760 */
     PxyBatch *overlayBatches[32]; /* +0x770: drawn before and after the sorted batches */
@@ -267,7 +292,7 @@ typedef struct PxyModelRenderState {
     u8 unk870[0xA70 - 0x870];
     PxyBatchTable batchTables[2]; /* +0xa70: one per draw pass */
     PxyDrawSlot slots[PXY_SLOT_COUNT]; /* +0x4a90 */
-    u8 unk4AD0[0x10880 - 0x4AD0];
+    PxyPacketRequest entryQueue[PXY_ENTRY_QUEUE_SIZE]; /* +0x4ad0 */
     int flagSearchHeaders[256]; /* +0x10880: headers of the flags-0x10 search, count at +0x5c0; bound from the object extent up to pxyDrawEntryTable at 0x97A980 */
     u8 unk10C80[0x10D50 - 0x10C80];
     PxyDrawEntry drawEntryTable[6656]; /* +0x10d50: opaque entries below 4096, translucent from 4096 */
@@ -793,7 +818,37 @@ void pxyLatchValueB(s32 valueToLatch)
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019ED68);
+/* The draw callback slots of the render state (drawCallbacks). */
+#define PXY_DRAW_CALLBACK_SLOTS 16
+
+/* Registers a draw callback in the first free slot unless it is registered already; nothing happens when
+ * all slots hold other callbacks. */
+void func_0019ED68(void (*callback)(int))
+{
+    int i;
+
+    i = 0;
+    if (gPxyModelRenderStateStorage.drawCallbacks[i] == 0) {
+        gPxyModelRenderStateStorage.drawCallbacks[i] = callback;
+        gPxyModelRenderStateStorage.drawCallbackCount++;
+        return;
+    }
+    /* kept: the backward goto; as a do-while or for loop the index becomes a running pointer, the original
+     * recomputes the slot address from i on every pass. */
+next:
+    if (gPxyModelRenderStateStorage.drawCallbacks[i] == callback) {
+        return;
+    }
+    i++;
+    if (i >= PXY_DRAW_CALLBACK_SLOTS) {
+        return;
+    }
+    if (gPxyModelRenderStateStorage.drawCallbacks[i] != 0) {
+        goto next;
+    }
+    gPxyModelRenderStateStorage.drawCallbacks[i] = callback;
+    gPxyModelRenderStateStorage.drawCallbackCount++;
+}
 
 void pxyEnableFlag400000(s32 enabled) {
     if (enabled != 0) {
@@ -1141,9 +1196,34 @@ s32 pxyWaterReflectionPendingGet(void) {
     return pxyModelFlags[0] & 1;
 }
 
+/* renderStatus bit of a clip plane pair. */
+#define NML_RENDER_CLIP_PLANE_PAIR 0x4000
+/* Clip planes a table holds (PxyPlaneTable, five quadwords reserved). */
+#define PXY_CLIP_PLANES 2
+#define PXY_CLIP_TABLE_QUADWORDS 5
+
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019F678);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019F778);
+/* Adds a clip plane pair unless both rows are zero; the first pair also fills the second entry. */
+void pxyAddClipPlanePair(PxyRowBits *plane, PxyRowBits *angle)
+{
+    if (plane->rowWords[0] != 0 || plane->rowWords[1] != 0 || plane->rowWords[2] != 0 || angle->rowWords[0] != 0
+        || angle->rowWords[1] != 0 || angle->rowWords[2] != 0) {
+        if (pxyState.clipPlanes == 0) {
+            pxyState.clipPlanes = xglPacketReserve(PXY_CLIP_TABLE_QUADWORDS);
+        }
+        if (pxyState.clipPlaneCount < PXY_CLIP_PLANES) {
+            pxyState.clipPlanes->plane[pxyState.clipPlaneCount] = *plane;
+            pxyState.clipPlanes->angle[pxyState.clipPlaneCount] = *angle;
+            if (pxyState.clipPlaneCount == 0) {
+                pxyState.clipPlanes->plane[1] = *plane;
+                pxyState.clipPlanes->angle[1] = *angle;
+            }
+            pxyState.renderStatus |= NML_RENDER_CLIP_PLANE_PAIR;
+            pxyState.clipPlaneCount++;
+        }
+    }
+}
 
 void pxySetClipPlaneMasked(PxyRowBits *plane, PxyRowBits *angle, int maskedPlaneCount, float x, float y, float z, u32 *planeMask) {
     if (plane->rowWords[0] != 0 || plane->rowWords[1] != 0 || plane->rowWords[2] != 0 || angle->rowWords[0] != 0 || angle->rowWords[1] != 0 || angle->rowWords[2] != 0) {
@@ -1167,22 +1247,55 @@ void pxySetClipPlaneMasked(PxyRowBits *plane, PxyRowBits *angle, int maskedPlane
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019FA20);
+float pxyKeyInterpolate(const Vector4 *keyA, const Vector4 *keyB, float time, float blend);
+
+/* A key value with bit 0 set is held (not interpolated) when the weight reaches PXY_KEY_HOLD_WEIGHT. */
+#define PXY_KEY_HOLD_WEIGHT 0.2f
+#define PXY_KEY_HOLD_BIT 1
+
+/* The value of a key track (x time, y value) at time. */
+float pxyInterpolateKeys(int count, Vector4 *keyframes, float time, float weight)
+{
+    int i;
+
+    if (time <= keyframes[0].x) {
+        return keyframes[0].y;
+    }
+    if (time >= keyframes[count - 1].x) {
+        return keyframes[count - 1].y;
+    }
+    if (count == 1) {
+        return keyframes[0].y;
+    }
+    i = 0;
+    while (i < count) {
+        if (time < keyframes[i].x) {
+            break;
+        }
+        i++;
+    }
+    i--;
+    if (i < 0) {
+        return keyframes[0].y;
+    }
+    if (weight >= PXY_KEY_HOLD_WEIGHT) {
+        union {
+            float value;
+            u32 bits;
+        } key;
+
+        key.value = keyframes[i].y;
+        if (key.bits & PXY_KEY_HOLD_BIT) {
+            return keyframes[i].y;
+        }
+    }
+    return pxyKeyInterpolate(&keyframes[i], &keyframes[i + 1], time, 1.0f);
+}
 
 #include "gs.h"
 
-/* The render targets of xgl_render.c's state block (D_004C8390). */
-typedef struct XglRenderTargets {
-    u8 unk00[2];
-    s16 psm;                 /* +0x02 */
-    s16 screenWidth;         /* +0x04 */
-    s16 screenHeight;        /* +0x06 */
-    u16 depthBase;           /* +0x08 */
-    u8 unk0A[0x12 - 0x0A];
-    u16 renderTextureBase;   /* +0x12 */
-} XglRenderTargets;
 
-extern XglRenderTargets D_004C8390;
+extern XglRenderStateBlock D_004C8390;
 
 #define PXY_SHADOW_QUADWORDS 0x36
 
@@ -1397,8 +1510,8 @@ void pxySetupShadowProjector(PxyModelHeader *modelHeader)
         xglMatrixStackInverse();
         xglMatrixStackSave(inverse.rows);
         xglMatrixStackUnit();
-        offset.vector.x -= (D_004C8390.screenWidth - size.vector.x) * 0.5f;
-        offset.vector.y -= (D_004C8390.screenHeight - size.vector.y) * 0.5f;
+        offset.vector.x -= (D_004C8390.frame_width - size.vector.x) * 0.5f;
+        offset.vector.y -= (D_004C8390.frame_height - size.vector.y) * 0.5f;
         xglMatrixStackTrans(&offset.vector);
         xglMatrixStackScale(&scale.vector);
         xglMatrixStackMul(inverse.rows);
@@ -1415,7 +1528,7 @@ void pxySetupShadowProjector(PxyModelHeader *modelHeader)
         shadow->height = 0x40;
         shadow->repeatU = 0;
         shadow->repeatV = 0;
-        shadow->frameBase = D_004C8390.renderTextureBase;
+        shadow->frameBase = D_004C8390.texture_base;
         shadow->scale.vector.x = 64.0f / (zoom * 128.0f);
         shadow->scale.vector.y = 64.0f / (zoom * 128.0f);
         shadow->unk330 = 0;
@@ -1541,7 +1654,34 @@ float pxyCalcFadeMetric(int cameraIndex, const Vector4 *point, float scale) {
     return fadeMetric;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A12A0);
+#define BYTE_OFFSET(base, off) ((u8 *) (base) + (off))
+
+/* The model's bounding sphere in world space: the centre through the draw matrix, the radius
+ * the larger one of the pack and its sub pack, scaled; the shadow heights follow the model's height. */
+void pxyCalcModelBounds(PxyModelHeader *modelHeader)
+{
+    DoublewordVector4 sphere;
+    PxyModelHeader *subPack;
+
+    xglVectorScaleXYZ(&sphere.vector, &pxyState.modelPosition, 1.0f / pxyState.modelScaleMax);
+    if (pxyState.jointMatrices == 0) {
+        QuadwordCopy(&sphere, &modelHeader->sphere);
+    }
+    sphere.vector.w = 1.0f;
+    xglVectorMulMat(&pxyState.modelPosition, pxyState.drawMatrix.rows, &sphere.vector);
+    QuadwordCopy(&sphere, &pxyState.modelPosition);
+    subPack = (PxyModelHeader *) BYTE_OFFSET(modelHeader, modelHeader->subPackOffset);
+    if (subPack->sphere.w < modelHeader->sphere.w) {
+        sphere.vector.w = modelHeader->sphere.w * pxyState.modelScaleMax;
+    } else {
+        sphere.vector.w = subPack->sphere.w * pxyState.modelScaleMax;
+    }
+    pxyState.modelPosition.w = sphere.vector.w;
+    pxyState.boundSphere = sphere;
+    pxyState.shadowHeightLower += pxyState.drawMatrix.rows[3][1];
+    pxyState.shadowHeightUpper += pxyState.drawMatrix.rows[3][1];
+    pxyState.fadeMetric = pxyCalcFadeMetric(0, &pxyState.modelPosition, sphere.vector.w);
+}
 
 void pxyCalcCameraVisibility(void)
 {
@@ -1564,9 +1704,9 @@ void pxyCalcCameraVisibility(void)
                 gPxyModelRenderStateStorage.cameraVisible[i] = 1;
             } else {
                 _ModelCalcClipInitMat1(camera->volume[0].planeSet[0], clipMatrix);
-                visible = _ModelCalcClipMat1(&gPxyModelRenderStateStorage.boundSphere);
+                visible = _ModelCalcClipMat1(&gPxyModelRenderStateStorage.boundSphere.vector);
                 if (visible && (modelHeader->flags & 2)) {
-                    visible = xglCullingPollCheck(camera, &gPxyModelRenderStateStorage.boundSphere) == 0;
+                    visible = xglCullingPollCheck(camera, &gPxyModelRenderStateStorage.boundSphere.vector) == 0;
                 }
                 if ((gPxyModelRenderStateStorage.cameraVisible[i] = visible)) {
                     anyVisible = 1;
@@ -1628,14 +1768,14 @@ void pxyCalcFogFactors(PxyModelHeader *modelHeader)
                 pxyState.cameraFog[i] = 0xA00;
             } else {
                 pxyState.cameraFog[i] =
-                    nmlModelGetFogParaStudio(&pxyState.boundSphere, i) << 4;
+                    nmlModelGetFogParaStudio(&pxyState.boundSphere.vector, i) << 4;
             }
             if (pxyState.geometryFogFactors != 0) {
                 for (j = 0; j < modelHeader->geometryCount; j++) {
                     AlignedVector4 position;
 
                     pxyVectorAddXYZ(&position, (Vector4 *) pxyState.partMatrices[j].rows[3],
-                                    &pxyState.boundSphere);
+                                    &pxyState.boundSphere.vector);
                     ((PxyGeometryFog *) pxyState.geometryFogFactors)[j].camera[i] =
                         nmlModelGetFogParaStudio(&position, i) << 4;
                 }
@@ -1752,7 +1892,6 @@ typedef struct PxySortWork {
 #define PXY_HEADER_AT(header, offset) ((void *)((u8 *)(header) + (offset)))
 
 void func_001A0A10(PxyModelHeader *header);
-void func_001A12A0(PxyModelHeader *header);
 void pxyCalcFogFactors(PxyModelHeader *header);
 void func_001A17F8(PxyModelHeader *header);
 void pxySetupShadowProjector(PxyModelHeader *header);
@@ -1943,7 +2082,7 @@ int pxySubmitModel(PxyModelHeader *modelHeader)
         if (pxyState.slotWriteIndex >= PXY_SLOT_COUNT) {
             pxyState.slotWriteIndex = 0;
         }
-        func_001A12A0(modelHeader);
+        pxyCalcModelBounds(modelHeader);
         pxyCalcCameraVisibility();
         pxyCalcFogFactors(modelHeader);
     }
@@ -2388,9 +2527,48 @@ int pxySubmitModel(PxyModelHeader *modelHeader)
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3638);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3D90);
+void xglPacketAddRefFlagged(void *refDmaBytes, u32 qwc, u32 refControlBits);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3E30);
+/* Sends the queued entries of one group. */
+void pxyPlayEntryGroup(int group)
+{
+    int i;
+    PxyPacketRequest *entry;
+
+    if ((pxyState.entryGroupMask & (1 << group)) != 0) {
+        for (i = 0; i < pxyState.entryCount; i++) {
+            entry = &pxyState.entryQueue[i];
+            if (entry->groupBit == group) {
+                xglPacketAddRefFlagged(entry->packetData, entry->quadwordCount, entry->sendState);
+            }
+        }
+    }
+}
+
+void func_001AD7D8(void *data, unsigned int qwc);
+
+/* Sends the queued entries of one group whose send flag is filter: PXY_ENTRY_ROW_DIRECT entries through
+ * func_001AD7D8, the others by reference. */
+void pxyPlayEntryGroupFiltered(int group, int filter)
+{
+    int i;
+    PxyPacketRequest *entry;
+
+    if ((pxyState.entryGroupMask & (1 << group)) != 0) {
+        for (i = 0; i < pxyState.entryCount; i++) {
+            entry = &pxyState.entryQueue[i];
+            if (entry->groupBit == group) {
+                if (entry->sendFlag == filter) {
+                    if ((signed char) entry->row == PXY_ENTRY_ROW_DIRECT) {
+                        func_001AD7D8(entry->packetData, entry->quadwordCount);
+                    } else {
+                        xglPacketAddRefFlagged(entry->packetData, entry->quadwordCount, entry->sendState);
+                    }
+                }
+            }
+        }
+    }
+}
 
 void nmlModelDirectSend(int key, void *packetData, int qwc)
 {
@@ -2405,7 +2583,29 @@ void nmlModelDirectSendWithFlag(s32 key, void *packetData, s32 qwc, s32 sendFlag
     nmlModelDirectSendFull(key, packetData, qwc, sendFlag, 0);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", nmlModelDirectSendFull);
+void nmlModelDirectSendFull(int key, void *packetData, int qwc, int sendFlag, int sendState)
+{
+    PxyPacketRequest *entry;
+
+    if (pxyState.flushDoneFlag != 0) {
+        return;
+    }
+    if (pxyState.entryCount < PXY_ENTRY_QUEUE_LIMIT) {
+        entry = &pxyState.entryQueue[pxyState.entryCount];
+        entry->quadwordCount = qwc;
+        entry->sendFlag = sendFlag;
+        if ((key & PXY_SEND_KEY_IN_PLACE) == 0) {
+            entry->packetData = xglPacketCopy16(packetData, qwc);
+        } else {
+            entry->packetData = packetData;
+        }
+        entry->groupBit = (key % PXY_SEND_KEY_ROW) >> 1;
+        entry->row = key / PXY_SEND_KEY_ROW;
+        entry->sendState = sendState;
+        pxyState.entryGroupMask |= 1 << entry->groupBit;
+        pxyState.entryCount++;
+    }
+}
 
 /* kept apart: the real PxyDrawWork is declared after this function; same layout. */
 typedef struct PxyDrawWorkView {
@@ -2553,7 +2753,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
         queueIndex = xglDirectQueueCount;
         gifWrite = (u64 *)&xglDirectQueueBuffer[queueIndex];
         gifStart = gifWrite;
-        GS_PUT(gifWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.depthBase, 1, 1));
+        GS_PUT(gifWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.zbuf_base, 1, 1));
         GS_PUT(gifWrite, GS_FBA_1, 0);
         GS_PUT(gifWrite, GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
         GS_PUT(gifWrite, GS_CLAMP_1, shadow->clamp);
@@ -2600,9 +2800,9 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
             queueIndex = xglDirectQueueCount;
             gifWrite = (u64 *)&xglDirectQueueBuffer[queueIndex];
             gifStart = gifWrite;
-            GS_PUT(gifWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm,
+            GS_PUT(gifWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm,
                                                drawWork->batch->packet->frameMask | 0xFF000000));
-            GS_PUT(gifWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm,
+            GS_PUT(gifWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm,
                                                drawWork->batch->packet->frameMask | 0xFF000000));
             xglDirectQueueCount = queueIndex + (((u32)gifWrite - (u32)gifStart) >> 4);
         }
@@ -2851,7 +3051,6 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A69D8);
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A7690);
 
 void func_0019D990(int frameMask, u32 frameBase);
-void func_001A3E30(int group, int camera);
 void func_001A69D8(int mode, PxyBatch *batch, u32 frameBase, int flags);
 void func_001A7690(int mode, PxyBatch *batch, u32 frameBase, int flags);
 void func_001A62A8(PxyBatch *batch, u32 frameBase);
@@ -2861,8 +3060,8 @@ void func_001A52C8(u32 frameBase);
 void func_001A5108(u32 frameBase);
 void func_001A57A0(u32 frameBase);
 
-#define SCREEN_HALF_W (D_004C8390.screenWidth / 2)
-#define SCREEN_HALF_H (D_004C8390.screenHeight / 2)
+#define SCREEN_HALF_W (D_004C8390.frame_width / 2)
+#define SCREEN_HALF_H (D_004C8390.frame_height / 2)
 
 void pxyDrawBatches(int drawMode, u32 frameBase)
 {
@@ -2897,7 +3096,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         }
     }
     if (drawMode == 0) {
-        func_001A3E30(4, pxyState.camera);
+        pxyPlayEntryGroupFiltered(4, pxyState.camera);
     }
     lightFlags = 0;
     batchTable = &pxyState.batchTables[pxyState.drawPass];
@@ -2963,7 +3162,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                 *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                 nmlPacketAddGsFlush();
             }
-            for (y = 0; y < D_004C8390.screenHeight; y += SCREEN_HALF_H) {
+            for (y = 0; y < D_004C8390.frame_height; y += SCREEN_HALF_H) {
                 int pass;
 
                 {
@@ -2975,9 +3174,9 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     queueIndex = xglDirectQueueCount;
                     queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
                     queueStart = queueWrite;
-                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(D_004C8390.renderTextureBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
+                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(D_004C8390.texture_base, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
                     GS_PUT(queueWrite, GS_TEXFLUSH, 0);
-                    GS_PUT(queueWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.depthBase, 1, 1));
+                    GS_PUT(queueWrite, GS_ZBUF_1, GS_SET_ZBUF(D_004C8390.zbuf_base, 1, 1));
                     GS_PUT(queueWrite, GS_CLAMP_1, 0);
                     GS_PUT(queueWrite, GS_RGBAQ, GS_SET_RGBAQ(0x80, 0x80, 0x80, 0, 0x3F800000));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
@@ -2986,8 +3185,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
                     GS_PUT(queueWrite, GS_UV, GS_SET_UV(0, (y << 4)));
                     GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4), ((SCREEN_HALF_H + y) << 4)));
-                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
+                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4), ((SCREEN_HALF_H + y) << 4)));
+                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
                     GS_PUT(queueWrite, GS_RGBAQ, GS_SET_RGBAQ(color.rgba[0], color.rgba[1], color.rgba[2], color.rgba[3], 0x3F800000));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(1, 5, 0x80, 0, 0, 0, 1, 1));
                     GS_PUT(queueWrite, GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
@@ -3016,8 +3215,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV(9, (y << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((shift - SCREEN_HALF_W + 0x800) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV(((D_004C8390.screenWidth - shift) << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV(((D_004C8390.frame_width - shift) << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3033,8 +3232,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV((shift << 4) + 9, (y << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W - shift + 0x800) << 4), 0x8000, 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4) + 9, ((SCREEN_HALF_H + y) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W - shift + 0x800) << 4), 0x8000, 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3050,8 +3249,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV(8, ((shift + y) << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4) + 8, ((SCREEN_HALF_H + y) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x800) << 4), ((0x800 - shift) << 4), 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4) + 8, ((SCREEN_HALF_H + y) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x800) << 4), ((0x800 - shift) << 4), 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3067,8 +3266,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                         GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
                         GS_PUT(queueWrite, GS_UV, GS_SET_UV(8, (y << 4) + 9));
                         GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((shift - SCREEN_HALF_H + 0x800) << 4), 0));
-                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4) + 8, ((SCREEN_HALF_H + y - shift) << 4) + 9));
-                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
+                        GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4) + 8, ((SCREEN_HALF_H + y - shift) << 4) + 9));
+                        GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x800) << 4), 0x8000, 0));
                         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                         nmlPacketAddGsFlushWide();
                     }
@@ -3089,8 +3288,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
                     GS_PUT(queueWrite, GS_UV, GS_SET_UV(0, (y << 4)));
                     GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((0x800 - SCREEN_HALF_H) << 4), 0));
-                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4), ((SCREEN_HALF_H + y) << 4)));
-                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
+                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4), ((SCREEN_HALF_H + y) << 4)));
+                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x7FF) << 4), (0x7FF << 4), 0));
                     *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                     nmlPacketAddGsFlushWide();
                 }
@@ -3103,17 +3302,17 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
                     queueIndex = xglDirectQueueCount;
                     queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
                     queueStart = queueWrite;
-                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
+                    GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
                     GS_PUT(queueWrite, GS_TEXFLUSH, 0);
                     GS_PUT(queueWrite, GS_RGBAQ, GS_SET_RGBAQ(0x80, 0x80, 0x80, 0x80, 0x3F800000));
-                    GS_PUT(queueWrite, GS_TEX0_1, GS_SET_TEX0(D_004C8390.renderTextureBase << 5, 8, 0, 9, 9, 1, 0, 0, 0, 0, 0, 1));
+                    GS_PUT(queueWrite, GS_TEX0_1, GS_SET_TEX0(D_004C8390.texture_base << 5, 8, 0, 9, 9, 1, 0, 0, 0, 0, 0, 1));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(1, 5, 0x80, 0, 1, 0, 1, 1));
                     GS_PUT(queueWrite, GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
                     GS_PUT(queueWrite, GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
                     GS_PUT(queueWrite, GS_UV, GS_SET_UV(0, 0));
                     GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((0x800 - SCREEN_HALF_W) << 4), ((y - SCREEN_HALF_H + 0x800) << 4), 0));
-                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.screenWidth << 4), (SCREEN_HALF_H << 4)));
-                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.screenWidth - SCREEN_HALF_W + 0x7FF) << 4), ((y + 0x7FF) << 4), 0));
+                    GS_PUT(queueWrite, GS_UV, GS_SET_UV((D_004C8390.frame_width << 4), (SCREEN_HALF_H << 4)));
+                    GS_PUT(queueWrite, GS_XYZF2, GS_SET_XYZ(((D_004C8390.frame_width - SCREEN_HALF_W + 0x7FF) << 4), ((y + 0x7FF) << 4), 0));
                     GS_PUT(queueWrite, GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
                     *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
                     nmlPacketAddGsFlushWide();
@@ -3141,13 +3340,13 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         queueIndex = xglDirectQueueCount;
         queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
         queueStart = queueWrite;
-        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
-        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0xFF000000));
+        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
+        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0xFF000000));
         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
         nmlPacketAddGsFlush();
     }
     if (drawMode == 0) {
-        func_001A3E30(0, pxyState.camera);
+        pxyPlayEntryGroupFiltered(0, pxyState.camera);
     }
     pxyState.drawPass = 1;
     pxyPacketSetCacheValue(pxyState.drawPass);
@@ -3331,8 +3530,8 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         queueIndex = xglDirectQueueCount;
         queueWrite = (u64 *)&(*queueBuffer)[queueIndex];
         queueStart = queueWrite;
-        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0));
-        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.screenWidth / 64, D_004C8390.psm, 0xFF000000));
+        GS_PUT(queueWrite, GS_FRAME_1, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0));
+        GS_PUT(queueWrite, GS_FRAME_2, GS_SET_FRAME(frameBase, D_004C8390.frame_width / 64, D_004C8390.psm, 0xFF000000));
         *queueCount = queueIndex + (((u32)queueWrite - (u32)queueStart) >> 4);
         nmlPacketAddGsFlush();
     }
@@ -3340,7 +3539,7 @@ void pxyDrawBatches(int drawMode, u32 frameBase)
         if (func_001AEE50() > 85.0f || func_001AEF08() > 85.0f) {
             return;
         }
-        func_001A3E30(1, pxyState.camera);
+        pxyPlayEntryGroupFiltered(1, pxyState.camera);
     }
 }
 
@@ -3411,21 +3610,35 @@ f32 pxyWorkFloat2F94Get(void) {
     return D_008C2F94[0];
 }
 
-extern s32 D_008C2F74[];
-
 void pxyWorkFlag2F74Set(void) {
-    D_008C2F74[0] = 1;
+    pxyState.frameCopyRequest = 1;
 }
+
+void func_001AA828(XglPacket *packet);
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA828);
 
-s32 func_001A3D90(s32 mode);
 
-void pxyPlayEntryGroupFive(void) {
-    func_001A3D90(5);
+void pxyPlayEntryGroupFive(XglPacket *packet) {
+    pxyPlayEntryGroup(5);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA968);
+/* Profile draw flag of the pxy module (X2 pxyProfileDrawFlag). */
+extern s32 pxyProfileDrawFlag;
+
+/* Init the pxy module: the reset helpers, then its two final packet callbacks (frame copy, entry group 5). */
+void nmlModelConstruct(void)
+{
+    pxyProfileDrawFlag = 0;
+    pxyClearPacketSlots();
+    pxyInitModelCounters();
+    pxyInitTables();
+    pxyResetBatchTables();
+    CONSTRUCT_CIRCLR_SHADOW();
+    pxyState.frameCopyRequest = 0;
+    D_004C8390.finalPacketCallbacks[RENDER_CALLBACK_PXY_FRAME_COPY] = func_001AA828;
+    D_004C8390.finalPacketCallbacks[RENDER_CALLBACK_PXY_ENTRY_GROUP] = pxyPlayEntryGroupFive;
+}
 
 /* ---- data of this TU (scaffold items recovered in C) ---- */
 int gPxyFadeRampIndexTable[32] = {
@@ -3440,8 +3653,6 @@ Vector4 pxyGlobalColor = { 0 };
 s32 D_00551240 = 0;
 s32 gPxyDirtyFlag = 0;
 int pxyShadowTexturesReady = 0;
-
-const float D_0054FFF4 = 0.2f;
 
 /* .bss: the render state (its inner labels are fields), then the shadow texture, its CLUT and the fade ramp table. */
 PxyModelRenderState gPxyModelRenderStateStorage;

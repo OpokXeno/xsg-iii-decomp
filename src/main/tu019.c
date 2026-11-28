@@ -1,5 +1,6 @@
 #include "common.h"
 #include "main/xgl_cd.h"
+#include "main/sound_driver.h"
 
 typedef int s32;
 extern s32 gSoundVoiceVolume[];
@@ -8,7 +9,20 @@ void soundVoiceVolumeReset(s32 voiceIndex) {
     gSoundVoiceVolume[voiceIndex] = 0x200;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/tu019", func_0018E490);
+/* The slot record of soundSlotNumber when it is in range and has a work buffer, else 0. */
+SoundSlot *func_0018E490(int soundSlotNumber)
+{
+    SoundSlot *slot;
+
+    if (soundSlotNumber >= SOUND_SLOT_RECORDS) {
+        return 0;
+    }
+    slot = &gSoundRecordBlock.soundSlotRecords[soundSlotNumber];
+    if (slot->voiceWork.voiceWorkBuffer == 0) {
+        return 0;
+    }
+    return slot;
+}
 
 int sprintf(char *destination, const char *format, ...);
 /* "%08x.%08x": the location string of a sound file, its start sector and sector count in hex. */
@@ -77,9 +91,6 @@ s32 soundMasterVolumeSet(s32 requestedVolume) {
     return previousVolume;
 }
 
-/* The master volume ramp (its layout is in se_volume.c). */
-typedef struct VolumeRamp VolumeRamp;
-extern VolumeRamp seMasterVolumeRamp;
 int seVolumeRampSet(VolumeRamp *ramp, int level, int levelPerStep);
 
 /* Ramps the master volume towards level (a level above 0x7FFF goes through gSoundVolumeCurve) and writes it. */
@@ -89,7 +100,7 @@ s32 func_0018E698(s32 level, s32 levelPerStep)
         if (level > 0x7FFF) {
             level = gSoundVolumeCurve[level];
         }
-        level = seVolumeRampSet(&seMasterVolumeRamp, level, levelPerStep);
+        level = seVolumeRampSet(&gSoundRecordBlock.master_ramp, level, levelPerStep);
     }
     return soundMasterVolumeSet(level * 0x102);
 }

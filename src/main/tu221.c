@@ -54,7 +54,7 @@ void movieTestMainLoop(void);
 void xglFontPrint(int x, int y, unsigned int color, const char *text);
 void xglFontPrintDirect(const char *text);
 void xglFontDebugPrefixSet(int *debugPrefix);
-int func_00185CB0(int, int);
+int xglFontLoad(int, int);
 extern PadRecord PadData[];
 void xglSleep(void);
 extern int gifStateTravelAlpha;
@@ -98,7 +98,7 @@ void debugTestMenuMain(void) {
 
     selectedIndex = 0;
     gifStateNoOp();
-    func_00185CB0(1, 0);
+    xglFontLoad(1, 0);
     for (;;) {
         xglFontDebugPrefixSet(D_00550D24);
         if ((PadData[0].heldAndPressed & 0x08000100) == 0x08000100) {

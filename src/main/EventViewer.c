@@ -1,4 +1,5 @@
 #include "common.h"
+#include "main/xgl_font.h"
 
 #include "main/xgl_2.h"
 #include "main/tu007.h"
@@ -205,7 +206,6 @@ void eventViewerDrawCaption(u8 *caption) {
 
 static char **gEventViewerLineTable;
 s32 xglCdGetFileSize(const char *);
-s32 xglCdReadFile(const char *, void *, s32, void *);
 void *memset(void *, s32, unsigned int);
 
 /* Reads the text file `path` into buffer and splits it into 128-byte lines (CR LF or LF)
@@ -650,12 +650,11 @@ void eventViewerFrameCallback(void *packet) {
 }
 
 extern s32 gEventViewerWindowTop;
-s32 func_00185CB0(s32, s32);
 s32 xglCdSetReadyFlag();
 s32 gifStateResetTimings();
 
 void eventViewerReset(void) {
-    func_00185CB0(0, 0);
+    xglFontLoad(0, 0);
     do {
 
     } while (xglCdServiceIfPending() != 0);
@@ -912,7 +911,7 @@ void eventViewerStop(void) {
     xglRenderHoldClear();
     xglRenderLockClear();
     stateExchangeOverrideClear();
-    func_00185CB0(1, 0);
+    xglFontLoad(1, 0);
 }
 
 void eventViewerReset();

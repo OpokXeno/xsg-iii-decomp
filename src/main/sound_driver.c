@@ -15,16 +15,6 @@ void func_0018E4C0(char *path, const char *dirName, const char *fileName, const 
 int soundDriverReset(void);
 int korgEvagAllUnitsSoundOff(void);
 
-/* One 16-byte sound slot. Driver calls take driver_id; the create call takes the voice's work
- * buffer and its size. */
-typedef struct SoundSlot {
-    int driver_id;
-    struct {
-        unsigned char *voiceWorkBuffer;    /* the voice's work buffer, carved from WorkEnd */
-        int voiceWorkSize;
-    } voiceWork;                     /* what the create call takes */
-    VolumeRamp ramp;                  /* +0x0C */
-} SoundSlot;
 /* The sound control block: a 16-byte head with the song number, the levels and the master volume
  * ramp, then the two sound slots soundSlots. */
 typedef union SoundControl {
@@ -43,42 +33,10 @@ typedef union SoundControl {
     /* The head has a slot's layout too; soundSlotReopen indexes the slots as soundSlotRecords[index + 1]. */
     SoundSlot soundSlotRecords[3];
 } SoundControl;
-/* Sound channels 1..63 (channel 0 is not used). */
-#define SOUND_CHANNEL_COUNT 64
-/* One sound channel's state word: state in the second byte, a counter in the first. */
-typedef union SoundChannelState {
-    int word;
-    unsigned short half;   /* counter | state << 8 */
-    struct {
-        unsigned char counter;
-        unsigned char state;
-    } bytes;
-} SoundChannelState;
 
-/* Channels in the assignment table of the record block (soundApplySettings counts its channel states with
- * SOUND_CHANNEL_COUNT). */
-#define SOUND_ASSIGN_COUNT 0x118
-/* The songs with a swapped channel bank keep three banks of SOUND_BANK_CHANNELS channels from
- * SOUND_LIVE_BANK in the save area from SOUND_SAVED_BANK, which runs past the channel table. */
-#define SOUND_BANK_CHANNELS 24
-#define SOUND_LIVE_BANK 0x60
-#define SOUND_SAVED_BANK 0x100
-#define SOUND_CHANNEL_SLOTS (SOUND_ASSIGN_COUNT + 2 * SOUND_BANK_CHANNELS)
-typedef struct SoundRecordBlock {
-    unsigned char master_volume; /* +0x00: scales the level of slot 0 */
-    unsigned char volumeLevels[3];
-    unsigned char current_song;  /* +0x04: selects the channel range set (soundSongRangeSet) */
-    unsigned char unmodeled_05[3];
-    unsigned char *driver_work;  /* +0x08: the driver work area D_0089BF00 */
-    VolumeRamp master_ramp;      /* +0x0C: the output volume ramp (main/tu019 reaches it as seMasterVolumeRamp) */
-    unsigned int channelAssign[SOUND_CHANNEL_SLOTS]; /* +0x10: id << 24 | kind << 16 | group << 8 | index */
-    SoundChannelState channelStates[SOUND_CHANNEL_COUNT]; /* +0x530: indexed by channel (1..63; 0 unused) */
-    SoundSlot soundSlotRecords[4]; /* +0x630 */
-} SoundRecordBlock;
 typedef signed char s8;
 typedef int s32;
 extern unsigned char gSeBankFileExt[];
-extern SoundRecordBlock gSoundRecordBlock;
 extern s32 D_004C7040[];
 extern unsigned char gSeBankDirName[];
 
@@ -299,9 +257,9 @@ int func_0018EC68(int channel)
 }
 
 s32 func_001808E0();
+void soundVoiceVolumeReset(s32 voiceIndex);
 
 void seVoiceStart(unsigned int voice, unsigned int volume, unsigned int pan) {
-    extern s32 func_0018EDD8();
     if ((voice & 0xF0000000) == 0x10000000) {
         func_001808E0(voice & 0x0FFFFFFF, volume & 0xFF, pan & 0xFF);
         return;
@@ -335,14 +293,121 @@ void soundDriverNoop(void) {
 
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/sound_driver", func_0018EDD8);
+/* The group of each of the first SOUND_CUE_GROUP_SLOTS cue slots: starting a cue stops the channels that play a cue of
+ * its group (group 0: every cue channel). */
+#define SOUND_CUE_GROUP_SLOTS 0x40
+extern unsigned char soundCueGroupTable[SOUND_CUE_GROUP_SLOTS];
+#define SOUND_CUE_RECORD_BYTES 4
+/* Cue ids from SOUND_CUE_UPDATE_FIRST on below SOUND_CUE_UPDATE_END only change the volume and pan of their slot. */
+#define SOUND_CUE_UPDATE_FIRST 0x101
+#define SOUND_CUE_UPDATE_END 0x140
+/* Bits 16.. of a cue id may name the channel; a channel hint with any of these bits set is ignored. */
+#define SOUND_CUE_HINT_INVALID 0xF000
+/* A pan of 0xFF centres the channel. */
+#define SOUND_PAN_CENTRE 0xFF
+/* Channel handles returned for a started cue. */
+#define SOUND_CHANNEL_HANDLE 0x100
 
-s32 seVoiceStartDriver(s32 voice) {
-    extern s32 func_0018EDD8();
-    return func_0018EDD8(voice, 0x7F, 0xFFFF);
+/* Driver calls for one channel; each returns 0 or a negative error code. */
+int func_0017E790(int channel, int bank, int program, int key, int index);
+int func_0017E820(int channel);
+int func_0017E9E0(int channel, int volume);
+int func_0017EA50(int channel, int pan);
+int func_0017EAC0(int channel);
+
+/* Starts the cue `id` (slot id & 0xFF) at `volume` and `pan` on a free channel (or the one named in id >> 16) and returns
+ * its channel handle, or 0 when the slot is unassigned or the named channel is busy. Starting a cue first stops the
+ * channels of its group. Ids SOUND_CUE_UPDATE_FIRST.. only store and apply a new volume and pan (negative: keep). */
+int func_0018EDD8(int id, int volume, int pan)
+{
+    int bank;
+    int program;
+    int key;
+    int index;
+    unsigned char slot;
+    unsigned int value;
+    unsigned char channel;
+    int group;
+    int other;
+    unsigned char playing;
+
+    if (id == 0) {
+        return 0;
+    }
+    value = id >> 16;
+    slot = id & 0xFF;
+    channel = 0;
+    if (value != 0) {
+        if ((value & SOUND_CUE_HINT_INVALID) == 0) {
+            channel = value;
+        }
+    } else {
+        if (id >= SOUND_CUE_UPDATE_END) {
+            return 0;
+        }
+        if (id >= SOUND_CUE_UPDATE_FIRST) {
+            if (volume >= 0) {
+                gSoundCueVolumeTable[(id & 0xFF) * SOUND_CUE_RECORD_BYTES] = volume;
+                func_0017E9E0(slot, volume);
+            }
+            if (pan >= 0) {
+                gSoundCueVolumeTable[(id & 0xFF) * SOUND_CUE_RECORD_BYTES + 1] = pan;
+                func_0017EA50(slot, pan);
+            }
+            return id;
+        }
+    }
+    value = gSoundRecordBlock.channelAssign[slot];
+    if (value == 0) {
+        return 0;
+    }
+    bank = value >> 24;
+    program = (value >> 16) & 0xFF;
+    key = (value >> 8) & 0xFF;
+    index = value & 0xFF;
+    if (slot < SOUND_CUE_GROUP_SLOTS) {
+        group = soundCueGroupTable[slot];
+        for (other = 1; other < SOUND_CUE_GROUP_SLOTS; other++) {
+            playing = gSoundRecordBlock.channelStates[other].bytes.counter;
+            if (playing != 0 && playing < SOUND_CUE_GROUP_SLOTS) {
+                if (group == 0 || soundCueGroupTable[playing] == group) {
+                    soundVoiceVolumeReset(other);
+                }
+            }
+        }
+    }
+    if (channel != 0) {
+        if (gSoundRecordBlock.channelStates[channel].half != 0) {
+            return 0;
+        }
+    } else {
+        channel = 1;
+        if (gSoundRecordBlock.channelStates[channel].word != 0) {
+            do {
+                channel++;
+                if (channel >= SOUND_CHANNEL_COUNT) {
+                    break;
+                }
+            } while (gSoundRecordBlock.channelStates[channel].word != 0);
+        }
+    }
+    gSoundRecordBlock.channelStates[channel].half = slot;
+    gSoundRecordBlock.channelStates[channel].bytes.volume = volume;
+    gSoundRecordBlock.channelStates[channel].bytes.pan = pan;
+    func_0017E790(channel, bank, program, key, index);
+    func_0017E820(channel);
+    func_0017E9E0(channel, volume);
+    if ((pan & 0xFF) == SOUND_PAN_CENTRE) {
+        func_0017EAC0(channel);
+    } else {
+        func_0017EA50(channel, pan);
+    }
+    return channel + SOUND_CHANNEL_HANDLE;
 }
 
-void soundVoiceVolumeReset(s32 voiceIndex);
+s32 seVoiceStartDriver(s32 voice) {
+    return func_0018EDD8(voice, 0x7F, 0xFFFF);
+}
 
 /* Resets the voice volume of every channel `id` occupies. */
 void func_0018F098(int id)
@@ -415,7 +480,6 @@ void ADXT_SetLpFlg(int id, int value);
 void ADXT_StartFname(int id, const char *key);
 int ADXT_SetOutVol(int id, int value);
 void ADXM_ExecVint(int value);
-SoundSlot *func_0018E490(int soundSlotNumber);
 int func_00169688(int id, int value);
 void func_0016A908(int id, const char *key);
 
@@ -671,36 +735,27 @@ unsigned int func_0018F7E8(unsigned int count)
     return (count * 0xD511 + 0xDD11) / 0x800 * 0x800 + 0x8200;
 }
 
-typedef struct SoundWork {
-    s32 voiceHandle;              /* +0x00: the voice handle, 0 when none */
-    unsigned char *packetData;    /* +0x04: the packet data the voice plays */
-    s32 packetSize;               /* +0x08 */
-    unsigned char unk_0C[4];
-} SoundWork;
-
-extern SoundWork gSoundVoices[4];
-
 void *soundWorkSource(s32 soundSlotNumber, void *packetData, s32 packetSize)
 {
   void *currentPacketData;
   void *packetDataArg;
   s32 isValidIndex;
   s32 packetSizeArg;
-  SoundWork *soundWork;
+  SoundSlot *soundWork;
   packetDataArg = packetData;
   packetSizeArg = packetSize;
   isValidIndex = soundSlotNumber < 4;
   if (isValidIndex != 0)
   {
-    soundWork = &gSoundVoices[soundSlotNumber];
+    soundWork = &gSoundRecordBlock.soundSlotRecords[soundSlotNumber];
     if ((packetDataArg != 0) && (packetSizeArg == 0))
     {
-      currentPacketData = soundWork->packetData;
+      currentPacketData = soundWork->voiceWork.voiceWorkBuffer;
       *(void **) packetDataArg = currentPacketData;
       return currentPacketData;
     }
-    soundWork->packetData = (unsigned char *) packetDataArg;
-    soundWork->packetSize = packetSizeArg;
+    soundWork->voiceWork.voiceWorkBuffer = (unsigned char *) packetDataArg;
+    soundWork->voiceWork.voiceWorkSize = packetSizeArg;
     soundSlotCreate(soundSlotNumber);
     return;
   }
@@ -901,21 +956,21 @@ s32 func_00168D48();
 
 void soundSlotCreate(int soundSlotNumber) {
     extern s32 func_00160C88();
-    SoundWork *soundWork;
+    SoundSlot *soundWork;
     s32 voiceHandle;
 
-    soundWork = &gSoundVoices[soundSlotNumber];
-    if (soundWork->voiceHandle != 0) {
-        func_00167588(soundWork->voiceHandle);
+    soundWork = &gSoundRecordBlock.soundSlotRecords[soundSlotNumber];
+    if (soundWork->driver_id != 0) {
+        func_00167588(soundWork->driver_id);
     }
-    if (soundWork->packetData == 0) {
-        soundWork->voiceHandle = 0;
+    if (soundWork->voiceWork.voiceWorkBuffer == 0) {
+        soundWork->driver_id = 0;
         return;
     }
-    voiceHandle = func_00167100(2, soundWork->packetData, soundWork->packetSize);
-    soundWork->voiceHandle = voiceHandle;
+    voiceHandle = func_00167100(2, soundWork->voiceWork.voiceWorkBuffer, soundWork->voiceWork.voiceWorkSize);
+    soundWork->driver_id = voiceHandle;
     func_00168D48(voiceHandle, 0x1E);
-    func_00160C88(soundWork->voiceHandle, 1);
+    func_00160C88(soundWork->driver_id, 1);
     soundSlotSetVolume(soundSlotNumber, -1, 0);
 }
 

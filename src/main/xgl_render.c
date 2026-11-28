@@ -4,6 +4,8 @@
 #include "main/Packet.h"
 #include "main/xgl_render.h"
 #include "gs.h"
+#include "main/xgl_dma.h"
+#include "main/nml_model_set.h"
 
 /* The render state block at 0x004C8390 (X3 scaffold label). */
 extern XglRenderStateBlock D_004C8390;
@@ -55,7 +57,6 @@ INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_00199BE0);
 
 void soundApplySettings(void);
 
-void xglDmaDirectNormal(unsigned int channel, unsigned int address, unsigned int count);
 
 /* GS PMODE register: display circuit enables and the alpha blend value. */
 typedef struct GsPmode {
@@ -699,7 +700,51 @@ void xglRenderClearColor(u32 color)
     gEnvFlags.color.alpha = color >> 24;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019A558);
+/* VIF DIRECT code; its low half is the quadword count that follows. */
+#define VIF_DIRECT_CODE 0x51000000
+/* The GIF part of the clear packet: the GIF tag and its 0x13 A+D writes. */
+#define RENDER_CLEAR_GIF_QWORDS 0x14
+/* GIF tag of the clear packet: NLOOP 0x13 A+D writes, end of packet, one register descriptor. */
+#define GIF_TAG_CLEAR_PACKET 0x1000000000008013ULL
+#define RENDER_CLEAR_COLOR_DEFAULT 0x80000000
+/* The clear sprites cover 512 x 448 pixels around the GS centre, in strips of 64 pixels. */
+#define RENDER_CLEAR_CENTER 2048
+#define RENDER_CLEAR_HALF_WIDTH 256
+#define RENDER_CLEAR_HALF_HEIGHT 224
+#define RENDER_CLEAR_STRIP_WIDTH 64
+#define RENDER_CLEAR_LEFT (RENDER_CLEAR_CENTER - RENDER_CLEAR_HALF_WIDTH)
+/* GS XYZ coordinates are 12.4 fixed point; Y sits in the high half of the low word. */
+#define GS_XY_FIXED(v) ((v) << 4)
+#define RENDER_CLEAR_TOP (GS_XY_FIXED(RENDER_CLEAR_CENTER - RENDER_CLEAR_HALF_HEIGHT) << 16)
+#define RENDER_CLEAR_BOTTOM ((u64) GS_XY_FIXED(RENDER_CLEAR_CENTER + RENDER_CLEAR_HALF_HEIGHT) << 16)
+
+/* Builds the clear packet (TEST from xglRenderClearFrame, a sprite primitive, the
+ * default colour and the sprites over the frame). */
+void xglRenderClearEnvInit(void)
+{
+    int i;
+    int left;
+    u64 right;
+
+    gEnvFlags.vifCodes[1] = VIF_DIRECT_CODE | RENDER_CLEAR_GIF_QWORDS;
+    gEnvFlags.gifTag[0] = GIF_TAG_CLEAR_PACKET;
+    gEnvFlags.gifTag[1] = GIF_AD;
+    gEnvFlags.vifCodes[0] = 0;
+    xglRenderClearFrame();
+    gEnvFlags.testRegister = GS_TEST_1;
+    gEnvFlags.prim = GS_PRIM_SPRITE;
+    gEnvFlags.primRegister = GS_PRIM;
+    xglRenderClearColor(RENDER_CLEAR_COLOR_DEFAULT);
+    gEnvFlags.colorRegister = GS_RGBAQ;
+    for (i = 0; i < RENDER_CLEAR_SPRITES; i++) {
+        left = GS_XY_FIXED(RENDER_CLEAR_LEFT + i * RENDER_CLEAR_STRIP_WIDTH);
+        right = GS_XY_FIXED(RENDER_CLEAR_LEFT + (i + 1) * RENDER_CLEAR_STRIP_WIDTH);
+        gEnvFlags.corners[i][0].data = left | RENDER_CLEAR_TOP;
+        gEnvFlags.corners[i][0].reg = GS_XYZF2;
+        gEnvFlags.corners[i][1].data = right | RENDER_CLEAR_BOTTOM;
+        gEnvFlags.corners[i][1].reg = GS_XYZF2;
+    }
+}
 
 void xglRenderSyncInit();
 
@@ -742,7 +787,6 @@ void xglRenderStart(s32 renderStartMode) {
 }
 
 void func_00199FE8(void);
-void func_0019A558(void);
 void xglStudioReset(void);
 void xglStudioMainCameraInit(void);
 
@@ -781,7 +825,7 @@ void xglRenderSetReso(int resolution)
     D_004C8390.flip_base = D_004C8390.prev_dispfb_base;
     func_00199FE8();
     xglRenderDispEnvInit();
-    func_0019A558();
+    xglRenderClearEnvInit();
     xglStudioReset();
     xglStudioMainCameraInit();
 }
@@ -878,7 +922,6 @@ void func_0019AC80(s32 active)
 INCLUDE_ASM("asm/main/nonmatchings/xgl_render", func_0019AC98);
 
 void xglRenderGlobalFadeReset(void);
-void func_001AA968(void);
 u8 stateExchangeOff(void);
 
 #define RENDER_FADE_NEUTRAL 0x80
@@ -911,7 +954,7 @@ void xglRenderInit(void)
         D_004C8390.finalPacketCallbacks[i] = 0;
     }
     xglRenderGlobalFadeReset();
-    func_001AA968();
+    nmlModelConstruct();
     stateExchangeOff();
     xglIntcEnable(5);
     xglRenderLocked = 0;
@@ -934,13 +977,11 @@ void xglRenderFinalPacket(void)
     }
 }
 
-extern s32 D_004C8400[];
-
 extern s32 xglRenderGlobalFadeValue;
 
 void xglRenderGlobalFadeReset(void) {
     xglRenderGlobalFadeValue = 0;
-    D_004C8400[0] = 0;
+    D_004C8390.globalFadeCallback = 0;
 }
 
 s32 xglRenderGlobalFadeValueGet(void) {

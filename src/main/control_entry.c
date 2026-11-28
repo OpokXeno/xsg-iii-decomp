@@ -1,6 +1,7 @@
 #include "common.h"
 #include "shared.h"
 #include "main/assert_fail.h"
+#include "main/xgl_font.h"
 
 void xglSleep(void);
 void xglRenderFrame(void);
@@ -27,7 +28,6 @@ void xglIntrInit(void);
 void xglGeometryInit(void);
 void xglPacketInitDoubleBuffer(unsigned int base, unsigned int size, float rate);
 void xglRenderInit(void);
-void func_00185D58(void);
 void moviePlayerSetSize(void);
 void initScratchpadBuffers(void);
 
@@ -78,7 +78,7 @@ void InitializeSystem(void) {
     xglGeometryInit();
     xglPacketInitDoubleBuffer(0xB00000, 0x180000, 50.0f);
     xglRenderInit();
-    func_00185D58();
+    xglFontInitial();
     moviePlayerSetSize();
     initScratchpadBuffers();
 }
