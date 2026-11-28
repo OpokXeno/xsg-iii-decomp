@@ -235,7 +235,7 @@ extern SdvPacketEffect *sefCurrentEffectRecord;
 extern unsigned char MMathUnitMatrix[];
 void *scGetImmAdrImmIdx2(int scriptBase, short *immediateTable, int immediateIndex);
 void sefGetSourceMatrix(void *packet, short kindValue);
-void func_0025A000(Vector4 *outPoint, const Vector4 *start, const Vector4 *next, float parameter);
+void MMathLerpKeyPoint(Vector4 *outPoint, const Vector4 *start, const Vector4 *next, float parameter);
 
 /* Per-frame update of one effect owner. When its next row is due, claims image records and packet records for the
    row's rowParts and installs their keys; then advances every packet of the owner along its keys. */
@@ -383,8 +383,8 @@ void func_001F3A98(SdvPacketOwner *owner, int scriptBase, int elapsed) {
                     }
                 }
                 progress = (float) ((short) ownedPacket->time - key->time) / (float) (key[1].time - key->time);
-                func_0025A000(&ownedPacket->position, &key->start, &key[1].start, progress);
-                func_0025A000(&ownedPacket->heading, &key->end, &key[1].end, progress);
+                MMathLerpKeyPoint(&ownedPacket->position, &key->start, &key[1].start, progress);
+                MMathLerpKeyPoint(&ownedPacket->heading, &key->end, &key[1].end, progress);
                 ownedPacket->heading.w = ((key[1].end.w - key->end.w) * progress) + key->end.w;
                 ownedPacket->previousScale = ((key[1].start.w - key->start.w) * progress) + key->start.w;
             }

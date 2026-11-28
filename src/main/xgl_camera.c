@@ -8,7 +8,6 @@
 #include "main/tu007.h"
 
 void sdvInitSpecialWork(void);
-
 void *memset(void *destination, int value, unsigned int count);
 
 typedef int s32;
@@ -48,9 +47,7 @@ void xglCameraResetState(XglCamera *camera)
 }
 
 extern Vector4 gCameraDefaultClipRange;
-
 extern Vector4 gCameraDefaultPortEffect;
-
 /* The render state; the camera screen takes its frame size. */
 extern XglRenderStateBlock D_004C8390;
 
@@ -74,19 +71,12 @@ void xglCameraScreenInit(XglCamera *camera)
 }
 
 extern Vector4 gCameraDefaultRotation;
-
 extern Vector4 gCameraDefaultAngleVelocity;
-
 extern Vector4 gCameraDefaultAngleDelta;
-
 extern Vector4 gCameraDefaultPosition;
-
 extern Vector4 gCameraDefaultPlaceVelocity;
-
 extern Vector4 gCameraDefaultPlaceDelta;
-
 extern Vector4 gCameraDefaultChaseReference;
-
 extern Vector4 gCameraDefaultChasePosition;
 
 /* Fills the CameraTravel block at camera+0x90 with the default travel view. */
@@ -111,7 +101,6 @@ void xglCameraTravelDefaultInit(XglCamera *camera) {
 }
 
 extern Vector4 gCameraResetAngleDelta;
-
 extern Vector4 gCameraResetPlaceDelta;
 
 /* Clears the travel scale and resets the angle and place deltas. */
@@ -134,7 +123,7 @@ extern PadRecord PadData[2];
 #define CAMERA_FOCUS_HELD_MIN 10.0f
 #define CAMERA_FOCUS_MAX 99.0f
 #define CAMERA_FOCUS_MIN 1.0f
-#define CAMERA_FOCUS_STEP 1.0f
+
 /* The travel scale the scale buttons set (in radians per frame). */
 #define CAMERA_SCALE_STEP 0.0011170107f
 
@@ -156,17 +145,17 @@ void func_00193A78(XglCamera *camera)
     if (!(held & CAMERA_FOCUS_BTN_SHIFTS) && D_005511EC == 0) {
         if (travel->focus >= CAMERA_FOCUS_HELD_MIN) {
             if ((held & CAMERA_FOCUS_BTN_IN) && travel->focus < CAMERA_FOCUS_MAX) {
-                travel->focus += CAMERA_FOCUS_STEP;
+                travel->focus += CAMERA_FOCUS_MIN;
             }
             if ((held & CAMERA_FOCUS_BTN_OUT) && travel->focus > CAMERA_FOCUS_MIN) {
-                travel->focus -= CAMERA_FOCUS_STEP;
+                travel->focus -= CAMERA_FOCUS_MIN;
             }
         } else {
             if ((pressed & CAMERA_FOCUS_BTN_IN) && travel->focus < CAMERA_FOCUS_MAX) {
-                travel->focus += CAMERA_FOCUS_STEP;
+                travel->focus += CAMERA_FOCUS_MIN;
             }
             if ((pressed & CAMERA_FOCUS_BTN_OUT) && travel->focus > CAMERA_FOCUS_MIN) {
-                travel->focus -= CAMERA_FOCUS_STEP;
+                travel->focus -= CAMERA_FOCUS_MIN;
             }
         }
     }
@@ -179,7 +168,8 @@ void func_00193A78(XglCamera *camera)
 }
 
 /* Cross (PS2 pad bit 0x40): the travel runs four times as fast. */
-#define CAMERA_TRAVEL_BTN_FAST 0x0040
+#define CAMERA_BTN_ORBIT 0x0040
+
 /* From focus 10 on the angle delta keeps the factor of focus 9 (episode II's largest focus). */
 #define CAMERA_TRAVEL_ANGLE_FOCUS_MAX 9.0f
 
@@ -196,7 +186,7 @@ void func_00193BD0(XglCamera *camera)
     if (sdvSpecialBuf.active) {
         held = sdvSpecialBuf.held;
     }
-    if (held & CAMERA_TRAVEL_BTN_FAST) {
+    if (held & CAMERA_BTN_ORBIT) {
         travel->scale = travel->scale * 4.0f;
         xglVectorScaleXYZ(&travel->angle_delta, &travel->angle_delta, 4.0f);
         xglVectorScaleXYZ(&travel->place_delta, &travel->place_delta, 4.0f);
@@ -218,17 +208,11 @@ void func_00193BD0(XglCamera *camera)
 }
 
 void func_00193A40(XglCamera *camera);
-
 void func_00193A78(XglCamera *camera);
-
 void func_00193BD0(XglCamera *camera);
-
 void xglVectorScaleAddXYZ(Vector4 *destination, const Vector4 *source, float scale, const Vector4 *addend);
-
 void xglMatrixStackUnit(void);
-
 void xglMatrixStackRotY(float angle);
-
 void xglMatrixStackSave(Matrix4 matrix);
 
 /* Pad update, free (manual) travel mode (camera state 2). */
@@ -259,12 +243,12 @@ void xglCameraPadUpdateFree(XglCamera *camera) {
         deadZone[3] = PadData[0].axisDeadZone[3];
     }
     /* The second pad takes over when its sticks are deflected more than the first pad's (or the override's). */
-    if (((rightX < 0) ? -rightX : rightX) + ((leftX < 0) ? -leftX : leftX)
-            + ((rightY < 0) ? -rightY : rightY) + ((leftY < 0) ? -leftY : leftY)
-        < (((PadData[1].rightX < 0) ? -PadData[1].rightX : PadData[1].rightX)
-           + ((PadData[1].leftX < 0) ? -PadData[1].leftX : PadData[1].leftX)
-           + ((PadData[1].rightY < 0) ? -PadData[1].rightY : PadData[1].rightY)
-           + ((PadData[1].leftY < 0) ? -PadData[1].leftY : PadData[1].leftY))) {
+    if (((rightX < 0) ? -rightX : rightX) + ((leftX < 0) ? -leftX : leftX) +
+            ((rightY < 0) ? -rightY : rightY) + ((leftY < 0) ? -leftY : leftY) <
+        (((PadData[1].rightX < 0) ? -PadData[1].rightX : PadData[1].rightX) +
+         ((PadData[1].leftX < 0) ? -PadData[1].leftX : PadData[1].leftX) +
+         ((PadData[1].rightY < 0) ? -PadData[1].rightY : PadData[1].rightY) +
+         ((PadData[1].leftY < 0) ? -PadData[1].leftY : PadData[1].leftY))) {
         rightX = PadData[1].rightX;
         leftX = PadData[1].leftX;
         rightY = PadData[1].rightY;
@@ -278,16 +262,16 @@ void xglCameraPadUpdateFree(XglCamera *camera) {
     func_00193A40(camera);
     func_00193A78(camera);
     if (rightY < 0) {
-        travel->angle_delta.x = (rightY + deadZone[1]) * -6.981317e-05f;
+        travel->angle_delta.x = (rightY + deadZone[1]) * -0.00006981317f;
     }
     if (rightY > 0) {
-        travel->angle_delta.x = (rightY - deadZone[1]) * -6.981317e-05f;
+        travel->angle_delta.x = (rightY - deadZone[1]) * -0.00006981317f;
     }
     if (rightX < 0) {
-        travel->angle_delta.y = (rightX + deadZone[0]) * -6.981317e-05f;
+        travel->angle_delta.y = (rightX + deadZone[0]) * -0.00006981317f;
     }
     if (rightX > 0) {
-        travel->angle_delta.y = (rightX - deadZone[0]) * -6.981317e-05f;
+        travel->angle_delta.y = (rightX - deadZone[0]) * -0.00006981317f;
     }
     if (held & 0x8000) {
         travel->angle_delta.z = 0.0022340214f;
@@ -323,42 +307,30 @@ void xglCameraPadUpdateFree(XglCamera *camera) {
     xglMatrixStackUnit();
     xglMatrixStackRotY(travel->rotation.y);
     xglMatrixStackSave(axes.rows);
-    xglVectorScaleAddXYZ(&travel->place_velocity, &axes.vectors[0], travel->place_delta.x, &travel->place_velocity);
+    xglVectorScaleAddXYZ(&travel->place_velocity, &axes.vectors[0], travel->place_delta.x,
+                         &travel->place_velocity);
     travel->place_velocity.y = travel->place_velocity.y + travel->place_delta.y;
-    xglVectorScaleAddXYZ(&travel->place_velocity, &axes.vectors[2], travel->place_delta.z, &travel->place_velocity);
+    xglVectorScaleAddXYZ(&travel->place_velocity, &axes.vectors[2], travel->place_delta.z,
+                         &travel->place_velocity);
     Vu0AddVectorXYZ(&travel->rotation, &travel->rotation, &travel->angle_velocity);
     Vu0AddVectorXYZ(&travel->position, &travel->position, &travel->place_velocity);
 }
 
 float xglSin(float angle);
-
 float xglCos(float angle);
-
 float xglPointLengthXZ(const Vector4 *first, const Vector4 *second);
-
 void xglVectorLength(float *destination, const Vector4 *source);
-
 void xglVectorNormal(Vector4 *destination, const Vector4 *source);
-
 extern float atan2f(float y, float x);
 
 /* Pad button bits of PadRecord.held and pressed that the chase camera reads. */
 #define CAMERA_BTN_DOWN 0x0001
-
 #define CAMERA_BTN_UP 0x0004
-
-#define CAMERA_BTN_ORBIT 0x0040
-
-#define CAMERA_BTN_MOVE_FOCUS 0x0080
 
 #define CAMERA_BTN_LOCK 0x0800
 
-extern float gCameraHalfPi;
-
 #define STICK_SCALE 0.0002f /* stick units past the dead zone to camera units */
-
 #define PAN_STEP 0.032f     /* height step per frame, as a fraction of the distance to the focus */
-
 #define ABS(x) ((x) < 0 ? -(x) : (x))
 
 /* Pad update, chase travel mode (camera state 3). */
@@ -398,8 +370,8 @@ void xglCameraPadUpdateChase(XglCamera *camera) {
         deadZone[3] = PadData[0].axisDeadZone[3];
     }
     /* The second pad takes over when its sticks are deflected more than the first pad's (or the override's). */
-    if (ABS(rightX) + ABS(leftX) + ABS(rightY) + ABS(leftY)
-        < ABS(PadData[1].rightX) + ABS(PadData[1].leftX) + ABS(PadData[1].rightY) + ABS(PadData[1].leftY)) {
+    if (ABS(rightX) + ABS(leftX) + ABS(rightY) + ABS(leftY) <
+        ABS(PadData[1].rightX) + ABS(PadData[1].leftX) + ABS(PadData[1].rightY) + ABS(PadData[1].leftY)) {
         rightX = PadData[1].rightX;
         leftX = PadData[1].leftX;
         rightY = PadData[1].rightY;
@@ -424,7 +396,7 @@ void xglCameraPadUpdateChase(XglCamera *camera) {
             camera->lookAtLocked = 1;
         }
     }
-    if ((held & CAMERA_BTN_MOVE_FOCUS) || (held & CAMERA_BTN_ORBIT)) {
+    if ((held & CAMERA_FOCUS_BTN_OUT) || (held & CAMERA_BTN_ORBIT)) {
         if (held & CAMERA_BTN_DOWN) {
             travel->chase_position.y += distance * -PAN_STEP;
         }
@@ -447,22 +419,22 @@ void xglCameraPadUpdateChase(XglCamera *camera) {
         travel->place_delta.x = (leftX - deadZone[2]) * STICK_SCALE;
     }
     if (travel->place_delta.x != 0.0f) {
-        if ((held & CAMERA_BTN_MOVE_FOCUS) && !(held & CAMERA_BTN_ORBIT)) {
+        if ((held & CAMERA_FOCUS_BTN_OUT) && !(held & CAMERA_BTN_ORBIT)) {
             float halfPi;
             yaw = atan2f(forward.x, forward.z);
-            halfPi = gCameraHalfPi;
+            halfPi = 1.57079601f;
             travel->position.x += xglSin(yaw - halfPi) * travel->place_delta.x * distance;
             travel->position.z += xglCos(yaw - halfPi) * travel->place_delta.x * distance;
             travel->chase_position.x += xglSin(yaw - halfPi) * travel->place_delta.x * distance;
             travel->chase_position.z += xglCos(yaw - halfPi) * travel->place_delta.x * distance;
         }
-        if (!(held & CAMERA_BTN_ORBIT) && !(held & CAMERA_BTN_MOVE_FOCUS)) {
+        if (!(held & CAMERA_BTN_ORBIT) && !(held & CAMERA_FOCUS_BTN_OUT)) {
             angle = atan2f(forward.x, forward.z);
             angle = angle + travel->place_delta.x;
             travel->position.x = travel->chase_position.x - xglSin(angle) * distance;
             travel->position.z = travel->chase_position.z - xglCos(angle) * distance;
         }
-        if ((held & CAMERA_BTN_ORBIT) && !(held & CAMERA_BTN_MOVE_FOCUS)) {
+        if ((held & CAMERA_BTN_ORBIT) && !(held & CAMERA_FOCUS_BTN_OUT)) {
             angle = atan2f(forward.x, forward.z);
             angle = angle - travel->place_delta.x;
             travel->chase_position.x = travel->position.x + xglSin(angle) * distance;
@@ -475,7 +447,7 @@ void xglCameraPadUpdateChase(XglCamera *camera) {
     if (leftY > 0) {
         travel->place_delta.z = (leftY - deadZone[3]) * STICK_SCALE;
     }
-    if ((held & CAMERA_BTN_MOVE_FOCUS) || (held & CAMERA_BTN_ORBIT)) {
+    if ((held & CAMERA_FOCUS_BTN_OUT) || (held & CAMERA_BTN_ORBIT)) {
         travel->chase_position.x -= forward.x * travel->place_delta.z * distance * pitchScale;
         travel->chase_position.y -= forward.y * travel->place_delta.z * distance * pitchScale;
         travel->chase_position.z -= forward.z * travel->place_delta.z * distance * pitchScale;
@@ -490,7 +462,8 @@ void xglCameraPadUpdateChase(XglCamera *camera) {
     xglVectorNormal(&lookDirection, &lookDirection);
     lookDirection.z = -lookDirection.z;
     travel->rotation.y = atan2f(lookDirection.x, lookDirection.z);
-    travel->rotation.x = atan2f(lookDirection.y, lookDirection.x * xglSin(travel->rotation.y) + lookDirection.z * xglCos(travel->rotation.y));
+    travel->rotation.x = atan2f(lookDirection.y, lookDirection.x * xglSin(travel->rotation.y) +
+                                                     lookDirection.z * xglCos(travel->rotation.y));
     travel->rotation.y = -travel->rotation.y;
 }
 
@@ -501,7 +474,48 @@ void xglCameraSetPadPort(XglCamera *camera, s32 port) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xgl_camera", func_001947F0);
+/* Camera pad step: takes the held and pressed buttons of pads 1 and of the camera's port (or the special buffer when it is
+ * active) and runs the update of the camera state: free or chase pad update, or the default travel init on the 0x10 press. */
+void xglCameraPadUpdate(XglCamera *camera) {
+    unsigned short held;
+    unsigned short pressed;
+
+    held = PadData[1].held | PadData[camera->padPort].held;
+    pressed = PadData[1].pressed | PadData[camera->padPort].pressed;
+    if (sdvSpecialBuf.active) {
+        held = sdvSpecialBuf.held;
+        pressed = sdvSpecialBuf.pressed;
+    }
+    switch (camera->cameraState) {
+    case 0:
+        return;
+    case 1:
+        break;
+    case 2:
+        if (held & 0x100) {
+            if (pressed & 0x10) {
+                xglCameraTravelDefaultInit(camera);
+            }
+        } else {
+            xglCameraPadUpdateFree(camera);
+        }
+        break;
+    case 3:
+        if (held & 0x100) {
+            if (pressed & 0x10) {
+                xglCameraTravelDefaultInit(camera);
+            }
+        } else {
+            xglCameraPadUpdateChase(camera);
+        }
+        break;
+    case 4:
+        break;
+    default:
+        break;
+    }
+    sdvInitSpecialWork();
+}
 
 void xglVectorScale(Vector4 *scaledVector, const Vector4 *vector, float scale);
 
@@ -520,6 +534,10 @@ typedef struct CameraDepthRange {
 
 /* Derives the screen offset and scale, the clip range and the projection from the window, resolution and
  * port effect of the camera screen. */
+const unsigned char D_00541294[28] = { 0 };
+
+const AlignedVector4 gDefaultSpringOffset = { 0.0f, 0.0f, 0.0f, 1.0f };
+
 void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
 {
     XglCameraScreen *screen = &camera->screen;
@@ -558,21 +576,13 @@ void xglCameraViewScreen(XglCamera *camera, const Vector4 *offset)
 
 float tanf(float angle);
 void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
-
 void xglPlaneParameter(Vector4 *plane, const Vector4 *a, const Vector4 *b, const Vector4 *c);
-
 void xglMatrixStackMul(Matrix4 matrix);
-
 void xglMatrixStackInverse(void);
-
 void xglMatrixStackTrans(const Vector4 *vector);
-
 void xglMatrixStackRotX(float angle);
-
 void xglMatrixStackRotZ(float angle);
-
 void xglMatrixStackFrustum(float left, float right, float bottom, float top, float nearPlane, float farPlane);
-
 extern signed char aaiVertexIndex[6][3];
 
 /* Builds the frustum corners and the view/inverse transforms from the screen and travel state, then saves them into
@@ -670,14 +680,10 @@ void xglCameraViewVolume(XglCamera *camera, Vector4 *offset) {
 }
 
 void xglCameraResetState(XglCamera *camera);
-
 /* Fills the CameraTravel block at camera+0x90 with the default travel view. */
 void xglCameraTravelDefaultInit(XglCamera *camera);
-
 void xglCameraScreenInit(XglCamera *camera);
-
 void xglCameraViewTravel(XglCamera *camera, Vector4 *cameraShift);
-
 void xglCameraViewVolume(XglCamera *camera, Vector4 *cameraShift);
 
 void xglCameraInit(XglCamera *camera) {
@@ -752,16 +758,35 @@ void xglCameraSetWindow(XglCamera *camera, int left, int top, int right, int bot
     screen->window.vector.w = bottom;
 }
 
-extern f32 gCameraDefaultNearClip;
-
-extern f32 gCameraDefaultFarClip;
-
 void xglCameraResetClipRange(XglCamera *camera) {
     f32 nearClip;
     f32 farClip;
 
-    nearClip = gCameraDefaultNearClip;
-    farClip = gCameraDefaultFarClip;
+    nearClip = 0.08f;
+    farClip = 12000.0f;
     camera->screen.clipRange.vector.y = farClip;
     camera->screen.clipRange.vector.x = nearClip;
 }
+
+AlignedVector4 gCameraDefaultClipRange = { 0.08f, 14000.0f, 0.0f, 0.0f };
+AlignedVector4 gCameraDefaultPortEffect = { 1.0f, 1.0f, 1.0f, 100.0f };
+AlignedVector4 gCameraDefaultRotation = { 0.0f, 0.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraDefaultAngleVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraDefaultAngleDelta = { 0.0f, 0.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraDefaultPosition = { 0.0f, 1.0f, 4.0f, 1.0f };
+AlignedVector4 gCameraDefaultPlaceVelocity = { 0.0f, 0.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraDefaultPlaceDelta = { 0.0f, 0.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraDefaultChaseReference = { 0.0f, 1.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraDefaultChasePosition = { 0.0f, 1.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraResetAngleDelta = { 0.0f, 0.0f, 0.0f, 1.0f };
+AlignedVector4 gCameraResetPlaceDelta = { 0.0f, 0.0f, 0.0f, 1.0f };
+signed char aaiVertexIndex[6][3] = {
+    { 0, 2, 4 },
+    { 1, 0, 5 },
+    { 0, 1, 2 },
+    { 3, 1, 7 },
+    { 2, 3, 6 },
+    { 4, 6, 5 }
+};
+
+CameraPadOverride sdvSpecialBuf;

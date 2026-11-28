@@ -17,7 +17,7 @@ typedef struct Ov02ArmedTrigger {
 } Ov02ArmedTrigger;
 
 extern Ov02ArmedTrigger gOv02ArmedTrigger;
-void func_0025C240();
+void battleUpdateStep();
 
 void ov02FlagPoll(void) {
     s32 isArmed;
@@ -27,7 +27,7 @@ void ov02FlagPoll(void) {
     } else {
         isArmed = gOv02ArmedTrigger.armed != 0;
         /* The do/while(0) keeps the call out of tail position; plain if/else changes the frame. */
-        do { if (isArmed) { func_0025C240(); } } while (0);
+        do { if (isArmed) { battleUpdateStep(); } } while (0);
     }
 }
 

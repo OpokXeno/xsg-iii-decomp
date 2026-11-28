@@ -136,7 +136,7 @@ void objectApplyAxisFlags(ObjectTransform *transform) {
     objectUpdateAngles(transform);
 }
 
-s32 func_0025FD90(void *);
+s32 cameraAnglesWrapPi(void *);
 s32 xglVectorToAngles(void *angles, void *from, void *base, void *pitchLimits, void *yawLimits);
 s32 func_00265878(ObjectTransform *);
 
@@ -145,7 +145,7 @@ void objectUpdateAngles(ObjectTransform *transform) {
 
     angles = &transform->pitch;
     xglVectorToAngles(angles, transform->targetPosition, transform->position, transform->pitchLimits, transform->yawLimits);
-    func_0025FD90(angles);
+    cameraAnglesWrapPi(angles);
     func_00265878(transform);
 }
 
@@ -156,7 +156,7 @@ INCLUDE_ASM("asm/main/nonmatchings/tu262", func_002658B8);
 INCLUDE_ASM("asm/main/nonmatchings/tu262", func_00265A78);
 
 extern unsigned char objectAdvanceFailText[];
-s32 func_00260238(void *, s16, void *, void *, f32);
+s32 mapProbeSpanHit(void *, s16, void *, void *, f32);
 s32 xglFontDebugPrintAt(s32, s32, void *);
 void objectApplyAxisFlags();
 
@@ -166,7 +166,7 @@ void objectAdvanceToTarget(ObjectTransform *transform) {
 
     targetPosition = transform->targetPosition;
     __asm__ __volatile__("lqc2 vf20, 0(%0)\n\tlqc2 vf21, 0(%1)\n\tvadd.xyzw vf20, vf20, vf21\n\tsqc2 vf20, 0(%0)" :  : "r"(targetPosition), "r"(transform->velocity) : "memory");
-    if ( func_00260238(transform, transform->advanceMode, targetPosition, transform->rotation, transform->offsetZ) == 0) {
+    if ( mapProbeSpanHit(transform, transform->advanceMode, targetPosition, transform->rotation, transform->offsetZ) == 0) {
         xglFontDebugPrintAt(0x28, 0x32, objectAdvanceFailText);
     }
     copiedValue = transform->sourceValue;

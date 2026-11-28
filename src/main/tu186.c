@@ -351,9 +351,9 @@ s32 vmSetRosterTableFlag(s32 vmThread) {
 }
 
 s32 func_00230218(s32);
-s32 func_0025F5C0(s32);
+s32 cameraCaptureOrRestoreSlots(s32);
 
-/* VM native: builds the roster flags from the current roster index and an optional shifted bit, then calls func_00230218 between func_0025F5C0(1) and func_0025F5C0(0). */
+/* VM native: builds the roster flags from the current roster index and an optional shifted bit, then calls func_00230218 between cameraCaptureOrRestoreSlots(1) and cameraCaptureOrRestoreSlots(0). */
 s32 vmSetRosterFlagsFromArgs(s32 vmThread) {
     extern u8 gBattleCurrentRosterIndex[];
     extern s32 VM_PLUGIN_CNT_GET(s32);
@@ -372,9 +372,9 @@ s32 vmSetRosterFlagsFromArgs(s32 vmThread) {
             rosterFlags |= rosterBit << vmArgValue;
         }
     }
-    func_0025F5C0(1);
+    cameraCaptureOrRestoreSlots(1);
     func_00230218(rosterFlags);
-    func_0025F5C0(0);
+    cameraCaptureOrRestoreSlots(0);
     return 1;
 }
 
@@ -385,10 +385,10 @@ s32 vmStartSeVoiceFromArgGuarded(s32 vmThread) {
     s32 seVoiceResult;
     s32 seVoiceId;
 
-    func_0025F5C0(1);
+    cameraCaptureOrRestoreSlots(1);
     seVoiceId = vmArgGet(vmThread, 1);
     seVoiceResult = seVoiceStartGuarded(seVoiceId);
-    func_0025F5C0(0);
+    cameraCaptureOrRestoreSlots(0);
     return seVoiceResult;
 }
 

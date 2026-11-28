@@ -40,7 +40,7 @@ sys.path.insert(0, str(ROOT / 'tools/tu'))
 import tu_edit  # noqa: E402
 from x3_calibrate import ElfObject, Target  # noqa: E402
 
-CC = ROOT / '.work/toolchains/ee-gcc2.96-realconv-lp7-fsv16-v1/bin'
+CC = ROOT / '.work/toolchains/ee-gcc2.96-realconv-lp7-fsv17-v1/bin'
 AS = ROOT / '.work/toolchains/ee-legacy-binutils-la29-vsqrt-nolabel-laimm-swap-v1/bin/ee-as'
 CC_TU = ROOT / 'tools/tu/cc_tu.sh'
 HOMOLOGS = ROOT / 'annotations/leads/x2-homologs.tsv'

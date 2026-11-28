@@ -2,7 +2,6 @@
 #include "shared.h"
 
 /* Row-major 4x4 float matrix. */
-
 int MMathMatrixBetweenVectors(Matrix4 *rotation, const Vector4 *fromDirection, const Vector4 *toDirection);
 
 /* Builds in rotation the rotation that turns the unit vector from onto
@@ -84,6 +83,14 @@ int MMathMatrixBetweenVectors(Matrix4 *rotation, const Vector4 *fromDirection, c
     return isRotatedHalfTurn;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/m_se_obj", func_0025BA50);
+/* Release-build stub of the MatuzawaTest debug module: prints that the module has no debug code. */
+void matuzawaTestReportNoDebug(void) {
+    printf("MatuzawaTest: NODEBUG\n");
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/m_se_obj", func_0025BA70);
+extern void func_A949B0(void);
+
+/* Entry of the MatuzawaTest module: forwards to func_A949B0 (the real body, outside this TU). */
+void func_0025BA70(void) {
+    func_A949B0();
+}

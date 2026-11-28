@@ -7,6 +7,7 @@
 #include "quadword.h"
 
 typedef int s32;
+
 typedef signed char s8;
 
 /* Row-major 4x4 float matrix. */
@@ -18,6 +19,7 @@ union Matrix;
 struct PxyShadow;
 struct PxyHideMask;
 void *nmlPacketSetAttributeData16N(void *matrices, int count);
+
 void nmlModelDirectSend(int key, void *packetData, int qwc);
 void nmlModelDirectSendFull(int key, void *packetData, int qwc, int sendFlag, int sendState);
 void pxyAbortModel(void);
@@ -40,43 +42,13 @@ typedef struct PxyPlaneTable {
 
 #define PXY_SLOT_COUNT 4 /* ring of recently drawn packets */
 
-typedef struct PxyDrawSlot {
-    struct PxyDrawPacket *packet;
-    int batch;
-    int translucentBatch;
-    int unk0C;
-} PxyDrawSlot;
+/* A clip plane while it is built: the plane equation, written as one vector or element by element. */
 
-typedef union PxyBestRecord {
-    struct {
-        float best;  /* +0x00 */
-        int bestIndex;   /* +0x04 */
-        int bestCount;   /* +0x08 */
-        int unk0C;   /* +0x0c: not read here */
-    };
-    int rawWords[4];
-    u64 doublewords[2]; /* the records are doubleword aligned */
-} PxyBestRecord;
-
-/* PxyModelRenderState: defined after PxyBatchTable below. */
-
-/* One 8-byte record of the draw entry table: the part and the packet it belongs to. */
-typedef struct PxyDrawEntry {
-    PxyPart *part;
-    struct PxyDrawPacket *packet;
-} PxyDrawEntry;
-
-typedef struct PxyBatch {
-    s16 firstDrawEntry; /* +0x00: first entry in pxyDrawEntryTable */
-    s16 drawEntryCount;
-    float depth;
-    u32 batchFlags;
-    struct PxyDrawPacket *packet; /* +0x0c */
-    s16 unk10;
-    s16 nextBatch; /* +0x12: index of the next batch, < 0 at the end */
-    struct PxyBatch *translucent; /* +0x14 */
-    u8 unk18[8];
-} PxyBatch;
+/* The clip plane table of a draw packet as this function fills it. */
+typedef struct PxyClipPlaneTable {
+    PxyVector plane[2];
+    PxyVector angle[2];
+} PxyClipPlaneTable;
 
 typedef struct PxyDrawPacket {
     u32 renderStatus; /* +0x00 */
@@ -110,7 +82,8 @@ typedef struct PxyDrawPacket {
     float lowerClipHeight; /* +0xd0 */
     u8 unkD4[4];
     float upperClipHeight; /* +0xd8 */
-    u8 unkDC[0xE4 - 0xDC];
+    u8 unkDC[4];
+    u8 *partIndexList; /* +0xe0: 16 part indices ended by 0xff */
     u32 flags; /* +0xe4: bit 0 skips the translucent passes, bit 2 draws with the alternate light tables */
     u8 unkE8[0xF0 - 0xE8];
     Matrix4 localMatrix; /* +0xf0: model to world */
@@ -123,6 +96,43 @@ typedef struct PxyDrawPacket {
     u8 unk1D4[0x1E0 - 0x1D4];
     void (*postDraw)(int camera, int drawPass); /* +0x1e0 */
 } PxyDrawPacket;
+
+typedef struct PxyDrawSlot {
+    struct PxyDrawPacket *packet;
+    int batch;
+    int translucentBatch;
+    int unk0C;
+} PxyDrawSlot;
+
+typedef union PxyBestRecord {
+    struct {
+        float best;  /* +0x00 */
+        int bestIndex;   /* +0x04 */
+        int bestCount;   /* +0x08 */
+        int unk0C;   /* +0x0c: not read here */
+    };
+    int rawWords[4];
+    u64 doublewords[2]; /* the records are doubleword aligned */
+} PxyBestRecord;
+
+/* PxyModelRenderState: defined after PxyBatchTable below. */
+/* One 8-byte record of the draw entry table: the part and the packet it belongs to. */
+typedef struct PxyDrawEntry {
+    PxyPart *part;
+    struct PxyDrawPacket *packet;
+} PxyDrawEntry;
+
+typedef struct PxyBatch {
+    s16 firstDrawEntry; /* +0x00: first entry in pxyDrawEntryTable */
+    s16 drawEntryCount;
+    float depth;
+    u32 batchFlags;
+    struct PxyDrawPacket *packet; /* +0x0c */
+    s16 unk10;
+    s16 nextBatch; /* +0x12: index of the next batch, < 0 at the end */
+    struct PxyBatch *translucent; /* +0x14 */
+    u8 unk18[8];
+} PxyBatch;
 
 /* The 16-byte tail of a batch table. As in X2's PxyBatchTableTail the record is doubleword aligned: with a
  * word-aligned record GCC folds the field offset into the loop pointer, the original keeps it as the store offset. */
@@ -264,31 +274,7 @@ typedef struct PxyModelRenderState {
     u8 resetWork[0x30]; /* +0x1dd50 */
 } PxyModelRenderState;
 
-/* One 16-byte record of the pxy entry table pxyEntryQueue. */
-typedef struct PxyPacketRequest {
-    void *packetData; /* +0x00: the packet data, copied to the attribute buffer when the key is even */
-    unsigned short quadwordCount; /* +0x04: low half of the second argument */
-    unsigned char groupBit; /* +0x06: bit index into pxyEntryGroupMask */
-    unsigned char sendFlag; /* +0x07 */
-    int sendState; /* +0x08 */
-    unsigned char row; /* +0x0C: key / 12 */
-    unsigned char unmodeled_0d[3];
-} PxyPacketRequest;
-
-extern PxyPacketRequest pxyEntryQueue[400];
-void xglVectorClear(Vector4 *destination);
-extern int nmlRenderStatus;
-extern int pxyShadowMode;
-extern PxyModelHeader *pxyCurrentHeader;
-extern int pxyRenderLevel;
-extern Matrix *pxyShadowMatrix;
-extern PxyPlaneTable *pxyClipPlanes;
-extern Matrix *pxyGlobalMatrices;
-extern Matrix nmlModelDrawMatrix;
-extern float nmlModelSortOffset;
-extern int pxyForcedVisibilityRequested;
 void pxyResetGlobals(void);
-extern int pxyEntryGroupMask;
 
 extern PxyModelRenderState gPxyModelRenderStateStorage;
 extern int pxyCameraEnabled[4];
@@ -516,7 +502,7 @@ extern int pxyShadowTexturesReady;
 #define PXY_CIRCLE_SHADOW_RADIUS 32.0f
 #define PXY_CIRCLE_SHADOW_FADE 31.0f
 /* The darkest level of the shadow texture. */
-#define PXY_CIRCLE_SHADOW_LEVEL_MAX 31.0f
+
 /* The fade ramp spread of the shadow palette. */
 #define PXY_CIRCLE_SHADOW_RAMP_SPREAD 0.3f
 
@@ -529,7 +515,7 @@ void CONSTRUCT_CIRCLR_SHADOW(void)
     int column;
     PxyUploadHeader *packet;
 
-    maxLevel = PXY_CIRCLE_SHADOW_LEVEL_MAX;
+    maxLevel = PXY_CIRCLE_SHADOW_FADE;
     if (pxyShadowTexturesReady != 0) {
         return;
     }
@@ -617,7 +603,6 @@ PxyModelRenderState *pxyModelRenderStateGet(void) {
     return &gPxyModelRenderStateStorage;
 }
 
-
 void pxyModelRenderStateInitLight(void) {
     func_001975C8(&gPxyModelRenderStateStorage);
 }
@@ -629,6 +614,7 @@ void xglMatrixStackRotX(float angle);
 void xglMatrixStackRotY(float angle);
 void xglMatrixStackSave(Matrix4 matrix);
 extern const AlignedVector4 cfeForwardVector;
+const AlignedVector4 cfeForwardVector = { 0.0f, 0.0f, 1.0f, 1.0f };
 
 void pxySetSyncMode(s32 syncMode) {
     gPxyModelRenderStateStorage.shadowCasterMode = syncMode;
@@ -871,7 +857,6 @@ void nmlModelSetFogCol(Vector4 *color)
 
 /* A vector kept as a plain float[4] (like sceVu0FVECTOR); its w is element 3. Vector4 here changes the
  * address arithmetic of the w stores, so the casts to Vector4 * at the calls stay. */
-
 XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
 
 void nmlModelFogPara(Vector4 *out, f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
@@ -902,7 +887,6 @@ void nmlModelSetFogDist(f32 fogNear, f32 fogFar, f32 fogMin, f32 fogMax) {
     nmlModelFogPara((Vector4 *)&gPxyModelRenderStateStorage.fogParams, fogNear, fogFar, fogMin, fogMax);
     gPxyModelRenderStateStorage.renderStatus |= 1;
 }
-
 
 void _CurMatrixSet(Matrix4 *matrix);
 void _CurRotTransPersFog(Vector4 *projected, const Vector4 *position, const Vector4 *fog);
@@ -1100,7 +1084,6 @@ void nmlModelSetStoredValue(int storedValue) {
     gPxyModelRenderStateStorage.activeCameraIndex = storedValue;
 }
 
-
 void pxyAbortModel(void) {
     pxyResetGlobals();
 }
@@ -1162,7 +1145,6 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019F678);
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019F778);
 
-
 void pxySetClipPlaneMasked(PxyRowBits *plane, PxyRowBits *angle, int maskedPlaneCount, float x, float y, float z, u32 *planeMask) {
     if (plane->rowWords[0] != 0 || plane->rowWords[1] != 0 || plane->rowWords[2] != 0 || angle->rowWords[0] != 0 || angle->rowWords[1] != 0 || angle->rowWords[2] != 0) {
         PxyModelRenderState *renderState = &gPxyModelRenderStateStorage;
@@ -1189,7 +1171,6 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_0019FA20);
 
 #include "gs.h"
 
-
 /* The render targets of xgl_render.c's state block (D_004C8390). */
 typedef struct XglRenderTargets {
     u8 unk00[2];
@@ -1204,22 +1185,18 @@ typedef struct XglRenderTargets {
 extern XglRenderTargets D_004C8390;
 
 #define PXY_SHADOW_QUADWORDS 0x36
-/* A vector the pxy code also moves as four words. */
 
+/* A vector the pxy code also moves as four words. */
 void xglVectorNormal(Vector4 *destination, const Vector4 *source);
 void xglVectorScale(Vector4 *destination, Vector4 *source, float scale);
 void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
 f32 xglPointLength(void *from, void *to);
 void xglMatrixScale(Matrix *destination, Matrix *source, Vector4 *scale);
-void xglMatrixStackUnit(void);
 void xglMatrixStackTrans(Vector4 *translation);
-void xglMatrixStackRotX(float angle);
-void xglMatrixStackRotY(float angle);
 void xglMatrixStackRotZ(float angle);
 void xglMatrixStackScale(Vector4 *scale);
 void xglMatrixStackInverse(void);
 void xglMatrixStackMul(Matrix4 matrix);
-void xglMatrixStackSave(Matrix4 matrix);
 void xglMatrixInverse(Matrix4 inverseMatrix, Matrix4 matrix);
 void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
 struct XglCamera *xglStudioSelectGetActiveCamera(int cameraIndex);
@@ -1540,8 +1517,6 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A0ED0);
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A1140);
 
-struct XglCamera *xglStudioSelectGetActiveCamera(int cameraIndex);
-void _CurMatrixSet(Matrix4 *matrix);
 void _CurSetViewScaleTrans(Vector4 *scale, Vector4 *translation);
 int _CurRotTransPersClipScreen(ScreenVector4 *screenOut, const Vector4 *point);
 float tanf(float x);
@@ -1567,10 +1542,6 @@ float pxyCalcFadeMetric(int cameraIndex, const Vector4 *point, float scale) {
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A12A0);
-
-void _ModelCalcClipInitMat1(float (*planeSet)[4], Matrix4 matrix);
-int _ModelCalcClipMat1(Vector4 *point);
-int xglCullingPollCheck(XglCamera *camera, Vector4 *sphere);
 
 void pxyCalcCameraVisibility(void)
 {
@@ -1680,6 +1651,8 @@ typedef struct PxyShuffleTable {
 } PxyShuffleTable;
 
 extern const PxyShuffleTable pxyHeaderShuffleTable;
+const PxyShuffleTable pxyHeaderShuffleTable = { {
+    { 0, 1 }, { 1, 2 }, { 2, 3 }, { 3, 0 }, { 0, 2 }, { 1, 3 }, { 2, 0 }, { 3, 1 } } };
 
 /* Undoes the in-place scramble of a pxy modelHeader when flags bit 31 is set. */
 void pxyUnscrambleHeader(PxyModelHeader *modelHeader)
@@ -1717,7 +1690,6 @@ void pxyUnscrambleHeader(PxyModelHeader *modelHeader)
         modelHeader->flags &= 0x7fffffff;
     }
 }
-
 
 #define PXY_BATCH_MAX 256
 #define PXY_OPAQUE_ENTRY_END 4096      /* end of the opaque draw-entry range */
@@ -1785,15 +1757,8 @@ void pxyCalcFogFactors(PxyModelHeader *header);
 void func_001A17F8(PxyModelHeader *header);
 void pxySetupShadowProjector(PxyModelHeader *header);
 void func_001A0ED0(PxyDrawSlot *slot, PxyDrawPacket *packet);
-void xglVectorScaleXYZ(Vector4 *destination, const Vector4 *source, float scale);
-void xglMatrixInverse(Matrix4 inverseMatrix, Matrix4 matrix);
 void xglMatrixStackLoad(Matrix4 matrix);
-void xglMatrixStackMul(Matrix4 matrix);
 void xglMatrixStackMulVector(Vector4 *transformedVector, const Vector4 *vector);
-void xglMatrixStackRotX(float angle);
-void xglMatrixStackRotY(float angle);
-void xglVectorNormal(Vector4 *destination, const Vector4 *source);
-f32 xglPointLength(void *from, void *to);
 void *xglPacketCopy16(const void *data, unsigned int qwc);
 void *memcpy(void *destination, const void *source, unsigned int size);
 
@@ -2421,7 +2386,6 @@ int pxySubmitModel(PxyModelHeader *modelHeader)
     return 0;
 }
 
-
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3638);
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A3D90);
@@ -2443,17 +2407,57 @@ void nmlModelDirectSendWithFlag(s32 key, void *packetData, s32 qwc, s32 sendFlag
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", nmlModelDirectSendFull);
 
-INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001A4058);
+/* kept apart: the real PxyDrawWork is declared after this function; same layout. */
+typedef struct PxyDrawWorkView {
+    PxyDrawEntry *entry;       /* +0x00 */
+    int i;                            /* +0x04 */
+    u32 batchFlags;                   /* +0x08 */
+    int count;                        /* +0x0c */
+    PxyDrawPacket *packet;     /* +0x10 */
+    PxyDrawPacket *lastPacket; /* +0x14 */
+    int mode;                         /* +0x18 */
+    PxyPart *part;                    /* +0x1c */
+    u32 partFlags;                    /* +0x20 */
+    u32 packetFlags;                  /* +0x24 */
+    int unk28;                        /* +0x28 */
+    u8 cameraBit;                     /* +0x2c */
+    u8 unk2D[3];
+    u32 frameMask;          /* +0x30 */
+    u32 frameBase;          /* +0x34 */
+    PxyBatch *batch; /* +0x38 */
+} PxyDrawWorkView;
+
+int pxyPacketExcludesPart(PxyDrawPacket *packet, PxyDrawWorkView *work);
+
+/* Returns 1 when the packet has a part index list (partIndexList, ended by 0xFF) that does not contain the part of the
+ * work record, 0 otherwise: the part is excluded from the packet. */
+int pxyPacketExcludesPart(PxyDrawPacket *packet, PxyDrawWorkView *work) {
+    if (packet->partIndexList != 0) {
+        int i;
+
+        for (i = 0; i < 16; i++) {
+            if (packet->partIndexList[i] == 0xFF) {
+                break;
+            }
+            if (work->part->index == packet->partIndexList[i]) {
+                return 0;
+            }
+        }
+        return 1;
+    }
+    return 0;
+}
 
 #include "gs.h"
 
-/* The X3 layout of the packet a batch draws: X2's PxyPacket with 0x10 more bytes below +0x9c. */
+/* One value of the scratchpad block at 0x70000000 (the effect work area). */
+#define SEF_SCRATCHPAD(type, offset) (*(type *) (0x70000000 + (offset)))
 
 #include "main/xgl_direct_queue.h"
 
+/* The X3 layout of the packet a batch draws: X2's PxyPacket with 0x10 more bytes below +0x9c. */
+
 /* ---- pxyDrawBatches ---- */
-
-
 extern XglDirectQueueEntry *xglDirectQueueBuffer;
 extern int xglDirectQueueCount;
 
@@ -2465,6 +2469,9 @@ typedef struct BlurPassValues {
 
 extern const BlurPassValues pxyBlurPassAlphaTable[];
 extern const BlurPassValues D_00541E80[];
+const BlurPassValues pxyBlurPassAlphaTable[] = { { 40, 48 } };
+const BlurPassValues D_00541E80[] = { { 2, 1 } };
+const char D_00541E88[24] = "pxyFlush";
 void nmlPacketClrModelCache(void);
 void nmlPacketClrMatrixCache(void);
 void nmlPacketClrTextureCache(void);
@@ -2477,7 +2484,6 @@ void nmlPacketAddGsFlush(void);
 void nmlPacketAddGsFlushWide(void);
 
 /* ---- pxyDrawShadowCaster ---- */
-
 /* Draw state kept in the EE scratchpad while the batches are drawn. */
 typedef struct PxyDrawWork {
     PxyDrawEntry *entry; /* +0x00 */
@@ -2498,25 +2504,13 @@ typedef struct PxyDrawWork {
     PxyBatch *batch; /* +0x38 */
 } PxyDrawWork;
 
-#define pxyDrawWork ((PxyDrawWork *)0x70000000)
-
-/* A clip plane while it is built: the plane equation, written as one vector or element by element. */
-typedef union PxyClipPlane {
-    AlignedVector4 vector;
-    u32 words[4];
-} PxyClipPlane;
-
-/* The clip plane table of a draw packet as this function fills it. */
-typedef struct PxyClipPlaneTable {
-    PxyClipPlane plane[2];
-    PxyClipPlane angle[2];
-} PxyClipPlaneTable;
+#define pxyDrawWork (&SEF_SCRATCHPAD(PxyDrawWork, 0x0))
 
 typedef struct XglPacket XglPacket;
+
 typedef unsigned int XglQuadword __attribute__((mode(TI)));
 
 extern PxyDrawEntry D_008D3600[];
-int func_001A4058(PxyDrawPacket *packet, PxyDrawWork *work);
 void func_001AAE70(int mode, PxyDrawPacket *packet);
 void pxyPacketSelectMode(PxyDrawPacket *packet);
 void func_001ACB50(void);
@@ -2529,13 +2523,7 @@ void sceVif1PkOpenUpkCode(XglPacket *packet, unsigned int address, unsigned int 
 void sceVif1PkAddUpkData128N(XglPacket *packet, const void *data, unsigned int count);
 void sceVif1PkAddUpkData128(XglPacket *packet, XglQuadword data);
 void sceVif1PkCloseUpkCode(XglPacket *packet);
-void xglMatrixStackLoad(Matrix4 matrix);
-void xglMatrixStackMul(Matrix4 matrix);
-void xglMatrixStackSave(Matrix4 matrix);
-void xglMatrixStackMulVector(Vector4 *transformedVector, const Vector4 *vector);
 void xglMatrixMul(Matrix4 productMatrix, Matrix4 left, Matrix4 right);
-void xglMatrixInverse(Matrix4 inverseMatrix, Matrix4 matrix);
-void xglVectorMulMat(Vector4 *transformedVector, Matrix4 matrix, const Vector4 *vector);
 
 /* Draws the batches of shadow caster `caster` into its shadow texture at frameBase. */
 void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
@@ -2576,7 +2564,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
     nmlPacketAddGsFlushWide();
     for (overlayIndex = 0; overlayIndex < pxyState.overlayBatchCount; overlayIndex++) {
         int pass;
-        PxyClipPlane clipPlane;
+        PxyVector clipPlane;
         XglPacket *shadowQueue;
         Matrix4 uploadMatrix;
         AlignedVector4 partBounds[2];
@@ -2674,7 +2662,7 @@ void pxyDrawShadowCasterTexture(int caster, u32 frameBase)
                 if (drawWork->packet->header->flags & 0x80) {
                     break;
                 }
-                if (func_001A4058(packet, drawWork)) {
+                if (pxyPacketExcludesPart(packet, drawWork)) {
                     continue;
                 }
                 if (drawWork->part->flags & 0x1000) {
@@ -3362,7 +3350,6 @@ INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA1B0);
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA580);
 
-extern s32 gPxyDirtyFlag;
 s32 func_001AA580();
 
 void pxyStateConsumeDirty(void) {
@@ -3375,7 +3362,6 @@ void pxyStateConsumeDirty(void) {
 
 void pxyFinishInit();
 void pxyInitPacketSlots();
-void pxyInitGlobals();
 void pxyClearEntryTable(void);
 
 void pxyInitModuleState(void) {
@@ -3440,3 +3426,25 @@ void pxyPlayEntryGroupFive(void) {
 }
 
 INCLUDE_ASM("asm/main/nonmatchings/nml_model_set", func_001AA968);
+
+/* ---- data of this TU (scaffold items recovered in C) ---- */
+int gPxyFadeRampIndexTable[32] = {
+    0, 1, 2, 3, 4, 5, 6, 7,
+    16, 17, 18, 19, 20, 21, 22, 23,
+    8, 9, 10, 11, 12, 13, 14, 15,
+    24, 25, 26, 27, 28, 29, 30, 31
+};
+int pxyCameraEnabled[4] = { 0 };
+Vector4 pxyGlobalColor = { 0 };
+
+s32 D_00551240 = 0;
+s32 gPxyDirtyFlag = 0;
+int pxyShadowTexturesReady = 0;
+
+const float D_0054FFF4 = 0.2f;
+
+/* .bss: the render state (its inner labels are fields), then the shadow texture, its CLUT and the fade ramp table. */
+PxyModelRenderState gPxyModelRenderStateStorage;
+PxyCircleShadowTexture pxyCircleShadowTexture;
+PxyUploadHeader pxyCircleShadowClut;
+int gPxyFadeRampTable[1024];

@@ -16,7 +16,7 @@ typedef struct TiRingVertex {
     f32 w;
 } TiRingVertex;
 f32 actorSlotGetRadius();
-s32 func_0025BE00();
+s32 actorSlotGetVector();
 void tiRingEmitVertices(TiRingVertex *vertices, s32 *counter, void *offset, f32 radius);
 
 void tiRingEmitMode2(TiRingVertex *vertices, s32 *emittedVertexCount, s32 actorSlot) {
@@ -24,9 +24,9 @@ void tiRingEmitMode2(TiRingVertex *vertices, s32 *emittedVertexCount, s32 actorS
     f32 radius;
 
     radius = actorSlotGetRadius(actorSlot);
-    if (func_0025BE00(&offsetVector[0], actorSlot, 2) != 0) {
+    if (actorSlotGetVector(&offsetVector[0], actorSlot, 2) != 0) {
         tiRingEmitVertices(vertices, emittedVertexCount, &offsetVector[0], radius);
-        if (func_0025BE00(&offsetVector[0], actorSlot, 0) != 0) {
+        if (actorSlotGetVector(&offsetVector[0], actorSlot, 0) != 0) {
             tiRingEmitVertices(vertices, emittedVertexCount, &offsetVector[0], radius);
         }
     }
@@ -71,9 +71,9 @@ void tiRingEmitMode1(TiRingVertex *vertices, s32 *emittedVertexCount, s32 actorS
     f32 radius;
 
     radius = actorSlotGetRadius(actorSlot);
-    if (func_0025BE00(&offsetVector[0], actorSlot, 1) != 0) {
+    if (actorSlotGetVector(&offsetVector[0], actorSlot, 1) != 0) {
         tiRingEmitVertices(vertices, emittedVertexCount, &offsetVector[0], radius);
-        if (func_0025BE00(&offsetVector[0], actorSlot, 0) != 0) {
+        if (actorSlotGetVector(&offsetVector[0], actorSlot, 0) != 0) {
             tiRingEmitVertices(vertices, emittedVertexCount, &offsetVector[0], radius);
         }
     }

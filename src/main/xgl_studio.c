@@ -107,7 +107,7 @@ XglCamera *xglStudioSelectGetActiveCamera(int studio_index)
 XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
 void xglCameraInit(XglCamera *camera);
 void xglCameraMove(XglCamera *camera);
-void func_001947F0(XglCamera *camera);
+void xglCameraPadUpdate(XglCamera *camera);
 void xglRenderIoEnd(void);
 void xglLightPrepare(StudioLight *light);
 
@@ -194,7 +194,7 @@ void xglStudioMove(void)
             camera = xglStudioGetCamera2(camera_index);
             if (camera->active == 1) {
                 if (studio_index == gSelectedStudioIndex && gStudioSceneFlag != 0)
-                    func_001947F0(camera);
+                    xglCameraPadUpdate(camera);
                 xglCameraMove(camera);
             }
         }

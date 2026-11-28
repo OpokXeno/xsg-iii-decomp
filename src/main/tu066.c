@@ -994,7 +994,7 @@ s32 MMathRandomNext();
 void sefFlagSetBit26();
 void njPlaneSetRange();
 void func_001BBBB8();
-void func_0025F5C0();
+void cameraCaptureOrRestoreSlots();
 void soundDriverSetOutputMode();
 void soundSlotSetLevelIfStill();
 void func_00230218();
@@ -1049,11 +1049,11 @@ void func_001BD450() {
     }
     if (!(gGameLoopRuntime.loopFlags & 0x4800) && (slot->flags & 0x400000) && !slot->unk_158) {
         if (pressedButtons & PAD_BUTTON_TRIANGLE) {
-            func_0025F5C0(1);
+            cameraCaptureOrRestoreSlots(1);
             soundDriverSetOutputMode(1);
             soundSlotSetLevelIfStill(1, 1);
             func_00230218(((s32) slot->flags >> 8) & 1);
-            func_0025F5C0(0);
+            cameraCaptureOrRestoreSlots(0);
             soundDriverSetOutputMode(0);
             soundSlotSetLevelIfStill(1, 0);
             gGameLoopRuntime.waitFrames = 5;

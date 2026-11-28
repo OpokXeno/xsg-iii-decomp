@@ -176,7 +176,7 @@ PlayerObject *RgDispModelFindByKey(s32 mode);
 f32 MMathCalcDist(const Vector4 *fromPoint, const Vector4 *toPoint);
 void seVoiceStartDefault(unsigned int handle);
 void func_00A83760(void);
-s32 func_0025F5C0(s32 flag);
+s32 cameraCaptureOrRestoreSlots(s32 flag);
 s32 soundDriverSetOutputMode(s32 mode);
 s32 soundSlotSetLevelIfStill(s32 slot, s32 level);
 s32 saveScreenRun(s32 mode);
@@ -224,7 +224,7 @@ void emitterSoundUpdate(EmitterOwner *owner) {
     if ((gGameLoopRuntimeStorage[0] & 0x04000800) == 0 && (player->flags & 0x400000) != 0 &&
         (params->flags & 1) != 0 && (gPadDataPressed[0] & 0x20) != 0) {
         if (params->soundTableRow == 0 || params->soundTableRow == 3) {
-            func_0025F5C0(1);
+            cameraCaptureOrRestoreSlots(1);
             soundDriverSetOutputMode(1);
             soundSlotSetLevelIfStill(1, 1);
         }
@@ -240,7 +240,7 @@ void emitterSoundUpdate(EmitterOwner *owner) {
             break;
         }
         if (params->soundTableRow == 0 || params->soundTableRow == 3) {
-            func_0025F5C0(0);
+            cameraCaptureOrRestoreSlots(0);
             soundDriverSetOutputMode(0);
             soundSlotSetLevelIfStill(1, 0);
         }

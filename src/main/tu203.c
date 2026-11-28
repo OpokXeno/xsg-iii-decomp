@@ -1,123 +1,235 @@
 #include "common.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_00249230);
+#include "main/tu007.h"
 
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_002493C0);
+/* One value of the scratchpad block at 0x70000000 (the effect work area). */
+#define SEF_SCRATCHPAD(type, offset) (*(type *) (0x70000000 + (offset)))
+extern struct TextLine {
+    char *text;
+} *movieListLines;
 
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_00249740);
+extern int xglCdGetFileSize(const char *name);
+extern void *memset(void *dst, int value, unsigned int size);
 
-typedef signed char s8;
-typedef int s32;
-typedef unsigned int u32;
-typedef float f32;
-typedef unsigned char u8;
-extern s8 gXglCdDiskStatus;
+const char movieListPageFormat[16] = "%2d / %2d";
+const char movieListTextColourGrey[56] = "$bg3;$prop1;$han1;$xx0,36;$xx1,8;$xx2,0;$col707070;";
+const char movieListTextColourGreen[56] = "$bg3;$prop1;$han1;$xx0,36;$xx1,8;$xx2,0;$col60c000;";
+const char D_0053AFB0[40] = "\xa2" "\xa2" "\xa1" "\xa7" "\xa3" "\xc4" "\xa3" "\xef" "\xa3" "\xec" "\xa3" "\xe2" "\xa3" "\xf9" "\xa3" "\xc4" "\xa3" "\xe9" "\xa3" "\xe7" "\xa3" "\xe9" "\xa3" "\xf4" "\xa3" "\xe1" "\xa3" "\xec" " .%s";
+const char D_0053AFD8[24] = "\xa3" "\xcc" "\xa3" "\xd2" "\xa1" "\xa7" "\xa3" "\xd6" "\xa3" "\xcf" "\xa3" "\xcc" " .%d";
 
-void xglCdSetDiskStatus(s8 diskStatus) {
-    gXglCdDiskStatus = diskStatus;
-}
+/* Loads the movie list file `name` into `buffer` and splits it into text lines. The table at 0x00980000
+ * holds one TextLine pointer per slot (256 slots); the text of slot n lives in 128-byte rows from 0x00980400.
+ * CR LF ends a line, a bare LF is dropped, a '.' ends the visible text of its line. Returns the line count,
+ * or -1 when the read fails. */
+int movieListLoadLines(char *fileBuffer, const char *name) {
+    int fileSize;
+    int lineCount;
+    int column;
+    int lineIndex;
+    char *lineText;
+    int i;
 
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_00249870);
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_00249B40);
-
-/* The request block xglCdReadFileBlocking fills: the destination and the completion flags (the bytes between are not used here). */
-typedef struct XglCdReadJob {
-    u8 unk_00[0x28];
-    s32 loadAddress;
-    u8 unk_2C[0x8];
-    s32 completionFlags;
-} XglCdReadJob;
-
-#define xglCdReadJob (*(XglCdReadJob *) gXglCdReadJob)
-
-extern unsigned char gXglCdReadJob[];
-s32 xglCdReadFile(s32 fileId, s32 destination, s32 mode, s32 notify);
-s32 xglCdServiceIfPending();
-
-void xglCdReadFileBlocking(s32 fileId)
-{
-  while (xglCdServiceIfPending() != 0)
-  {
-  }
-  xglCdReadFile(fileId, xglCdReadJob.loadAddress, 1, 0);
-  xglCdReadJob.completionFlags |= 1;
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_00249C00);
-
-extern s32 gXglCdPendingStatus[];
-s32 func_00249870(s32 status);
-
-void xglCdFlushStatus(void) {
-    func_00249870(gXglCdPendingStatus[0]);
-
-}
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_00249CE0);
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_0024A008);
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_0024A058);
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_0024A0B8);
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_0024A0E8);
-
-INCLUDE_ASM("asm/main/nonmatchings/tu203", func_0024A340);
-
-void func_0024A340(s32 id, void *payload);
-
-/* One 0x90-byte envelope record. The view starts at the timing words (+0x40 of the record), so the record's own
- * payload and id live at the tail of the previous view. */
-typedef struct EnvelopeEntry {
-    s32 time;
-    f32 rate;
-    f32 level;
-    u8 unk_0C[0x68];
-    s32 id;
-    u8 unk_78[0x18];
-} EnvelopeEntry;
-
-typedef struct EnvelopePayload {
-    u8 envelopeBytes[0x90];
-} EnvelopePayload;
-
-/* Count-prefixed table: the same records seen from the payload start (+0x10) and from the timing words (+0x50). */
-typedef struct EnvelopeTable {
-    u32 count;
-    u8 unk_04[0xC];
-    union {
-        EnvelopePayload payloads[1];
-        struct {
-            u8 unk_00[0x40];
-            EnvelopeEntry envelopeEntries[1];
-        } timing;
-    } envelopeSteps;
-} EnvelopeTable;
-
-void xglEnvelopeTableUpdate(EnvelopeTable *envelopeTable, s32 time) {
-    f32 level;
-    u32 envelopeStepIndex;
-    EnvelopeEntry *envelopeEntry;
-    EnvelopePayload *envelopePayload;
-
-    envelopeStepIndex = 0;
-    if (envelopeTable->count != 0) {
-        envelopePayload = envelopeTable->envelopeSteps.payloads;
-        envelopeEntry = envelopeTable->envelopeSteps.timing.envelopeEntries;
-        do {
-            if (time >= envelopeEntry->time) {
-                func_0024A340(envelopeEntry[-1].id, envelopePayload);
-                level = envelopeEntry->level + envelopeEntry->rate;
-                envelopeEntry->level = level;
-                if (level > 128.0f) {
-                    envelopeEntry->level = 128.0f;
-                }
+    fileSize = xglCdGetFileSize(name);
+    memset(fileBuffer, 0, fileSize);
+    if (xglCdReadFile(name, fileBuffer, 0, 0) <= 0) {
+        return -1;
+    }
+    memset((void *) 0x00980000, 0, 0x100000);
+    movieListLines = (struct TextLine *) 0x00980000;
+    lineText = (char *) 0x00980400;
+    for (i = 0; i < 256; i++) {
+        movieListLines[i].text = lineText;
+        lineText += 128;
+    }
+    lineCount = 0;
+    column = 0;
+    lineIndex = 0;
+    for (i = 0; i < fileSize; i++) {
+        if (fileBuffer[i] == '\r' && fileBuffer[i + 1] == '\n') {
+            movieListLines[lineIndex].text[column] = 0;
+            lineIndex++;
+            lineCount++;
+            column = 0;
+        } else if (fileBuffer[i] != '\n') {
+            movieListLines[lineIndex].text[column] = fileBuffer[i];
+            if (movieListLines[lineIndex].text[column] == '.') {
+                movieListLines[lineIndex].text[column] = 0;
             }
-            envelopeStepIndex += 1;
-            envelopePayload += 1;
-            envelopeEntry += 1;
-        } while (envelopeStepIndex < envelopeTable->count);
+            column++;
+        }
+    }
+    movieListLines[lineIndex].text[column] = 0;
+    return lineCount;
+}
+
+extern int movieListCount;
+extern int movieListCursor;
+extern int movieVolume;
+extern unsigned char gXglMcAgedEntries[];
+extern PadRecord PadData;
+extern char movieDolbyOnText[];
+extern char movieDolbyOffText[];
+int sprintf(char *destination, const char *format, ...);
+void xglFontPrint(int x, int y, int color, const char *text);
+void xglFontPrintDirect(const char *text);
+
+/* Movie list menu, one frame: the pad moves the cursor line (movieListCursor) and pages through the list,
+ * the pressed bit 0x80 toggles gXglMcAgedEntries[41] (the ON/OFF row), the repeated bits 0x4 and 0x8 move
+ * the volume (movieVolume, clamped to 0..127), then the page, the cursor line and the two value rows are drawn. */
+void movieListMenuFrame(void) {
+    int pageIndex;
+    int pageFirst;
+    int pageEnd;
+    int i;
+    int volumeCopy;
+    int nextLineIndex;
+    int previousPageFirst;
+    int nextPageFirst;
+    int volume;
+    int repeatedButtons;
+
+    pageIndex = movieListCursor / 15;
+    pageFirst = pageIndex * 15;
+    pageEnd = pageFirst + 15;
+
+    if (PadData.directionRepeated & 0x1000) {
+        if (movieListCursor - 1 < pageFirst) {
+            movieListCursor = pageFirst + 14;
+        } else {
+            movieListCursor = movieListCursor - 1;
+        }
+        if (movieListCursor >= movieListCount) {
+            movieListCursor = movieListCount - 1;
+        }
+    }
+    if (PadData.directionRepeated & 0x4000) {
+        nextLineIndex = movieListCursor + 1;
+        if (nextLineIndex >= pageEnd) {
+            nextLineIndex = pageFirst;
+        }
+        if (nextLineIndex >= movieListCount) {
+            nextLineIndex = pageFirst;
+        }
+        movieListCursor = nextLineIndex;
+    }
+    if (PadData.directionRepeated & 0x8000) {
+        previousPageFirst = movieListCursor - movieListCursor % 15 - 15;
+        if (previousPageFirst < 0) {
+            movieListCursor = movieListCount - 1;
+        } else {
+            movieListCursor = previousPageFirst;
+        }
+    }
+    if (PadData.directionRepeated & 0x2000) {
+        nextPageFirst = movieListCursor - movieListCursor % 15 + 15;
+        if (nextPageFirst >= movieListCount) {
+            nextPageFirst = 0;
+        }
+        movieListCursor = nextPageFirst;
+    }
+
+    sprintf(&SEF_SCRATCHPAD(char, 0x0), movieListPageFormat, pageIndex + 1, (movieListCount - 1) / 15 + 1);
+    xglFontPrint(10, 5, 0xFFFFFF, movieListTextColourGrey);
+    xglFontPrintDirect(&SEF_SCRATCHPAD(char, 0x0));
+
+    for (i = pageFirst; i < pageEnd && i < movieListCount; i++) {
+        if (i == movieListCursor) {
+            xglFontPrint(10, (i - pageIndex * 15) * 20 + 30, 0xFFFFFF, movieListTextColourGreen);
+        } else {
+            xglFontPrint(10, (i - pageIndex * 15) * 20 + 30, 0xFFFFFF, movieListTextColourGrey);
+        }
+        xglFontPrintDirect(movieListLines[i].text);
+    }
+
+    if (PadData.pressed & 0x80) {
+        gXglMcAgedEntries[41] ^= 1;
+    }
+    repeatedButtons = PadData.repeated;
+    if (repeatedButtons & 0xC) {
+        if (repeatedButtons & 0x4) {
+            volume = movieVolume;
+            volume--;
+        } else {
+            volume = movieVolume;
+        }
+        if (repeatedButtons & 0x8) {
+            volumeCopy = volume + 1;
+            volume = volumeCopy;
+        }
+        if (volume < 0) {
+            volume = 0;
+        }
+        volumeCopy = volume;
+        if (volumeCopy >= 128) {
+            volume = 127;
+            movieVolume = volume;
+        } else {
+            movieVolume = volumeCopy;
+        }
+    }
+
+    sprintf(&SEF_SCRATCHPAD(char, 0x0), D_0053AFB0, gXglMcAgedEntries[41] ? movieDolbyOnText : movieDolbyOffText);
+    xglFontPrint(10, 360, 0xFFFFFF, movieListTextColourGreen);
+    xglFontPrintDirect(&SEF_SCRATCHPAD(char, 0x0));
+    sprintf(&SEF_SCRATCHPAD(char, 0x0), D_0053AFD8, movieVolume);
+    xglFontPrint(300, 360, 0xFFFFFF, movieListTextColourGreen);
+    xglFontPrintDirect(&SEF_SCRATCHPAD(char, 0x0));
+}
+
+typedef int s32;
+
+extern s32 movieListCount;
+extern s32 movieListCursor;
+extern u8 D_004B377F[];
+extern PadRecord PadData;
+s32 func_0018F7E8(s32 size);
+s32 func_001B6520(s32 value);
+s32 func_001B6798(s32 value);
+s32 func_001B6840(void);
+s32 func_001B3858(s32 value);
+s32 func_001B64D8(s32 a, s32 b);
+void movieListMenuFrame(void);
+void soundWorkSource(s32 a, s32 b, s32 c);
+void xglSleep(void);
+void xglRenderClearFrame(void);
+void xglRenderLockClear(void);
+
+/* Movie list screen: loads mov/sfd.lst into a buffer from func_001B6520 and shows it through movieListMenuFrame until
+ * the held-and-pressed combination 0x08000100 is seen. The pressed bit 0x20 passes the selected line's text to func_001B3858. */
+void movieListScreen(void) {
+    s32 listText;
+    s32 lineCount;
+    s32 soundSlot;
+    PadRecord pad;
+
+    xglSleep();
+    func_001B64D8(0xE00000, 0xFEE50000);
+    func_001B6840();
+    listText = func_001B6520(func_001B6840());
+    lineCount = movieListLoadLines((char *) listText, (const char *) "mov/sfd.lst");
+    movieListCount = lineCount;
+    if (lineCount > 0) {
+        func_001B6798(listText);
+        soundSlot = func_0018F7E8(8);
+        soundWorkSource(0, func_001B6520(soundSlot), soundSlot);
+        D_004B377F[0] = 1;
+        if ((PadData.heldAndPressed & 0x08000100) != 0x08000100) {
+            do {
+                if (PadData.pressed & 0x20) {
+                    func_001B3858((s32) movieListLines[movieListCursor].text);
+                }
+                movieListMenuFrame();
+                xglSleep();
+            } while ((PadData.heldAndPressed & 0x08000100) != 0x08000100);
+        }
+        xglRenderClearFrame();
+        xglRenderLockClear();
     }
 }
+
+struct TextLine *movieListLines = 0;
+s32 movieListCount = 0;
+s32 movieListCursor = 0;
+s32 movieVolume = 127;
+char movieDolbyOnText[] = "ON";
+char movieDolbyOffText[] = "OFF";

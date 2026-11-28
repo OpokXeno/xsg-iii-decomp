@@ -32028,7 +32028,7 @@
      2
     ],
     [
-     "func_001947F0",
+     "xglCameraPadUpdate",
      1656816,
      236,
      2
@@ -34170,7 +34170,7 @@
      2
     ],
     [
-     "func_001A4058",
+     "pxyPacketExcludesPart",
      1720408,
      112,
      2
@@ -47178,7 +47178,7 @@
      2
     ],
     [
-     "func_002439D8",
+     "eventViewerBoot",
      2374104,
      444,
      2
@@ -47196,19 +47196,19 @@
      2
     ],
     [
-     "func_00243D78",
+     "eventViewerFileMenu",
      2375032,
      1120,
      2
     ],
     [
-     "func_002441D8",
+     "eventViewerDebugHud",
      2376152,
      2652,
      2
     ],
     [
-     "func_00244C38",
+     "eventViewerFrameCallback",
      2378808,
      180,
      2
@@ -47232,13 +47232,13 @@
      2
     ],
     [
-     "func_00244DB8",
+     "eventViewerPollReady",
      2379192,
      428,
      2
     ],
     [
-     "func_00244F68",
+     "eventViewerPauseToggle",
      2379624,
      216,
      2
@@ -47250,13 +47250,13 @@
      2
     ],
     [
-     "func_00245098",
+     "eventViewerSendBitbltChain",
      2379928,
      256,
      2
     ],
     [
-     "func_00245198",
+     "eventViewerStop",
      2380184,
      236,
      2
@@ -47274,7 +47274,7 @@
      2
     ],
     [
-     "func_00245308",
+     "eventViewerRunEvent",
      2380552,
      360,
      2
@@ -47292,7 +47292,7 @@
      2
     ],
     [
-     "func_00245638",
+     "quadVertexSlotReset",
      2381368,
      108,
      2
@@ -47304,7 +47304,7 @@
      2
     ],
     [
-     "func_00245700",
+     "XenoActorAimTowardTarget",
      2381568,
      700,
      2
@@ -47322,19 +47322,19 @@
      2
     ],
     [
-     "func_00245FE0",
+     "xglCdReadFileAtCursor",
      2383840,
      104,
      2
     ],
     [
-     "func_00246048",
+     "gtestLightSetDefault",
      2383944,
      372,
      2
     ],
     [
-     "func_002461C0",
+     "gtestLightSetGrey",
      2384320,
      356,
      2
@@ -47346,61 +47346,61 @@
      2
     ],
     [
-     "func_002463A8",
+     "GtestActorBlockInitFirst",
      2384808,
      212,
      2
     ],
     [
-     "func_00246480",
+     "GtestActorBlockInitSecond",
      2385024,
      212,
      2
     ],
     [
-     "func_00246558",
+     "GtestTransformInit",
      2385240,
      244,
      2
     ],
     [
-     "func_00246650",
+     "AngleStateBlendShortestWay",
      2385488,
      192,
      2
     ],
     [
-     "func_00246710",
+     "GtestTransformUpdateFromPad",
      2385680,
      852,
      2
     ],
     [
-     "func_00246A68",
+     "GtestRandomYawVector",
      2386536,
      148,
      2
     ],
     [
-     "func_00246B00",
+     "GtestStudioUpdate",
      2386688,
      276,
      2
     ],
     [
-     "func_00246C18",
+     "GtestLoadActorFiles",
      2386968,
      344,
      2
     ],
     [
-     "func_00246D70",
+     "GtestMainMapAndPad",
      2387312,
      956,
      2
     ],
     [
-     "func_00247130",
+     "GtestMultiActorMain",
      2388272,
      1632,
      2
@@ -47442,19 +47442,19 @@
      2
     ],
     [
-     "func_00248060",
+     "motionViewerOpenPxyTxy",
      2392160,
      308,
      2
     ],
     [
-     "func_00248198",
+     "motionViewerOpenSet",
      2392472,
      560,
      2
     ],
     [
-     "func_002483C8",
+     "motionViewerLoadMotion",
      2393032,
      232,
      2
@@ -47472,31 +47472,31 @@
      2
     ],
     [
-     "func_00248580",
+     "movieSlotPlay",
      2393472,
      204,
      2
     ],
     [
-     "func_00248650",
+     "movieSlotPlaySwapId",
      2393680,
      216,
      2
     ],
     [
-     "func_00248728",
+     "movieSlotAdvanceFrame",
      2393896,
      164,
      2
     ],
     [
-     "func_002487D0",
+     "movieSlotDrawInfo",
      2394064,
      176,
      2
     ],
     [
-     "func_00248880",
+     "movieSlotRequestFile",
      2394240,
      300,
      2
@@ -47514,43 +47514,43 @@
      2
     ],
     [
-     "func_00248AF0",
+     "movieSlotStep",
      2394864,
      88,
      2
     ],
     [
-     "func_00248B48",
+     "movieSlotDrawName",
      2394952,
      308,
      2
     ],
     [
-     "func_00248C80",
+     "movieActorPadMove",
      2395264,
      380,
      2
     ],
     [
-     "func_00248E00",
+     "movieMenuRun",
      2395648,
      1072,
      2
     ],
     [
-     "func_00249230",
+     "movieListLoadLines",
      2396720,
      400,
      2
     ],
     [
-     "func_002493C0",
+     "movieListMenuFrame",
      2397120,
      892,
      2
     ],
     [
-     "func_00249740",
+     "movieListScreen",
      2398016,
      292,
      2
@@ -47562,13 +47562,13 @@
      2
     ],
     [
-     "func_00249870",
+     "narrEvPushPictureGif",
      2398320,
      716,
      2
     ],
     [
-     "func_00249B40",
+     "xglCdReadJobReset",
      2399040,
      92,
      2
@@ -47580,7 +47580,7 @@
      2
     ],
     [
-     "func_00249C00",
+     "xglCdReadJobDecodeNext",
      2399232,
      192,
      2
@@ -47592,37 +47592,37 @@
      2
     ],
     [
-     "func_00249CE0",
+     "narrEvCatPictureTest",
      2399456,
      804,
      2
     ],
     [
-     "func_0024A008",
+     "narrEvCountLineEnds",
      2400264,
      80,
      2
     ],
     [
-     "func_0024A058",
+     "narrEvResetEnvelopeTable",
      2400344,
      96,
      2
     ],
     [
-     "func_0024A0B8",
+     "narrEvResetEntryTable",
      2400440,
      48,
      2
     ],
     [
-     "func_0024A0E8",
+     "narrEvUploadPicture",
      2400488,
      596,
      2
     ],
     [
-     "func_0024A340",
+     "narrEvDrawEnvelopeSprite",
      2401088,
      804,
      2
@@ -47652,25 +47652,25 @@
      2
     ],
     [
-     "func_0024A868",
+     "narrEvDecodeSlots",
      2402408,
      132,
      2
     ],
     [
-     "func_0024A8F0",
+     "narrEvLoadSlotFile",
      2402544,
      184,
      2
     ],
     [
-     "func_0024A9A8",
+     "narrEvLoadMatchingSlots",
      2402728,
      132,
      2
     ],
     [
-     "func_0024AA30",
+     "narrEvAdvanceEntry",
      2402864,
      100,
      2
@@ -47688,55 +47688,55 @@
      2
     ],
     [
-     "func_0024AB18",
+     "narrEvAdvanceWhenIdle",
      2403096,
      176,
      2
     ],
     [
-     "func_0024ABC8",
+     "narrEvTextStartsWith",
      2403272,
      156,
      2
     ],
     [
-     "func_0024AC68",
+     "narrEvFindText",
      2403432,
      172,
      2
     ],
     [
-     "func_0024AD18",
+     "narrEvSkipLine",
      2403608,
      72,
      2
     ],
     [
-     "func_0024AD60",
+     "narrEvCopyEntryText",
      2403680,
      496,
      2
     ],
     [
-     "func_0024AF50",
+     "narrEvLoadEntryText",
      2404176,
      300,
      2
     ],
     [
-     "func_0024B080",
+     "narrEvParseScript",
      2404480,
      1216,
      2
     ],
     [
-     "func_0024B540",
+     "narrEvDrawHud",
      2405696,
      1336,
      2
     ],
     [
-     "func_0024BA78",
+     "narrEvPlayEpisode",
      2407032,
      1200,
      2
@@ -47754,7 +47754,7 @@
      2
     ],
     [
-     "func_0024C358",
+     "scisTestRun",
      2409304,
      1124,
      2
@@ -47778,7 +47778,7 @@
      2
     ],
     [
-     "func_0024CA00",
+     "tiWatSimDropAtCursor",
      2411008,
      372,
      2
@@ -47904,7 +47904,7 @@
      2
     ],
     [
-     "func_0024E348",
+     "xenoActorEntryAt",
      2417480,
      52,
      2
@@ -47982,7 +47982,7 @@
      2
     ],
     [
-     "func_0024E5A8",
+     "xglCdResetBlockStream",
      2418088,
      144,
      2
@@ -47994,19 +47994,19 @@
      2
     ],
     [
-     "func_0024E678",
+     "xenoActorMatrixTableLoad",
      2418296,
      224,
      2
     ],
     [
-     "func_0024E758",
+     "xenoActorMatrixTableStore",
      2418520,
      152,
      2
     ],
     [
-     "func_0024E7F0",
+     "xenoCdActorSlotFind",
      2418672,
      148,
      2
@@ -48018,13 +48018,13 @@
      2
     ],
     [
-     "func_0024E8C8",
+     "xenoActorSubPackApplyPlacements",
      2418888,
      416,
      2
     ],
     [
-     "func_0024EA68",
+     "xenoActorEventDepthOfPoint",
      2419304,
      272,
      2
@@ -48042,19 +48042,19 @@
      2
     ],
     [
-     "func_0024EBF0",
+     "xenoActorEventReloadEntries",
      2419696,
      192,
      2
     ],
     [
-     "func_0024ECB0",
+     "xenoActorEventSendSlotPackets",
      2419888,
      1804,
      2
     ],
     [
-     "func_0024F3C0",
+     "xenoActorEventOpenFile",
      2421696,
      416,
      2
@@ -48078,7 +48078,7 @@
      2
     ],
     [
-     "func_0024F590",
+     "xenoActorEventPrefetchBlock",
      2422160,
      132,
      2
@@ -48102,91 +48102,91 @@
      2
     ],
     [
-     "func_0024F690",
+     "xenoActorEventReadDispatch",
      2422416,
      136,
      2
     ],
     [
-     "func_0024F718",
+     "xenoActorEventReadNextChunk",
      2422552,
      216,
      2
     ],
     [
-     "func_0024F7F0",
+     "xenoActorEventApplyCamera",
      2422768,
      344,
      2
     ],
     [
-     "func_0024F948",
+     "xenoActorEventApplyCameraTimings",
      2423112,
      360,
      2
     ],
     [
-     "func_0024FAB0",
+     "xenoActorEventSetupLights",
      2423472,
      364,
      2
     ],
     [
-     "func_0024FC20",
+     "xenoActorSlotEntriesReset",
      2423840,
      144,
      2
     ],
     [
-     "func_0024FCB0",
+     "xenoActorEventUpdateSlots",
      2423984,
      456,
      2
     ],
     [
-     "func_0024FE78",
+     "xenoActorEventLinkSlots",
      2424440,
      252,
      2
     ],
     [
-     "func_0024FF78",
+     "xenoActorEventNotifySlots",
      2424696,
      232,
      2
     ],
     [
-     "func_00250060",
+     "xenoActorEventAdvanceFrame",
      2424928,
      124,
      2
     ],
     [
-     "func_002500E0",
+     "xenoActorEventAdvanceRing",
      2425056,
      300,
      2
     ],
     [
-     "func_00250210",
+     "xenoActorEventPollCdDrive",
      2425360,
      288,
      2
     ],
     [
-     "func_00250330",
+     "xenoActorEventFrameUpdate",
      2425648,
      272,
      2
     ],
     [
-     "func_00250440",
+     "xenoActorEventCountActive",
      2425920,
      72,
      2
     ],
     [
-     "func_00250488",
+     "xenoActorEventCountInactive",
      2425992,
      72,
      2
@@ -48216,7 +48216,7 @@
      2
     ],
     [
-     "func_00250540",
+     "xenoActorEventFindTableInterval",
      2426176,
      128,
      2
@@ -48324,7 +48324,7 @@
      2
     ],
     [
-     "func_00250768",
+     "xenoActorEventResetEffects",
      2426728,
      104,
      2
@@ -48336,37 +48336,37 @@
      2
     ],
     [
-     "func_002507E8",
+     "xenoActorSlotBlockAdd",
      2426856,
      64,
      2
     ],
     [
-     "func_00250828",
+     "xenoActorEffectGroupUpdate",
      2426920,
      312,
      2
     ],
     [
-     "func_00250960",
+     "xenoActorEventEsdPath",
      2427232,
      204,
      2
     ],
     [
-     "func_00250A30",
+     "xenoActorEventLoadEffectFile",
      2427440,
      380,
      2
     ],
     [
-     "func_00250BB0",
+     "xenoActorEventLoadEffectCd",
      2427824,
      424,
      2
     ],
     [
-     "func_00250D58",
+     "xenoActorEventRegisterEffect",
      2428248,
      180,
      2
@@ -48378,25 +48378,25 @@
      2
     ],
     [
-     "func_00250E48",
+     "xenoActorEventSpawnEffects",
      2428488,
      1068,
      2
     ],
     [
-     "func_00251278",
+     "xenoActorItemAt",
      2429560,
      52,
      2
     ],
     [
-     "func_002512B0",
+     "itemSourceExtensionIndex",
      2429616,
      156,
      2
     ],
     [
-     "func_00251350",
+     "xenoActorLoadItemResources",
      2429776,
      556,
      2
@@ -48408,37 +48408,37 @@
      2
     ],
     [
-     "func_00251648",
+     "itemSourceLzssUnpack",
      2430536,
      440,
      2
     ],
     [
-     "func_00251800",
+     "xenoActorLoadItemStream",
      2430976,
      484,
      2
     ],
     [
-     "func_002519E8",
+     "itemSourceResolveIndex",
      2431464,
      876,
      2
     ],
     [
-     "func_00251D58",
+     "xenoActorLoadItemFile",
      2432344,
      904,
      2
     ],
     [
-     "func_002520E0",
+     "xenoActorLoadEventItemList",
      2433248,
      628,
      2
     ],
     [
-     "func_00252358",
+     "xenoActorPlayAdxSound",
      2433880,
      240,
      2
@@ -48492,7 +48492,7 @@
      2
     ],
     [
-     "func_00252678",
+     "XstAnimTestMain",
      2434680,
      1028,
      2
@@ -48576,13 +48576,13 @@
      2
     ],
     [
-     "func_002561E8",
+     "gifStateDrawDepthFade",
      2449896,
      1380,
      2
     ],
     [
-     "func_00256750",
+     "gifStateDrawGlowPasses",
      2451280,
      1428,
      2
@@ -48594,13 +48594,13 @@
      2
     ],
     [
-     "func_00257CF8",
+     "gifStateDrawOffsetCopies",
      2456824,
      936,
      2
     ],
     [
-     "func_002580A0",
+     "gifStateDrawCameraTravelBlur",
      2457760,
      964,
      2
@@ -48660,7 +48660,7 @@
      2
     ],
     [
-     "func_002586A8",
+     "gifStateUpdateGlowCallback",
      2459304,
      180,
      2
@@ -48756,7 +48756,7 @@
      2
     ],
     [
-     "func_00258B90",
+     "debugTestMenuMain",
      2460560,
      672,
      2
@@ -48978,7 +48978,7 @@
      2
     ],
     [
-     "func_0025A000",
+     "MMathLerpKeyPoint",
      2465792,
      48,
      2
@@ -48996,25 +48996,25 @@
      2
     ],
     [
-     "func_0025A0E0",
+     "MMathEvalCatmullRom",
      2466016,
      344,
      2
     ],
     [
-     "func_0025A238",
+     "MMathEvalCatmullRomXYZ",
      2466360,
      308,
      2
     ],
     [
-     "func_0025A370",
+     "MMathEvalBezier",
      2466672,
      344,
      2
     ],
     [
-     "func_0025A4C8",
+     "MMathEvalBezierXYZ",
      2467016,
      308,
      2
@@ -49062,7 +49062,7 @@
      2
     ],
     [
-     "func_0025A820",
+     "MMathCalcLengthSquared",
      2467872,
      36,
      2
@@ -49092,7 +49092,7 @@
      2
     ],
     [
-     "func_0025A910",
+     "MMathCalcDistSquared",
      2468112,
      44,
      2
@@ -49374,7 +49374,7 @@
      2
     ],
     [
-     "func_0025BA50",
+     "matuzawaTestReportNoDebug",
      2472528,
      28,
      2
@@ -49392,19 +49392,19 @@
      2
     ],
     [
-     "func_0025BAB8",
+     "actorSlotsLoadAll",
      2472632,
      64,
      2
     ],
     [
-     "func_0025BAF8",
+     "actorSlotLoad",
      2472696,
      280,
      2
     ],
     [
-     "func_0025BC10",
+     "actorSlotClampVector",
      2472976,
      200,
      2
@@ -49446,7 +49446,7 @@
      2
     ],
     [
-     "func_0025BE00",
+     "actorSlotGetVector",
      2473472,
      156,
      2
@@ -49458,19 +49458,19 @@
      2
     ],
     [
-     "func_0025BEE0",
+     "actorSlotGetPlacement",
      2473696,
      116,
      2
     ],
     [
-     "func_0025BF58",
+     "actorSlotSetRadius",
      2473816,
      48,
      2
     ],
     [
-     "func_0025BF88",
+     "battleSlotActorGet",
      2473864,
      96,
      2
@@ -49482,7 +49482,7 @@
      2
     ],
     [
-     "func_0025C018",
+     "battleSlotRadiusGet",
      2474008,
      92,
      2
@@ -49524,7 +49524,7 @@
      2
     ],
     [
-     "func_0025C240",
+     "battleUpdateStep",
      2474560,
      124,
      2
@@ -49560,7 +49560,7 @@
      2
     ],
     [
-     "func_0025C368",
+     "battlePhaseDispatch",
      2474856,
      120,
      2
@@ -49614,7 +49614,7 @@
      2
     ],
     [
-     "func_0025C5D0",
+     "textApplyPickedEntry",
      2475472,
      108,
      2
@@ -49668,7 +49668,7 @@
      2
     ],
     [
-     "func_0025C8A0",
+     "textCmdWait",
      2476192,
      88,
      2
@@ -49680,19 +49680,19 @@
      2
     ],
     [
-     "func_0025C938",
+     "textRunCommands",
      2476344,
      216,
      2
     ],
     [
-     "func_0025CA10",
+     "textResetRecord",
      2476560,
      88,
      2
     ],
     [
-     "func_0025CA68",
+     "textSetScaleRecord",
      2476648,
      124,
      2
@@ -49734,7 +49734,7 @@
      2
     ],
     [
-     "func_0025CBB0",
+     "textSubmitSlotPairByLevel",
      2476976,
      264,
      2
@@ -49842,7 +49842,7 @@
      2
     ],
     [
-     "func_0025D360",
+     "textApplyPendingScale",
      2478944,
      188,
      2
@@ -49884,7 +49884,7 @@
      2
     ],
     [
-     "func_0025D688",
+     "textSubmitBattleModeLine",
      2479752,
      276,
      2
@@ -49986,7 +49986,7 @@
      2
     ],
     [
-     "recordBufferIsFull",
+     "battleRecordIsFull",
      2481000,
      28,
      2
@@ -49998,61 +49998,61 @@
      2
     ],
     [
-     "func_0025DBD8",
+     "bcamStart",
      2481112,
      160,
      2
     ],
     [
-     "recordAdvance",
+     "battleRecordAdvance",
      2481272,
      100,
      2
     ],
     [
-     "func_0025DCE0",
+     "bcamPos",
      2481376,
      352,
      2
     ],
     [
-     "func_0025DE40",
+     "bcamLook",
      2481728,
      352,
      2
     ],
     [
-     "func_0025DFA0",
+     "bcamCvr",
      2482080,
      136,
      2
     ],
     [
-     "func_0025E028",
+     "bcamRotZ",
      2482216,
      160,
      2
     ],
     [
-     "vmOpRecordAppend",
+     "bcamWait",
      2482376,
      104,
      2
     ],
     [
-     "func_0025E130",
+     "bcamOver",
      2482480,
      496,
      2
     ],
     [
-     "vmOpBattleStep",
+     "bcamOvercam",
      2482976,
      32,
      2
     ],
     [
-     "func_0025E340",
+     "bcamDef",
      2483008,
      152,
      2
@@ -50082,49 +50082,49 @@
      2
     ],
     [
-     "func_0025E470",
+     "battleTextCommandUpdate",
      2483312,
      548,
      2
     ],
     [
-     "func_0025E698",
+     "battleSlotRadiusPoint",
      2483864,
      416,
      2
     ],
     [
-     "func_0025E838",
+     "battleSlotBlendPoint",
      2484280,
      180,
      2
     ],
     [
-     "func_0025E8F0",
+     "battleCameraAnglesEmit",
      2484464,
      768,
      2
     ],
     [
-     "func_0025EBF0",
+     "battleSegmentHeightPoint",
      2485232,
      308,
      2
     ],
     [
-     "func_0025ED28",
+     "battleTextCommandInit",
      2485544,
      568,
      2
     ],
     [
-     "func_0025EF60",
+     "battleTextCommandSetFirstPoint",
      2486112,
      144,
      2
     ],
     [
-     "func_0025EFF0",
+     "battleTextCommandSetSecondPoint",
      2486256,
      144,
      2
@@ -50148,19 +50148,19 @@
      2
     ],
     [
-     "func_0025F158",
+     "battleTextCommandUpdateEndpoints",
      2486616,
      368,
      2
     ],
     [
-     "func_0025F2C8",
+     "battleActorGroupCentre",
      2486984,
      244,
      2
     ],
     [
-     "func_0025F3C0",
+     "cameraSlotsSelect",
      2487232,
      116,
      2
@@ -50184,19 +50184,19 @@
      2
     ],
     [
-     "func_0025F558",
+     "cameraUpdateFrame",
      2487640,
      100,
      2
     ],
     [
-     "func_0025F5C0",
+     "cameraCaptureOrRestoreSlots",
      2487744,
      196,
      2
     ],
     [
-     "func_0025F688",
+     "cameraSetStudioState",
      2487944,
      60,
      2
@@ -50226,7 +50226,7 @@
      2
     ],
     [
-     "func_0025F750",
+     "cameraSetLookAt",
      2488144,
      72,
      2
@@ -50238,7 +50238,7 @@
      2
     ],
     [
-     "func_0025F7D0",
+     "cameraOrbitPosition",
      2488272,
      168,
      2
@@ -50256,7 +50256,7 @@
      2
     ],
     [
-     "func_0025F9A0",
+     "cameraPendingEntry",
      2488736,
      52,
      2
@@ -50268,7 +50268,7 @@
      2
     ],
     [
-     "func_0025F9E8",
+     "cameraPairRecord",
      2488808,
      100,
      2
@@ -50280,7 +50280,7 @@
      2
     ],
     [
-     "func_0025FA68",
+     "cameraUpdateMode",
      2488936,
      216,
      2
@@ -50292,13 +50292,13 @@
      2
     ],
     [
-     "func_0025FB78",
+     "cameraTransitionUpdate",
      2489208,
      244,
      2
     ],
     [
-     "func_0025FC70",
+     "cameraObjectUpdate",
      2489456,
      184,
      2
@@ -50322,7 +50322,7 @@
      2
     ],
     [
-     "func_0025FD90",
+     "cameraAnglesWrapPi",
      2489744,
      264,
      2
@@ -50334,25 +50334,25 @@
      2
     ],
     [
-     "func_0025FEE0",
+     "mapProbeAllocBlock",
      2490080,
      52,
      2
     ],
     [
-     "func_0025FF18",
+     "mapProbeSegmentHits",
      2490136,
      220,
      2
     ],
     [
-     "func_0025FFF8",
+     "mapProbeNearestPoint",
      2490360,
      328,
      2
     ],
     [
-     "func_00260140",
+     "mapProbeSegmentEndpoints",
      2490688,
      220,
      2
@@ -50364,13 +50364,13 @@
      2
     ],
     [
-     "func_00260238",
+     "mapProbeSpanHit",
      2490936,
      352,
      2
     ],
     [
-     "func_00260398",
+     "mapProbeSegmentTest",
      2491288,
      248,
      2
@@ -56142,19 +56142,19 @@
      2
     ],
     [
-     "func_00290548",
+     "XenoActorSetFirstWord",
      2688328,
      24,
      2
     ],
     [
-     "func_00290560",
+     "XenoActorSetVectorUniform",
      2688352,
      24,
      2
     ],
     [
-     "func_00290578",
+     "XenoActorSetVector",
      2688376,
      24,
      2
@@ -56250,7 +56250,7 @@
      2
     ],
     [
-     "func_00291C68",
+     "XenoActorSetAimTargetNode",
      2694248,
      8,
      2
@@ -57432,7 +57432,7 @@
      2
     ],
     [
-     "func_002A0258",
+     "XrgQuaternionToEuler",
      2753112,
      488,
      2

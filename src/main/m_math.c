@@ -3,8 +3,17 @@
 #include "main/xgl_2.h"
 #include "quadword.h"
 
+const AlignedVector4 MMathUnitVector = { 0.0f, 0.0f, 0.0f, 1.0f };
+const Matrix4 MMathUnitMatrix = {
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+    { 0.0f, 0.0f, 1.0f, 0.0f },
+    { 0.0f, 0.0f, 0.0f, 1.0f },
+};
+
 void MMathRandomSeed(int seed);
-/* genrand_int32: regenerates the 624 words when they are used up, then tempers the next one. */ u32 MMathRandomNext(void);
+/* genrand_int32: regenerates the 624 words when they are used up, then tempers the next one. */
+u32 MMathRandomNext(void);
 float MMathMakeRandom(void);
 float MMathMakeRandomSigned(void);
 
@@ -22,7 +31,6 @@ float MMathMakeRandomSigned(void);
 extern int MMathRandomIndex;
 extern int MMathRandomLastSeed;
 extern u32 MMathRandomState[MT_STATE_WORDS];
-extern u32 MMathRandomMag01[2];
 
 /* init_genrand: a zero seed means the previous seed plus 0x1571. */
 void MMathRandomSeed(int seed)
@@ -41,7 +49,7 @@ void MMathRandomSeed(int seed)
     }
 }
 
-extern u32 D_00319880[];
+extern u32 MMathRandomMag01[];
 
 /* genrand_int32: regenerates the 624 words when they are used up, then tempers the next one. */
 u32 MMathRandomNext(void)
@@ -58,17 +66,17 @@ u32 MMathRandomNext(void)
         for (kk = 0; kk < MT_STATE_WORDS - MT_TWIST_OFFSET; kk++)
         {
             y = (MMathRandomState[kk] & MT_UPPER_MASK) | (MMathRandomState[kk + 1] & MT_LOWER_MASK);
-            MMathRandomState[kk] = MMathRandomState[kk + MT_TWIST_OFFSET] ^ (y >> 1) ^ D_00319880[y & 1];
+            MMathRandomState[kk] = MMathRandomState[kk + MT_TWIST_OFFSET] ^ (y >> 1) ^ MMathRandomMag01[y & 1];
         }
         for (; kk < MT_STATE_WORDS - 1; kk++)
         {
             y = (MMathRandomState[kk] & MT_UPPER_MASK) | (MMathRandomState[kk + 1] & MT_LOWER_MASK);
             MMathRandomState[kk] =
-                MMathRandomState[kk + (MT_TWIST_OFFSET - MT_STATE_WORDS)] ^ (y >> 1) ^ D_00319880[y & 1];
+                MMathRandomState[kk + (MT_TWIST_OFFSET - MT_STATE_WORDS)] ^ (y >> 1) ^ MMathRandomMag01[y & 1];
         }
         y = (MMathRandomState[MT_STATE_WORDS - 1] & MT_UPPER_MASK) | (MMathRandomState[0] & MT_LOWER_MASK);
         MMathRandomState[MT_STATE_WORDS - 1] =
-            MMathRandomState[MT_TWIST_OFFSET - 1] ^ (y >> 1) ^ D_00319880[y & 1];
+            MMathRandomState[MT_TWIST_OFFSET - 1] ^ (y >> 1) ^ MMathRandomMag01[y & 1];
         MMathRandomIndex = 0;
     }
     y = MMathRandomState[MMathRandomIndex++];
@@ -103,19 +111,12 @@ f32 MMathMakeRandomSigned(void)
     return (bits * 4.656613e-10f) - 1.0f;
 }
 
-void MMathRandomSeed(int seed);
-
-u32 MMathRandomNext(void);
-
 float MMathMakeRandom2PI(void);
 float MMathMakeRandomPI(void);
-
 /*
  * Mersenne Twister (MT19937): seeding, then the tempered 32-bit output of genrand_int32.
  * Parameters: state words, twist offset, word halves, tempering masks.
  */
-
-
 float fmodf(float, float);
 
 /* A random angle in [0, 2*pi): the 32-bit output scaled by 2*pi / 2^32. */
@@ -184,16 +185,31 @@ typedef Vector4 HermiteVector;
 
 float *MMathCalcHermite(float *outVector, HermiteVector *tangent_first, HermiteVector *tangent_second,
                          HermiteVector *endpoint_first, HermiteVector *endpoint_second, float parameter);
-
 void MMathCalcHermitePrm(HermiteVector *tangent_start, HermiteVector *tangent_end,
                           const HermiteVector *point_prev, const HermiteVector *point_start,
                           const HermiteVector *point_end, const HermiteVector *point_next);
-
 float MMathCalcLength(const Vector4 *vector);
-
 Vector4 *MMathNormalizeVector2(Vector4 *outVector, const Vector4 *inputVector);
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A000);
+/*
+ * Point between two Hermite keys: lhs + (rhs - lhs) * scale on x, y and z; w is 1.
+ * Callers: MMathEvalHermiteKeys (tu139), the sef and sdv_packet key tracks (progress in scale).
+ */
+Vector4 *MMathLerpKeyPoint(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float scale) {
+    __asm__ __volatile__("lqc2 vf1, 0(%1)\n\t"
+                         "lqc2 vf2, 0(%2)\n\t"
+                         "mfc1 $9, %3\n\t"
+                         "vmove.w vf2, vf0\n\t"
+                         "qmtc2 $9, vf3\n\t"
+                         "vsub.xyz vf2, vf2, vf1\n\t"
+                         "vmulx.xyz vf2, vf2, vf3x\n\t"
+                         "vadd.xyz vf2, vf2, vf1\n\t"
+                         "sqc2 vf2, 0(%0)"
+                         :
+                         : "r"(outVector), "r"(lhs), "r"(rhs), "f"(scale)
+                         : "$9", "memory");
+    return outVector;
+}
 
 /*
  * MMathCalcHermite: four-component cubic Hermite/Catmull-Rom evaluation at
@@ -271,13 +287,111 @@ void MMathCalcHermitePrm(HermiteVector *tangent_start, HermiteVector *tangent_en
     );
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A0E0);
+extern Matrix4 MMathCatmullRomBasis;
+Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *vector);
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A238);
+/* kept: the int round trip through the float field decides the emitted order of the basis stores. */
+#define FloatBitsRoundTrip(field) { int bits_ = *(int *) &(field); *(int *) &(field) = bits_; }
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A370);
+/*
+ * Catmull-Rom point at parameter between startPoint and endPoint (previousPoint, nextPoint are the
+ * neighbours): the basis (t^3, t^2, t, 1) times MMathCatmullRomBasis gives the four blend weights, and all four
+ * components are written, w included.
+ */
+Vector4 *MMathEvalCatmullRom(Vector4 *outVector, const Vector4 *previousPoint, const Vector4 *startPoint,
+                       const Vector4 *endPoint, const Vector4 *nextPoint, float parameter) {
+    Vector4 basis;
+    float tSquared;
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A4C8);
+    tSquared = parameter * parameter;
+    basis.x = tSquared * parameter;
+    FloatBitsRoundTrip(basis.x);
+    basis.y = tSquared;
+    basis.z = parameter;
+    basis.w = 1.0f;
+    MMathApplyMatrix(&basis, &MMathCatmullRomBasis, &basis);
+    outVector->x = basis.x * previousPoint->x + basis.y * startPoint->x + basis.z * endPoint->x + basis.w * nextPoint->x;
+    outVector->y = basis.x * previousPoint->y + basis.y * startPoint->y + basis.z * endPoint->y + basis.w * nextPoint->y;
+    outVector->z = basis.x * previousPoint->z + basis.y * startPoint->z + basis.z * endPoint->z + basis.w * nextPoint->z;
+    outVector->w = basis.x * previousPoint->w + basis.y * startPoint->w + basis.z * endPoint->w + basis.w * nextPoint->w;
+    return outVector;
+}
+
+extern Matrix4 MMathCatmullRomBasisXYZ;
+
+/*
+ * The Catmull-Rom point of MMathEvalCatmullRom with the same basis (MMathCatmullRomBasisXYZ), x, y and z only:
+ * w is forced to 1.
+ */
+Vector4 *MMathEvalCatmullRomXYZ(Vector4 *outVector, const Vector4 *previousPoint, const Vector4 *startPoint,
+                       const Vector4 *endPoint, const Vector4 *nextPoint, float parameter) {
+    Vector4 basis;
+    float tSquared;
+    tSquared = parameter * parameter;
+    basis.w = 1.0f;
+    basis.x = tSquared * parameter;
+    FloatBitsRoundTrip(basis.x);
+    basis.z = parameter;
+    basis.y = tSquared;
+    FloatBitsRoundTrip(basis.y);
+    MMathApplyMatrix(&basis, &MMathCatmullRomBasisXYZ, &basis);
+    outVector->x = basis.x * previousPoint->x + basis.y * startPoint->x + basis.z * endPoint->x + basis.w * nextPoint->x;
+    outVector->y = basis.x * previousPoint->y + basis.y * startPoint->y + basis.z * endPoint->y + basis.w * nextPoint->y;
+    outVector->z = basis.x * previousPoint->z + basis.y * startPoint->z + basis.z * endPoint->z + basis.w * nextPoint->z;
+    outVector->w = 1.0f;
+    return outVector;
+}
+
+extern Matrix4 MMathBezierBasis;
+
+/*
+ * Cubic Bezier point at parameter between startPoint and endPoint (controlPoint1, controlPoint2 are
+ * the handles): the basis matrix MMathBezierBasis gives the four weights, and all four components are
+ * written, w included.
+ */
+Vector4 *MMathEvalBezier(Vector4 *outVector, const Vector4 *startPoint, const Vector4 *controlPoint1,
+                       const Vector4 *controlPoint2, const Vector4 *endPoint, float parameter) {
+    Vector4 basis;
+    float tSquared;
+
+    tSquared = parameter * parameter;
+    basis.x = tSquared * parameter;
+    FloatBitsRoundTrip(basis.x);
+    basis.y = tSquared;
+    basis.z = parameter;
+    basis.w = 1.0f;
+    MMathApplyMatrix(&basis, &MMathBezierBasis, &basis);
+    outVector->x = basis.x * startPoint->x + basis.y * controlPoint1->x + basis.z * controlPoint2->x + basis.w * endPoint->x;
+    outVector->y = basis.x * startPoint->y + basis.y * controlPoint1->y + basis.z * controlPoint2->y + basis.w * endPoint->y;
+    outVector->z = basis.x * startPoint->z + basis.y * controlPoint1->z + basis.z * controlPoint2->z + basis.w * endPoint->z;
+    outVector->w = basis.x * startPoint->w + basis.y * controlPoint1->w + basis.z * controlPoint2->w + basis.w * endPoint->w;
+    return outVector;
+}
+
+extern float MMathBezierBasisXYZ[13];
+
+/*
+ * The Bezier point of MMathEvalBezier with the basis MMathBezierBasisXYZ, x, y and z only: w is forced to 1.
+ */
+Vector4 *MMathEvalBezierXYZ(Vector4 *outVector, const Vector4 *startPoint, const Vector4 *controlPoint1,
+                       const Vector4 *controlPoint2, const Vector4 *endPoint, float parameter) {
+    Vector4 basis;
+    float tSquared;
+
+    tSquared = parameter * parameter;
+    basis.w = 1.0f;
+    basis.x = tSquared * parameter;
+    FloatBitsRoundTrip(basis.x);
+    basis.z = parameter;
+    basis.y = tSquared;
+    FloatBitsRoundTrip(basis.y);
+    MMathApplyMatrix(&basis, (Matrix4 *) MMathBezierBasisXYZ, &basis);
+    outVector->x = basis.x * startPoint->x + basis.y * controlPoint1->x + basis.z * controlPoint2->x + basis.w * endPoint->x;
+    outVector->y = basis.x * startPoint->y + basis.y * controlPoint1->y + basis.z * controlPoint2->y + basis.w * endPoint->y;
+    outVector->z = basis.x * startPoint->z + basis.y * controlPoint1->z + basis.z * controlPoint2->z + basis.w * endPoint->z;
+    outVector->w = 1.0f;
+    return outVector;
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A600);
 
@@ -381,7 +495,21 @@ float MMathCalcLength(const Vector4 *vector)
 
 float MMathCalcDist(const Vector4 *fromPoint, const Vector4 *toPoint);
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A820);
+/* Squared length of vector over x, y and z (no square root; sef compares it with squared radii). */
+float MMathCalcLengthSquared(const Vector4 *vector) {
+    Vector4 squared;
+
+    __asm__ __volatile__("lqc2 vf1, 0(%1)\n\t"
+                         "vmul.xyz vf1, vf1, vf1\n\t"
+                         "vaddy.x vf1, vf1, vf1y\n\t"
+                         "vaddz.x vf1, vf1, vf1z\n\t"
+                         "qmfc2 $8, vf1\n\t"
+                         "mtc1 $8, %0"
+                         : "=f"(squared.x)
+                         : "r"(vector)
+                         : "$8", "memory");
+    return squared.x;
+}
 
 /* Vector length over x and y only. */
 float MMathCalcLengthXY(const Vector4 *vector)
@@ -465,7 +593,6 @@ float MMathCalcDist(const Vector4 *fromPoint, const Vector4 *toPoint)
 
 float MMathCalcDistXZ(const Vector4 *fromPoint, const Vector4 *toPoint);
 Vector4 *MMathCalcDirVector(Vector4 *outVector, const Vector4 *fromPoint, const Vector4 *toPoint);
-Vector4 *MMathNormalizeVector2(Vector4 *outVector, const Vector4 *inputVector);
 Vector4 *MMathDivVectorS(Vector4 *outVector, const Vector4 *inputVector, float scale);
 Vector4 *MMathCalcAngle(Vector4 *outAngles, const Vector4 *fromPoint, const Vector4 *toPoint);
 Vector4 *MMathSubVectorMulS(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float scale);
@@ -474,7 +601,23 @@ Vector4 *MMathVectorCrossProduct(Vector4 *outVector, const Vector4 *lhs, const V
 Vector4 *MMathVectorInterpolation(Vector4 *outVector, const Vector4 *lhs, const Vector4 *rhs, float parameter);
 float srsAtan2(float x, float y);
 
-INCLUDE_ASM("asm/main/nonmatchings/m_math", func_0025A910);
+/* Squared distance between two points over x, y and z (sef compares it with a squared step). */
+float MMathCalcDistSquared(const Vector4 *fromPoint, const Vector4 *toPoint) {
+    Vector4 difference;
+
+    __asm__ __volatile__("lqc2 vf1, 0(%1)\n\t"
+                         "lqc2 vf2, 0(%2)\n\t"
+                         "vsub.xyz vf1, vf2, vf1\n\t"
+                         "vmul.xyz vf1, vf1, vf1\n\t"
+                         "vaddy.x vf1, vf1, vf1y\n\t"
+                         "vaddz.x vf1, vf1, vf1z\n\t"
+                         "qmfc2 $8, vf1\n\t"
+                         "mtc1 $8, %0"
+                         : "=f"(difference.x)
+                         : "r"(fromPoint), "r"(toPoint)
+                         : "$8", "memory");
+    return difference.x;
+}
 
 /* Distance from first to second in the XZ plane (MMathCalcDistXZ in X1); the unused
  * `difference` local reproduces the 16-byte frame, as in MMathCalcDist. */
@@ -800,7 +943,6 @@ Vector4 *MMathVectorInterpolation(Vector4 *outVector, const Vector4 *lhs, const 
 }
 
 /* Row-major 4x4 float matrix. */
-
 Matrix4 *MMathRotateMatrixX(Matrix4 *outMatrix, Matrix4 *matrix, float angle);
 Matrix4 *MMathRotateMatrixY(Matrix4 *outMatrix, Matrix4 *matrix, float angle);
 Matrix4 *MMathRotateMatrixZ(Matrix4 *outMatrix, Matrix4 *matrix, float angle);
@@ -1186,10 +1328,6 @@ Matrix4 *MMathRotateMatrixZYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4
     return outMatrix;
 }
 
-/* Row-major 4x4 float matrix. */
-
-Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *vector);
-
 Matrix4 *MMathMulMatrix(Matrix4 *outMatrix, Matrix4 *rhs, Matrix4 *lhs);
 Matrix4 *MMathScaleMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *scale);
 
@@ -1266,20 +1404,12 @@ Matrix4 *MMathScaleMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *sc
     return outMatrix;
 }
 
-/* Row-major 4x4 float matrix. */
-
-Vector4 *MMathCalcAngle(Vector4 *outAngles, const Vector4 *fromPoint, const Vector4 *toPoint);
-Matrix4 *MMathRotateMatrixYX(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
-Matrix4 *MMathRotateMatrixYXZ(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *angles);
-Vector4 *MMathApplyMatrix(Vector4 *outVector, Matrix4 *matrix, const Vector4 *vector);
 Matrix4 *MMathCalcLookAtMatrix(Matrix4 *outMatrix, const Vector4 *fromPoint, const Vector4 *toPoint, const Vector4 *position, float roll);
 Matrix4 *MMathScaleMatrixRotS(Matrix4 *outMatrix, Matrix4 *matrix, float scale);
 Matrix4 *MMathTranslateMatrix(Matrix4 *outMatrix, Matrix4 *matrix, const Vector4 *translation);
 struct XglCamera;
-float srsAtan2(float x, float y);
-
-
-/* out = the transformed +Z point: (0, 0, 1, 1) times the matrix with its row 3 replaced by MMathUnitVector. */ Vector4 *MMathCalcVectorMatrixZ(Vector4 *out, Matrix4 *matrix);
+/* out = the transformed +Z point: (0, 0, 1, 1) times the matrix with its row 3 replaced by MMathUnitVector. */
+Vector4 *MMathCalcVectorMatrixZ(Vector4 *out, Matrix4 *matrix);
 
 /* out = matrix with rows 0..2 scaled by scale; row 3, the translation row, is copied unchanged. */
 Matrix4 *MMathScaleMatrixRotS(Matrix4 *outMatrix, Matrix4 *matrix, float scale)
@@ -1479,7 +1609,6 @@ Matrix4 *MMathCalcMatrixVector(Matrix4 *outMatrix, const Vector4 *toPoint)
     return outMatrix;
 }
 
-
 /* out = the transformed +Z point: (0, 0, 1, 1) times the matrix with its row 3 replaced by MMathUnitVector. */
 Vector4 *MMathCalcVectorMatrixZ(Vector4 *outVector, Matrix4 *matrix)
 {
@@ -1536,15 +1665,9 @@ void MMathRotTransPers(Vector4 *outVector, const XglCamera *camera, const Matrix
         : : "r"(point), "r"(matrix), "r"(&camera->screen.screenScale), "r"(&camera->screen.screenOffset), "r"(outVector) : "memory");
 }
 
-/* Row-major 4x4 float matrix. */
-
-struct XglCamera;
-
 int MMathRotTransPersClip(Vector4 *outVector, const struct XglCamera *camera, Matrix4 *matrix, const Vector4 *point);
 int MMathQuatBetweenVectors(Vector4 *outQuat, const Vector4 *fromUnit, const Vector4 *toUnit);
-
 Vector4 *MMathQuatToMatrix(Vector4 *outVector, const Vector4 *inputQuat);
-
 
 /*
  * Transforms point by matrix, projects it with the camera's screen scale and offset, and stores
@@ -1712,3 +1835,30 @@ Vector4 *MMathQuatToMatrixReordered(Vector4 *outVector, const Vector4 *inputQuat
         : : "r"(outVector), "r"(inputQuat) : "memory");
     return outVector;
 }
+
+int MMathRandomIndex = 625;
+int MMathRandomLastSeed = 0;
+u32 MMathRandomState[MT_STATE_WORDS];
+
+u32 MMathRandomMag01[4] = { 0, 0x9908B0DFu, 0, 0 };
+Matrix4 MMathCatmullRomBasis = {
+    { -0.5f, 1.5f, -1.5f, 0.5f },
+    { 1.0f, -2.5f, 2.0f, -0.5f },
+    { -0.5f, 0.0f, 0.5f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+};
+Matrix4 MMathCatmullRomBasisXYZ = {
+    { -0.5f, 1.5f, -1.5f, 0.5f },
+    { 1.0f, -2.5f, 2.0f, -0.5f },
+    { -0.5f, 0.0f, 0.5f, 0.0f },
+    { 0.0f, 1.0f, 0.0f, 0.0f },
+};
+Matrix4 MMathBezierBasis = {
+    { -1.0f, 3.0f, -3.0f, 1.0f },
+    { 3.0f, -6.0f, 3.0f, 0.0f },
+    { -3.0f, 3.0f, 0.0f, 0.0f },
+    { 1.0f, 0.0f, 0.0f, 0.0f },
+};
+float MMathBezierBasisXYZ[13] = {
+    -1.0f, 3.0f, -3.0f, 1.0f, 3.0f, -6.0f, 3.0f, 0.0f, -3.0f, 3.0f, 0.0f, 0.0f, 1.0f,
+};

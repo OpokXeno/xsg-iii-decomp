@@ -14,23 +14,22 @@ extern void tiDrawJointDrawLists(struct TiDrawJointState *state, float (*pGlobal
 #include "main/xgl_2.h"
 #include "main/tu045.h"
 #include "vu0_macro.h"
+
 XglCamera *xglStudioSelectGetActiveCamera(int index);
 float xglPointLength(Vector4 *a, Vector4 *b);
 extern float XenoActorFadeDistanceScale;
 
-typedef struct TiSolverState TiDynamicsOut;
-
 void tiMRPackageInit(TiMRPackage *pMRPackage);
 void tiMRPackageSetAnimData(TiMRPackage *pMRPackage, TiOffsetEntry *entry);
-/* A vector kept as a plain float[4] (like sceVu0FVECTOR); its w is element 3. Vector4 here changes the
- * address arithmetic of the w stores, so the casts to Vector4 * at the calls stay. */
 void xglLightSetDefault(XglLightSet *lightSet);
+
 struct RgHeap;
 struct RgHeap *InstanceOfRgHeapById(unsigned int heapId);
 void InitRgHeap(struct RgHeap *pHeap, void *pMemory, int size);
 void RgHeapFree(void *pPtr, const char *pSourceFile, int line);
 void assertFailed(const char *message, const char *file, int line);
 void UnduParamInit(MapCollisionObject *object);
+
 struct XenoActor;
 
 /* Indices of XenoActor.rsrc: the model pack (.pxy, xenoActor.c reads it as PxyModelHeader *), the texture (.txy), the
@@ -76,23 +75,32 @@ void XenoActorSetHoldFlag(void);
 #define XenoActorLocalMatrix(a) ((XenoMatrix *)&(a)->localMatrix)
 /* The focus vector at +0x590 (colorIndex block) read as a Vector4. */
 #define XenoActorFocusVector(a) ((Vector4 *)(a)->colorIndex)
-/* colorIndex value meaning "no color"; XenoActorInit fills the 0x10-byte block at colorIndex with it. */
-#define XENO_COLOR_INDEX_NONE 0xFF
+
 /* The "pxy" tag of a model pack (PxyModelHeader.magic), read as a little-endian 24-bit word. */
 #define XENO_PXY_TAG 0x797870
 
 extern int XenoActorPoolCount;
 extern XenoActor **XenoActorActiveTable;
-extern const char xenoActorAssertFile[16];
+
 extern const char D_0053F9A8[];
 extern const char D_0053F910[];
-extern const char xenoActorHrcItemLabel[];
 extern unsigned char xenoActorAssertExpr[];
 extern int XenoActorHoldFlag;
+extern int xenoActorHrcItemLabel[];
 extern unsigned char xenoActorAssertExpr[8];
 void *memset(void *dst, int value, unsigned int size);
 void XenoActorInit(XenoActor *actor);
-extern const char xenoActorAssertExprRelease[16];
+
+/* Scaffold .rodata strings of this TU; the names the asserts pass to assertFailed and the strings of the asm functions. */
+const char D_0053F910[16] = "xenoActor.euc.c";
+const char D_0053F920[24] = "pAct->pDynamics != NIL";
+const char D_0053F938[24] = "pAct->pLocalMat != NIL";
+const char D_0053F950[24] = "pAct->pGlobalMat != NIL";
+const char D_0053F968[24] = "pAct->pBlendMat != NIL";
+const char D_0053F980[40] = "pAct->motionPack.pPartsInfo==NULL";
+const char D_0053F9A8[8] = "pAct";
+const char D_0053F9B0[40] = "*** Cluster is not \"CLST\" %c%c%c%c\n";
+const char D_0053F9D8[24] = "bRelease";
 
 INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_0028D350);
 
@@ -106,6 +114,7 @@ typedef struct XenoRsrcHeader {
     unsigned char unk_00[0xD0];
     int subPackOffset;
 } XenoRsrcHeader;
+
 #define XENO_ACTOR_POOL_STRIDE 0x6D0
 /* Data-driven byte offset: the offset is read from a resource header at run time. */
 #define BYTE_OFFSET(base, off) ((unsigned char *) (base) + (off))
@@ -129,7 +138,6 @@ void func_001975C8(void *block);
 void func_002A70E8(void *block);
 void tiWordClearBits(void *block, int mask);
 void tiWordSetBits(void *block, int mask);
-void XenoActorInit(XenoActor *actor);
 
 /* Pool init (X2 homolog name XenoActorPoolInit, lead only): sets the pool base and count, builds the active table after the pool and inits every record. */
 unsigned char *XenoActorPoolInit(void *actorPoolMemory, int actorPoolCount) {
@@ -589,9 +597,6 @@ INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_0028E5E8);
 
 INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_0028E788);
 
-void tiMRPackageInit(TiMRPackage *pMRPackage);
-extern const float D_0054FD90;
-extern const float D_0054FD94;
 void func_00299350(TiMRPackage *pMRPackage, float (*matrix)[4]);
 void func_0029F548(int value, TiMRPackage *pMRPackage, int other);
 
@@ -660,14 +665,8 @@ void XenoActorClearHoldFlag(void) {
     XenoActorHoldFlag = 0;
 }
 
-typedef float XglFVector[4];
-
-typedef MapFixupEntry MapRecordGroup;
-
 /* Flag word bit of XenoActor.motionFlags (X3 offset 0x4EC): set by XenoActorWrapRotation, the next update only snapshots the joint rows. */
 #define XENO_FLAG_SKIP_DELTA 0x800
-
-void RgHeapFree(void *pPtr, const char *pSourceFile, int line);
 
 void XenoActorRelease(XenoActor *actor) {
     int i;
@@ -835,10 +834,11 @@ void XenoActorRefreshItems(XenoActor *actor) {
     hrcData = actor->pHrcData;
     hrcItemIndex = 0;
     if (hrcData != 0) {
-        hrcItem = (XenoHrcItem *)BYTE_OFFSET(hrcData, hrcData->dataOffset);
+        hrcItem = (XenoHrcItem *) BYTE_OFFSET(hrcData, hrcData->dataOffset);
         if (hrcData->count != 0) {
             do {
-                tiDrawCollisionDrawObjectRing(hrcItem->radius, hrcItem->ring, xenoActorHrcItemLabel);
+                tiDrawCollisionDrawObjectRing(hrcItem->radius, hrcItem->ring,
+                                              (const char *) xenoActorHrcItemLabel);
                 hrcItemIndex++;
                 hrcItem++;
             } while (hrcItemIndex < actor->pHrcData->count);
@@ -885,6 +885,7 @@ void xglMatrixStackScale(const Vector4 *vector);
 void xglMatrixStackSave(Matrix4 matrix);
 void xglMatrixStackLoad(Matrix4 matrix);
 void xglMatrixStackMul(Matrix4 matrix);
+
 /* Builds the actor transform on the matrix stack from its parent (or from itself), saves it in localMatrix and concatenates
  * the override matrix; a slot of 2 or more also multiplies by the parent's joint matrix and the pack's joint matrix. */
 void XenoActorPushMatrix(XenoActor *actor) {
@@ -915,11 +916,26 @@ void XenoActorPushMatrix(XenoActor *actor) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_00290548);
+void tiMRPackageSetFirstWord(TiMRPackage *pMRPackage, int value);
 
-INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_00290560);
+/* Sets the first word of package B (shadowB) of the actor. */
+void XenoActorSetFirstWord(XenoActor *actor, int value) {
+    tiMRPackageSetFirstWord(XenoActorPackageB(actor), value);
+}
 
-INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_00290578);
+void tiMRPackageSetVectorUniform(TiMRPackage *pMRPackage, float value);
+
+/* Sets the uniform scale of package B (shadowB) of the actor to value. */
+void XenoActorSetVectorUniform(XenoActor *actor, float value) {
+    tiMRPackageSetVectorUniform(XenoActorPackageB(actor), value);
+}
+
+void tiMRPackageSetVector(TiMRPackage *pMRPackage, float x, float y, float z);
+
+/* Sets the scale vector of package B (shadowB) of the actor. */
+void XenoActorSetVector(XenoActor *actor, float x, float y, float z) {
+    tiMRPackageSetVector(XenoActorPackageB(actor), x, y, z);
+}
 
 INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_00290590);
 
@@ -1150,7 +1166,10 @@ void XenoActorSetFocusTarget(XenoActor *actor, Vector4 *focusPoint) {
     }
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/xenoActor", func_00291C68);
+/* Sets the node index that the aim solver of package B targets (TiMRPackage.targetNode, read by TiMotionSolver). */
+void XenoActorSetAimTargetNode(XenoActor *actor, int value) {
+    XenoActorPackageB(actor)->targetNode = value;
+}
 
 /* Reads the two bounds of entry idx of the slot's range table as ints; 0 when the table or entry is missing or the bounds are inverted. */
 int XenoActorGetSlotRange(XenoActor *actor, int motionSlot, unsigned int motionRangeIndex, int *motionRangeStart, int *motionRangeEnd) {
@@ -1186,3 +1205,45 @@ void XenoActorTransformOffset(XenoActor *actor, Vector4 *vector) {
     xglCurMatrixSet(&actor->localMatrix);
     xglCurApplyVector(vector, &actor->vector70);
 }
+
+/* Scaffold .bss items of this TU as objects; each run of items that starts off an 8-byte boundary is one object. */
+unsigned char XenoActorDefaultPool[60896];
+static unsigned char D_00780060[1952];
+static unsigned char D_00780800[2048];
+static unsigned char D_00781000[25720];
+static unsigned char D_00787478[37768];
+static unsigned char D_00790800[28784];
+static unsigned char D_00797870[36752];
+static unsigned char D_007A0800[29312];
+XenoActor *D_007A7A80[128];
+unsigned char XenoActorHeapMemory[35712];
+static unsigned char D_007B0800[65536];
+static unsigned char D_007C0800[65536];
+static unsigned char D_007D0800[65536];
+static unsigned char D_007E0800[29824];
+
+int xenoActorHrcItemLabel[] = { 96, 170, 96, 255 };
+
+XenoActor *XenoActorPool = (XenoActor *) XenoActorDefaultPool;
+XenoActor **XenoActorActiveTable = D_007A7A80;
+int XenoActorHoldFlag = 0;
+int D_00551138 = 0;
+float XenoActorFadeDistanceScale = 1.0f;
+/* Strings of short names the original keeps in .sdata: no reader here, so each 4-byte word is its own int. */
+int D_00551140 = 7233896;
+int D_00551144 = 0;
+int D_00551148 = 30840;
+int D_0055114C = 0;
+int D_00551150 = 26466;
+int D_00551154 = 0;
+int D_00551158 = 7106403;
+int D_0055115C = 0;
+int D_00551160 = 31090;
+int D_00551164 = 0;
+int D_00551168 = 30834;
+int D_0055116C = 0;
+int D_00551170 = 31329;
+int D_00551174 = 0;
+int D_00551178 = 31073;
+int D_0055117C = 0;
+int D_00551180 = 30817;

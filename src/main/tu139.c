@@ -45,7 +45,7 @@ typedef struct MMathHermiteKey {
 
 float sefEaseCurve(float offset, float span, int ease);
 void MMathHermiteKeyNeighbors(const MMathHermiteKey *key, Vector4 **first, Vector4 **second, Vector4 **third, Vector4 **fourth);
-void func_0025A000(Vector4 *outPoint, const Vector4 *start, const Vector4 *next, float parameter);
+void MMathLerpKeyPoint(Vector4 *outPoint, const Vector4 *start, const Vector4 *next, float parameter);
 void MMathCalcHermitePrm(Vector4 *tangent_start, Vector4 *tangent_end, const Vector4 *point_prev,
                          const Vector4 *point_start, const Vector4 *point_end, const Vector4 *point_next);
 float *MMathCalcHermite(float *outPoint, Vector4 *tangent_first, Vector4 *tangent_second,
@@ -98,7 +98,7 @@ void MMathEvalHermiteKeys(Vector4 *outPoint, MMathHermiteKey *keys, float time)
     switch (firstKey->curveAndEase & 0xf) {
     case 0:
     default:
-        func_0025A000(outPoint, (const Vector4 *) firstKey, (const Vector4 *) nextKey, parameter);
+        MMathLerpKeyPoint(outPoint, (const Vector4 *) firstKey, (const Vector4 *) nextKey, parameter);
         break;
     case 1:
         MMathHermiteKeyNeighbors(firstKey, &points[0], &points[1], &points[2], &points[3]);

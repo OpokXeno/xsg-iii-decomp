@@ -659,7 +659,7 @@ void emitterStartMode1(SpawnActor *spawnActor, s32 emitterKind) {
 void func_001BBC68(SpawnActor *owner);
 void pendingCountSet(s32 count);
 void XenoActorRelease(s32 handle);
-void func_00290548(SpawnModel *node, s32 value);
+void XenoActorSetFirstWord(SpawnModel *node, s32 value);
 
 static inline void spawnVectorSetUniform(SpawnVector4 *destination, f32 value) {
     __asm__ __volatile__(
@@ -727,7 +727,7 @@ s32 func_001C4A80(SpawnActor *spawnActor) {
     XenoActorSetChannelValueB(actorModel, 1.0f);
     XenoActorEnableChannelB(actorModel);
     XenoActorSetSelector(actorModel, 0);
-    func_00290548(actorModel, 0x1e);
+    XenoActorSetFirstWord(actorModel, 0x1e);
     actorModel->flags2F0 &= ~4;
     emitterStartMode1(spawnActor, spawnActor->emitterKind);
     emitterSlotAttachActors(spawnActor);

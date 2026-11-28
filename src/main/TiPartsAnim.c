@@ -6,18 +6,21 @@ void XrgOuterVector(Vector4 *destination, Vector4 *first, Vector4 *second);
 f32 cosf(f32);
 f32 sinf(f32);
 f32 acosf(f32);
-
 /* Row-major 4x4 float matrix. */
-
 void XrgQuaternionToMatrix(Matrix4 matrix, const Vector4 *quaternion);
+
+const char D_00542B48[16] = "pPack->pPamData";
+const char D_00542B58[24] = "TiPartsAnim.euc.c";
+const char D_00542B70[32] = "not found parts anim id %d\n";
 
 INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029F548);
 
 INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_0029F9A0);
 
 typedef int s32;
-typedef signed char s8;
+
 #include "quadword.h"
+
 /* Parts state returned by func_0029F9A0: flagBits at 0, a float at 4 and a float at 8 (set by XrgPartsSetTime and XrgPartsSetWeight). */
 typedef struct XrgPartsState {
     s32 flagBits;
@@ -156,7 +159,42 @@ void XrgEulerToQuaternion(Vector4 *quaternion, Vector4 *euler)
     XrgQuaternionNormalize(quaternion, quaternion);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/TiPartsAnim", func_002A0258);
+f32 atan2f(f32, f32);
+
+/* Euler angles (radians) of a quaternion, through its rotation matrix; X2 homolog XrgQuaternionToEuler (xrg_rand_int.c) with the
+ * 1/cosine division and the zero guard. */
+void XrgQuaternionToEuler(Vector4 *euler, Vector4 *quaternion) {
+    f32 matrix[3][3];
+    Vector4 cosine;
+    Vector4 sine;
+    f32 inverseCosine;
+
+    matrix[0][0] = 1.0f - 2.0f * quaternion->y * quaternion->y - 2.0f * quaternion->z * quaternion->z;
+    matrix[1][0] = 2.0f * quaternion->x * quaternion->y + 2.0f * quaternion->w * quaternion->z;
+    matrix[2][0] = 2.0f * quaternion->x * quaternion->z - 2.0f * quaternion->w * quaternion->y;
+    sine.y = -matrix[2][0];
+    matrix[2][1] = 2.0f * quaternion->y * quaternion->z + 2.0f * quaternion->w * quaternion->x;
+    matrix[2][2] = 1.0f - 2.0f * quaternion->x * quaternion->x + 2.0f * quaternion->y * quaternion->y;
+    cosine.y = __builtin_sqrtf(1.0f - sine.y * sine.y);
+    euler->y = atan2f(sine.y, cosine.y);
+    if (__builtin_fabsf(cosine.y) > 0.0f) {
+        inverseCosine = 1.0f / cosine.y;
+        if (inverseCosine == 0.0f) {
+            inverseCosine = 0.00001f;
+        }
+        sine.x = matrix[2][1] * inverseCosine;
+        cosine.x = matrix[2][2] * inverseCosine;
+        euler->x = atan2f(sine.x, cosine.x);
+        sine.z = matrix[1][0] * inverseCosine;
+        cosine.z = matrix[0][0] * inverseCosine;
+        euler->z = atan2f(sine.z, cosine.z);
+    } else {
+        matrix[1][1] = 1.0f - 2.0f * quaternion->x * quaternion->x - 2.0f * quaternion->z * quaternion->z;
+        matrix[1][2] = 2.0f * quaternion->y * quaternion->z - 2.0f * quaternion->w * quaternion->x;
+        euler->x = atan2f(-matrix[1][2], matrix[1][1]);
+        euler->z = atan2f(0.0f, 1.0f);
+    }
+}
 
 /* Axis-angle from a quaternion: angle is twice acosf(w); the axis is xyz divided by sin(angle / 2), with a zero
  * sine clamped to 1e-6. */
