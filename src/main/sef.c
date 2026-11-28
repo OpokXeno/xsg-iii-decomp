@@ -768,7 +768,7 @@ typedef struct SefVectorTrackCursor {
 
 void MMathCalcHermitePrm(Vector4 *prm, Vector4 *tangent, SefHermiteKey *prev, SefHermiteKey *cur, SefHermiteKey *next, SefHermiteKey *after);
 void MMathCalcHermite(Vector4 *value, Vector4 *prm, Vector4 *tangent, SefHermiteKey *cur, SefHermiteKey *next, float fraction);
-void func_0025A000(Vector4 *value, SefHermiteKey *key, SefHermiteKey *nextKey, float fraction);
+void MMathLerpKeyPoint(Vector4 *value, SefHermiteKey *key, SefHermiteKey *nextKey, float fraction);
 
 /* Samples the vector track of cursor into cursor->value: advances the track, then eases the segment that starts at
  * the current key (a plain segment, or a Hermite one when its curve kind is SEF_CURVE_KIND_HERMITE). Returns 0
@@ -800,7 +800,7 @@ int sefSampleVectorCurveTrack(SefHermiteKey *keys, SefVectorTrackCursor *cursor)
         switch (curveKey->curveFlags & SEF_CURVE_KIND_MASK) {
         case 0:
         default:
-            func_0025A000(trackValue, curveKey, curveKey + 1, easedFraction);
+            MMathLerpKeyPoint(trackValue, curveKey, curveKey + 1, easedFraction);
             break;
         case SEF_CURVE_KIND_HERMITE:
             MMathHermiteKeyNeighbors(curveKey, &previousKey, &currentKey, &nextKey, &afterNextKey);
@@ -1090,7 +1090,7 @@ void sefEvaluateKeyTrackPoint(SefMotionKeyObject *keyObject, SefAlignedMatrix4 *
                 }
             }
         }
-            func_0025A000((&SEF_SCRATCHPAD(AlignedVector4, 0x1D0)), &outPoints[0], &outPoints[1], fraction);
+            MMathLerpKeyPoint((&SEF_SCRATCHPAD(AlignedVector4, 0x1D0)), &outPoints[0], &outPoints[1], fraction);
             return;
         case 1:
             SefHermiteKeyNeighbors(firstKey, &neighborKeys[0], &neighborKeys[1], &neighborKeys[2], &neighborKeys[3]);
@@ -1131,7 +1131,7 @@ void xglMatrix2Quaternion(Vector4 *quaternion, Matrix4 matrix);
 void *vu0NormalizeXyzwTo(void *normalizedVector, void *inputVector);
 float MMathCalcLength(const Vector4 *vector);
 void MMathEvalHermiteKeys(Vector4 *destination, SefHermiteKey *keys, float time);
-float func_0025A910(const Vector4 *a, const Vector4 *b);
+float MMathCalcDistSquared(const Vector4 *a, const Vector4 *b);
 void rotationMatrixToQuaternion(void *output, void *input);
 extern s32 sefVectorMode;
 extern SefMotionObject *D_005510A4;
@@ -1264,13 +1264,13 @@ int sefComputeMotionStep(Vector4 *out, SefMotionObject *object, int kind, float 
                                        SEF_SCRATCHPAD(s32, 0x2D4));
                 resultVector = &SEF_SCRATCHPAD(Vector4, 0x220);
                 if (blend != 0.0f) {
-                    if (func_0025A910(&object->target, &object->previousTarget) < frameStep * frameStep) {
+                    if (MMathCalcDistSquared(&object->target, &object->previousTarget) < frameStep * frameStep) {
                         SefSubVectorXYZ4(resultVector, &object->target, &object->previousTarget);
                     }
                 }
             } else {
                 selectedMatrix = &rotation;
-                if (blend != 0.0f && func_0025A910(&object->target, &object->previousTarget) < frameStep * frameStep) {
+                if (blend != 0.0f && MMathCalcDistSquared(&object->target, &object->previousTarget) < frameStep * frameStep) {
                     selectedMatrix = 0;
                     SefSubVectorXYZ4(&SEF_SCRATCHPAD(Vector4, 0x220), &object->target, &object->previousTarget);
                 } else {
@@ -3941,9 +3941,9 @@ int sefEmitLocalEffectSteps(SefLineDataView *localData, int slotIndex) {
                 if (0.0f < frac && frac < 1.0f) {
                     if (saved0Set) {
                         sefGetPosition(&localData->v10, &localData->vB0, key0Value);
-                        func_0025A000(&localData->v10, &SEF_SCRATCHPAD(AlignedVector4, 0x40), &localData->v10, frac);
+                        MMathLerpKeyPoint(&localData->v10, &SEF_SCRATCHPAD(AlignedVector4, 0x40), &localData->v10, frac);
                     } else {
-                        func_0025A000(&blendVec, &SEF_SCRATCHPAD(AlignedVector4, 0x0), &localData->vB0, frac);
+                        MMathLerpKeyPoint(&blendVec, &SEF_SCRATCHPAD(AlignedVector4, 0x0), &localData->vB0, frac);
                         sefGetPosition(&localData->v10, &blendVec, key0Value);
                     }
                 } else {
@@ -3958,9 +3958,9 @@ int sefEmitLocalEffectSteps(SefLineDataView *localData, int slotIndex) {
                 if (0.0f < frac && frac < 1.0f) {
                     if (saved1Set) {
                         sefGetPosition(&localData->v30, &localData->vD0, key1Value);
-                        func_0025A000(&localData->v30, &SEF_SCRATCHPAD(AlignedVector4, 0x50), &localData->v30, frac);
+                        MMathLerpKeyPoint(&localData->v30, &SEF_SCRATCHPAD(AlignedVector4, 0x50), &localData->v30, frac);
                     } else {
-                        func_0025A000(&blendVec, &SEF_SCRATCHPAD(AlignedVector4, 0x10), &localData->vD0, frac);
+                        MMathLerpKeyPoint(&blendVec, &SEF_SCRATCHPAD(AlignedVector4, 0x10), &localData->vD0, frac);
                         sefGetPosition(&localData->v30, &blendVec, key1Value);
                     }
                 } else {

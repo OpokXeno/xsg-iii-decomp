@@ -70,7 +70,7 @@ extern unsigned int sefRandVectorIncrements[4];
 Vector4 *MMathNormalizeVector2(Vector4 *destination, const Vector4 *source);
 void sefMemZero(void *dest, int size);
 void *memset(void *destination, int value, unsigned int size);
-void func_0025A000(Vector4 *value, SefHermiteKey *key, SefHermiteKey *nextKey, float fraction);
+void MMathLerpKeyPoint(Vector4 *value, SefHermiteKey *key, SefHermiteKey *nextKey, float fraction);
 float MMathCalcLength(const Vector4 *vector);
 void rotationMatrixToQuaternion(void *output, void *input);
 extern s32 sefVectorMode;
@@ -1512,7 +1512,7 @@ typedef struct VuMatrix4 {
     f32 cells[4][4];
 } __attribute__((aligned(16))) VuMatrix4;
 
-extern f32 func_0025A820(const AlignedVector4*);
+extern f32 MMathCalcLengthSquared(const AlignedVector4*);
 extern void vu0RotateCurrentX(f32);
 extern void vu0RotateCurrentZ(f32);
 extern VuMatrix4 vu0IdentityMatrix;
@@ -1612,9 +1612,9 @@ void func_00206058(AlignedVector4 *dest, AlignedVector4 *params, AlignedVector4 
 
         SEF_NORMALIZE_VECTOR2(&unitDir, source);
         VuScaleVector(dest, &unitDir, sefRandf() * params->x);
-        if (func_0025A820(source) > func_0025A820(dest)) {
+        if (MMathCalcLengthSquared(source) > MMathCalcLengthSquared(dest)) {
             VuAddVector(dest, source, dest);
-            if (func_0025A820(dest) > params->x * params->x) {
+            if (MMathCalcLengthSquared(dest) > params->x * params->x) {
                 VuScaleVector(dest, &unitDir, params->x);
             }
         }
@@ -1623,9 +1623,9 @@ void func_00206058(AlignedVector4 *dest, AlignedVector4 *params, AlignedVector4 
 
         SEF_NORMALIZE_VECTOR2(&unitDir, source);
         VuScaleVector(dest, &unitDir, sefRandf() * params->x);
-        if (func_0025A820(source) < func_0025A820(dest)) {
+        if (MMathCalcLengthSquared(source) < MMathCalcLengthSquared(dest)) {
             VuSubVector(dest, dest, source);
-            if (func_0025A820(dest) > func_0025A820(source)) {
+            if (MMathCalcLengthSquared(dest) > MMathCalcLengthSquared(source)) {
                 VuZeroVector(dest);
             }
         }
@@ -1696,7 +1696,7 @@ void func_00206058(AlignedVector4 *dest, AlignedVector4 *params, AlignedVector4 
         cubeCorner.w = 1.0f;
         do {
             sefGetCubePosCenter(dest, &cubeCorner);
-        } while (!(func_0025A820(dest) <= params->x * params->x));
+        } while (!(MMathCalcLengthSquared(dest) <= params->x * params->x));
         dest->y = sefRandf() * params->y;
     } else if (k == 0x15) {
         AlignedVector4 cubeCorner;
@@ -1705,7 +1705,7 @@ void func_00206058(AlignedVector4 *dest, AlignedVector4 *params, AlignedVector4 
         cubeCorner.w = 1.0f;
         do {
             sefGetCubePosCenter(dest, &cubeCorner);
-        } while (!(func_0025A820(dest) <= params->x * params->x));
+        } while (!(MMathCalcLengthSquared(dest) <= params->x * params->x));
         dest->y = sefNoiseNext() * params->y;
     }
 }
@@ -1863,7 +1863,7 @@ void func_00206D78(AlignedVector4 *out, unsigned char *line, float time) {
     int index = func_00206A50(*(short **) (line + 0x160));
 
     if (time < 1.0f) {
-        func_0025A000(&interpolated, &SEF_SCRATCHPAD(AlignedVector4, 0x20), (AlignedVector4 *) (line + 0x110), time);
+        MMathLerpKeyPoint(&interpolated, &SEF_SCRATCHPAD(AlignedVector4, 0x20), (AlignedVector4 *) (line + 0x110), time);
     } else {
         LineCopyVector(&interpolated, (AlignedVector4 *) (line + 0x110));
     }
@@ -1894,7 +1894,7 @@ void func_00206F18(AlignedVector4 *out, unsigned char *line, float time) {
     int index = func_00206A50(*(short **) (line + 0x168));
 
     if (time < 1.0f) {
-        func_0025A000(&interpolated, &SEF_SCRATCHPAD(AlignedVector4, 0x30), (AlignedVector4 *) (line + 0x130), time);
+        MMathLerpKeyPoint(&interpolated, &SEF_SCRATCHPAD(AlignedVector4, 0x30), (AlignedVector4 *) (line + 0x130), time);
     } else {
         LineCopyVector(&interpolated, (AlignedVector4 *) (line + 0x130));
     }

@@ -30,9 +30,9 @@ NOSIBCALL = 'ee-gcc2_96-nosibcall'
 NOSIBCALL_FLAGS = [['-O2', '-G0', '-fno-optimize-sibling-calls'],
                    ['-O2', '-G8', '-fno-optimize-sibling-calls']]
 # config/toolchains.json names it, and the profiles below are retired.
-GCC296_PAYLOAD = '.work/toolchains/ee-gcc2.96-realconv-lp7-fsv16-v1/bin'
+GCC296_PAYLOAD = '.work/toolchains/ee-gcc2.96-realconv-lp7-fsv17-v1/bin'
 GCC296_PAYLOAD_SHA256 = {
-    'cc1': '25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17',
+    'cc1': '39753b8d82b797e34286cde19dd7ee0fc101b1f7e2ec930205eca81547abc237',
     'cpp0': 'f6f6b598f39649edfe171d6da8c7f91d07f2b87c2aeeffffbc5f566bfb1a39a9',
     'ee-gcc': 'b8c284d16c9c0a0e8788e9522c46881e224ad01fa1c732aed43f821cc32f168b',
 }

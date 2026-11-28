@@ -97,14 +97,14 @@ void cameraSlotSetState(s32 cameraSlotIndex, s32 cameraSlotValue) {
     }
 }
 
-void *func_0025F9E8(s32, s32);
+void *cameraPairRecord(s32, s32);
 
 void cameraSlotSetStateById(s32 cameraStateKind, s32 id, s32 cameraSlotIndex, s32 cameraSlotValue) {
     s8 *cameraState;
 
     if (cameraSlotIndex >= 0) {
         if (cameraSlotIndex < 9) {
-            cameraState = func_0025F9E8(cameraStateKind, id);
+            cameraState = cameraPairRecord(cameraStateKind, id);
             if (cameraState != 0) {
                 cameraState[0] = cameraSlotIndex;
                 cameraState[1] = cameraSlotValue;

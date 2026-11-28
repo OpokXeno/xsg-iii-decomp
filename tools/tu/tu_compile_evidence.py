@@ -27,7 +27,7 @@ import tu_limits as tl  # noqa: E402
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / 'config/tu-compile-evidence.json'
 BUILD = ROOT / 'build/main/build/c'
-COMPILER = ROOT / '.work/toolchains/ee-gcc2.96-realconv-lp7-fsv16-v1/bin'
+COMPILER = ROOT / '.work/toolchains/ee-gcc2.96-realconv-lp7-fsv17-v1/bin'
 REACH = 150          # functions between caller and callee
 BASE_TYPES = {'int', 'char', 'short', 'long', 'float', 'double', 'void'}
 

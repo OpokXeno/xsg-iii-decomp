@@ -156,7 +156,7 @@ s32 markerPositionGet(s32 *request, s16 value);
 
 s32 SpawnSlotSetPosition(s32 *object, s32 *request);
 
-s32 func_00290548(s32 handle, s32 timeout);
+s32 XenoActorSetFirstWord(s32 handle, s32 timeout);
 
 s32 sbNativeQueueObjectRequest(s32 scriptThread)
 {
@@ -178,7 +178,7 @@ s32 sbNativeQueueObjectRequest(s32 scriptThread)
     subobjectHandle = positionObject[9];
     if (subobjectHandle != 0)
     {
-      func_00290548(subobjectHandle, 0x1E);
+      XenoActorSetFirstWord(subobjectHandle, 0x1E);
     }
   }
   return 1;
@@ -375,7 +375,7 @@ s32 scriptRuntimeFlagToggle(s32 scriptThread) {
     return 1;
 }
 
-s32 func_00245308();
+s32 eventViewerRunEvent();
 
 s32 xglCdAddReadyBits();
 
@@ -397,7 +397,7 @@ s32 sbNativeJumpToKeyedEntry(s32 vm) {
     keyedEntryKey = vmArgGet(vm, 1);
     keyedEntryText = vmKeyedEntryGet(vm, keyedEntryKey);
     xglCdAddReadyBits(1);
-    func_00245308(keyedEntryText);
+    eventViewerRunEvent(keyedEntryText);
     return 1;
 }
 

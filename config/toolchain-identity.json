@@ -18,10 +18,10 @@
   "tools": {
     "ee-gcc2.96-realconv-lp7": {
       "role": "cc1 of every GCC 2.96-family compile contract (game and runtime C)",
-      "dir": "ee-gcc2.96-realconv-lp7-fsv16-v1/bin",
-      "version": "gcc 2.96-ee-001003-1 (cc1), locally patched: realconv + lp7 + fsv3 + fsv4 + fsv5 + fsv6 + fsv7 + fsv8 + fsv9 + fsv10 + fsv12 + fsv13 + fsv14 + fsv15 + fsv16",
+      "dir": "ee-gcc2.96-realconv-lp7-fsv17-v1/bin",
+      "version": "gcc 2.96-ee-001003-1 (cc1), locally patched: realconv + lp7 + fsv3 + fsv4 + fsv5 + fsv6 + fsv7 + fsv8 + fsv9 + fsv10 + fsv12 + fsv13 + fsv14 + fsv15 + fsv16 + fsv17",
       "files": {
-        "cc1": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
+        "cc1": "39753b8d82b797e34286cde19dd7ee0fc101b1f7e2ec930205eca81547abc237",
         "cpp0": "f6f6b598f39649edfe171d6da8c7f91d07f2b87c2aeeffffbc5f566bfb1a39a9",
         "ee-gcc": "b8c284d16c9c0a0e8788e9522c46881e224ad01fa1c732aed43f821cc32f168b"
       },
@@ -40,13 +40,13 @@
         },
         "rebuild": [
           "Download the base archive and check its SHA-256.",
-          "Extract lib/gcc-lib/ee/2.96-ee-001003-1/{cc1,cpp0} and bin/ee-gcc into <root>/ee-gcc2.96-realconv-lp7-fsv16-v1/bin/.",
+          "Extract lib/gcc-lib/ee/2.96-ee-001003-1/{cc1,cpp0} and bin/ee-gcc into <root>/ee-gcc2.96-realconv-lp7-fsv17-v1/bin/.",
           "cpp0 and ee-gcc are used unmodified.",
-          "Apply the patches below to cc1, in file-offset order (nine single-byte patches and twenty-six multi-byte patches: fsv1, fsv3, fsv4, fsv5, fsv6, fsv7, fsv8, fsv9, fsv10, fsv12, fsv13, fsv14, fsv15 and fsv16; an entry whose offset repeats an earlier one patches the bytes that entry left); the result must hash to the cc1 SHA-256 above."
+          "Apply the patches below to cc1, in file-offset order (nine single-byte patches and twenty-eight multi-byte patches: fsv1, fsv3, fsv4, fsv5, fsv6, fsv7, fsv8, fsv9, fsv10, fsv12, fsv13, fsv14, fsv15, fsv16 and fsv17; an entry whose offset repeats an earlier one patches the bytes that entry left); the result must hash to the cc1 SHA-256 above."
         ],
         "cc1_byte_patches": {
           "note": [
-            "Each entry patches the bytes of the extracted cc1 at `file_offset` (one byte, except the fsv1, fsv3 and fsv4 entries, the 86-byte fsv5 gen_extendqidi2 entry, the three fsv6 entries, the four fsv7 entries, the two fsv8 entries, the fsv9 entry, the two fsv10 entries, the two fsv12 entries, the two fsv13 entries, the two fsv14 entries, the fsv15 entry and the fsv16 entry, which replace the given hex strings).",
+            "Each entry patches the bytes of the extracted cc1 at `file_offset` (one byte, except the fsv1, fsv3 and fsv4 entries, the 86-byte fsv5 gen_extendqidi2 entry, the three fsv6 entries, the four fsv7 entries, the two fsv8 entries, the fsv9 entry, the two fsv10 entries, the two fsv12 entries, the two fsv13 entries, the two fsv14 entries, the fsv15 entry, the fsv16 entry and the two fsv17 entries, which replace the given hex strings).",
             "`old` must be the byte already there; `new` replaces it.",
             "The six `realconv` patches turn the six MASK_MIPS5900 conversion gates",
             "of the bundled e-type float code into unconditional jumps, so decimal",
@@ -171,6 +171,14 @@
             "in-struct with alias set 0, the load MEM is not in-struct and its address is a SYMBOL_REF, it returns",
             "canon_true_dependence with rtx_addr_varies_p (the FSF decision). Empirical, one positive case (X2 main",
             "tu048 func_001D6070); neutral on every C TU of X2 (4,056 functions) and X1 (5,959).",
+            "The `fsv17` patch (release ee-gcc2.96-realconv-lp7-fsv17-v1, user decision 2026-11-27,",
+            "reports/cc1-fsv17-r3entry.md) narrows the fsv12 R3 split (\"R3e\"): at 0x08169f74 (file 0x121f74)",
+            "the R3 cave jumps to a 52-byte walk at 0x0816a030 (file 0x122030, the dead tail of debug_candidate)",
+            "that follows PREV_INSN to the start of the insn chain; a CODE_LABEL or JUMP_INSN refuses the split,",
+            "and a callee-saved symbolic load is split only when the walk reached the start and saw a CALL_INSN",
+            "(the entry block). Empirical, two cases (X1 main sefExecScheduler still split; X3 main",
+            "func_00249CE0 now whole); neutral on every C unit of X1 main (588), X2 main (425), X3 main (639)",
+            "and the 42 overlay units of X2 and X3.",
             "Why this is a patched binary and not a published one (public-compiler hunt,",
             "2026-09-12, .work/attempts/tu-public-compiler-hunt/attempt-1/artifact.json):",
             "all 15 public ee-gcc* entries of the pinned decompme catalog revision were",
@@ -393,6 +401,24 @@
               "length": 286,
               "function": "cave over debug_candidate (unreferenced)",
               "governs": "R3: after reload, (set callee-saved-reg symbolic) splits into high + lo_sum of the same register when a CALL_INSN precedes it in the basic block"
+            },
+            {
+              "group": "fsv17",
+              "file_offset": 1187700,
+              "old": "8b450c85c0",
+              "new": "e9b7000000",
+              "length": 5,
+              "function": "fsv12 R3 cave (over debug_candidate): start of the PREV_INSN walk",
+              "governs": "jump to the fsv17 walk"
+            },
+            {
+              "group": "fsv17",
+              "file_offset": 1187888,
+              "old": "edffeb258b1598e224080155fca188e224088b4dfc8b048850682fb42108a1ace9230850e8abf5edff8d65ec5b5e5f89ec5dc390",
+              "new": "31d28b450c85c0741e8b400c85c074170fb70883f92d750342ebee83f92f740583f92c75e431d285d20f8543ffffffe9b7ffffff",
+              "length": 52,
+              "function": "dead tail of debug_candidate after the fsv12 cave",
+              "governs": "R3 splits a callee-saved symbolic load only when the PREV_INSN walk reaches the start of the insn chain without a CODE_LABEL or JUMP_INSN and has seen a CALL_INSN (entry block)"
             },
             {
               "group": "fsv7",

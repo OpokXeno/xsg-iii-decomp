@@ -485,7 +485,7 @@ typedef struct RgDispModel {
 
 RgDispModel *RgDispModelNextByKind();
 
-s32 func_00290548();
+s32 XenoActorSetFirstWord();
 
 s32 sbNativeModelsTimeoutSet(s32 thread) {
     RgDispModel *model;
@@ -503,7 +503,7 @@ s32 sbNativeModelsTimeoutSet(s32 thread) {
             break;
         }
         if (model->actorId != 0) {
-            func_00290548(model->actorId, timeoutFrames);
+            XenoActorSetFirstWord(model->actorId, timeoutFrames);
         }
     }
     return 1;

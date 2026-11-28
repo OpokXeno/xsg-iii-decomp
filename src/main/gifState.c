@@ -45,7 +45,7 @@
 #define GS_SET_UV(u, v) ((u64)(u) | ((u64)(v) << 16))
 #define GS_SET_XYZ(x, y, z) ((u64)(x) | ((u64)(y) << 16) | ((u64)(z) << 32))
 /* Pixel storage modes. */
-#define GS_PSMCT32 0x00
+
 #include "main/Packet.h"
 #include "main/gifState.h"
 #include "main/xgl_render.h"
@@ -64,6 +64,7 @@ void sceVif1PkOpenDirectHLCode(XglPacket *packet, unsigned int count);
 void sceVif1PkAddDirectDataN(XglPacket *packet, const void *data, unsigned int qwc);
 void sceVif1PkCloseDirectHLCode(XglPacket *packet);
 extern XglRenderState sRender;
+
 void gifStateSetupContext(XglPacket *packet, signed char alphaFix);
 extern int gifStateOriginX;
 extern int gifStateOriginY;
@@ -93,8 +94,6 @@ extern int gifStateRingCount;
 /* The GIF tag template of the ring (the vertex count is or-ed in); no symbol name yet. */
 extern u32 gifRingGifTag[4];
 
-/* Scratchpad RAM staging area of the ring packet. */
-#define GIF_SCRATCHPAD 0x70000000
 #define GIF_X(x) ((gifStateOriginX + (x)) * 16 - 8)
 #define GIF_Y(y) ((gifStateOriginY + (y)) * 16 - 9)
 
@@ -126,14 +125,11 @@ extern u32 gifFadeQuadTag[4];
  * gifStatePacket; entry 0 is the GIF tag word, the pairs follow in packed mode (A+D).
  * The assert text "numPacket < (STATEPACKET_MAX - 1)" names both.
  */
-extern unsigned int gifStateNumPacket;
-extern GifStateQword gifStatePacket[128];
+static unsigned int gifStateNumPacket;
 
 #define GIF_TAG_NREG_1 0x10000000
 
 /* The assert text and the file name of the packet queue asserts (no config name: splat names). */
-extern const char gifStatePacketAssert[40];
-extern const char gifStateSourceFile[24];
 
 /* The queue size the assert names: numPacket < (STATEPACKET_MAX - 1); the compare is against 63 in this build. */
 #define STATEPACKET_MAX 0x40
@@ -141,13 +137,15 @@ extern const char gifStateSourceFile[24];
 /* Scaffold u16 words at 0x004C8390 (no config name): the frame-buffer pages of the render state, in 32-word
  * units (tu119 reads the same words as outlinePage +0x0E, glowSourcePage +0x12 and screenPage +0x16). */
 extern u16 D_004C8390[];
+
 #define GIF_PAGE_OUTLINE D_004C8390[7]
 #define GIF_PAGE_GLOW_SOURCE D_004C8390[9]
 #define GIF_PAGE_SCREEN D_004C8390[11]
-
+/* The render state block at D_004C8390, read as the struct (its page slots are the GIF_PAGE_* indices above). */
+#define gRenderState (*(XglRenderStateBlock *) D_004C8390)
 /* The frame register and the texture register that address a page (PSMCT32, 512 pixels wide, 512x512 texture). */
-#define GIF_PAGE_FRAME(page) GS_SET_FRAME(page, 8, GS_PSMCT32, 0xFF000000)
-#define GIF_PAGE_TEX0(page) GS_SET_TEX0((page) << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0)
+#define GIF_PAGE_FRAME(page) GS_SET_FRAME(page, 8, GS_PRIM, 0xFF000000)
+#define GIF_PAGE_TEX0(page) GS_SET_TEX0((page) << 5, 8, GS_PRIM, 9, 9, 1, 0, 0, 0, 0, 0, 0)
 /* Alpha blend source * fixed alpha + destination * (1 - fixed alpha). */
 #define GIF_BLEND_FIXED_ALPHA(fixedAlpha) GS_SET_ALPHA(0, 2, 2, 1, fixedAlpha)
 /* Vertex colors: 0x80 is the neutral texture modulation; Q is 1.0f. */
@@ -158,13 +156,13 @@ extern u16 D_004C8390[];
  * context registers: clamp, frame, the alpha blend picked by the effect state, texture, test and z buffer. */
 void gifStateSetupContext(XglPacket *packet, signed char alphaFix)
 {
-    gifStateSetupPacket[6].adPair[0] = GS_SET_FRAME(D_004C8390[7], 8, GS_PSMCT32, 0);
+    gifStateSetupPacket[6].adPair[0] = GS_SET_FRAME(D_004C8390[7], 8, GS_PRIM, 0);
     switch (gifStatus.fbp) {
     case 0:
         gifStateSetupPacket[7].adPair[0] = GIF_PAGE_TEX0(GIF_PAGE_SCREEN);
         break;
     case 1:
-        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[12] << 5, 8, GS_PSMCT32, 9, 9, 1, 0, 0, 0, 0, 0, 0);
+        gifStateSetupPacket[7].adPair[0] = GS_SET_TEX0(D_004C8390[12] << 5, 8, GS_PRIM, 9, 9, 1, 0, 0, 0, 0, 0, 0);
         break;
     default:
         gifStateSetupPacket[7].adPair[0] = GIF_PAGE_TEX0(GIF_PAGE_SCREEN);
@@ -210,7 +208,7 @@ void gifStateSetupContext(XglPacket *packet, signed char alphaFix)
     }
     gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(2, 2, 0, GIF_STATE_WIDTH - 1, 0, GIF_STATE_HEIGHT - 1));
     gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
-    gifStateAddReg(GS_TEX0_1, GS_SET_TEX0(D_004C8390[7] << 5, 8, GS_PSMCT32, 9, 9, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_TEX0_1, GS_SET_TEX0(D_004C8390[7] << 5, 8, GS_PRIM, 9, 9, 0, 0, 0, 0, 0, 0, 0));
     gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
     gifStateAddReg(GS_TEXFLUSH, 0);
     gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
@@ -460,10 +458,9 @@ extern u32 gifCameraQuadTag[4];
 /* Gp-relative float cell the radial blur keeps its minimum scale in. */
 extern float gifBlurMinScale;
 /* The scaffold float cells the radial blur reads: 0.9 and 0.01. */
-extern const float gifBlurScaleFloor;
-extern const float gifBlurScaleStep;
 /* The per-edge scales of the radial blur (512 floats; the splat label ends before the table does). */
-extern float gifBlurScales[];
+static float gifBlurScales[512];
+static GifStateQword gifStatePacket[64];
 /* The GIF tag template of the radial blur fan (the vertex count is or-ed in). */
 extern u32 gifBlurFanTag[4];
 
@@ -474,8 +471,7 @@ extern u32 gifBlurFanTag[4];
  * subWindow[0] pixels; each edge point samples the texture at a random scale between 0.9 and 1.0 of the ratio
  * towards the centre, so the picture blurs radially. The scales are drawn anew and the ratio lowered by its
  * step. Nothing is drawn while the ratio is 0. */
-void gifStateDrawRadialBlur(XglPacket *packet)
-{
+void gifStateDrawRadialBlur(XglPacket *packet) {
     u32 *cursor;
     u32 *fanTag = 0;
     int scaleIndex;
@@ -487,9 +483,9 @@ void gifStateDrawRadialBlur(XglPacket *packet)
     if (gifStatus.ratio == edgeScale) {
         return;
     }
-    gifBlurMinScale = gifStatus.ratio * gifBlurScaleFloor;
+    gifBlurMinScale = gifStatus.ratio * 0.9f;
     for (edgePos = 0; edgePos < 512; edgePos++) {
-        gifBlurScales[edgePos] = (xglSRand() % 10U) * gifBlurScaleStep + gifBlurMinScale;
+        gifBlurScales[edgePos] = (xglSRand() % 10U) * 0.01f + gifBlurMinScale;
     }
     scaleIndex = 0;
     fanVertexCount = 1;
@@ -1246,9 +1242,173 @@ void gifStateDrawEchoBlur(XglPacket *packet)
     sceVif1PkCloseDirectHLCode(packet);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_002561E8);
+/*
+ * Five GIF direct packets: the screen is copied into the outline page, a black quad is drawn at the far depth
+ * and a white quad at depth = ratio * 0xFFFFFF, the outline page is blended back onto the screen, and the last
+ * packet restores the screen frame.
+ */
+void gifStateDrawDepthFade(XglPacket *packet, float ratio) {
+    u32 depth = ratio * 16777215.0f;
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00256750);
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(1, 1, 0, 0, 0, 0));
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FBA_1, 0);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_STATE_WIDTH << 4, GIF_STATE_HEIGHT << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(256), GIF_Y(224), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FBA_1, 0);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
+    gifStateAddReg(GS_FRAME_1, GS_SET_FRAME(GIF_PAGE_SCREEN, 8, GS_PRIM, 0xFFFFFF));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_BLACK);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0xFFFFFF));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), 0xFFFFFF));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_FBA_1, 1);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FRAME_1, GS_SET_FRAME(GIF_PAGE_SCREEN, 8, GS_PRIM, 0xFFFFFF));
+    gifStateAddReg(GS_RGBAQ, GS_SET_RGBAQ(0xFF, 0xFF, 0xFF, 0xFF, 0x3F800000));
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 0, 0, 0, 0, 0, 0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), depth));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), depth));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 1, 0, 1, 1));
+    gifStateAddReg(GS_ALPHA_1, GS_SET_ALPHA(0, 1, 2, 1, 0x80));
+    gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(256 << 4, 224 << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+}
+
+/*
+ * Glow copy in passCount passes: pass p shrinks the glow source into the outline page at 1/(p + 2) of the
+ * state size and copies it back, then one blended copy at depth = ratio * 0xFFFFFF closes the sequence.
+ */
+void gifStateDrawGlowPasses(XglPacket *packet, int passCount, float ratio) {
+    u32 depth = ratio * 16777215.0f;
+    int pass;
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, 0);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_STATE_WIDTH << 4, GIF_STATE_HEIGHT << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(256), GIF_Y(224), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    for (pass = 1; pass <= passCount; pass++) {
+        int divisor = pass + 2;
+        int width = GIF_STATE_WIDTH / divisor;
+        int height = GIF_STATE_HEIGHT / divisor;
+
+        sceVif1PkCnt(packet, 0);
+        sceVif1PkOpenDirectHLCode(packet, 0);
+        gifStateReset();
+        gifStateAddReg(GS_TEXFLUSH, 0);
+        gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_OUTLINE));
+        gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_GLOW_SOURCE));
+        gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+        gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+        gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+        gifStateAddReg(GS_UV, GS_SET_UV(256 << 4, 224 << 4));
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(width), GIF_Y(height), 0));
+        gifStateFlush();
+        sceVif1PkCloseDirectHLCode(packet);
+
+        sceVif1PkCnt(packet, 0);
+        sceVif1PkOpenDirectHLCode(packet, 0);
+        gifStateReset();
+        gifStateAddReg(GS_TEXFLUSH, 0);
+        gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_GLOW_SOURCE));
+        gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+        gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+        gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+        gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+        gifStateAddReg(GS_UV, GS_SET_UV(width << 4, height << 4));
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(256), GIF_Y(224), 0));
+        gifStateFlush();
+        sceVif1PkCloseDirectHLCode(packet);
+    }
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 2));
+    gifStateAddReg(GS_ALPHA_1, GS_SET_ALPHA(0, 1, 2, 1, 0x40));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_GLOW_SOURCE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), depth));
+    gifStateAddReg(GS_UV, GS_SET_UV(256 << 4, 224 << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), depth));
+    gifStateFlush();
+    /* kept: the do-while(0) around the last close decides the emitted order (removing it is NOTSTRICT). */
+    do {
+        sceVif1PkCloseDirectHLCode(packet);
+    } while (0);
+}
 
 /* Offset step of the copies drawn by gifStateDrawCustomEchoBlur (no config name yet: splat name). */
 extern int gifStateEchoPassOffsetStep;
@@ -1457,9 +1617,139 @@ void gifStateDrawCustomEchoBlur(XglPacket *packet, int echoPattern, int echoAlph
     sceVif1PkCloseDirectHLCode(packet);
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_00257CF8);
+/*
+ * Draws the flip page into the work page, then count + 1 copies (i from count down to 0) from the work page
+ * into the display page, moved by offset[] * i and with the alpha fix alphaFix.
+ */
+void gifStateDrawOffsetCopies(XglPacket *packet, f32 *offsetPerCopy, int maxCopyIndex, int alphaFix) {
+    extern u64 func_003098D0(f32 value);
+    int i;
+    f32 scale;
+    u64 cornerX;
+    u64 cornerY;
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_002580A0);
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(1, 1, 0, 0, 0, 0));
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FBA_1, 0);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
+    gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(gRenderState.work_buffer_base));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(gRenderState.flip_base));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_STATE_WIDTH << 4, GIF_STATE_HEIGHT << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    for (i = maxCopyIndex; i >= 0; i--) {
+        scale = i;
+        sceVif1PkCnt(packet, 0);
+        sceVif1PkOpenDirectHLCode(packet, 0);
+        gifStateReset();
+        gifStateAddReg(GS_TEXFLUSH, 0);
+        gifStateAddReg(GS_ALPHA_1, ((long long) alphaFix << 32) | GS_SET_ALPHA(0, 1, 2, 1, 0));
+        gifStateAddReg(GS_FRAME_1,
+                       GIF_PAGE_FRAME(gRenderState.display_buffer_base));
+        gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(gRenderState.work_buffer_base));
+        gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+        gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+        gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+        cornerX = func_003098D0(((f32) gifStateOriginX + offsetPerCopy[0] * scale) * 16.0f - 8.0f);
+        cornerY = func_003098D0(((f32) gifStateOriginY + offsetPerCopy[1] * scale) * 16.0f - 9.0f);
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(cornerX, cornerY, 0));
+        gifStateAddReg(GS_UV, GS_SET_UV(GIF_STATE_WIDTH << 4, GIF_STATE_HEIGHT << 4));
+        cornerX =
+            func_003098D0(((f32) (gifStateOriginX + GIF_STATE_WIDTH) + offsetPerCopy[0] * scale) * 16.0f - 8.0f);
+        cornerY =
+            func_003098D0(((f32) (gifStateOriginY + GIF_STATE_HEIGHT) + offsetPerCopy[1] * scale) * 16.0f - 9.0f);
+        gifStateAddReg(GS_XYZF2, GS_SET_XYZ(cornerX, cornerY, 0));
+        gifStateFlush();
+        sceVif1PkCloseDirectHLCode(packet);
+    }
+}
+
+/*
+ * Keeps the camera travel position as the previous one (gifStateCameraPrevPosition), rebuilds the camera rotation and its
+ * inverse, then draws two packets: an outline-page copy (texture D_004C8390[12]) and an alpha pass with gifStateTravelAlpha.
+ */
+void gifStateDrawCameraTravelBlur(XglPacket *packet) {
+    extern XglCamera *xglStudioSelectGetActiveCamera(int studio_index);
+    extern void tiVu0LoadIdentityMatrix(void);
+    extern void xglCurMatrixGet(Matrix4 matrix);
+    extern void xglMatrixInverse(Matrix * inverseMatrix, Matrix * matrix);
+    extern void xglVectorMulMat(Vector4 * transformedVector, Matrix4 matrix, const Vector4 *vector);
+    extern f32 gifStateTravelScale;
+    extern f32 gifStateCameraPrevPosition[12];
+    extern int gifStateTravelAlpha;
+    XglCamera *camera;
+    Vector4Elements delta;
+    Matrix inverse;
+    f32 *position;
+    int i;
+
+    camera = xglStudioSelectGetActiveCamera(0);
+    i = 0;
+    position = (f32 *) &camera->travel.position;
+    for (; i < 3; i++) {
+        delta.component[i] = (*position++ - gifStateCameraPrevPosition[i]) * gifStateTravelScale;
+    }
+    for (i = 0; i < 3; i++) {
+        gifStateCameraPrevPosition[i] = ((f32 *) &camera->travel.position)[i];
+    }
+    tiVu0LoadIdentityMatrix();
+    xglCurMulRotateY(camera->travel.rotation.y);
+    xglCurMulRotateX(camera->travel.rotation.x);
+    xglCurMulRotateZ(camera->travel.rotation.z);
+    xglCurMatrixGet(inverse.rows);
+    xglMatrixInverse(&inverse, &inverse);
+    xglVectorMulMat(&delta.vector, inverse.rows, &delta.vector);
+    __builtin_sqrtf(delta.component[0] * delta.component[0] + delta.component[1] * delta.component[1] +
+                    delta.component[2] * delta.component[2]);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_CLAMP_1, GS_SET_CLAMP(1, 1, 0, 0, 0, 0));
+    gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 1));
+    gifStateAddReg(GS_FBA_1, 1);
+    gifStateAddReg(GS_TEST_1, GS_SET_TEST(0, 0, 0, 0, 0, 0, 1, 1));
+    gifStateAddReg(GS_ALPHA_1, GIF_BLEND_FIXED_ALPHA(0x80));
+    gifStateAddReg(GS_TEX1_1, GS_SET_TEX1(0, 0, 1, 1, 0, 0, 0));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(D_004C8390[12]));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 0, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_STATE_WIDTH << 4, GIF_STATE_HEIGHT << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_TEXFLUSH, 0);
+    gifStateAddReg(GS_ALPHA_1, GS_SET_ALPHA(0, 1, 2, 1, gifStateTravelAlpha));
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(GIF_PAGE_SCREEN));
+    gifStateAddReg(GS_TEX0_1, GIF_PAGE_TEX0(GIF_PAGE_OUTLINE));
+    gifStateAddReg(GS_RGBAQ, GIF_RGBAQ_NEUTRAL);
+    gifStateAddReg(GS_PRIM, GS_SET_PRIM(6, 0, 1, 0, 1, 0, 1, 0, 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(0, 0));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(0), GIF_Y(0), 0));
+    gifStateAddReg(GS_UV, GS_SET_UV(GIF_STATE_WIDTH << 4, GIF_STATE_HEIGHT << 4));
+    gifStateAddReg(GS_XYZF2, GS_SET_XYZ(GIF_X(GIF_STATE_WIDTH), GIF_Y(GIF_STATE_HEIGHT), 0));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+}
 
 /* Empties the queue and writes the tag header: one register per loop, A+D descriptor. */
 void gifStateReset(void) {
@@ -1472,10 +1762,9 @@ void gifStateReset(void) {
 
 /* Queues the A+D pair (gifAddress, gifData) as the next quadword of gifStatePacket (asserts while the
  * packet is not full). */
-void gifStateAddReg(int gifAddress, u64 gifData)
-{
+void gifStateAddReg(int gifAddress, u64 gifData) {
     if (gifStateNumPacket >= STATEPACKET_MAX - 1) {
-        assertFailed(gifStatePacketAssert, gifStateSourceFile, 37);
+        assertFailed("numPacket < (STATEPACKET_MAX - 1)", "gifState.euc.c", 37);
     }
     gifStateNumPacket++;
     gifStatePacket[gifStateNumPacket].adPair[0] = gifData;
@@ -1483,10 +1772,9 @@ void gifStateAddReg(int gifAddress, u64 gifData)
 }
 
 /* Queues four raw words as one quadword of gifStatePacket (asserts while the packet is not full). */
-void gifStateAddRawQword(u32 qwordLowBits, u32 qwordLowMidBits, u32 qwordHighMidBits, u32 qwordHighBits)
-{
+void gifStateAddRawQword(u32 qwordLowBits, u32 qwordLowMidBits, u32 qwordHighMidBits, u32 qwordHighBits) {
     if (gifStateNumPacket >= STATEPACKET_MAX - 1) {
-        assertFailed(gifStatePacketAssert, gifStateSourceFile, 50);
+        assertFailed("numPacket < (STATEPACKET_MAX - 1)", "gifState.euc.c", 50);
     }
     gifStateNumPacket++;
     gifStatePacket[gifStateNumPacket].rawBits[0] = qwordLowBits;
@@ -1534,10 +1822,87 @@ void gifStateSetZBufFormat(void) {
     gifStateAddReg(GS_ZBUF_1, GS_SET_ZBUF(0, 0x31, 0));
 }
 
-extern int D_00550E30;
+extern int gifStateGlowHold;
 
 void gifStateEnableFlag(void) {
-    D_00550E30 = 1;
+    gifStateGlowHold = 1;
 }
 
-INCLUDE_ASM("asm/main/nonmatchings/gifState", func_002586A8);
+/*
+ * Per-frame glow hook: with a glow pending and gifStateGlowHold clear it arms gifStateDrawEchoBlur as callback 0;
+ * otherwise it clears final packet callback 2, draws the display page frame and clears gifStateGlowHold.
+ */
+void gifStateUpdateGlowCallback(void) {
+    XglPacket *packet;
+    extern int pxyGlowPendingGet(void);
+    extern XglRenderFadeCallback D_004C83B4[7];
+
+    if (pxyGlowPendingGet() != 0 && gifStateGlowHold == 0) {
+        D_004C83B4[0] = gifStateDrawEchoBlur;
+        return;
+    }
+    packet = xglPacketGetCurrent();
+    gRenderState.finalPacketCallbacks[2] = 0;
+    sceVif1PkCnt(packet, 0);
+    sceVif1PkOpenDirectHLCode(packet, 0);
+    gifStateReset();
+    gifStateAddReg(GS_FRAME_1, GIF_PAGE_FRAME(gRenderState.display_buffer_base));
+    gifStateFlush();
+    sceVif1PkCloseDirectHLCode(packet);
+    gifStateGlowHold = 0;
+}
+
+GifStateQword gifStateSetupPacket[15] = {
+    { { 0x0ULL, 0x5100000E00000000ULL } },
+    { { 0xD08B400000008001ULL, 0xEE53531EEEEEEULL } },
+    { { 0x131000000ULL, 0x4EULL } },
+    { { 0x71001ULL, 0x47ULL } },
+    { { 0x0ULL, 0x14ULL } },
+    { { 0x1ULL, 0x4AULL } },
+    { { 0x0ULL, 0x4CULL } },
+    { { 0x0ULL, 0x6ULL } },
+    { { 0x8000000080ULL, 0x80ULL } },
+    { { 0x0ULL, 0x0ULL } },
+    { { 0x71F700006FF8ULL, 0xFFFFFFFFULL } },
+    { { 0x1C0000002000ULL, 0x0ULL } },
+    { { 0x8DF700008FF8ULL, 0xFFFFFFFFULL } },
+    { { 0x0ULL, 0x3FULL } },
+    { { 0x0ULL, 0x4AULL } }
+};
+
+unsigned int gifRingGifTag[4] = {
+    32768, 0x30AE4000u, 1329, 0
+};
+unsigned int gifBlurFanTag[4] = {
+    32768, 0x20AEC000u, 83, 0
+};
+unsigned int gifCameraQuadTag[4] = {
+    32768, 0x20AE4000u, 83, 0
+};
+unsigned int gifGridFirstRowTag[4] = {
+    32768, 0x20AE4000u, 83, 0
+};
+unsigned int gifGridRowTag[4] = {
+    32768, 0x20AE4000u, 83, 0
+};
+unsigned int gifFadeQuadTag[4] = {
+    32768, 0x20AE4000u, 83, 0
+};
+float gifStateCameraPrevPosition[12] = { 0 };
+
+int gifStateOriginX = 0x700;
+int gifStateOriginY = 0x720;
+int gifStateRingCount = 90;
+float gifBlurMinScale = 0.800000012f;
+int gifStateGridStep = 10;
+int gifStateEchoDarkenDivisor = 3;
+int gifStateEchoPattern = 0;
+int gifStateEchoAlphaBase = 90;
+int gifStateEchoPassCount = 6;
+int gifStateEchoOffsetStep = 1;
+int D_00550D0C = 0;                     /* no reader */
+int gifStateEchoPassOffsetStep = 1;
+f32 gifStateTravelScale = 20.0f;
+int D_00550D18 = 16;                    /* no reader */
+int gifStateTravelAlpha = 42;
+int D_00550D20 = 0x319;                 /* no reader */

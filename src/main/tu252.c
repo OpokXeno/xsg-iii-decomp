@@ -20,8 +20,8 @@ void cameraRegisterEffcamNatives(void) {
 
 INCLUDE_ASM("asm/main/nonmatchings/tu252", func_00261DA0);
 
-extern unsigned char D_003E3350[];
-#define gPointRef (*(PointRef *) D_003E3350)
+extern unsigned char gCameraSourcePointers[];
+#define gPointRef (*(PointRef *) gCameraSourcePointers)
 extern f32 gCameraRefDistance;
 extern f32 gCameraRefScale;
 f32 xglPointLength(void *cameraPoint, void *to);

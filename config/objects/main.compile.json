@@ -5,7 +5,7 @@
  "toolchains": {
   "ee-gcc2_96-realconv-lp7": {
    "cc_dir": "tool:ee-gcc2.96-realconv-lp7",
-   "cc1_sha256": "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17",
+   "cc1_sha256": "39753b8d82b797e34286cde19dd7ee0fc101b1f7e2ec930205eca81547abc237",
    "note": "the patched cc1 and corrected assembler with -g of X1 and X2; see reports/x3-compiler-calibration.md"
   },
   "LA29-vsqrt": {

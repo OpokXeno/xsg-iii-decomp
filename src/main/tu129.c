@@ -237,7 +237,7 @@ typedef struct CurveEntry {
 extern Matrix4Rows sefCameraMatrixBlock;
 extern void vu0QuatToMatrix(void*,void*);
 extern float sefEaseCurve(int,float,float);
-extern void func_0025A000(void*,void*,void*,float);
+extern void MMathLerpKeyPoint(void*,void*,void*,float);
 extern void MMathHermiteKeyNeighbors(void*,void*,void*,void*,void*);
 extern void MMathCalcHermitePrm(void*,void*,void*,void*,void*,void*);
 extern void MMathCalcHermite(void*,void*,void*,void*,void*,float);
@@ -295,7 +295,7 @@ void func_001F7BB0(CurveObject *object) {
             switch (entry->ease & 15) {
             case 0:
             default:
-                func_0025A000(&value, entry, entry + 1, eased);
+                MMathLerpKeyPoint(&value, entry, entry + 1, eased);
                 break;
             case 1:
                 MMathHermiteKeyNeighbors(entry, &hermitePoints[0], &hermitePoints[1], &hermitePoints[2], &hermitePoints[3]);
@@ -1466,7 +1466,7 @@ void sefLineEffectDraw(unsigned int poolIndex, int *lastResourceType) {
             if (line->interpolateKeys) {
                 CopyVectorLe(&scratchVec, &key->pos);
                 scratchVec.y -= dropOffset;
-                func_0025A000(&packetQuads[quadCount], key, &scratchVec, lifeFraction);
+                MMathLerpKeyPoint(&packetQuads[quadCount], key, &scratchVec, lifeFraction);
             } else {
                 CopyVectorLe(&packetQuads[quadCount], (AlignedVector4 *) key);
                 packetQuads[quadCount].y -= dropOffset;

@@ -53,7 +53,7 @@ DATA_SECTIONS = (".data", ".rodata", ".lit4", ".sdata", ".sbss", ".bss")
 SPLAT_TYPE = {".data": "data", ".rodata": "rodata", ".lit4": "lit4", ".sdata": "sdata",
               ".sbss": "sbss", ".bss": "bss"}
 
-CC1_SHA = "25944d5c023a48316d719ff10b13a366afc31c3209662f28e440a90eb43d3b17"
+CC1_SHA = "39753b8d82b797e34286cde19dd7ee0fc101b1f7e2ec930205eca81547abc237"
 AS_SWAP_SHA = "448143a3f1f7ecd4fffb79ea3e641afa36863895366873f93462028535f95494"
 AS_PLAIN_SHA = "8c55ab9beeb4834c6cc0e841379b81930e329496f85893e8607d5b772c2b51ff"
 COMPILER_ID = "ee-gcc2_96-realconv-lp7"

@@ -58,7 +58,7 @@ s32 vmArgGet();
 s32 vmArgTagIsZero();
 void SpawnSlotSetPosition(SbVmObject *object, Vector4 *vector);
 void SpawnSlotSetRotation(SbVmObject *object, Vector4 *vector);
-void func_00290548(SlotActorHead *actor, s32 timeout);
+void XenoActorSetFirstWord(SlotActorHead *actor, s32 timeout);
 SbVmObject *RgDispModelFindByKey(s32 index);
 
 /* Script native: sets the scale and offset vectors of a slot object from 4-5 arguments, defaulting to the stored ones. */
@@ -89,7 +89,7 @@ s32 scriptSlotObjectScaleOffsetSet(s32 thread) {
     if (modelSlot->actor == 0) {
         return 1;
     }
-    func_00290548(modelSlot->actor, 30);
+    XenoActorSetFirstWord(modelSlot->actor, 30);
     return 1;
 }
 

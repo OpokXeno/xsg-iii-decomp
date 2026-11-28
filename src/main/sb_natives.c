@@ -211,7 +211,7 @@ void sbStudioCameraResetIfFlagged(void) {
     }
 }
 
-void func_0025C240(void);
+void battleUpdateStep(void);
 
 static inline int studioFlagBit(unsigned long long studioFlags, int flagBit)
 {
@@ -237,7 +237,7 @@ void sbStudioCameraStep(void)
         if (studioFlagBit(SB_STUDIO_BLOCK.studioFlags, 6)) {
             camera->cameraState = 4;
         }
-        func_0025C240();
+        battleUpdateStep();
         if (studioFlagBit(SB_STUDIO_BLOCK.studioFlags, 6)) {
             camera->cameraState = 2;
         }

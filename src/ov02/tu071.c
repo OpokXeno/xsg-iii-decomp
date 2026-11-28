@@ -257,7 +257,7 @@ s32 *battleActorPlayMovie(BattleActor *actor) {
     return &gBattleMoviePlayer;
 }
 
-s32 func_00290548(BattleSlot *, s32);
+s32 XenoActorSetFirstWord(BattleSlot *, s32);
 
 void battleActorRequestSlotState(BattleActor *actor) {
     BattleSlot *unitActor;
@@ -268,7 +268,7 @@ void battleActorRequestSlotState(BattleActor *actor) {
     if (unitSide != 0) {
         unitActor = unitSide->unitActor;
     }
-    func_00290548(unitActor, 0x1E);
+    XenoActorSetFirstWord(unitActor, 0x1E);
 }
 
 INCLUDE_ASM("asm/nonmatchings/ov02/tu071", func_00AA3610);

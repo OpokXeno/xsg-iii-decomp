@@ -221,7 +221,7 @@ segments:
       - [0x128E90, c, MotionViewer]
       - [0x1294B0, c, tu202]
       - [0x12A230, c, tu203]
-      - [0x12B720, c, NarrEv]
+      - [0x12A868, c, NarrEv]
       - [0x12CF58, c, ScisTest]
       - [0x12D7C0, c, ti_wat_sim_update]
       - [0x12DA00, c, TiWatSim]
@@ -397,7 +397,7 @@ segments:
       - [0x2A85C0, data, tu159]
       - [0x2B25C0, data, tu165]
       - [0x2BD5C0, data, xc_decode]
-      - [0x2C1174, data, tu237]
+      - [0x2C1170, data, tu237]
       - [0x2C1180, data, tu238]
       - [0x2C3330, data, tu239]
       - [0x2C3990, data, tu240]
@@ -455,8 +455,7 @@ segments:
       - [0x2CC860, data, CFLLightTest]
       - [0x2CCA10, data, tu202]
       - [0x2CCB80, data, MotionViewer]
-      - [0x2CCBC0, data, tu203]
-      - [0x2CCE08, data, NarrEv]
+      - [0x2CCBC0, data, NarrEv]
       - [0x2CCE80, data, TiWater]
       - [0x2CD140, data, nml_packet_add_225]
       - [0x2CD1B0, data, TiWatSim]
@@ -622,10 +621,10 @@ segments:
       - [0x41BD80, rodata, MotionViewer]
       - [0x41BE68, rodata, tu202]
       - [0x41BF30, rodata, tu203]
-      - [0x41C0E0, rodata, NarrEv]
+      - [0x41C000, rodata, NarrEv]
       - [0x41C440, rodata, ScisTest]
       - [0x41C800, rodata, TiWater]
-      - [0x41CBE0, rodata, XstAnimTest]
+      - [0x41CA40, rodata, XstAnimTest]
       - [0x41CD60, rodata, glow]
       - [0x41CEB8, rodata, TiWatSim]
       - [0x41CEE0, rodata, tu298]
@@ -778,8 +777,7 @@ segments:
       - [0x430708, lit4, CFLLightTest]
       - [0x430718, lit4, Gtest]
       - [0x4307FC, lit4, tu202]
-      - [0x43080C, lit4, tu203]
-      - [0x430810, lit4, NarrEv]
+      - [0x43080C, lit4, NarrEv]
       - [0x430818, lit4, TiWater]
       - [0x430828, lit4, glow]
       - [0x430834, lit4, nml_packet_add_225]
@@ -925,7 +923,7 @@ segments:
       - [0x431D58, sdata, tu202]
       - [0x431D6C, sdata, MotionViewer]
       - [0x431D78, sdata, tu203]
-      - [0x431DBC, sdata, NarrEv]
+      - [0x431D98, sdata, NarrEv]
       - [0x431E00, sdata, TiWater]
       - [0x431E34, sdata, nml_packet_add_225]
       - [0x431E3C, sdata, TiWatSim]
@@ -1086,7 +1084,7 @@ segments:
       - { type: bss, vram: 0x005A6C60, name: gifState }
       - { type: bss, vram: 0x005A7860, name: CFLLightTest }
       - { type: bss, vram: 0x005A7CF0, name: tu202 }
-      - { type: bss, vram: 0x005A8080, name: tu203 }
+      - { type: bss, vram: 0x005A8080, name: NarrEv }
       - { type: bss, vram: 0x005A8180, name: tu298 }
       - { type: bss, vram: 0x005C11C0, name: tu297 }
       - { type: bss, vram: 0x005C1200, name: tu310 }
